@@ -24,7 +24,7 @@ public class CircleEdgeGenerator : MonoBehaviour
         float currentPillarAngle = pillarAngle;
         for (int i = 0; i < levels; i++)
         {
-            currentRadius -= decreaseAmount;
+            currentRadius -= i % 2 == 0 ? decreaseAmount : 0;
             currentPillarAngle = pillarAngle / (currentRadius / radius);
 
             float angleRad = currentPillarAngle * Mathf.Deg2Rad;
