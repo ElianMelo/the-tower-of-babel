@@ -31,7 +31,8 @@ public class CircleEdgeGenerator : MonoBehaviour
     {
         float currentRadius = floorRadius;
         float currentTileAngle = tileAngle;
-        while(currentRadius > 0)
+        int index = 0;
+        while (currentRadius > 0)
         {
             currentTileAngle = tileAngle / (currentRadius / radius);
 
@@ -39,11 +40,12 @@ public class CircleEdgeGenerator : MonoBehaviour
             for (float angle = 0f; angle < Mathf.PI * 2f; angle += angleRad)
             {
                 Vector2 point = CalculatePillarPoint(angle, currentRadius);
-                var obj = Instantiate(tileObject, new Vector3(point.x, baseLevel, point.y), Quaternion.identity);
+                var obj = Instantiate(tileObject, new Vector3(point.x, baseLevel + (index * 0.0001f), point.y), Quaternion.identity);
                 Vector2 dir = (center - point).normalized;
                 float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 yAngle -= 90f;
                 obj.transform.rotation = Quaternion.Euler(0, yAngle, 0);
+                index++;
             }
             currentRadius -= tileDecreaseRate;
         }
