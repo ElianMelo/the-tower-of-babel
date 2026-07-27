@@ -1,7 +1,9 @@
+using NaughtyAttributes;
 using UnityEngine;
 
 public class CircleEdgeGenerator : MonoBehaviour
 {
+    public Transform parent;
     public GameObject pillarObject;
     public GameObject archObject;
     public GameObject tileObject;
@@ -23,11 +25,11 @@ public class CircleEdgeGenerator : MonoBehaviour
 
     void Start()
     {
-        FillBordersForAllLevels();
+        // FillBordersForAllLevels();
         // FillCurrentLevel(0.2f);
     }
 
-    private void FillCurrentLevel(float floorRadius, float baseLevel)
+    public void FillCurrentLevel(float floorRadius, float baseLevel)
     {
         float currentRadius = floorRadius;
         float currentTileAngle = tileAngle;
@@ -45,13 +47,15 @@ public class CircleEdgeGenerator : MonoBehaviour
                 float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 yAngle -= 90f;
                 obj.transform.rotation = Quaternion.Euler(0, yAngle, 0);
+                obj.transform.parent = parent;
                 index++;
             }
             currentRadius -= tileDecreaseRate;
         }
     }
 
-    private void FillBordersForAllLevels()
+    [Button]
+    public void FillBordersForAllLevels()
     {
         float currentRadius = radius;
         float currentPillarAngle = pillarAngle;
@@ -71,6 +75,8 @@ public class CircleEdgeGenerator : MonoBehaviour
                 float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 yAngle -= 90f;
                 objArch.transform.rotation = Quaternion.Euler(0, yAngle, 0);
+                obj.transform.parent = parent;
+                objArch.transform.parent = parent;
                 obj.name = "Pillar " + angle;
             }
             FillCurrentLevel(currentRadius, baseHeight + 0.2f);
