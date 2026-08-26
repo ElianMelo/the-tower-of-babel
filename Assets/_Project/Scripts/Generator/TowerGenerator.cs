@@ -69,7 +69,7 @@ public class TowerGenerator : MonoBehaviour
         // 90 degrees as it climbs to the next floor
         for (int flight = 0; flight < 4; flight++)
         {
-            float startAngleRad = flight * 90f * Mathf.Deg2Rad;
+            float startAngleRad = flight * 90f * Mathf.Deg2Rad;                                                           
 
             for (int step = 0; step < stepCount; step++)
             {
@@ -103,7 +103,6 @@ public class TowerGenerator : MonoBehaviour
         RemoveBlockingFloor();
     }
 
-    [Button]
     private void RemoveBlockingFloor()
     {
         foreach (var stair in stairs)
@@ -114,7 +113,7 @@ public class TowerGenerator : MonoBehaviour
             float directionMod = -1f;
 
             Vector3 origin = stair + (Vector3.up * 0.2f) + (direction * directionMod);
-            float rayLength = 4f;
+            float rayLength = 2f;
             bool didHit = Physics.Raycast(origin, Vector3.up, out RaycastHit hit, rayLength);
             Debug.DrawRay(origin, Vector3.up * rayLength, didHit ? Color.green : Color.red, 10f);
             if (didHit)
@@ -163,8 +162,13 @@ public class TowerGenerator : MonoBehaviour
                 objArch.transform.parent = parent;
                 obj.name = "Pillar " + angle;
             }
-            FillCurrentLevelFloor(currentRadius, baseHeight + 0.2f);
-            FillCurrentLevelStairs(currentRadius, baseHeight + 0.2f);
+            var calculatedFloorRadius = i % 2 == 0 ? currentRadius + decreaseAmount : currentRadius;
+            calculatedFloorRadius = i == 0 ? currentRadius : calculatedFloorRadius;
+            FillCurrentLevelFloor(calculatedFloorRadius, baseHeight + 0.2f);
+            if(i < (levels - 1))
+            {
+                FillCurrentLevelStairs(currentRadius, baseHeight + 0.2f);
+            }            
 
             baseHeight += heighIncrease;
         }

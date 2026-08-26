@@ -1,11 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// First-person player controller built on Unity's CharacterController component.
-/// Handles WASD movement, mouse look, jumping, sprinting, crouching and gravity.
-/// Compatible with Unity 6.3 LTS (uses the new Input System is optional — this
-/// version uses the legacy Input Manager for simplicity and portability).
-/// </summary>
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
@@ -22,9 +16,21 @@ public class PlayerController : MonoBehaviour
 
     [Header("Jumping & Gravity")]
     [SerializeField] private float jumpHeight = 1.2f;
-    [SerializeField] private float gravity = -19.62f; // ~2x Unity default for snappier FPS feel
-    [SerializeField] private float groundedGravity = -2f; // small downward force to keep grounded check stable
-    [SerializeField] private int extraJumps = 0; // set >0 for double-jump style movement
+    [SerializeField] private float gravity = -19.62f;
+    [SerializeField] private float groundedGravity = -2f;
+    [SerializeField] private int extraJumps = 0;
+
+    [Header("Ground Check")]
+    [SerializeField] private LayerMask groundMask = ~0;
+    [SerializeField] private float groundCheckDistance = 0.15f;
+    [Tooltip("Radius offset for the ground check sphere. Slightly smaller than controller.radius prevents false positives on walls.")]
+    [SerializeField] private float groundCheckRadiusOffset = 0.05f;
+
+    [Header("Jump Feel")]
+    [Tooltip("Time after leaving ground where you can still jump (seconds).")]
+    [SerializeField] private float coyoteTime = 0.1f;
+    [Tooltip("Time before landing where a jump press is buffered (seconds).")]
+    [SerializeField] private float jumpBufferTime = 0.1f;
 
     [Header("Crouching")]
     [SerializeField] private bool allowCrouch = true;
@@ -38,10 +44,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxPitch = 85f;
     [SerializeField] private bool lockCursor = true;
 
-    [Header("Ground Check")]
-    [SerializeField] private LayerMask groundMask = ~0;
-    [SerializeField] private float groundCheckDistance = 0.2f;
-
     private CharacterController controller;
     private Vector3 velocity;
     private Vector3 currentHorizontalVelocity;
@@ -51,21 +53,20 @@ public class PlayerController : MonoBehaviour
     private float targetHeight;
     private Vector3 originalCameraLocalPos;
 
-    private bool IsGrounded => controller.isGrounded;
+    // Ground state
+    private bool isGrounded;
+    private float coyoteTimeCounter;
+    private float jumpBufferCounter;
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
 
         if (playerCamera == null)
-        {
             playerCamera = GetComponentInChildren<Camera>();
-        }
 
         if (playerCamera != null)
-        {
             originalCameraLocalPos = playerCamera.transform.localPosition;
-        }
 
         targetHeight = standingHeight;
         controller.height = standingHeight;
@@ -83,29 +84,53 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        HandleMouseLook();
+        // HandleMouseLook();
         // HandleCrouch();
-        HandleMovement();
+
+        // Update ground state BEFORE movement
+        UpdateGroundState();
+
         HandleJumpAndGravity();
+        HandleMovement();
+
+        // Apply combined movement in a single Move() call
+        Vector3 finalMotion = currentHorizontalVelocity + velocity;
+        controller.Move(finalMotion * Time.deltaTime);
 
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
             ToggleCursorLock();
-        }
+    }
+
+    private void UpdateGroundState()
+    {
+        // SphereCast from slightly above the bottom of the controller downward
+        Vector3 sphereOrigin = transform.position + Vector3.up * (controller.radius - groundCheckRadiusOffset);
+        float checkDistance = groundCheckDistance + groundCheckRadiusOffset;
+
+        isGrounded = Physics.SphereCast(
+            sphereOrigin,
+            controller.radius - groundCheckRadiusOffset,
+            Vector3.down,
+            out _,
+            checkDistance,
+            groundMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        // Also check if the controller itself thinks it's grounded as a fallback
+        if (!isGrounded && controller.isGrounded)
+            isGrounded = true;
     }
 
     private void HandleMouseLook()
     {
-        return;
         if (playerCamera == null) return;
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // Yaw rotates the whole body (left/right)
         transform.Rotate(Vector3.up * mouseX);
 
-        // Pitch rotates only the camera (up/down), clamped to avoid flipping
         pitch -= mouseY;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
         playerCamera.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
@@ -116,104 +141,117 @@ public class PlayerController : MonoBehaviour
         float inputX = Input.GetAxisRaw("Horizontal");
         float inputZ = Input.GetAxisRaw("Vertical");
 
-        Vector3 inputDirection = (Camera.main.transform.right * inputX + Camera.main.transform.forward * inputZ);
+        // Use playerCamera instead of Camera.main for consistency
+        Transform camTransform = playerCamera != null ? playerCamera.transform : Camera.main.transform;
+        Vector3 inputDirection = (camTransform.right * inputX + camTransform.forward * inputZ);
+        inputDirection.y = 0f; // Flatten to XZ plane
+
         if (inputDirection.sqrMagnitude > 1f)
-        {
             inputDirection.Normalize();
-        }
 
         float targetSpeed = walkSpeed;
         if (isCrouching)
-        {
             targetSpeed = crouchSpeed;
-        }
         else if (Input.GetKey(KeyCode.LeftShift) && inputZ > 0f)
-        {
             targetSpeed = sprintSpeed;
-        }
 
         Vector3 targetHorizontalVelocity = inputDirection * targetSpeed;
 
-        // Smooth acceleration; reduce control authority while airborne
-        float accel = acceleration * (IsGrounded ? 1f : airControlMultiplier);
+        // Smooth acceleration; less control while airborne
+        float accel = acceleration * (isGrounded ? 1f : airControlMultiplier);
+
+        // BUG FIX: Removed erroneous * targetSpeed multiplication
         currentHorizontalVelocity = Vector3.MoveTowards(
             currentHorizontalVelocity,
             targetHorizontalVelocity,
-            accel * Time.deltaTime * targetSpeed
+            accel * Time.deltaTime
         );
-
-        controller.Move(currentHorizontalVelocity * Time.deltaTime);
     }
 
     private void HandleJumpAndGravity()
     {
-        if (IsGrounded)
+        // Decrement coyote time when airborne
+        if (isGrounded)
+            coyoteTimeCounter = coyoteTime;
+        else
+            coyoteTimeCounter -= Time.deltaTime;
+
+        // Buffer jump input
+        if (Input.GetButtonDown("Jump"))
+            jumpBufferCounter = jumpBufferTime;
+        else
+            jumpBufferCounter -= Time.deltaTime;
+
+        // Reset jumps when grounded
+        if (isGrounded && velocity.y <= 0f)
         {
             jumpsRemaining = extraJumps;
-
-            // Keep a small downward force so isGrounded stays reliable on slopes/steps
-            if (velocity.y < 0f)
-            {
-                velocity.y = groundedGravity;
-            }
-
-            if (Input.GetButtonDown("Jump"))
-            {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            }
+            velocity.y = groundedGravity;
         }
-        else
+
+        // Execute jump if buffered and we have coyote time or extra jumps
+        bool canJump = (coyoteTimeCounter > 0f && jumpsRemaining == extraJumps) || (jumpsRemaining > 0);
+
+        if (jumpBufferCounter > 0f && canJump)
         {
-            if (Input.GetButtonDown("Jump") && jumpsRemaining > 0)
-            {
-                velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                jumpsRemaining--;
-            }
+            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            jumpBufferCounter = 0f; // Consume the buffer
 
-            velocity.y += gravity * Time.deltaTime;
+            // Only consume extra jumps if we were actually airborne (coyote time expired)
+            if (!isGrounded && coyoteTimeCounter <= 0f && jumpsRemaining > 0)
+                jumpsRemaining--;
+            else if (isGrounded)
+                jumpsRemaining = extraJumps; // Reset on ground jump
         }
 
-        controller.Move(velocity * Time.deltaTime);
+        // Apply gravity
+        if (!isGrounded)
+            velocity.y += gravity * Time.deltaTime;
+
+        // Hard cap falling speed to prevent tunneling
+        if (velocity.y < -50f)
+            velocity.y = -50f;
     }
 
     private void HandleCrouch()
     {
-        if (!allowCrouch)
-        {
-            return;
-        }
+        if (!allowCrouch) return;
 
         if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.C))
-        {
             isCrouching = !isCrouching;
-        }
 
         targetHeight = isCrouching ? crouchingHeight : standingHeight;
 
-        // Prevent standing up if something is above the player's head
-        if (!isCrouching && Physics.SphereCast(
-                transform.position, controller.radius, Vector3.up,
-                out _, standingHeight - controller.height + 0.1f, groundMask))
+        // Prevent standing up if something is above
+        if (!isCrouching)
         {
-            targetHeight = crouchingHeight;
-            isCrouching = true;
+            Vector3 sphereOrigin = transform.position + Vector3.up * controller.height;
+            float checkDist = standingHeight - controller.height + 0.1f;
+            if (Physics.SphereCast(sphereOrigin, controller.radius, Vector3.up, out _, checkDist, groundMask))
+            {
+                targetHeight = crouchingHeight;
+                isCrouching = true;
+            }
         }
 
         float previousHeight = controller.height;
         controller.height = Mathf.Lerp(controller.height, targetHeight, crouchTransitionSpeed * Time.deltaTime);
 
-        // Keep the controller's base anchored to the ground while height changes
+        // Keep feet anchored to ground
         float heightDelta = controller.height - previousHeight;
-        //controller.center = new Vector3(0f, controller.height / 2f, 0f);
-        transform.position += new Vector3(0f, heightDelta / 2f, 0f);
+        transform.position += new Vector3(0f, heightDelta * 0.5f, 0f);
 
-        //if (playerCamera != null)
-        //{
-        //    Vector3 camPos = originalCameraLocalPos;
-        //    camPos.y *= controller.height / standingHeight;
-        //    playerCamera.transform.localPosition = Vector3.Lerp(
-        //        playerCamera.transform.localPosition, camPos, crouchTransitionSpeed * Time.deltaTime);
-        //}
+        // Adjust camera height proportionally
+        if (playerCamera != null)
+        {
+            Vector3 camPos = originalCameraLocalPos;
+            camPos.y *= controller.height / standingHeight;
+            playerCamera.transform.localPosition = Vector3.Lerp(
+                playerCamera.transform.localPosition,
+                camPos,
+                crouchTransitionSpeed * Time.deltaTime
+            );
+        }
     }
 
     private void ToggleCursorLock()
@@ -221,5 +259,16 @@ public class PlayerController : MonoBehaviour
         bool isLocked = Cursor.lockState == CursorLockMode.Locked;
         Cursor.lockState = isLocked ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isLocked;
+    }
+
+    // Optional: visualize ground check in Scene view
+    private void OnDrawGizmosSelected()
+    {
+        if (controller == null) return;
+
+        Gizmos.color = isGrounded ? Color.green : Color.red;
+        Vector3 origin = transform.position + Vector3.up * (controller.radius - groundCheckRadiusOffset);
+        Gizmos.DrawLine(origin, origin + Vector3.down * (groundCheckDistance + groundCheckRadiusOffset));
+        Gizmos.DrawWireSphere(origin + Vector3.down * (groundCheckDistance + groundCheckRadiusOffset), controller.radius - groundCheckRadiusOffset);
     }
 }
