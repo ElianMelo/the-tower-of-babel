@@ -1,4 +1,7 @@
 using NaughtyAttributes;
+using NUnit.Framework;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TowerGenerator : MonoBehaviour
@@ -24,8 +27,10 @@ public class TowerGenerator : MonoBehaviour
     public float floorHeight;
 
     public Vector2 center = Vector2.zero;
+    public Vector3 center3D = Vector3.zero;
 
     private float baseHeight = 0f;
+    private List<Vector3> stairs = new();
 
     public void FillCurrentLevelFloor(float floorRadius, float baseLevel)
     {
@@ -87,16 +92,48 @@ public class TowerGenerator : MonoBehaviour
                 obj.transform.rotation = Quaternion.Euler(0, yAngle, 0);
                 obj.transform.parent = parent;
                 obj.name = "Stair " + flight + "_" + step;
+                stairs.Add(obj.transform.position);
             }
         }
+    }
+
+    private IEnumerator DelayedRemoveBlockingFloor()
+    {
+        yield return new WaitForSeconds(1f);
+        RemoveBlockingFloor();
+    }
+
+    [Button]
+    private void RemoveBlockingFloor()
+    {
+        foreach (var stair in stairs)
+        {
+            Vector3 direction = stair - center3D;
+            direction.y = 0;
+            direction = direction.normalized;
+            float directionMod = -1f;
+
+            Vector3 origin = stair + (Vector3.up * 0.2f) + (direction * directionMod);
+            float rayLength = 4f;
+            bool didHit = Physics.Raycast(origin, Vector3.up, out RaycastHit hit, rayLength);
+            Debug.DrawRay(origin, Vector3.up * rayLength, didHit ? Color.green : Color.red, 10f);
+            if (didHit)
+            {
+                DestroyImmediate(hit.collider.gameObject);
+            }
+        }
+        stairs.Clear();
     }
 
     [Button]
     public void ClearGeneratedTower()
     {
-        foreach (Transform child in parent)
+        while(parent.childCount > 0)
         {
-            DestroyImmediate(child.gameObject);
+            foreach (Transform child in parent)
+            {
+                DestroyImmediate(child.gameObject);
+            }
         }
     }
 
@@ -131,6 +168,7 @@ public class TowerGenerator : MonoBehaviour
 
             baseHeight += heighIncrease;
         }
+        StartCoroutine(DelayedRemoveBlockingFloor());
     }
 
     private Vector2 CalculatePillarPoint(float value, float radius)
