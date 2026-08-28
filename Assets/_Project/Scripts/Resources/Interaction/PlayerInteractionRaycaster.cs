@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TowerOfBabel.Resources.Interaction
 {
@@ -13,8 +12,6 @@ namespace TowerOfBabel.Resources.Interaction
         [SerializeField] private LayerMask interactionMask = ~0;
         [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
-        [Header("UI")]
-        [SerializeField] private Text objectNameText;
         [SerializeField] private string promptFormat = "{0}";
 
         public GameObject CurrentTarget { get; private set; }
@@ -26,9 +23,6 @@ namespace TowerOfBabel.Resources.Interaction
 
             if (interactionCamera == null)
                 interactionCamera = Camera.main;
-
-            if (objectNameText == null)
-                objectNameText = CreateDefaultHud();
 
             ClearTarget();
         }
@@ -50,56 +44,27 @@ namespace TowerOfBabel.Resources.Interaction
 
         private void SetTarget(GameObject target)
         {
-            CurrentTarget = target;
-            if (objectNameText == null)
+            if (CurrentTarget == target)
                 return;
 
+            CurrentTarget = target;
             InteractableName namedTarget = target.GetComponentInParent<InteractableName>();
             string targetName = namedTarget != null ? namedTarget.DisplayName : target.name;
-            objectNameText.text = string.Format(promptFormat, targetName);
-            objectNameText.enabled = true;
+            InterfaceManager.Instance?.ShowInteraction(string.Format(promptFormat, targetName));
         }
 
         private void ClearTarget()
         {
-            CurrentTarget = null;
-            if (objectNameText == null)
+            if (CurrentTarget == null)
                 return;
 
-            objectNameText.text = string.Empty;
-            objectNameText.enabled = false;
+            CurrentTarget = null;
+            InterfaceManager.Instance?.HideInteraction();
         }
 
-        private static Text CreateDefaultHud()
+        private void OnDisable()
         {
-            GameObject canvasObject = new GameObject("Interaction HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
-            Canvas canvas = canvasObject.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 100;
-
-            CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(1920f, 1080f);
-
-            GameObject textObject = new GameObject("Target Name", typeof(RectTransform), typeof(Text));
-            textObject.transform.SetParent(canvasObject.transform, false);
-
-            RectTransform rect = textObject.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0f);
-            rect.anchoredPosition = new Vector2(0f, 28f);
-            rect.sizeDelta = new Vector2(600f, 60f);
-
-            Text text = textObject.GetComponent<Text>();
-            text.font = UnityEngine.Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            text.fontSize = 28;
-            text.alignment = TextAnchor.MiddleCenter;
-            text.color = Color.white;
-            text.raycastTarget = false;
-            text.horizontalOverflow = HorizontalWrapMode.Overflow;
-            text.verticalOverflow = VerticalWrapMode.Overflow;
-            return text;
+            ClearTarget();
         }
 
         private void OnDrawGizmosSelected()

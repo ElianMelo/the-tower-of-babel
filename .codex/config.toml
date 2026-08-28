@@ -3,3 +3,9 @@ enabled = true
 startup_timeout_sec = 30
 tool_timeout_sec = 300
 url = "https://ai-game.dev/mcp/p/edd989cc"
+
+[mcp_servers.ai-game-developer.tools.assets-refresh]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.script-execute]
+approval_mode = "approve"

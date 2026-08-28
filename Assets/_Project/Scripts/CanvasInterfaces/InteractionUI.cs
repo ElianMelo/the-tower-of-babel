@@ -3,29 +3,19 @@ using UnityEngine;
 
 public class InteractionUI : MonoBehaviour
 {
-    // Handle visuals without deactive the actual game object
+    // Handle visuals without deactivating the interface component itself.
     [SerializeField] private GameObject visuals;
-
-    // Fields used for this interface
     [SerializeField] private TMP_Text text;
 
-    void Start()
+    public void Show(string objectName)
     {
-        
-    }
-
-    void Update()
-    {
-        
-    }
-
-    public void Show()
-    {
+        text.text = objectName;
         visuals.SetActive(true);
     }
 
     public void Hide()
     {
+        text.text = string.Empty;
         visuals.SetActive(false);
     }
 }
