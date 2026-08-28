@@ -5,6 +5,7 @@ using TMPro;
 using TowerOfBabel.Resources.Interaction;
 using UnityEngine;
 using UnityEngine.UI;
+using TowerOfBabel.Networking.Resources;
 
 namespace TowerOfBabel.Resources.Tests
 {
@@ -72,6 +73,30 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [Test]
+        public void ServerPlayerResourceStore_EnforcesPerResourceCapacity()
+        {
+            ServerPlayerResourceStore store = new(50);
+
+            Assert.That(store.TryAdd(7, ResourceType.Stone, 49, out int firstAmount), Is.True);
+            Assert.That(firstAmount, Is.EqualTo(49));
+            Assert.That(store.TryAdd(7, ResourceType.Stone, 3, out int cappedAmount), Is.True);
+            Assert.That(cappedAmount, Is.EqualTo(50));
+            Assert.That(store.TryAdd(7, ResourceType.Stone, 1, out int rejectedAmount), Is.False);
+            Assert.That(rejectedAmount, Is.EqualTo(50));
+        }
+
+        [Test]
+        public void ServerPlayerResourceStore_SeparatesPlayers()
+        {
+            ServerPlayerResourceStore store = new(50);
+            store.TryAdd(1, ResourceType.Stone, 4, out _);
+            store.TryAdd(2, ResourceType.Stone, 2, out _);
+
+            Assert.That(store.GetAmount(1, ResourceType.Stone), Is.EqualTo(4));
+            Assert.That(store.GetAmount(2, ResourceType.Stone), Is.EqualTo(2));
+        }
+
+        [Test]
         public void Resource_CancelRestoresVisualPosition()
         {
             ResourceDefinition definition = CreateDefinition(0.02f, 0.03f, 1);
@@ -129,6 +154,31 @@ namespace TowerOfBabel.Resources.Tests
             ui.Hide();
             Assert.That(visuals.activeSelf, Is.False);
             Assert.That(progress.activeSelf, Is.False);
+            Object.DestroyImmediate(root);
+        }
+
+        [Test]
+        public void ServerStatusUI_ShowsConnectionStatesAndHidesWhenConnected()
+        {
+            GameObject root = new("ServerStatus");
+            TowerOfBabel.ServerStatusUI ui = root.AddComponent<TowerOfBabel.ServerStatusUI>();
+            GameObject visuals = new("Visuals");
+            visuals.transform.SetParent(root.transform);
+            TMP_Text status = CreateText(visuals.transform, "Status");
+            SetField(ui, "visuals", visuals);
+            SetField(ui, "statusText", status);
+
+            ui.ShowDisconnected();
+            Assert.That(ui.IsVisible, Is.True);
+            Assert.That(ui.StatusText, Is.EqualTo("Not connected to server"));
+            Assert.That(status.color, Is.EqualTo(Color.red));
+
+            ui.ShowConnecting();
+            Assert.That(ui.StatusText, Is.EqualTo("Connecting..."));
+            Assert.That(status.color, Is.EqualTo(Color.yellow));
+
+            ui.Hide();
+            Assert.That(ui.IsVisible, Is.False);
             Object.DestroyImmediate(root);
         }
 

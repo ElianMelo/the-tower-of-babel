@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 using TMPro;
 using TowerOfBabel.Resources.Interaction;
@@ -8,13 +9,16 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 using TowerOfBabel;
+using TowerOfBabel.Networking;
+using FishNet.Managing;
+using FishNet.Managing.Object;
 
 namespace TowerOfBabel.Resources.Tests
 {
     public sealed class ResourceInteractionPlayModeTests
     {
         [UnityTest]
-        public IEnumerator ResourceCompletion_GrantsStone_HidesAndRespawnsVisuals()
+        public IEnumerator ResourceCompletion_DoesNotPredictWalletOrCooldown()
         {
             ResourceDefinition definition = CreateDefinition(0.02f, 0.04f, 3);
             GameObject player = new("Player");
@@ -30,11 +34,7 @@ namespace TowerOfBabel.Resources.Tests
             resource.BeginInteraction(player);
             resource.CompleteInteraction(player);
 
-            Assert.That(wallet.GetAmount(ResourceType.Stone), Is.EqualTo(3));
-            Assert.That(visuals.activeSelf, Is.False);
-            Assert.That(resource.CanInteract, Is.False);
-
-            yield return new WaitForSeconds(0.06f);
+            Assert.That(wallet.GetAmount(ResourceType.Stone), Is.Zero);
             Assert.That(visuals.activeSelf, Is.True);
             Assert.That(resource.CanInteract, Is.True);
 
@@ -47,21 +47,20 @@ namespace TowerOfBabel.Resources.Tests
         public IEnumerator Raycaster_StartAndSecondActionCancel_LocksAndUnlocksControls()
         {
             GameObject player = new("Player");
+            PlayerControlStateMachine stateMachine = CreateConnectedStateMachine(player);
             PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
-            FakeControlLock control = player.AddComponent<FakeControlLock>();
             FakeInteractable interactable = player.AddComponent<FakeInteractable>();
             yield return null;
 
-            SetField(raycaster, "controlLocks", new IPlayerControlLock[] { control });
             SetField(raycaster, "currentInteractable", interactable);
             SetField(raycaster, "currentInteractableBehaviour", interactable);
 
             Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
-            Assert.That(control.IsLocked, Is.True);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Gathering));
             Assert.That(interactable.BeginCount, Is.EqualTo(1));
 
             raycaster.CancelCurrentInteraction();
-            Assert.That(control.IsLocked, Is.False);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Moving));
             Assert.That(interactable.CancelCount, Is.EqualTo(1));
 
             Object.Destroy(player);
@@ -71,11 +70,10 @@ namespace TowerOfBabel.Resources.Tests
         public IEnumerator DisabledResource_CancelsActiveInteraction()
         {
             GameObject player = new("Player");
+            PlayerControlStateMachine stateMachine = CreateConnectedStateMachine(player);
             PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
-            FakeControlLock control = player.AddComponent<FakeControlLock>();
             FakeInteractable interactable = player.AddComponent<FakeInteractable>();
             yield return null;
-            SetField(raycaster, "controlLocks", new IPlayerControlLock[] { control });
             SetField(raycaster, "currentInteractable", interactable);
             SetField(raycaster, "currentInteractableBehaviour", interactable);
             raycaster.TryBeginCurrentInteraction();
@@ -83,20 +81,104 @@ namespace TowerOfBabel.Resources.Tests
             interactable.enabled = false;
             Invoke(raycaster, "UpdateActiveInteraction");
 
-            Assert.That(control.IsLocked, Is.False);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Moving));
             Assert.That(interactable.CancelCount, Is.EqualTo(1));
             Object.Destroy(player);
+        }
+
+        [UnityTest]
+        public IEnumerator ClientCancel_SendsServerCancelRequest()
+        {
+            GameObject player = new("Player");
+            CreateConnectedStateMachine(player);
+            PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
+            FakeInteractable interactable = player.AddComponent<FakeInteractable>();
+            yield return null;
+            SetField(raycaster, "currentInteractable", interactable);
+            SetField(raycaster, "currentInteractableBehaviour", interactable);
+
+            Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+            raycaster.CancelCurrentInteraction();
+
+            Assert.That(interactable.ServerCancelRequestCount, Is.EqualTo(1));
+            Object.Destroy(player);
+        }
+
+        [UnityTest]
+        public IEnumerator ServerRejection_CancelsLocallyWithoutCancelEcho()
+        {
+            GameObject player = new("Player");
+            PlayerControlStateMachine stateMachine = CreateConnectedStateMachine(player);
+            PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
+            FakeInteractable interactable = player.AddComponent<FakeInteractable>();
+            yield return null;
+            SetField(raycaster, "currentInteractable", interactable);
+            SetField(raycaster, "currentInteractableBehaviour", interactable);
+            raycaster.TryBeginCurrentInteraction();
+
+            interactable.RejectFromServer();
+
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Moving));
+            Assert.That(interactable.CancelCount, Is.EqualTo(1));
+            Assert.That(interactable.ServerCancelRequestCount, Is.Zero);
+            Object.Destroy(player);
+        }
+
+        [UnityTest]
+        public IEnumerator AuthoritativeCooldown_DisablesAndRestoresResource()
+        {
+            ResourceDefinition definition = CreateDefinition(0.02f, 0.03f, 1);
+            GameObject root = new("Stone");
+            GameObject visuals = new("Visuals");
+            visuals.transform.SetParent(root.transform);
+            Resource resource = root.AddComponent<Resource>();
+            SetField(resource, "definition", definition);
+            SetField(resource, "visuals", visuals);
+            yield return null;
+
+            resource.BeginAuthoritativeCooldown(0.03f);
+            Assert.That(resource.ServerCanGather, Is.False);
+            Assert.That(visuals.activeSelf, Is.False);
+            yield return new WaitForSeconds(0.05f);
+            Assert.That(resource.ServerCanGather, Is.True);
+            Assert.That(visuals.activeSelf, Is.True);
+
+            Object.Destroy(root);
+            Object.Destroy(definition);
+        }
+
+        [UnityTest]
+        public IEnumerator PlayerControlStateMachine_DisconnectInterruptsGatheringAndRelock()
+        {
+            GameObject player = new("Player");
+            PlayerControlStateMachine stateMachine = player.AddComponent<PlayerControlStateMachine>();
+            bool interrupted = false;
+            stateMachine.GatheringInterrupted += () => interrupted = true;
+
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Locked));
+            stateMachine.SetConnected(true);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Moving));
+            Assert.That(stateMachine.BeginGathering(), Is.True);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Gathering));
+
+            stateMachine.SetConnected(false);
+            Assert.That(interrupted, Is.True);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Locked));
+            stateMachine.SetConnected(true);
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Moving));
+
+            Object.Destroy(player);
+            yield return null;
         }
 
         [UnityTest]
         public IEnumerator InventoryToggle_DoesNotCancelActiveGathering()
         {
             GameObject player = new("Player");
+            PlayerControlStateMachine stateMachine = CreateConnectedStateMachine(player);
             PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
-            FakeControlLock control = player.AddComponent<FakeControlLock>();
             FakeInteractable interactable = player.AddComponent<FakeInteractable>();
             yield return null;
-            SetField(raycaster, "controlLocks", new IPlayerControlLock[] { control });
             SetField(raycaster, "currentInteractable", interactable);
             SetField(raycaster, "currentInteractableBehaviour", interactable);
             Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
@@ -112,7 +194,7 @@ namespace TowerOfBabel.Resources.Tests
             inventory.Toggle();
 
             Assert.That(inventory.IsVisible, Is.True);
-            Assert.That(control.IsLocked, Is.True, "Gathering must remain active while inventory is toggled.");
+            Assert.That(stateMachine.CurrentState, Is.EqualTo(PlayerControlState.Gathering), "Gathering must remain active while inventory is toggled.");
             Assert.That(interactable.CancelCount, Is.Zero);
 
             raycaster.CancelCurrentInteraction();
@@ -168,6 +250,33 @@ namespace TowerOfBabel.Resources.Tests
             Object.Destroy(definition);
         }
 
+        [UnityTest]
+        public IEnumerator NetworkBootstrap_StartHost_StartsServerAndClient_AndSecondCallDoesNothing()
+        {
+            NetworkManager manager = Object.FindFirstObjectByType<NetworkManager>(FindObjectsInactive.Include);
+            GameObject root = manager != null ? manager.gameObject : new GameObject("NetworkSystem");
+            if (manager == null)
+            {
+                root.SetActive(false);
+                LogAssert.Expect(LogType.Error, new Regex("SpawnablePrefabs is null.*"));
+                manager = root.AddComponent<NetworkManager>();
+                SetField(manager, "_spawnablePrefabs", ScriptableObject.CreateInstance<DefaultPrefabObjects>());
+                root.SetActive(true);
+            }
+            NetworkBootstrap bootstrap = root.GetComponent<NetworkBootstrap>();
+            if (bootstrap == null)
+                bootstrap = root.AddComponent<NetworkBootstrap>();
+            SetField(bootstrap, "networkManager", manager);
+
+            Assert.That(bootstrap.StartHost(), Is.True);
+            yield return new WaitUntil(() => manager.ServerManager.Started && manager.ClientManager.Started);
+            Assert.That(bootstrap.StartHost(), Is.False);
+
+            manager.ClientManager.StopConnection();
+            manager.ServerManager.StopConnection(true);
+            yield return null;
+        }
+
         private static ResourceDefinition CreateDefinition(float duration, float cooldown, int amount)
         {
             ResourceDefinition definition = ScriptableObject.CreateInstance<ResourceDefinition>();
@@ -195,13 +304,14 @@ namespace TowerOfBabel.Resources.Tests
             return text;
         }
 
-        private sealed class FakeControlLock : MonoBehaviour, IPlayerControlLock
+        private static PlayerControlStateMachine CreateConnectedStateMachine(GameObject player)
         {
-            public bool IsLocked { get; private set; }
-            public void SetControlLocked(bool locked) => IsLocked = locked;
+            PlayerControlStateMachine stateMachine = player.AddComponent<PlayerControlStateMachine>();
+            stateMachine.SetConnected(true);
+            return stateMachine;
         }
 
-        private sealed class FakeInteractable : MonoBehaviour, IInteractable
+        private sealed class FakeInteractable : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable
         {
             public string ObjectName => "Stone";
             public string DetailText => "Stone";
@@ -211,10 +321,15 @@ namespace TowerOfBabel.Resources.Tests
             public bool CanInteract => enabled;
             public int BeginCount { get; private set; }
             public int CancelCount { get; private set; }
+            public int ServerCancelRequestCount { get; private set; }
+            public event System.Action ServerRejected;
             public void BeginInteraction(GameObject interactor) => BeginCount++;
             public void UpdateInteraction(float normalizedProgress) { }
             public void CancelInteraction() => CancelCount++;
             public void CompleteInteraction(GameObject interactor) { }
+            public bool RequestServerStart(GameObject interactor) => true;
+            public void RequestServerCancel() => ServerCancelRequestCount++;
+            public void RejectFromServer() => ServerRejected?.Invoke();
         }
     }
 }

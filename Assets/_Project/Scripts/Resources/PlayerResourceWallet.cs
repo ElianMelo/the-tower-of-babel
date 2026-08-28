@@ -24,5 +24,12 @@ namespace TowerOfBabel.Resources
             amounts[resourceType] = newAmount;
             ResourceAmountChanged?.Invoke(resourceType, newAmount);
         }
+
+        public void SetAuthoritativeAmount(ResourceType resourceType, int amount)
+        {
+            int sanitizedAmount = Mathf.Max(0, amount);
+            amounts[resourceType] = sanitizedAmount;
+            ResourceAmountChanged?.Invoke(resourceType, sanitizedAmount);
+        }
     }
 }

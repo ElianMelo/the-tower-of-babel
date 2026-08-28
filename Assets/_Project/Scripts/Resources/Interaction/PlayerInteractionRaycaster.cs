@@ -14,7 +14,7 @@ namespace TowerOfBabel.Resources.Interaction
         [SerializeField] private QueryTriggerInteraction triggerInteraction = QueryTriggerInteraction.Ignore;
 
         [SerializeField] private string promptFormat = "{0}";
-        [SerializeField] private MonoBehaviour[] controlsToLock;
+        [SerializeField] private PlayerControlStateMachine playerStateMachine;
 
         public GameObject CurrentTarget { get; private set; }
 
@@ -22,8 +22,9 @@ namespace TowerOfBabel.Resources.Interaction
         private MonoBehaviour currentInteractableBehaviour;
         private IInteractable activeInteraction;
         private MonoBehaviour activeInteractionBehaviour;
-        private IPlayerControlLock[] controlLocks;
         private float interactionElapsed;
+        private IServerAuthoritativeInteractable authoritativeInteractable;
+        private bool serverRejected;
 
         private void Awake()
         {
@@ -33,13 +34,10 @@ namespace TowerOfBabel.Resources.Interaction
             if (interactionCamera == null)
                 interactionCamera = Camera.main;
 
-            MonoBehaviour[] controlSources = controlsToLock != null && controlsToLock.Length > 0
-                ? controlsToLock
-                : GetComponentsInChildren<MonoBehaviour>(true);
-
-            controlLocks = controlSources
-                .OfType<IPlayerControlLock>()
-                .ToArray();
+            if (playerStateMachine == null)
+                playerStateMachine = GetComponent<PlayerControlStateMachine>();
+            if (playerStateMachine != null)
+                playerStateMachine.GatheringInterrupted += HandleConnectionInterruptedGathering;
 
             ClearTarget();
         }
@@ -111,6 +109,9 @@ namespace TowerOfBabel.Resources.Interaction
                 CancelCurrentInteraction();
             else
                 ClearTarget();
+
+            if (playerStateMachine != null)
+                playerStateMachine.GatheringInterrupted -= HandleConnectionInterruptedGathering;
         }
 
         public bool TryBeginCurrentInteraction()
@@ -118,11 +119,23 @@ namespace TowerOfBabel.Resources.Interaction
             if (activeInteraction != null || currentInteractable == null || !currentInteractable.CanInteract)
                 return false;
 
+            if (playerStateMachine == null || !playerStateMachine.BeginGathering())
+                return false;
+
             activeInteraction = currentInteractable;
             activeInteractionBehaviour = currentInteractableBehaviour;
             interactionElapsed = 0f;
-            SetControlsLocked(true);
             activeInteraction.BeginInteraction(gameObject);
+            authoritativeInteractable = activeInteraction as IServerAuthoritativeInteractable;
+            if (authoritativeInteractable != null)
+            {
+                authoritativeInteractable.ServerRejected += HandleServerRejected;
+                if (!authoritativeInteractable.RequestServerStart(gameObject))
+                {
+                    HandleServerRejected();
+                    return false;
+                }
+            }
             InterfaceManager.Instance?.SetInteractionProgress(0f);
             return true;
         }
@@ -162,6 +175,8 @@ namespace TowerOfBabel.Resources.Interaction
             if (activeInteraction == null)
                 return;
 
+            if (!serverRejected)
+                authoritativeInteractable?.RequestServerCancel();
             activeInteraction?.CancelInteraction();
             FinishInteraction();
             ClearTarget();
@@ -169,17 +184,27 @@ namespace TowerOfBabel.Resources.Interaction
 
         private void FinishInteraction()
         {
+            if (authoritativeInteractable != null)
+                authoritativeInteractable.ServerRejected -= HandleServerRejected;
+            authoritativeInteractable = null;
+            serverRejected = false;
             activeInteraction = null;
             activeInteractionBehaviour = null;
             interactionElapsed = 0f;
-            SetControlsLocked(false);
+            playerStateMachine?.EndGathering();
             InterfaceManager.Instance?.HideInteractionProgress();
         }
 
-        private void SetControlsLocked(bool locked)
+        private void HandleServerRejected()
         {
-            foreach (IPlayerControlLock controlLock in controlLocks)
-                controlLock.SetControlLocked(locked);
+            serverRejected = true;
+            CancelCurrentInteraction();
+        }
+
+        private void HandleConnectionInterruptedGathering()
+        {
+            if (activeInteraction != null)
+                CancelCurrentInteraction();
         }
 
         private void OnDrawGizmosSelected()

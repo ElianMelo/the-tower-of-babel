@@ -7,6 +7,7 @@ public class InterfaceManager : MonoBehaviour
 
     [SerializeField] private InteractionUI interactionUI;
     [SerializeField] private TowerOfBabel.InventoryUI inventoryUI;
+    [SerializeField] private TowerOfBabel.ServerStatusUI serverStatusUI;
 
     private void Awake()
     {
@@ -20,6 +21,7 @@ public class InterfaceManager : MonoBehaviour
         Instance = this;
         interactionUI?.Hide();
         inventoryUI?.Hide();
+        serverStatusUI?.ShowDisconnected();
     }
 
     private void OnDestroy()
@@ -62,4 +64,8 @@ public class InterfaceManager : MonoBehaviour
     {
         inventoryUI?.Hide();
     }
+
+    public void ShowServerDisconnected() => serverStatusUI?.ShowDisconnected();
+    public void ShowServerConnecting() => serverStatusUI?.ShowConnecting();
+    public void HideServerStatus() => serverStatusUI?.Hide();
 }
