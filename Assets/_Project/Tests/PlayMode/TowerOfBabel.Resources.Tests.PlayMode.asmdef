@@ -2,7 +2,9 @@
   "name": "TowerOfBabel.Resources.Tests.PlayMode",
   "rootNamespace": "TowerOfBabel.Resources.Tests",
   "references": [
-    "TowerOfBabel.Gameplay"
+    "TowerOfBabel.Gameplay",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

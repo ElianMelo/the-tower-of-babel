@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Collections.Generic;
 using NUnit.Framework;
 using TMPro;
 using TowerOfBabel.Resources.Interaction;
@@ -33,6 +34,40 @@ namespace TowerOfBabel.Resources.Tests
             wallet.Add(ResourceType.Stone, 3);
 
             Assert.That(wallet.GetAmount(ResourceType.Stone), Is.EqualTo(5));
+            Object.DestroyImmediate(player);
+        }
+
+        [Test]
+        public void ResourceDefinitionCollection_ExposesConfiguredDefinitions()
+        {
+            ResourceDefinition definition = CreateDefinition(0.02f, 0.03f, 1);
+            ResourceDefinitionCollection collection = ScriptableObject.CreateInstance<ResourceDefinitionCollection>();
+            SetField(collection, "definitions", new List<ResourceDefinition> { definition });
+
+            Assert.That(collection.Definitions, Has.Count.EqualTo(1));
+            Assert.That(collection.Definitions[0], Is.SameAs(definition));
+
+            Object.DestroyImmediate(collection);
+            Object.DestroyImmediate(definition);
+        }
+
+        [Test]
+        public void PlayerResourceWallet_RaisesChangedAmount()
+        {
+            GameObject player = new("Player");
+            PlayerResourceWallet wallet = player.AddComponent<PlayerResourceWallet>();
+            ResourceType changedType = default;
+            int changedAmount = -1;
+            wallet.ResourceAmountChanged += (type, amount) =>
+            {
+                changedType = type;
+                changedAmount = amount;
+            };
+
+            wallet.Add(ResourceType.Stone, 2);
+
+            Assert.That(changedType, Is.EqualTo(ResourceType.Stone));
+            Assert.That(changedAmount, Is.EqualTo(2));
             Object.DestroyImmediate(player);
         }
 

@@ -6,6 +6,7 @@ public class InterfaceManager : MonoBehaviour
     public static InterfaceManager Instance { get; private set; }
 
     [SerializeField] private InteractionUI interactionUI;
+    [SerializeField] private TowerOfBabel.InventoryUI inventoryUI;
 
     private void Awake()
     {
@@ -17,7 +18,8 @@ public class InterfaceManager : MonoBehaviour
         }
 
         Instance = this;
-        interactionUI.Hide();
+        interactionUI?.Hide();
+        inventoryUI?.Hide();
     }
 
     private void OnDestroy()
@@ -44,5 +46,20 @@ public class InterfaceManager : MonoBehaviour
     public void HideInteraction()
     {
         interactionUI.Hide();
+    }
+
+    public void ToggleInventory()
+    {
+        inventoryUI?.Toggle();
+    }
+
+    public void ShowInventory()
+    {
+        inventoryUI?.Show();
+    }
+
+    public void HideInventory()
+    {
+        inventoryUI?.Hide();
     }
 }

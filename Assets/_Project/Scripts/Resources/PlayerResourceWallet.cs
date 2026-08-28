@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace TowerOfBabel.Resources
     public sealed class PlayerResourceWallet : MonoBehaviour
     {
         private readonly Dictionary<ResourceType, int> amounts = new();
+
+        public event Action<ResourceType, int> ResourceAmountChanged;
 
         public int GetAmount(ResourceType resourceType)
         {
@@ -17,7 +20,9 @@ namespace TowerOfBabel.Resources
             if (amount <= 0)
                 return;
 
-            amounts[resourceType] = GetAmount(resourceType) + amount;
+            int newAmount = GetAmount(resourceType) + amount;
+            amounts[resourceType] = newAmount;
+            ResourceAmountChanged?.Invoke(resourceType, newAmount);
         }
     }
 }

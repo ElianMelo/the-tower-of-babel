@@ -1,4 +1,5 @@
 using TMPro;
+using TowerOfBabel.Resources;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,16 +11,20 @@ namespace TowerOfBabel
         [SerializeField] private TMP_Text resourceName;
         [SerializeField] private TMP_Text resourceAmount;
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
+        public ResourceType ResourceType { get; private set; }
+
+        public void Bind(ResourceDefinition definition, int amount)
         {
-        
+            ResourceType = definition.ResourceType;
+            resourceIcon.sprite = definition.Icon;
+            resourceIcon.enabled = definition.Icon != null;
+            resourceName.text = definition.DisplayName;
+            SetAmount(amount);
         }
 
-        // Update is called once per frame
-        void Update()
+        public void SetAmount(int amount)
         {
-        
+            resourceAmount.text = Mathf.Max(0, amount).ToString();
         }
     }
 }

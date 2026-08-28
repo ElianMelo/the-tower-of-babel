@@ -64,13 +64,13 @@ public class MouseRotator : MonoBehaviour, IPlayerControlLock
         var angle = transform.localEulerAngles.x;
 
         //Clamp the Up/Down rotation
-        if (angle > 180 && angle < 340)
+        if (angle > 180 && angle < 280)
         {
-            angles.x = 340;
+            angles.x = 280;
         }
-        else if (angle < 180 && angle > 40)
+        else if (angle < 180 && angle > 80)
         {
-            angles.x = 40;
+            angles.x = 80;
         }
 
 
