@@ -12,3 +12,15 @@ approval_mode = "approve"
 
 [mcp_servers.ai-game-developer.tools.tests-run]
 approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.gameobject-create]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.gameobject-component-add]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.gameobject-component-modify]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.scene-save]
+approval_mode = "approve"
