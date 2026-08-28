@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
+using TowerOfBabel.Resources.Interaction;
 
-public class MouseRotator : MonoBehaviour
+public class MouseRotator : MonoBehaviour, IPlayerControlLock
 {
     private NavMeshAgent _agent;
     public Vector2 _move;
@@ -19,6 +20,7 @@ public class MouseRotator : MonoBehaviour
     // public Transform playerTransform;
 
     private Vector2 _inputDir;
+    private bool controlsLocked;
 
     private void Start()
     {
@@ -27,6 +29,9 @@ public class MouseRotator : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (controlsLocked)
+            return;
+
         //if (GameManager.Instance.currentGameState == GameManager.GameState.Drawing) return;
         //if (PlayerController.Instance == null) return;
         //if (Input.GetKeyDown(KeyCode.F))
@@ -98,6 +103,13 @@ public class MouseRotator : MonoBehaviour
         // playerTransform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
         //reset the y rotation of the look transform
         transform.localEulerAngles = new Vector3(angles.x, 0, 0);
+    }
+
+    public void SetControlLocked(bool locked)
+    {
+        controlsLocked = locked;
+        _move = Vector2.zero;
+        _look = Vector2.zero;
     }
 
 }

@@ -1,0 +1,23 @@
+{
+  "name": "TowerOfBabel.Resources.Tests.EditMode",
+  "rootNamespace": "TowerOfBabel.Resources.Tests",
+  "references": [
+    "TowerOfBabel.Gameplay",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

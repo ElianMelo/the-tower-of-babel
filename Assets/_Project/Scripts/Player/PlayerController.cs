@@ -1,7 +1,8 @@
 using UnityEngine;
+using TowerOfBabel.Resources.Interaction;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IPlayerControlLock
 {
     [Header("References")]
     [Tooltip("The camera used for looking around. If left empty, will try to find a child camera.")]
@@ -57,6 +58,7 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded;
     private float coyoteTimeCounter;
     private float jumpBufferCounter;
+    private bool controlsLocked;
 
     private void Awake()
     {
@@ -84,6 +86,9 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (controlsLocked)
+            return;
+
         // HandleMouseLook();
         // HandleCrouch();
 
@@ -99,6 +104,13 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Escape))
             ToggleCursorLock();
+    }
+
+    public void SetControlLocked(bool locked)
+    {
+        controlsLocked = locked;
+        currentHorizontalVelocity = Vector3.zero;
+        velocity = Vector3.zero;
     }
 
     private void UpdateGroundState()

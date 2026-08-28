@@ -26,9 +26,19 @@ public class InterfaceManager : MonoBehaviour
             Instance = null;
     }
 
-    public void ShowInteraction(string objectName)
+    public void ShowInteraction(string objectName, string detail, Color detailColor, string prompt)
     {
-        interactionUI.Show(objectName);
+        interactionUI.Show(objectName, detail, detailColor, prompt);
+    }
+
+    public void SetInteractionProgress(float normalizedProgress)
+    {
+        interactionUI.SetProgress(normalizedProgress);
+    }
+
+    public void HideInteractionProgress()
+    {
+        interactionUI.HideProgress();
     }
 
     public void HideInteraction()
