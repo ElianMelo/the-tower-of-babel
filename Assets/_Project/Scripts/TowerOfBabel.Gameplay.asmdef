@@ -6,7 +6,10 @@
     "UnityEngine.UI",
     "Unity.InputSystem",
     "FishNet.Runtime",
-    "NaughtyAttributes.Core"
+    "NaughtyAttributes.Core",
+    "Unity.Burst",
+    "Unity.Collections",
+    "Unity.Mathematics"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

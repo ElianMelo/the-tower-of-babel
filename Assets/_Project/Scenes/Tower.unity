@@ -514731,6 +514731,12 @@ MonoBehaviour:
   - assetType: 3
     prefab: {fileID: 7803406487178166736, guid: 411bbd9d4ea1e854aa3ab3bab4044a3c, type: 3}
   chunkManager: {fileID: 0}
+  renderCamera: {fileID: 0}
+  cellFloorSpan: 4
+  cellHorizontalSpan: 2
+  enableFrustumCulling: 1
+  maximumDrawDistance: 0
+  useLightProbes: 1
 --- !u!114 &1114320932
 MonoBehaviour:
   m_ObjectHideFlags: 0

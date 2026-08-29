@@ -7,11 +7,13 @@ namespace TowerOfBabel.World.Chunks
     {
         public ChunkKey Key { get; }
         public IReadOnlyList<ChunkAssetData> Assets { get; }
+        public int Version { get; }
 
-        public FarChunkSnapshot(ChunkKey key, IReadOnlyList<ChunkAssetData> assets)
+        public FarChunkSnapshot(ChunkKey key, IReadOnlyList<ChunkAssetData> assets, int version = 0)
         {
             Key = key;
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));
+            Version = version;
         }
     }
 

@@ -12,9 +12,11 @@ namespace TowerOfBabel.World.Chunks
     {
         [SerializeField] private ChunkKey key;
         [SerializeField] private List<ChunkAssetData> assets = new();
+        [NonSerialized] private int version;
 
         public ChunkKey Key => key;
         public IReadOnlyList<ChunkAssetData> Assets => assets;
+        public int Version => version;
 
         internal ChunkSceneCache(ChunkKey key, List<ChunkAssetData> assets)
         {
@@ -30,6 +32,7 @@ namespace TowerOfBabel.World.Chunks
             ChunkAssetData asset = assets[localIndex];
             asset.SetStage(stage);
             assets[localIndex] = asset;
+            version++;
             return true;
         }
     }
@@ -195,7 +198,10 @@ namespace TowerOfBabel.World.Chunks
                 return false;
 
             if (loadedChunks.Contains(key))
-                RefreshNearPool();
+            {
+                ResolveNearAssetPool();
+                nearAssetPool?.ApplyAssetStage(chunk, localIndex);
+            }
             else
             {
                 SetFarChunkVisible(chunk, false);
@@ -503,7 +509,7 @@ namespace TowerOfBabel.World.Chunks
 
             if (visible)
             {
-                FarChunkSnapshot snapshot = new(chunk.Key, chunk.Assets);
+                FarChunkSnapshot snapshot = new(chunk.Key, chunk.Assets, chunk.Version);
                 farChunkRenderer.LoadChunk(in snapshot);
             }
             else
