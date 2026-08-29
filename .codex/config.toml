@@ -24,3 +24,15 @@ approval_mode = "approve"
 
 [mcp_servers.ai-game-developer.tools.scene-save]
 approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.gameobject-component-destroy]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.gameobject-modify]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.assets-prefab-create]
+approval_mode = "approve"
+
+[mcp_servers.ai-game-developer.tools.gameobject-destroy]
+approval_mode = "approve"

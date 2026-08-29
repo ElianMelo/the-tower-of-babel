@@ -27,6 +27,15 @@ namespace TowerOfBabel.World.Chunks
             return distance > int.MaxValue ? int.MaxValue : (int)distance;
         }
 
+        public static int ManhattanDistance(ChunkKey first, ChunkKey second)
+        {
+            long floorDistance = Math.Abs((long)first.FloorIndex - second.FloorIndex);
+            long xDistance = Math.Abs((long)first.X - second.X);
+            long zDistance = Math.Abs((long)first.Z - second.Z);
+            long distance = floorDistance + xDistance + zDistance;
+            return distance > int.MaxValue ? int.MaxValue : (int)distance;
+        }
+
         public static void GetNeighborhood(ChunkKey center, int radius, ICollection<ChunkKey> results)
         {
             if (radius < 0)
