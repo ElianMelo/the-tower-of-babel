@@ -77,7 +77,10 @@ namespace TowerOfBabel.Networking.Players
 
             NetworkConnection connection = ClientManager.Connection;
             if (connection != null && connection.ClientId >= 0)
+            {
                 playersManager.RegisterLocalPlayer((uint)connection.ClientId);
+                RequestRosterServerRpc();
+            }
         }
 
         public override void OnStopClient()
@@ -102,8 +105,9 @@ namespace TowerOfBabel.Networking.Players
                 PlayerInstance instance = serverRegistry.Register(playerId, Vector3.zero, Quaternion.identity);
                 observerSubscriptions[connection.ClientId] = new ObserverSubscription();
 
-                serverRegistry.CopySnapshots(rosterBuffer);
-                SendRosterTargetRpc(connection, rosterBuffer.ToArray());
+                // Existing observers learn about the new player immediately. The joining
+                // client requests its roster from OnStartClient, after this NetworkObject
+                // is guaranteed to be spawned and observable on that client.
                 PlayerJoinedObserversRpc(instance.CurrentSnapshot);
             }
             else if (args.ConnectionState == RemoteConnectionState.Stopped)
@@ -127,6 +131,16 @@ namespace TowerOfBabel.Networking.Players
 
             playersManager.CopyPriorityPlayerIds(localPriorityIds);
             SetObservedPlayersServerRpc(localPriorityIds.ToArray());
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RequestRosterServerRpc(NetworkConnection sender = null)
+        {
+            if (sender == null || sender.ClientId < 0)
+                return;
+
+            serverRegistry.CopySnapshots(rosterBuffer);
+            SendRosterTargetRpc(sender, rosterBuffer.ToArray());
         }
 
         [ServerRpc(RequireOwnership = false)]

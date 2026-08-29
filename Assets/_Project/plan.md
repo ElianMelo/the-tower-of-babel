@@ -1000,7 +1000,10 @@ Friends remain highest priority and may be immediately reselected even when geog
 
 ## 13.5 Crowded chunk selection
 
-When more local candidates exist than free slots, use nearest physical distance plus stable hysteresis.
+When more local candidates exist than free slots, compare Chebyshev chunk distance only
+and retain stable hysteresis. Do not use `Vector3.Distance` for player selection. Players
+at the same chunk distance are randomized; in particular, selection among players in the
+same chunk must not depend on their physical positions.
 
 Do not reshuffle the set every network tick.
 
@@ -1015,6 +1018,34 @@ All 100 watched players:
 ```
 
 No distance-based player update tiers for MVP.
+
+## 13.7 FishNet joining-client roster handshake
+
+Do not send the initial player roster with a `TargetRpc` directly from
+`ServerManager.OnRemoteConnectionState` / the remote-connection `Started` callback.
+At that point FishNet may not yet have added the joining connection as an observer of
+the scene `NetworkObject`; FishNet validates `TargetRpc` targets and rejects the send
+when the target is not already an observer. This creates an asymmetric failure where
+existing clients see the new player, but the new client never learns about existing
+players.
+
+Required sequence:
+
+```text
+Server registers the connection
+    -> existing observers receive the player-joined notification
+Joining client reaches NetworkBehaviour.OnStartClient
+    -> client registers its local PlayerInstance
+    -> client sends a ServerRpc requesting the roster
+Server replies with a TargetRpc now that the client observes the NetworkObject
+Client indexes the complete roster by chunk
+    -> one deferred priority search runs on the next Update
+    -> client submits its watched-player IDs to the server
+```
+
+Roster entries must be indexed as a batch before searching. Do not run a chunk search
+once per roster entry. Request one deferred search so every roster entry is available,
+then preserve the normal 2-5 second vacancy-search cadence afterward.
 
 ---
 
