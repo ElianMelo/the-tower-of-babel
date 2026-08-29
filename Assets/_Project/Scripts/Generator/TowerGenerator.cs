@@ -1,7 +1,7 @@
 using NaughtyAttributes;
-using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using TowerOfBabel.World.Tower;
 using UnityEngine;
 
 public class TowerGenerator : MonoBehaviour
@@ -45,12 +45,14 @@ public class TowerGenerator : MonoBehaviour
             for (float angle = 0f; angle < Mathf.PI * 2f; angle += angleRad)
             {
                 Vector2 point = CalculatePillarPoint(angle, currentRadius);
-                var obj = Instantiate(floorTileObject, new Vector3(point.x, baseLevel + (index * 0.0001f), point.y), Quaternion.identity);
                 Vector2 dir = (center - point).normalized;
                 float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 yAngle -= 90f;
-                obj.transform.rotation = Quaternion.Euler(0, yAngle, 0);
-                obj.transform.parent = parent;
+                CreateTowerAsset(
+                    floorTileObject,
+                    TowerAssetType.Floor,
+                    new Vector3(point.x, baseLevel + (index * 0.0001f), point.y),
+                    Quaternion.Euler(0, yAngle, 0));
                 index++;
             }
             currentRadius -= tileDecreaseRate;
@@ -84,14 +86,15 @@ public class TowerGenerator : MonoBehaviour
 
                 float y = baseLevel + step * stairHeight;
 
-                var obj = Instantiate(stairStepObject, new Vector3(point.x, y, point.y), Quaternion.identity);
-
                 Vector2 dir = (nextPoint - point).normalized;
                 float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 yAngle -= 180f;
-                obj.transform.rotation = Quaternion.Euler(0, yAngle, 0);
-                obj.transform.parent = parent;
-                obj.name = "Stair " + flight + "_" + step;
+                GameObject obj = CreateTowerAsset(
+                    stairStepObject,
+                    TowerAssetType.Stair,
+                    new Vector3(point.x, y, point.y),
+                    Quaternion.Euler(0, yAngle, 0),
+                    "Stair " + flight + "_" + step);
                 stairs.Add(obj.transform.position);
             }
         }
@@ -152,15 +155,20 @@ public class TowerGenerator : MonoBehaviour
             {
                 Vector2 point = CalculatePillarPoint(angle, currentRadius);
                 Vector2 nextPoint = CalculatePillarPoint(angle + angleRad, currentRadius);
-                var obj = Instantiate(pillarObject, new Vector3(point.x, baseHeight, point.y), Quaternion.identity);
-                var objArch = Instantiate(archObject, new Vector3(point.x, baseHeight + yOffset, point.y), Quaternion.identity);
                 Vector2 dir = (nextPoint - point).normalized;
                 float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
                 yAngle -= 90f;
-                objArch.transform.rotation = Quaternion.Euler(0, yAngle, 0);
-                obj.transform.parent = parent;
-                objArch.transform.parent = parent;
-                obj.name = "Pillar " + angle;
+                CreateTowerAsset(
+                    pillarObject,
+                    TowerAssetType.Pillar,
+                    new Vector3(point.x, baseHeight, point.y),
+                    Quaternion.identity,
+                    "Pillar " + angle);
+                CreateTowerAsset(
+                    archObject,
+                    TowerAssetType.Arch,
+                    new Vector3(point.x, baseHeight + yOffset, point.y),
+                    Quaternion.Euler(0, yAngle, 0));
             }
             var calculatedFloorRadius = i % 2 == 0 ? currentRadius + decreaseAmount : currentRadius;
             calculatedFloorRadius = i == 0 ? currentRadius : calculatedFloorRadius;
@@ -181,5 +189,33 @@ public class TowerGenerator : MonoBehaviour
             Mathf.Cos(value),
             Mathf.Sin(value)
         ) * radius;
+    }
+
+    public GameObject GetModelPrefab(TowerAssetType assetType)
+    {
+        return assetType switch
+        {
+            TowerAssetType.Floor => floorTileObject,
+            TowerAssetType.Stair => stairStepObject,
+            TowerAssetType.Pillar => pillarObject,
+            TowerAssetType.Arch => archObject,
+            _ => null
+        };
+    }
+
+    private GameObject CreateTowerAsset(GameObject modelPrefab, TowerAssetType assetType,
+        Vector3 position, Quaternion rotation, string assetName = null)
+    {
+        if (modelPrefab == null)
+            throw new System.InvalidOperationException($"No model prefab is assigned for {assetType}.");
+
+        GameObject instance = Instantiate(modelPrefab, position, rotation, parent);
+        TowerAsset marker = instance.GetComponent<TowerAsset>();
+        if (marker == null)
+            marker = instance.AddComponent<TowerAsset>();
+        marker.SetAssetType(assetType);
+        if (!string.IsNullOrEmpty(assetName))
+            instance.name = assetName;
+        return instance;
     }
 }

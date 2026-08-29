@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4200043039238331101}
   - component: {fileID: 2138501384674733591}
   - component: {fileID: 1310982643142560940}
+  - component: {fileID: 3315054879955183029}
   m_Layer: 0
   m_Name: Step_Tile
   m_TagString: Untagged
@@ -112,3 +113,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 0.19999999, z: 4}
   m_Center: {x: 2, y: -0.099999994, z: -2}
+--- !u!114 &3315054879955183029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 481190122475769794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7f11c1f07a662048af91c0e6a1e1111, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerAsset
+  assetType: 1

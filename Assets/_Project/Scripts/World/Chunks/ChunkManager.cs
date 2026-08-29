@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NaughtyAttributes;
 using TowerOfBabel.Players;
+using TowerOfBabel.World.Tower;
 using UnityEngine;
 
 namespace TowerOfBabel.World.Chunks
@@ -11,14 +12,40 @@ namespace TowerOfBabel.World.Chunks
     {
         [SerializeField] private ChunkKey key;
         [SerializeField] private List<GameObject> gameObjects = new();
+        [SerializeField] private List<TowerAssetType> assetTypes = new();
+        [NonSerialized] private List<FarChunkAsset> farAssets;
 
         public ChunkKey Key => key;
         public IReadOnlyList<GameObject> GameObjects => gameObjects;
+        public IReadOnlyList<FarChunkAsset> FarAssets
+        {
+            get
+            {
+                EnsureFarAssets();
+                return farAssets;
+            }
+        }
 
-        internal ChunkSceneCache(ChunkKey key, List<GameObject> gameObjects)
+        internal ChunkSceneCache(ChunkKey key, List<GameObject> gameObjects, List<TowerAssetType> assetTypes)
         {
             this.key = key;
             this.gameObjects = gameObjects;
+            this.assetTypes = assetTypes;
+        }
+
+        private void EnsureFarAssets()
+        {
+            if (farAssets != null && farAssets.Count == gameObjects.Count)
+                return;
+
+            farAssets = new List<FarChunkAsset>(gameObjects.Count);
+            int count = Mathf.Min(gameObjects.Count, assetTypes.Count);
+            for (int i = 0; i < count; i++)
+            {
+                GameObject asset = gameObjects[i];
+                if (asset != null)
+                    farAssets.Add(new FarChunkAsset(assetTypes[i], asset.transform.localToWorldMatrix));
+            }
         }
     }
 
@@ -35,6 +62,8 @@ namespace TowerOfBabel.World.Chunks
         [SerializeField, Min(0.01f)] private float chunkSizeMeters = ChunkGrid.DefaultChunkSizeMeters;
         [SerializeField, Min(0.01f)] private float floorHeight = 6f;
         [SerializeField] private List<ChunkSceneCache> cachedChunks = new();
+        [Tooltip("Component implementing IFarChunkRenderer. Defaults to one on this GameObject.")]
+        [SerializeField] private MonoBehaviour farChunkRendererComponent;
 
         [Header("Local Player")]
         [Tooltip("Defaults to the active scene object named Player when left empty.")]
@@ -49,6 +78,7 @@ namespace TowerOfBabel.World.Chunks
         private ChunkKey currentChunk;
         private bool hasCurrentChunk;
         private bool visibilityInitialized;
+        private IFarChunkRenderer farChunkRenderer;
 
         public float ChunkSizeMeters => chunkSizeMeters;
         public float FloorHeight => floorHeight;
@@ -69,6 +99,8 @@ namespace TowerOfBabel.World.Chunks
             if (!Application.isPlaying)
                 return;
             RebuildChunkLookup();
+            ResolveFarChunkRenderer();
+            farChunkRenderer?.SetVisible(true);
             ResolveScenePlayer();
             RefreshFromPlayer(true);
 #endif
@@ -96,29 +128,35 @@ namespace TowerOfBabel.World.Chunks
                 return;
             }
 
-            Dictionary<ChunkKey, List<GameObject>> groupedObjects = new();
-            Transform[] descendants = towerRoot.GetComponentsInChildren<Transform>(true);
-            for (int i = 0; i < descendants.Length; i++)
+            Dictionary<ChunkKey, List<TowerAsset>> groupedAssets = new();
+            TowerAsset[] towerAssets = towerRoot.GetComponentsInChildren<TowerAsset>(true);
+            for (int i = 0; i < towerAssets.Length; i++)
             {
-                Transform descendant = descendants[i];
-                if (descendant == towerRoot.transform)
-                    continue;
-
-                ChunkKey key = WorldToChunk(descendant.position);
-                if (!groupedObjects.TryGetValue(key, out List<GameObject> objectsInChunk))
+                TowerAsset asset = towerAssets[i];
+                ChunkKey key = WorldToChunk(asset.transform.position);
+                if (!groupedAssets.TryGetValue(key, out List<TowerAsset> assetsInChunk))
                 {
-                    objectsInChunk = new List<GameObject>();
-                    groupedObjects.Add(key, objectsInChunk);
+                    assetsInChunk = new List<TowerAsset>();
+                    groupedAssets.Add(key, assetsInChunk);
                 }
-                objectsInChunk.Add(descendant.gameObject);
+                assetsInChunk.Add(asset);
             }
 
-            List<ChunkKey> keys = new(groupedObjects.Keys);
+            List<ChunkKey> keys = new(groupedAssets.Keys);
             keys.Sort();
             for (int i = 0; i < keys.Count; i++)
             {
                 ChunkKey key = keys[i];
-                cachedChunks.Add(new ChunkSceneCache(key, groupedObjects[key]));
+                List<TowerAsset> assetsInChunk = groupedAssets[key];
+                List<GameObject> gameObjects = new(assetsInChunk.Count);
+                List<TowerAssetType> assetTypes = new(assetsInChunk.Count);
+                for (int assetIndex = 0; assetIndex < assetsInChunk.Count; assetIndex++)
+                {
+                    TowerAsset asset = assetsInChunk[assetIndex];
+                    gameObjects.Add(asset.gameObject);
+                    assetTypes.Add(asset.AssetType);
+                }
+                cachedChunks.Add(new ChunkSceneCache(key, gameObjects, assetTypes));
             }
 
             RebuildChunkLookup();
@@ -131,7 +169,7 @@ namespace TowerOfBabel.World.Chunks
             if (gameObject.scene.IsValid())
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
 #endif
-            Debug.Log($"Cached {descendants.Length - 1} tower descendants into {cachedChunks.Count} chunks.", this);
+            Debug.Log($"Cached {towerAssets.Length} typed tower assets into {cachedChunks.Count} chunks.", this);
         }
 
         public ChunkKey WorldToChunk(Vector3 worldPosition) =>
@@ -328,23 +366,35 @@ namespace TowerOfBabel.World.Chunks
 
         private void ApplyTowerVisibility(ChunkKey center, bool force)
         {
+            ResolveFarChunkRenderer();
             ChunkGrid.GetNeighborhood(center, NearChunkRadius, desiredChunks);
             if (!visibilityInitialized || force)
             {
                 for (int i = 0; i < cachedChunks.Count; i++)
-                    SetChunkObjectsActive(cachedChunks[i], desiredChunks.Contains(cachedChunks[i].Key));
+                {
+                    ChunkSceneCache chunk = cachedChunks[i];
+                    bool isNear = desiredChunks.Contains(chunk.Key);
+                    SetChunkObjectsActive(chunk, isNear);
+                    SetFarChunkVisible(chunk, !isNear);
+                }
             }
             else
             {
                 foreach (ChunkKey loaded in loadedChunks)
                 {
                     if (!desiredChunks.Contains(loaded) && chunkLookup.TryGetValue(loaded, out ChunkSceneCache chunk))
+                    {
                         SetChunkObjectsActive(chunk, false);
+                        SetFarChunkVisible(chunk, true);
+                    }
                 }
                 foreach (ChunkKey desired in desiredChunks)
                 {
                     if (!loadedChunks.Contains(desired) && chunkLookup.TryGetValue(desired, out ChunkSceneCache chunk))
+                    {
+                        SetFarChunkVisible(chunk, false);
                         SetChunkObjectsActive(chunk, true);
+                    }
                 }
             }
 
@@ -368,6 +418,47 @@ namespace TowerOfBabel.World.Chunks
             }
         }
 
+        private void ResolveFarChunkRenderer()
+        {
+            if (farChunkRenderer != null)
+                return;
+
+            if (farChunkRendererComponent != null)
+            {
+                farChunkRenderer = farChunkRendererComponent as IFarChunkRenderer;
+                if (farChunkRenderer == null)
+                    Debug.LogError($"{farChunkRendererComponent.GetType().Name} does not implement IFarChunkRenderer.", this);
+                return;
+            }
+
+            MonoBehaviour[] components = GetComponents<MonoBehaviour>();
+            for (int i = 0; i < components.Length; i++)
+            {
+                if (components[i] is IFarChunkRenderer renderer)
+                {
+                    farChunkRendererComponent = components[i];
+                    farChunkRenderer = renderer;
+                    return;
+                }
+            }
+        }
+
+        private void SetFarChunkVisible(ChunkSceneCache chunk, bool visible)
+        {
+            if (farChunkRenderer == null)
+                return;
+
+            if (visible)
+            {
+                FarChunkSnapshot snapshot = new(chunk.Key, chunk.FarAssets);
+                farChunkRenderer.LoadChunk(in snapshot);
+            }
+            else
+            {
+                farChunkRenderer.RemoveChunk(chunk.Key);
+            }
+        }
+
         private static void SetChunkObjectsActive(ChunkSceneCache chunk, bool active)
         {
             IReadOnlyList<GameObject> objects = chunk.GameObjects;
@@ -377,6 +468,11 @@ namespace TowerOfBabel.World.Chunks
                 if (target != null && target.activeSelf != active)
                     target.SetActive(active);
             }
+        }
+
+        private void OnDisable()
+        {
+            farChunkRenderer?.SetVisible(false);
         }
 
         private void OnValidate()
