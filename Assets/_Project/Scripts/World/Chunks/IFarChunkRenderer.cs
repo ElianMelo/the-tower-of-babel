@@ -1,32 +1,14 @@
 using System;
 using System.Collections.Generic;
-using TowerOfBabel.World.Tower;
-using UnityEngine;
 
 namespace TowerOfBabel.World.Chunks
 {
-    [Serializable]
-    public struct FarChunkAsset
-    {
-        [SerializeField] private TowerAssetType assetType;
-        [SerializeField] private Matrix4x4 objectToWorld;
-
-        public TowerAssetType AssetType => assetType;
-        public Matrix4x4 ObjectToWorld => objectToWorld;
-
-        public FarChunkAsset(TowerAssetType assetType, Matrix4x4 objectToWorld)
-        {
-            this.assetType = assetType;
-            this.objectToWorld = objectToWorld;
-        }
-    }
-
     public readonly struct FarChunkSnapshot
     {
         public ChunkKey Key { get; }
-        public IReadOnlyList<FarChunkAsset> Assets { get; }
+        public IReadOnlyList<ChunkAssetData> Assets { get; }
 
-        public FarChunkSnapshot(ChunkKey key, IReadOnlyList<FarChunkAsset> assets)
+        public FarChunkSnapshot(ChunkKey key, IReadOnlyList<ChunkAssetData> assets)
         {
             Key = key;
             Assets = assets ?? throw new ArgumentNullException(nameof(assets));

@@ -38,7 +38,7 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
-        public void CacheChunks_IncludesEveryDescendantAndUsesWorldPosition()
+        public void CacheChunks_StoresPureDeterministicDataThatSurvivesAuthoringObjectDestruction()
         {
             GameObject managerObject = new("ChunkManagerTest");
             managerObject.SetActive(false);
@@ -61,49 +61,139 @@ namespace TowerOfBabel.World.Tests
 
             Assert.That(manager.CachedChunks, Has.Count.EqualTo(2));
             Assert.That(manager.CachedChunks[0].Key, Is.EqualTo(new ChunkKey(0, 1, 0)));
-            Assert.That(manager.CachedChunks[0].GameObjects[0], Is.SameAs(firstAsset));
-            Assert.That(manager.CachedChunks[0].FarAssets[0].AssetType, Is.EqualTo(TowerAssetType.Floor));
+            Assert.That(manager.CachedChunks[0].Assets[0].AssetType, Is.EqualTo(TowerAssetType.Floor));
+            Assert.That(manager.CachedChunks[0].Assets[0].LocalIndex, Is.Zero);
+            Assert.That(manager.CachedChunks[0].Assets[0].Stage, Is.EqualTo(ChunkAssetData.CompletedStage));
+            Assert.That(manager.CachedChunks[0].Assets[0].Position, Is.EqualTo(firstAsset.transform.position));
             Assert.That(manager.CachedChunks[1].Key, Is.EqualTo(new ChunkKey(2, 3, -1)));
-            Assert.That(manager.CachedChunks[1].GameObjects[0], Is.SameAs(nestedAsset));
-            Assert.That(manager.CachedChunks[1].FarAssets[0].AssetType, Is.EqualTo(TowerAssetType.Arch));
+            Assert.That(manager.CachedChunks[1].Assets[0].AssetType, Is.EqualTo(TowerAssetType.Arch));
+
+            Vector3 cachedPosition = manager.CachedChunks[1].Assets[0].Position;
+            Object.DestroyImmediate(towerRoot);
+
+            Assert.That(manager.CachedChunks[1].Assets[0].Position, Is.EqualTo(cachedPosition));
+
+            Object.DestroyImmediate(managerObject);
+        }
+
+        [Test]
+        public void CacheChunks_AssignsDeterministicTypeAndPositionOrderedLocalIndices()
+        {
+            GameObject managerObject = new("ChunkManagerTest");
+            managerObject.SetActive(false);
+            ChunkManager manager = managerObject.AddComponent<ChunkManager>();
+            GameObject towerRoot = new("TowerRoot");
+            CreateTypedAsset("Arch", towerRoot.transform, new Vector3(1f, 0f, 0f), TowerAssetType.Arch);
+            CreateTypedAsset("FloorB", towerRoot.transform, new Vector3(2f, 0f, 0f), TowerAssetType.Floor);
+            CreateTypedAsset("FloorA", towerRoot.transform, new Vector3(1f, 0f, 0f), TowerAssetType.Floor);
+            SetField(manager, "towerRoot", towerRoot);
+
+            manager.CacheChunks();
+
+            IReadOnlyList<ChunkAssetData> assets = manager.CachedChunks[0].Assets;
+            Assert.That(assets, Has.Count.EqualTo(3));
+            Assert.That(assets[0].AssetType, Is.EqualTo(TowerAssetType.Floor));
+            Assert.That(assets[0].Position.x, Is.EqualTo(1f));
+            Assert.That(assets[0].LocalIndex, Is.Zero);
+            Assert.That(assets[1].Position.x, Is.EqualTo(2f));
+            Assert.That(assets[1].LocalIndex, Is.EqualTo(1));
+            Assert.That(assets[2].AssetType, Is.EqualTo(TowerAssetType.Arch));
+            Assert.That(assets[2].LocalIndex, Is.EqualTo(2));
 
             Object.DestroyImmediate(towerRoot);
             Object.DestroyImmediate(managerObject);
         }
 
         [Test]
-        public void TowerVisibility_ImmediatelySwitchesAssetsBetweenNearObjectsAndFarRenderer()
+        public void ConfigureTower_CachesDataThenDestroysTemporaryAuthoringAssets()
+        {
+            GameObject root = new("ConfigureTowerTest");
+            root.SetActive(false);
+            GameObject towerParent = new("TowerParent");
+            towerParent.transform.SetParent(root.transform);
+            GameObject modelPrefab = new("TowerModel");
+            modelPrefab.SetActive(false);
+
+            TowerGenerator generator = root.AddComponent<TowerGenerator>();
+            generator.parent = towerParent.transform;
+            generator.pillarObject = modelPrefab;
+            generator.archObject = modelPrefab;
+            generator.floorTileObject = modelPrefab;
+            generator.stairStepObject = modelPrefab;
+            generator.radius = 2f;
+            generator.pillarAngle = 90f;
+            generator.tileAngle = 90f;
+            generator.tileDecreaseRate = 1f;
+            generator.levels = 1;
+            generator.floorHeight = 2f;
+            generator.stairHeight = 0.5f;
+
+            ChunkManager manager = root.AddComponent<ChunkManager>();
+            SetField(manager, "towerRoot", towerParent);
+            ConfigureTower configureTower = root.AddComponent<ConfigureTower>();
+            SetField(configureTower, "towerGenerator", generator);
+            SetField(configureTower, "chunkManager", manager);
+
+            configureTower.RunConfiguration();
+            for (int i = 0; i < 16 && configureTower.IsRunning; i++)
+                InvokePrivate(configureTower, "AdvanceConfiguration");
+
+            Assert.That(configureTower.IsRunning, Is.False);
+            Assert.That(towerParent.transform.childCount, Is.Zero);
+            Assert.That(manager.CachedChunks.Count, Is.GreaterThan(0));
+            Assert.That(manager.AssetPrefabs.IsComplete, Is.True);
+            Assert.That(root.GetComponent<NearTowerAssetPool>(), Is.Not.Null);
+            Assert.That(root.GetComponent<InstancedFarChunkRenderer>(), Is.Not.Null);
+
+            Object.DestroyImmediate(root);
+            Object.DestroyImmediate(modelPrefab);
+        }
+
+        [Test]
+        public void TowerVisibility_ImmediatelySwitchesChunkDataBetweenNearPoolAndFarRenderer()
         {
             GameObject managerObject = new("ChunkManagerTest");
             managerObject.SetActive(false);
             ChunkManager manager = managerObject.AddComponent<ChunkManager>();
             RecordingFarChunkRenderer renderer = managerObject.AddComponent<RecordingFarChunkRenderer>();
+            NearTowerAssetPool nearPool = managerObject.AddComponent<NearTowerAssetPool>();
             GameObject towerRoot = new("TowerRoot");
+            GameObject poolPrefab = CreateTypedAsset("PoolPrefab", null, Vector3.zero, TowerAssetType.Floor);
+            poolPrefab.SetActive(false);
+            ConfigureAllPrefabs(manager, poolPrefab);
 
             GameObject firstAsset = CreateTypedAsset("First", towerRoot.transform, Vector3.zero, TowerAssetType.Floor);
             GameObject secondAsset = CreateTypedAsset("Second", towerRoot.transform,
                 new Vector3(64f, 0f, 0f), TowerAssetType.Pillar);
             SetField(manager, "towerRoot", towerRoot);
             SetField(manager, "farChunkRendererComponent", renderer);
+            SetField(manager, "nearAssetPool", nearPool);
             manager.CacheChunks();
+            Object.DestroyImmediate(towerRoot);
 
             InvokePrivate(manager, "ResolveFarChunkRenderer");
             InvokePrivate(manager, "ApplyTowerVisibility", new ChunkKey(0, 0, 0), true);
 
-            Assert.That(firstAsset.activeSelf, Is.True);
-            Assert.That(secondAsset.activeSelf, Is.False);
+            Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(1));
+            Assert.That(nearPool.ActiveAssets[0].transform.position, Is.EqualTo(Vector3.zero));
             Assert.That(renderer.LoadedChunks, Has.No.Member(new ChunkKey(0, 0, 0)));
             Assert.That(renderer.LoadedChunks, Has.Member(new ChunkKey(0, 2, 0)));
 
             InvokePrivate(manager, "ApplyTowerVisibility", new ChunkKey(0, 2, 0), false);
 
-            Assert.That(firstAsset.activeSelf, Is.False);
-            Assert.That(secondAsset.activeSelf, Is.True);
+            Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(1));
+            Assert.That(nearPool.ActiveAssets[0].transform.position, Is.EqualTo(new Vector3(64f, 0f, 0f)));
             Assert.That(renderer.LoadedChunks, Has.Member(new ChunkKey(0, 0, 0)));
             Assert.That(renderer.LoadedChunks, Has.No.Member(new ChunkKey(0, 2, 0)));
 
-            Object.DestroyImmediate(towerRoot);
+            Assert.That(manager.SetAssetStage(new ChunkKey(0, 2, 0), 0, 0), Is.True);
+            Assert.That(nearPool.ActiveInstanceCount, Is.Zero);
+            Assert.That(manager.SetAssetStage(new ChunkKey(0, 2, 0), 0, 10), Is.True);
+            Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(1));
+            Assert.That(nearPool.GetCapacity(TowerAssetType.Pillar), Is.GreaterThanOrEqualTo(1));
+
             Object.DestroyImmediate(managerObject);
+            Object.DestroyImmediate(poolPrefab);
         }
 
         [Test]
@@ -124,9 +214,12 @@ namespace TowerOfBabel.World.Tests
             SetField(renderer, "models", new List<TowerAssetRenderModel> { model });
 
             ChunkKey key = new(0, 4, -2);
-            List<FarChunkAsset> assets = new(1024);
+            List<ChunkAssetData> assets = new(1025);
             for (int i = 0; i < 1024; i++)
-                assets.Add(new FarChunkAsset(TowerAssetType.Floor, Matrix4x4.Translate(Vector3.right * i)));
+                assets.Add(new ChunkAssetData(i, TowerAssetType.Floor, Vector3.right * i,
+                    Quaternion.identity, Vector3.one));
+            assets.Add(new ChunkAssetData(1024, TowerAssetType.Floor, Vector3.zero,
+                Quaternion.identity, Vector3.one, 0));
             FarChunkSnapshot snapshot = new(key, assets);
             renderer.LoadChunk(in snapshot);
 
@@ -260,6 +353,14 @@ namespace TowerOfBabel.World.Tests
             asset.transform.position = position;
             asset.AddComponent<TowerAsset>().SetAssetType(assetType);
             return asset;
+        }
+
+        private static void ConfigureAllPrefabs(ChunkManager manager, GameObject prefab)
+        {
+            manager.AssetPrefabs.SetPrefab(TowerAssetType.Floor, prefab);
+            manager.AssetPrefabs.SetPrefab(TowerAssetType.Stair, prefab);
+            manager.AssetPrefabs.SetPrefab(TowerAssetType.Pillar, prefab);
+            manager.AssetPrefabs.SetPrefab(TowerAssetType.Arch, prefab);
         }
 
         private static ChunkManager CreateInactiveChunkManager(out GameObject root)

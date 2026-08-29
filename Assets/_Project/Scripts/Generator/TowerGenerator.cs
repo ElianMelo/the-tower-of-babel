@@ -1,5 +1,4 @@
 using NaughtyAttributes;
-using System.Collections;
 using System.Collections.Generic;
 using TowerOfBabel.World.Tower;
 using UnityEngine;
@@ -31,6 +30,9 @@ public class TowerGenerator : MonoBehaviour
 
     private float baseHeight = 0f;
     private List<Vector3> stairs = new();
+
+    public bool IsBusy { get; private set; }
+    public Transform TowerParent => parent;
 
     public void FillCurrentLevelFloor(float floorRadius, float baseLevel)
     {
@@ -100,12 +102,6 @@ public class TowerGenerator : MonoBehaviour
         }
     }
 
-    private IEnumerator DelayedRemoveBlockingFloor()
-    {
-        yield return new WaitForSeconds(1f);
-        RemoveBlockingFloor();
-    }
-
     private void RemoveBlockingFloor()
     {
         foreach (var stair in stairs)
@@ -130,57 +126,84 @@ public class TowerGenerator : MonoBehaviour
     [Button]
     public void ClearGeneratedTower()
     {
-        while(parent.childCount > 0)
+        if (IsBusy)
+            throw new System.InvalidOperationException("TowerGenerator is already processing an authoring operation.");
+        if (parent == null)
+            throw new System.InvalidOperationException("TowerGenerator needs a Tower Parent.");
+
+        IsBusy = true;
+        try
         {
-            foreach (Transform child in parent)
+            while(parent.childCount > 0)
             {
-                DestroyImmediate(child.gameObject);
+                for (int i = parent.childCount - 1; i >= 0; i--)
+                    DestroyImmediate(parent.GetChild(i).gameObject);
             }
+            stairs.Clear();
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
     [Button]
     public void GenerateTower()
     {
-        baseHeight = 0f;
-        float currentRadius = radius;
-        float currentPillarAngle = pillarAngle;
-        for (int i = 0; i < levels; i++)
+        if (IsBusy)
+            throw new System.InvalidOperationException("TowerGenerator is already processing an authoring operation.");
+        if (parent == null)
+            throw new System.InvalidOperationException("TowerGenerator needs a Tower Parent.");
+
+        IsBusy = true;
+        try
         {
-            currentRadius -= i % 2 == 0 ? decreaseAmount : 0;
-            currentPillarAngle = pillarAngle / (currentRadius / radius);
-
-            float angleRad = currentPillarAngle * Mathf.Deg2Rad;
-            for (float angle = 0f; angle < Mathf.PI * 2f; angle += angleRad)
+            baseHeight = 0f;
+            stairs.Clear();
+            float currentRadius = radius;
+            float currentPillarAngle = pillarAngle;
+            for (int i = 0; i < levels; i++)
             {
-                Vector2 point = CalculatePillarPoint(angle, currentRadius);
-                Vector2 nextPoint = CalculatePillarPoint(angle + angleRad, currentRadius);
-                Vector2 dir = (nextPoint - point).normalized;
-                float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
-                yAngle -= 90f;
-                CreateTowerAsset(
-                    pillarObject,
-                    TowerAssetType.Pillar,
-                    new Vector3(point.x, baseHeight, point.y),
-                    Quaternion.identity,
-                    "Pillar " + angle);
-                CreateTowerAsset(
-                    archObject,
-                    TowerAssetType.Arch,
-                    new Vector3(point.x, baseHeight + yOffset, point.y),
-                    Quaternion.Euler(0, yAngle, 0));
+                currentRadius -= i % 2 == 0 ? decreaseAmount : 0;
+                currentPillarAngle = pillarAngle / (currentRadius / radius);
+
+                float angleRad = currentPillarAngle * Mathf.Deg2Rad;
+                for (float angle = 0f; angle < Mathf.PI * 2f; angle += angleRad)
+                {
+                    Vector2 point = CalculatePillarPoint(angle, currentRadius);
+                    Vector2 nextPoint = CalculatePillarPoint(angle + angleRad, currentRadius);
+                    Vector2 dir = (nextPoint - point).normalized;
+                    float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
+                    yAngle -= 90f;
+                    CreateTowerAsset(
+                        pillarObject,
+                        TowerAssetType.Pillar,
+                        new Vector3(point.x, baseHeight, point.y),
+                        Quaternion.identity,
+                        "Pillar " + angle);
+                    CreateTowerAsset(
+                        archObject,
+                        TowerAssetType.Arch,
+                        new Vector3(point.x, baseHeight + yOffset, point.y),
+                        Quaternion.Euler(0, yAngle, 0));
+                }
+                var calculatedFloorRadius = i % 2 == 0 ? currentRadius + decreaseAmount : currentRadius;
+                calculatedFloorRadius = i == 0 ? currentRadius : calculatedFloorRadius;
+                FillCurrentLevelFloor(calculatedFloorRadius, baseHeight + 0.2f);
+                if(i < (levels - 1))
+                {
+                    FillCurrentLevelStairs(currentRadius, baseHeight + 0.2f);
+                }
+
+                baseHeight += heighIncrease;
             }
-            var calculatedFloorRadius = i % 2 == 0 ? currentRadius + decreaseAmount : currentRadius;
-            calculatedFloorRadius = i == 0 ? currentRadius : calculatedFloorRadius;
-            FillCurrentLevelFloor(calculatedFloorRadius, baseHeight + 0.2f);
-            if(i < (levels - 1))
-            {
-                FillCurrentLevelStairs(currentRadius, baseHeight + 0.2f);
-            }            
-
-            baseHeight += heighIncrease;
+            Physics.SyncTransforms();
+            RemoveBlockingFloor();
         }
-        StartCoroutine(DelayedRemoveBlockingFloor());
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private Vector2 CalculatePillarPoint(float value, float radius)

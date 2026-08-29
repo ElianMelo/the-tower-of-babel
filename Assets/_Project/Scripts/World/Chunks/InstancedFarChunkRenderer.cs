@@ -24,8 +24,8 @@ namespace TowerOfBabel.World.Chunks
 
         [Tooltip("One stage-10 model prefab for every tower asset type.")]
         [SerializeField] private List<TowerAssetRenderModel> models = new();
-        [Tooltip("Fallback source for the four model prefabs when Models is empty.")]
-        [SerializeField] private global::TowerGenerator modelProvider;
+        [Tooltip("Fallback data source for the four model prefabs when Models is empty.")]
+        [SerializeField] private ChunkManager chunkManager;
 
         private readonly Dictionary<TowerAssetType, TypeBatch> batches = new();
         private readonly HashSet<ChunkKey> loadedChunks = new();
@@ -69,11 +69,11 @@ namespace TowerOfBabel.World.Chunks
             RemoveChunk(snapshot.Key);
             loadedChunks.Add(snapshot.Key);
 
-            IReadOnlyList<FarChunkAsset> assets = snapshot.Assets;
+            IReadOnlyList<ChunkAssetData> assets = snapshot.Assets;
             for (int i = 0; i < assets.Count; i++)
             {
-                FarChunkAsset asset = assets[i];
-                if (batches.TryGetValue(asset.AssetType, out TypeBatch batch))
+                ChunkAssetData asset = assets[i];
+                if (asset.UsesStageTenModel && batches.TryGetValue(asset.AssetType, out TypeBatch batch))
                     batch.Add(snapshot.Key, asset.ObjectToWorld);
             }
         }
@@ -112,18 +112,21 @@ namespace TowerOfBabel.World.Chunks
                 return;
             }
 
-            if (modelProvider == null)
-                modelProvider = FindFirstObjectByType<global::TowerGenerator>();
-            if (modelProvider == null)
+            if (chunkManager == null)
+                chunkManager = GetComponent<ChunkManager>();
+            if (chunkManager == null)
+                chunkManager = FindFirstObjectByType<ChunkManager>();
+            if (chunkManager == null)
             {
-                Debug.LogError("Far chunk rendering needs explicit Models or a TowerGenerator model provider.", this);
+                Debug.LogError("Far chunk rendering needs explicit Models or a ChunkManager prefab data source.", this);
                 return;
             }
 
-            AddModelBatch(TowerAssetType.Floor, modelProvider.GetModelPrefab(TowerAssetType.Floor));
-            AddModelBatch(TowerAssetType.Stair, modelProvider.GetModelPrefab(TowerAssetType.Stair));
-            AddModelBatch(TowerAssetType.Pillar, modelProvider.GetModelPrefab(TowerAssetType.Pillar));
-            AddModelBatch(TowerAssetType.Arch, modelProvider.GetModelPrefab(TowerAssetType.Arch));
+            TowerAssetPrefabSet prefabs = chunkManager.AssetPrefabs;
+            AddModelBatch(TowerAssetType.Floor, prefabs.GetPrefab(TowerAssetType.Floor));
+            AddModelBatch(TowerAssetType.Stair, prefabs.GetPrefab(TowerAssetType.Stair));
+            AddModelBatch(TowerAssetType.Pillar, prefabs.GetPrefab(TowerAssetType.Pillar));
+            AddModelBatch(TowerAssetType.Arch, prefabs.GetPrefab(TowerAssetType.Arch));
         }
 
         private void EnsureModelBatches()

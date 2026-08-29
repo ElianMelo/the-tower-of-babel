@@ -11,41 +11,26 @@ namespace TowerOfBabel.World.Chunks
     public sealed class ChunkSceneCache
     {
         [SerializeField] private ChunkKey key;
-        [SerializeField] private List<GameObject> gameObjects = new();
-        [SerializeField] private List<TowerAssetType> assetTypes = new();
-        [NonSerialized] private List<FarChunkAsset> farAssets;
+        [SerializeField] private List<ChunkAssetData> assets = new();
 
         public ChunkKey Key => key;
-        public IReadOnlyList<GameObject> GameObjects => gameObjects;
-        public IReadOnlyList<FarChunkAsset> FarAssets
-        {
-            get
-            {
-                EnsureFarAssets();
-                return farAssets;
-            }
-        }
+        public IReadOnlyList<ChunkAssetData> Assets => assets;
 
-        internal ChunkSceneCache(ChunkKey key, List<GameObject> gameObjects, List<TowerAssetType> assetTypes)
+        internal ChunkSceneCache(ChunkKey key, List<ChunkAssetData> assets)
         {
             this.key = key;
-            this.gameObjects = gameObjects;
-            this.assetTypes = assetTypes;
+            this.assets = assets;
         }
 
-        private void EnsureFarAssets()
+        internal bool TrySetStage(int localIndex, byte stage)
         {
-            if (farAssets != null && farAssets.Count == gameObjects.Count)
-                return;
+            if ((uint)localIndex >= (uint)assets.Count)
+                return false;
 
-            farAssets = new List<FarChunkAsset>(gameObjects.Count);
-            int count = Mathf.Min(gameObjects.Count, assetTypes.Count);
-            for (int i = 0; i < count; i++)
-            {
-                GameObject asset = gameObjects[i];
-                if (asset != null)
-                    farAssets.Add(new FarChunkAsset(assetTypes[i], asset.transform.localToWorldMatrix));
-            }
+            ChunkAssetData asset = assets[localIndex];
+            asset.SetStage(stage);
+            assets[localIndex] = asset;
+            return true;
         }
     }
 
@@ -57,13 +42,16 @@ namespace TowerOfBabel.World.Chunks
         public const int NearChunkSlotCount = 27;
 
         [Header("Tower Chunk Cache")]
-        [Tooltip("Every descendant of this object is assigned to a chunk from its world position.")]
+        [Tooltip("Temporary authoring assets under this object are scanned, cached as data, then destroyed.")]
         [SerializeField] private GameObject towerRoot;
         [SerializeField, Min(0.01f)] private float chunkSizeMeters = ChunkGrid.DefaultChunkSizeMeters;
         [SerializeField, Min(0.01f)] private float floorHeight = 6f;
         [SerializeField] private List<ChunkSceneCache> cachedChunks = new();
+        [SerializeField] private TowerAssetPrefabSet assetPrefabs = new();
         [Tooltip("Component implementing IFarChunkRenderer. Defaults to one on this GameObject.")]
         [SerializeField] private MonoBehaviour farChunkRendererComponent;
+        [Tooltip("Growable per-type pool used for the 3x3x3 near neighborhood.")]
+        [SerializeField] private NearTowerAssetPool nearAssetPool;
 
         [Header("Local Player")]
         [Tooltip("Defaults to the active scene object named Player when left empty.")]
@@ -83,9 +71,21 @@ namespace TowerOfBabel.World.Chunks
         public float ChunkSizeMeters => chunkSizeMeters;
         public float FloorHeight => floorHeight;
         public Transform PlayerTransform => player;
+        public GameObject TowerRoot => towerRoot;
         public ChunkKey CurrentChunk => currentChunk;
         public bool HasCurrentChunk => hasCurrentChunk;
         public IReadOnlyList<ChunkSceneCache> CachedChunks => cachedChunks;
+        public int CachedAssetCount
+        {
+            get
+            {
+                int count = 0;
+                for (int i = 0; i < cachedChunks.Count; i++)
+                    count += cachedChunks[i]?.Assets.Count ?? 0;
+                return count;
+            }
+        }
+        public TowerAssetPrefabSet AssetPrefabs => assetPrefabs;
         public int TrackedPlayerCount => trackedPlayers.Count;
 
         public event Action<ChunkKey, ChunkKey> CurrentChunkChanged;
@@ -100,6 +100,7 @@ namespace TowerOfBabel.World.Chunks
                 return;
             RebuildChunkLookup();
             ResolveFarChunkRenderer();
+            ResolveNearAssetPool();
             farChunkRenderer?.SetVisible(true);
             ResolveScenePlayer();
             RefreshFromPlayer(true);
@@ -148,15 +149,20 @@ namespace TowerOfBabel.World.Chunks
             {
                 ChunkKey key = keys[i];
                 List<TowerAsset> assetsInChunk = groupedAssets[key];
-                List<GameObject> gameObjects = new(assetsInChunk.Count);
-                List<TowerAssetType> assetTypes = new(assetsInChunk.Count);
+                assetsInChunk.Sort(CompareTowerAssets);
+                List<ChunkAssetData> assetData = new(assetsInChunk.Count);
                 for (int assetIndex = 0; assetIndex < assetsInChunk.Count; assetIndex++)
                 {
                     TowerAsset asset = assetsInChunk[assetIndex];
-                    gameObjects.Add(asset.gameObject);
-                    assetTypes.Add(asset.AssetType);
+                    Transform assetTransform = asset.transform;
+                    assetData.Add(new ChunkAssetData(
+                        assetIndex,
+                        asset.AssetType,
+                        assetTransform.position,
+                        assetTransform.rotation,
+                        assetTransform.lossyScale));
                 }
-                cachedChunks.Add(new ChunkSceneCache(key, gameObjects, assetTypes));
+                cachedChunks.Add(new ChunkSceneCache(key, assetData));
             }
 
             RebuildChunkLookup();
@@ -170,6 +176,32 @@ namespace TowerOfBabel.World.Chunks
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
 #endif
             Debug.Log($"Cached {towerAssets.Length} typed tower assets into {cachedChunks.Count} chunks.", this);
+        }
+
+        public void ConfigureAssetPrefabs(TowerGenerator generator)
+        {
+            if (generator == null)
+                throw new ArgumentNullException(nameof(generator));
+
+            assetPrefabs.SetPrefab(TowerAssetType.Floor, generator.GetModelPrefab(TowerAssetType.Floor));
+            assetPrefabs.SetPrefab(TowerAssetType.Stair, generator.GetModelPrefab(TowerAssetType.Stair));
+            assetPrefabs.SetPrefab(TowerAssetType.Pillar, generator.GetModelPrefab(TowerAssetType.Pillar));
+            assetPrefabs.SetPrefab(TowerAssetType.Arch, generator.GetModelPrefab(TowerAssetType.Arch));
+        }
+
+        public bool SetAssetStage(ChunkKey key, int localIndex, byte stage)
+        {
+            if (!chunkLookup.TryGetValue(key, out ChunkSceneCache chunk) || !chunk.TrySetStage(localIndex, stage))
+                return false;
+
+            if (loadedChunks.Contains(key))
+                RefreshNearPool();
+            else
+            {
+                SetFarChunkVisible(chunk, false);
+                SetFarChunkVisible(chunk, true);
+            }
+            return true;
         }
 
         public ChunkKey WorldToChunk(Vector3 worldPosition) =>
@@ -374,7 +406,6 @@ namespace TowerOfBabel.World.Chunks
                 {
                     ChunkSceneCache chunk = cachedChunks[i];
                     bool isNear = desiredChunks.Contains(chunk.Key);
-                    SetChunkObjectsActive(chunk, isNear);
                     SetFarChunkVisible(chunk, !isNear);
                 }
             }
@@ -384,7 +415,6 @@ namespace TowerOfBabel.World.Chunks
                 {
                     if (!desiredChunks.Contains(loaded) && chunkLookup.TryGetValue(loaded, out ChunkSceneCache chunk))
                     {
-                        SetChunkObjectsActive(chunk, false);
                         SetFarChunkVisible(chunk, true);
                     }
                 }
@@ -393,7 +423,6 @@ namespace TowerOfBabel.World.Chunks
                     if (!loadedChunks.Contains(desired) && chunkLookup.TryGetValue(desired, out ChunkSceneCache chunk))
                     {
                         SetFarChunkVisible(chunk, false);
-                        SetChunkObjectsActive(chunk, true);
                     }
                 }
             }
@@ -404,6 +433,7 @@ namespace TowerOfBabel.World.Chunks
                 if (chunkLookup.ContainsKey(desired))
                     loadedChunks.Add(desired);
             }
+            RefreshNearPool();
             visibilityInitialized = true;
         }
 
@@ -443,6 +473,29 @@ namespace TowerOfBabel.World.Chunks
             }
         }
 
+        private void ResolveNearAssetPool()
+        {
+            if (nearAssetPool == null)
+                nearAssetPool = GetComponent<NearTowerAssetPool>();
+            if (nearAssetPool != null)
+                nearAssetPool.Configure(assetPrefabs);
+        }
+
+        private void RefreshNearPool()
+        {
+            ResolveNearAssetPool();
+            if (nearAssetPool == null)
+                return;
+
+            nearAssetPool.BeginUpdate();
+            foreach (ChunkKey loaded in loadedChunks)
+            {
+                if (chunkLookup.TryGetValue(loaded, out ChunkSceneCache chunk))
+                    nearAssetPool.AddChunk(chunk);
+            }
+            nearAssetPool.EndUpdate();
+        }
+
         private void SetFarChunkVisible(ChunkSceneCache chunk, bool visible)
         {
             if (farChunkRenderer == null)
@@ -450,7 +503,7 @@ namespace TowerOfBabel.World.Chunks
 
             if (visible)
             {
-                FarChunkSnapshot snapshot = new(chunk.Key, chunk.FarAssets);
+                FarChunkSnapshot snapshot = new(chunk.Key, chunk.Assets);
                 farChunkRenderer.LoadChunk(in snapshot);
             }
             else
@@ -459,20 +512,55 @@ namespace TowerOfBabel.World.Chunks
             }
         }
 
-        private static void SetChunkObjectsActive(ChunkSceneCache chunk, bool active)
+        private static int CompareTowerAssets(TowerAsset first, TowerAsset second)
         {
-            IReadOnlyList<GameObject> objects = chunk.GameObjects;
-            for (int i = 0; i < objects.Count; i++)
-            {
-                GameObject target = objects[i];
-                if (target != null && target.activeSelf != active)
-                    target.SetActive(active);
-            }
+            int comparison = first.AssetType.CompareTo(second.AssetType);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = CompareVector(first.transform.position, second.transform.position);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = CompareQuaternion(first.transform.rotation, second.transform.rotation);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = CompareVector(first.transform.lossyScale, second.transform.lossyScale);
+            if (comparison != 0)
+                return comparison;
+
+            comparison = string.CompareOrdinal(first.name, second.name);
+            return comparison != 0
+                ? comparison
+                : first.transform.GetSiblingIndex().CompareTo(second.transform.GetSiblingIndex());
+        }
+
+        private static int CompareVector(Vector3 first, Vector3 second)
+        {
+            int comparison = first.x.CompareTo(second.x);
+            if (comparison != 0)
+                return comparison;
+            comparison = first.y.CompareTo(second.y);
+            return comparison != 0 ? comparison : first.z.CompareTo(second.z);
+        }
+
+        private static int CompareQuaternion(Quaternion first, Quaternion second)
+        {
+            int comparison = first.x.CompareTo(second.x);
+            if (comparison != 0)
+                return comparison;
+            comparison = first.y.CompareTo(second.y);
+            if (comparison != 0)
+                return comparison;
+            comparison = first.z.CompareTo(second.z);
+            return comparison != 0 ? comparison : first.w.CompareTo(second.w);
         }
 
         private void OnDisable()
         {
             farChunkRenderer?.SetVisible(false);
+            nearAssetPool?.ClearVisibleAssets();
         }
 
         private void OnValidate()
