@@ -4,6 +4,7 @@ using NUnit.Framework;
 using TowerOfBabel.Players;
 using TowerOfBabel.World.Chunks;
 using TowerOfBabel.World.Tower;
+using UnityEditor;
 using UnityEngine;
 
 namespace TowerOfBabel.World.Tests
@@ -368,6 +369,31 @@ namespace TowerOfBabel.World.Tests
             Object.DestroyImmediate(modelPrefab);
             Object.DestroyImmediate(material);
             Object.DestroyImmediate(mesh);
+        }
+
+        [Test]
+        public void TowerRenderPrefabs_RetainInstancingVariantsForPlayerBuilds()
+        {
+            string[] prefabPaths =
+            {
+                "Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab",
+                "Assets/_Project/Prefabs/Buildings/Step_Tile.prefab",
+                "Assets/_Project/Prefabs/Buildings/Pillar.prefab",
+                "Assets/_Project/Prefabs/Buildings/Arch.prefab"
+            };
+
+            for (int i = 0; i < prefabPaths.Length; i++)
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPaths[i]);
+                Assert.That(prefab, Is.Not.Null, $"Missing tower render prefab: {prefabPaths[i]}");
+
+                MeshRenderer renderer = prefab.GetComponent<MeshRenderer>();
+                Assert.That(renderer, Is.Not.Null, $"Tower render prefab needs a root MeshRenderer: {prefabPaths[i]}");
+                Assert.That(renderer.sharedMaterial, Is.Not.Null,
+                    $"Tower render prefab needs a source material: {prefabPaths[i]}");
+                Assert.That(renderer.sharedMaterial.enableInstancing, Is.True,
+                    $"GPU instancing must be enabled on the serialized source material so the player build does not strip its instancing shader variant: {prefabPaths[i]}");
+            }
         }
 
         [Test]

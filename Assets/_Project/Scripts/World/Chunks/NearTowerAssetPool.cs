@@ -487,7 +487,6 @@ namespace TowerOfBabel.World.Chunks
                             };
                             if (runtime.HasProperty("_ReceiveShadows"))
                                 runtime.SetFloat("_ReceiveShadows", 0f);
-                            runtime.EnableKeyword("_RECEIVE_SHADOWS_OFF");
                             runtimeMaterials.Add(source, runtime);
                         }
                         materials[materialIndex] = runtime;

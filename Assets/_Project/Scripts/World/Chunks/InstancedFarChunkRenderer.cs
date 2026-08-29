@@ -372,7 +372,6 @@ namespace TowerOfBabel.World.Chunks
                 };
                 if (material.HasProperty("_ReceiveShadows"))
                     material.SetFloat("_ReceiveShadows", 0f);
-                material.EnableKeyword("_RECEIVE_SHADOWS_OFF");
             }
 
             public void SetChunk(ChunkKey owner, RenderCellKey cellKey, List<Matrix4x4> matrices)

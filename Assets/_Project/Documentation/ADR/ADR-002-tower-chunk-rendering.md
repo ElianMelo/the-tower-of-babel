@@ -145,6 +145,8 @@ Each page stores world bounds. Before submission, pages may be culled against th
 
 Far rendering uses `Graphics.RenderMeshInstanced`, instancing-enabled runtime materials, no collision, no realtime shadows, no reflection probes, and no motion vectors. When light probes are enabled, spherical-harmonic data is sampled once at page rebuild time and reused through a `MaterialPropertyBlock`; probes are not sampled for every instance every frame.
 
+The serialized source materials referenced by the tower prefabs must also have GPU instancing enabled. Enabling it only on a runtime material clone is insufficient because a player build can strip the required instancing shader variant before that clone is created. Runtime render materials must avoid introducing keyword combinations that are absent from their serialized source materials unless those variants are retained explicitly by the build pipeline.
+
 ### Runtime and server boundary
 
 The rendering components disable themselves in `UNITY_SERVER` builds. Headless simulation consumes tower/chunk data and never creates near pools, render pages, colliders, or presentation materials.
