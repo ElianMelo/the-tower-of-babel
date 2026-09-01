@@ -20,6 +20,7 @@ namespace TowerOfBabel
         private InputAction toggleAction;
 
         public bool IsVisible => visuals != null && visuals.activeSelf;
+        public InputActionAsset InputActions => inputActions;
 
         private void Awake()
         {

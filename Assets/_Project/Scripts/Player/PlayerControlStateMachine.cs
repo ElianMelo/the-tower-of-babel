@@ -1,4 +1,5 @@
 using System;
+using TowerOfBabel;
 using UnityEngine;
 
 public enum PlayerControlState : byte
@@ -13,9 +14,11 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
 {
     [SerializeField] private PlayerController playerController;
     [SerializeField] private MouseRotator mouseRotator;
+    [SerializeField] private PlayerVisuals playerVisuals;
 
     private bool connected;
     private bool gathering;
+    private bool cameraInputLocked;
 
     public PlayerControlState CurrentState { get; private set; } = PlayerControlState.Locked;
     public event Action GatheringInterrupted;
@@ -23,6 +26,8 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
 
     private void Awake()
     {
+        if (playerVisuals == null)
+            playerVisuals = GetComponentInChildren<PlayerVisuals>(true);
         ApplyState(PlayerControlState.Locked);
     }
 
@@ -60,6 +65,15 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
         EvaluateState();
     }
 
+    public void SetCameraInputLocked(bool locked)
+    {
+        if (cameraInputLocked == locked)
+            return;
+
+        cameraInputLocked = locked;
+        ApplyMouseLock();
+    }
+
     private void EvaluateState()
     {
         PlayerControlState state = !connected
@@ -70,10 +84,22 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
 
     private void ApplyState(PlayerControlState state)
     {
+        PlayerControlState previousState = CurrentState;
         CurrentState = state;
         bool locked = state != PlayerControlState.Moving;
         playerController?.SetControlLocked(locked);
-        mouseRotator?.SetControlLocked(locked);
+        ApplyMouseLock();
+
+        if (state == PlayerControlState.Gathering)
+            playerVisuals?.PlayDigging();
+        else if (previousState == PlayerControlState.Gathering)
+            playerVisuals?.CancelAnimation();
+
         StateChanged?.Invoke(state);
+    }
+
+    private void ApplyMouseLock()
+    {
+        mouseRotator?.SetControlLocked(CurrentState != PlayerControlState.Moving || cameraInputLocked);
     }
 }

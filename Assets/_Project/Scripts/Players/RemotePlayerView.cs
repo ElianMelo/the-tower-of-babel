@@ -14,17 +14,18 @@ namespace TowerOfBabel.Players
             public Vector3 Position;
             public Quaternion Rotation;
             public PlayerAnimationState AnimationState;
+            public PlayerAnimationTrigger AnimationTrigger;
+            public uint AnimationTriggerSequence;
         }
 
-        [SerializeField] private Animator animator;
-        [SerializeField] private string animationStateParameter = "AnimationState";
+        [SerializeField] private PlayerVisuals playerVisuals;
 
         private readonly PresentationSnapshot[] snapshots = new PresentationSnapshot[BufferCapacity];
         private PlayerInstance instance;
         private int oldestIndex;
         private int snapshotCount;
-        private int animationStateHash;
         private PlayerAnimationState appliedAnimationState;
+        private uint appliedAnimationTriggerSequence;
         private bool hasAppliedAnimation;
         private double interpolationDelay = 0.1d;
 
@@ -33,9 +34,8 @@ namespace TowerOfBabel.Players
 
         private void Awake()
         {
-            if (animator == null)
-                animator = GetComponent<Animator>();
-            animationStateHash = Animator.StringToHash(animationStateParameter);
+            if (playerVisuals == null)
+                playerVisuals = GetComponentInChildren<PlayerVisuals>(true);
         }
 
         public void Bind(PlayerInstance playerInstance, double snapshotInterpolationDelay)
@@ -52,7 +52,7 @@ namespace TowerOfBabel.Players
             instance.StateChanged += HandleStateChanged;
             PushSnapshot(instance, Time.unscaledTimeAsDouble);
             transform.SetPositionAndRotation(instance.Position, instance.Rotation);
-            ApplyAnimation(instance.AnimationState);
+            ApplyAnimation(instance.AnimationState, instance.AnimationTrigger, instance.AnimationTriggerSequence);
         }
 
         public void Unbind()
@@ -63,6 +63,7 @@ namespace TowerOfBabel.Players
             oldestIndex = 0;
             snapshotCount = 0;
             hasAppliedAnimation = false;
+            playerVisuals?.ResetNetworkAnimation();
         }
 
         public void Render(double now)
@@ -96,7 +97,9 @@ namespace TowerOfBabel.Players
                 transform.SetPositionAndRotation(
                     Vector3.LerpUnclamped(previous.Position, next.Position, t),
                     Quaternion.SlerpUnclamped(previous.Rotation, next.Rotation, t));
-                ApplyAnimation(t < 0.5f ? previous.AnimationState : next.AnimationState);
+                PresentationSnapshot animationSnapshot = t < 0.5f ? previous : next;
+                ApplyAnimation(animationSnapshot.AnimationState, animationSnapshot.AnimationTrigger,
+                    animationSnapshot.AnimationTriggerSequence);
                 return;
             }
         }
@@ -125,7 +128,9 @@ namespace TowerOfBabel.Players
                 ReceivedAt = receivedAt,
                 Position = source.Position,
                 Rotation = source.Rotation,
-                AnimationState = source.AnimationState
+                AnimationState = source.AnimationState,
+                AnimationTrigger = source.AnimationTrigger,
+                AnimationTriggerSequence = source.AnimationTriggerSequence
             };
         }
 
@@ -135,25 +140,23 @@ namespace TowerOfBabel.Players
         private void ApplySnapshot(PresentationSnapshot snapshot)
         {
             transform.SetPositionAndRotation(snapshot.Position, snapshot.Rotation);
-            ApplyAnimation(snapshot.AnimationState);
+            ApplyAnimation(snapshot.AnimationState, snapshot.AnimationTrigger, snapshot.AnimationTriggerSequence);
         }
 
-        private void ApplyAnimation(PlayerAnimationState state)
+        private void ApplyAnimation(PlayerAnimationState state, PlayerAnimationTrigger trigger, uint triggerSequence)
         {
-            if (hasAppliedAnimation && appliedAnimationState == state)
+            if (hasAppliedAnimation && appliedAnimationState == state &&
+                appliedAnimationTriggerSequence == triggerSequence)
                 return;
             appliedAnimationState = state;
+            appliedAnimationTriggerSequence = triggerSequence;
             hasAppliedAnimation = true;
-
-            // The placeholder Animator intentionally has no controller. Avoid warnings until
-            // the final model/controller is assigned by the developer.
-            if (animator != null && animator.runtimeAnimatorController != null)
-                animator.SetInteger(animationStateHash, (int)state);
+            playerVisuals?.ApplyNetworkAnimation(state, trigger, triggerSequence);
         }
 
         private void Reset()
         {
-            animator = GetComponent<Animator>();
+            playerVisuals = GetComponentInChildren<PlayerVisuals>(true);
         }
     }
 }

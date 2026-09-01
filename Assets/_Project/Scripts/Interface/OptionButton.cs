@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -11,12 +12,45 @@ namespace TowerOfBabel
         [SerializeField] private Button button;
         [SerializeField] private TMP_Text optionText;
 
-        // todo: refactor when implement upgrade system
-        private bool isUnlocked = true;
+        private Action selectionCallback;
+        private bool listenerRegistered;
 
-        private void Start()
+        public string Label => optionText != null ? optionText.text : string.Empty;
+        public bool IsInteractable => button != null && button.interactable;
+
+        private void Awake()
         {
-            button.interactable = isUnlocked;
+            EnsureListener();
+            ToggleHover(false);
+        }
+
+        private void OnDestroy()
+        {
+            if (listenerRegistered && button != null)
+                button.onClick.RemoveListener(HandleSelected);
+        }
+
+        public void Configure(string label, Action onSelected, bool interactable = true)
+        {
+            EnsureListener();
+            selectionCallback = onSelected;
+            SetLabel(label);
+            SetInteractable(interactable);
+            ToggleHover(false);
+        }
+
+        public void SetLabel(string label)
+        {
+            if (optionText != null)
+                optionText.text = label ?? string.Empty;
+        }
+
+        public void SetInteractable(bool interactable)
+        {
+            if (button != null)
+                button.interactable = interactable;
+            if (!interactable)
+                ToggleHover(false);
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -31,7 +65,23 @@ namespace TowerOfBabel
 
         public void ToggleHover(bool isActive)
         {
-            hoverEffect.SetActive(isActive);
+            if (hoverEffect != null)
+                hoverEffect.SetActive(isActive && IsInteractable);
+        }
+
+        private void EnsureListener()
+        {
+            if (listenerRegistered || button == null)
+                return;
+
+            button.onClick.AddListener(HandleSelected);
+            listenerRegistered = true;
+        }
+
+        private void HandleSelected()
+        {
+            if (IsInteractable)
+                selectionCallback?.Invoke();
         }
     }
 }

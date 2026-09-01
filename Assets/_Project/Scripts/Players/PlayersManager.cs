@@ -16,6 +16,7 @@ namespace TowerOfBabel.Players
         [Header("References")]
         [SerializeField] private ChunkManager chunkManager;
         [SerializeField] private Transform localPlayer;
+        [SerializeField] private PlayerVisuals localPlayerVisuals;
         [SerializeField] private RemotePlayerView remotePlayerPrefab;
         [SerializeField] private Transform remoteVisualParent;
 
@@ -39,7 +40,6 @@ namespace TowerOfBabel.Players
         private readonly List<PlayerInstance> candidateBuffer = new();
 
         private PlayerInstance localPlayerInstance;
-        private PlayerAnimationState localAnimationState;
         private ChunkKey observerAnchorChunk;
         private bool hasObserverAnchor;
         private bool warnedMissingPrefab;
@@ -84,8 +84,18 @@ namespace TowerOfBabel.Players
             if (localPlayerInstance != null && localPlayer != null && now >= nextLocalSnapshotTime)
             {
                 nextLocalSnapshotTime = now + NetworkStateInterval;
+                PlayerAnimationState animationState = localPlayerVisuals != null
+                    ? localPlayerVisuals.CurrentAnimationState
+                    : PlayerAnimationState.Idle;
+                PlayerAnimationTrigger animationTrigger = localPlayerVisuals != null
+                    ? localPlayerVisuals.LatestTrigger
+                    : PlayerAnimationTrigger.None;
+                uint animationTriggerSequence = localPlayerVisuals != null
+                    ? localPlayerVisuals.TriggerSequence
+                    : 0u;
                 PlayerStateSnapshot snapshot = localPlayerInstance.CreateNextLocalSnapshot(
-                    localPlayer.position, localPlayer.rotation, localAnimationState);
+                    localPlayer.position, localPlayer.rotation, animationState,
+                    animationTrigger, animationTriggerSequence);
                 chunkManager.RefreshTrackedPlayer(localPlayerInstance);
                 LocalSnapshotCreated?.Invoke(snapshot);
             }
@@ -143,7 +153,14 @@ namespace TowerOfBabel.Players
             if (!playersById.TryGetValue(playerId, out PlayerInstance instance))
             {
                 instance = new PlayerInstance(playerId, localPlayer.position, localPlayer.rotation,
-                    localAnimationState, isLocal: true);
+                    localPlayerVisuals != null ? localPlayerVisuals.CurrentAnimationState : PlayerAnimationState.Idle,
+                    isLocal: true,
+                    animationTrigger: localPlayerVisuals != null
+                        ? localPlayerVisuals.LatestTrigger
+                        : PlayerAnimationTrigger.None,
+                    animationTriggerSequence: localPlayerVisuals != null
+                        ? localPlayerVisuals.TriggerSequence
+                        : 0u);
                 AddPlayer(instance);
             }
             else
@@ -238,8 +255,6 @@ namespace TowerOfBabel.Players
                 PriorityListChanged?.Invoke();
             return true;
         }
-
-        public void SetLocalAnimationState(PlayerAnimationState state) => localAnimationState = state;
 
         public void FillPrioritySeatsNow()
         {
@@ -435,6 +450,8 @@ namespace TowerOfBabel.Players
                 if (playerObject != null)
                     localPlayer = playerObject.transform;
             }
+            if (localPlayerVisuals == null && localPlayer != null)
+                localPlayerVisuals = localPlayer.GetComponentInChildren<PlayerVisuals>(true);
             if (remoteVisualParent == null)
                 remoteVisualParent = transform;
         }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using TowerOfBabel;
 using TowerOfBabel.Resources.Interaction;
 
 [RequireComponent(typeof(CharacterController))]
@@ -7,6 +8,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
     [Header("References")]
     [Tooltip("The camera used for looking around. If left empty, will try to find a child camera.")]
     [SerializeField] private Camera playerCamera;
+    [SerializeField] private PlayerVisuals playerVisuals;
 
     [Header("Movement")]
     [SerializeField] private float walkSpeed = 5f;
@@ -59,6 +61,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
     private float coyoteTimeCounter;
     private float jumpBufferCounter;
     private bool controlsLocked;
+    private bool isSprinting;
 
     private void Awake()
     {
@@ -66,6 +69,8 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
 
         if (playerCamera == null)
             playerCamera = GetComponentInChildren<Camera>();
+        if (playerVisuals == null)
+            playerVisuals = GetComponentInChildren<PlayerVisuals>(true);
 
         if (playerCamera != null)
             originalCameraLocalPos = playerCamera.transform.localPosition;
@@ -101,6 +106,8 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         // Apply combined movement in a single Move() call
         Vector3 finalMotion = currentHorizontalVelocity + velocity;
         controller.Move(finalMotion * Time.deltaTime);
+        AlignForwardWithCamera();
+        UpdatePlayerVisuals();
 
         if (Input.GetKeyDown(KeyCode.Escape))
             ToggleCursorLock();
@@ -111,6 +118,8 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         controlsLocked = locked;
         currentHorizontalVelocity = Vector3.zero;
         velocity = Vector3.zero;
+        isSprinting = false;
+        playerVisuals?.SetMovement(false, false, isGrounded);
     }
 
     private void UpdateGroundState()
@@ -162,10 +171,14 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
             inputDirection.Normalize();
 
         float targetSpeed = walkSpeed;
+        isSprinting = false;
         if (isCrouching)
             targetSpeed = crouchSpeed;
         else if (Input.GetKey(KeyCode.LeftShift) && inputZ > 0f)
+        {
             targetSpeed = sprintSpeed;
+            isSprinting = true;
+        }
 
         Vector3 targetHorizontalVelocity = inputDirection * targetSpeed;
 
@@ -208,6 +221,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpBufferCounter = 0f; // Consume the buffer
+            playerVisuals?.PlayJump();
 
             // Only consume extra jumps if we were actually airborne (coyote time expired)
             if (!isGrounded && coyoteTimeCounter <= 0f && jumpsRemaining > 0)
@@ -223,6 +237,25 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         // Hard cap falling speed to prevent tunneling
         if (velocity.y < -50f)
             velocity.y = -50f;
+    }
+
+    private void UpdatePlayerVisuals()
+    {
+        bool isMoving = currentHorizontalVelocity.sqrMagnitude > 0.01f;
+        playerVisuals?.SetMovement(isMoving, isMoving && isSprinting, isGrounded);
+    }
+
+    private void AlignForwardWithCamera()
+    {
+        if (playerCamera == null)
+            return;
+
+        Vector3 cameraForward = playerCamera.transform.forward;
+        cameraForward.y = 0f;
+        if (cameraForward.sqrMagnitude < 0.0001f)
+            return;
+
+        transform.rotation = Quaternion.LookRotation(cameraForward.normalized, Vector3.up);
     }
 
     private void HandleCrouch()

@@ -1,4 +1,5 @@
 using System;
+using TowerOfBabel;
 using TowerOfBabel.World.Chunks;
 using UnityEngine;
 
@@ -25,15 +26,20 @@ namespace TowerOfBabel.Players
         public Vector3 Position;
         public Quaternion Rotation;
         public PlayerAnimationState AnimationState;
+        public PlayerAnimationTrigger AnimationTrigger;
+        public uint AnimationTriggerSequence;
 
         public PlayerStateSnapshot(uint playerId, uint sequence, Vector3 position, Quaternion rotation,
-            PlayerAnimationState animationState)
+            PlayerAnimationState animationState, PlayerAnimationTrigger animationTrigger = PlayerAnimationTrigger.None,
+            uint animationTriggerSequence = 0u)
         {
             PlayerId = playerId;
             Sequence = sequence;
             Position = position;
             Rotation = rotation;
             AnimationState = animationState;
+            AnimationTrigger = animationTrigger;
+            AnimationTriggerSequence = animationTriggerSequence;
         }
     }
 
@@ -50,22 +56,28 @@ namespace TowerOfBabel.Players
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
         public PlayerAnimationState AnimationState { get; private set; }
+        public PlayerAnimationTrigger AnimationTrigger { get; private set; }
+        public uint AnimationTriggerSequence { get; private set; }
         public ChunkKey CurrentChunk { get; private set; }
         public bool HasChunk { get; private set; }
         public PlayerStateSnapshot CurrentSnapshot => new(
-            PlayerId, Sequence, Position, Rotation, AnimationState);
+            PlayerId, Sequence, Position, Rotation, AnimationState, AnimationTrigger, AnimationTriggerSequence);
 
         public event Action<PlayerInstance> StateChanged;
         public event Action<PlayerInstance> Disconnected;
 
         public PlayerInstance(uint playerId, Vector3 position, Quaternion rotation,
             PlayerAnimationState animationState = PlayerAnimationState.Idle,
-            bool isFriend = false, bool isLocal = false)
+            bool isFriend = false, bool isLocal = false,
+            PlayerAnimationTrigger animationTrigger = PlayerAnimationTrigger.None,
+            uint animationTriggerSequence = 0u)
         {
             PlayerId = playerId;
             Position = position;
             Rotation = NormalizeRotation(rotation);
             AnimationState = animationState;
+            AnimationTrigger = animationTrigger;
+            AnimationTriggerSequence = animationTriggerSequence;
             IsFriend = isFriend;
             IsLocal = isLocal;
         }
@@ -82,15 +94,19 @@ namespace TowerOfBabel.Players
             Position = snapshot.Position;
             Rotation = NormalizeRotation(snapshot.Rotation);
             AnimationState = snapshot.AnimationState;
+            AnimationTrigger = snapshot.AnimationTrigger;
+            AnimationTriggerSequence = snapshot.AnimationTriggerSequence;
             StateChanged?.Invoke(this);
             return true;
         }
 
         public PlayerStateSnapshot CreateNextLocalSnapshot(Vector3 position, Quaternion rotation,
-            PlayerAnimationState animationState)
+            PlayerAnimationState animationState, PlayerAnimationTrigger animationTrigger,
+            uint animationTriggerSequence)
         {
             uint nextSequence = hasSnapshot ? Sequence + 1u : 1u;
-            PlayerStateSnapshot snapshot = new(PlayerId, nextSequence, position, rotation, animationState);
+            PlayerStateSnapshot snapshot = new(PlayerId, nextSequence, position, rotation, animationState,
+                animationTrigger, animationTriggerSequence);
             ApplySnapshot(snapshot);
             return snapshot;
         }
