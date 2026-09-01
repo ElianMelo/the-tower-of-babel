@@ -515233,6 +515233,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Players.PlayersManager
   chunkManager: {fileID: 1114320928}
   localPlayer: {fileID: 805851541}
+  localPlayerVisuals: {fileID: 0}
   remotePlayerPrefab: {fileID: 4681380498516385697, guid: 6c6e8cff1c20ea6449ebd5c14139ab28, type: 3}
   remoteVisualParent: {fileID: 1345968934}
   priorityCapacity: 100
@@ -515790,6 +515791,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFollower
   player: {fileID: 805851541}
+  fallbackHeadHeight: 0.75
+  eyeHeightOffset: 0.06
 --- !u!1001 &1273116479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -516953,11 +516956,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a35db6e2696e8045aab9435ebda58c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.AnimationEmoteUI
+  visuals: {fileID: 0}
   options:
   - {fileID: 9093498154551673866}
   - {fileID: 1218302467}
   - {fileID: 816965081}
   - {fileID: 726207511}
+  inputActions: {fileID: 0}
+  toggleActionName: Player/Emote
+  playerVisuals: {fileID: 0}
+  radialRadius: 300
+  startAngleDegrees: 90
 --- !u!1001 &6624291752232578167
 PrefabInstance:
   m_ObjectHideFlags: 0

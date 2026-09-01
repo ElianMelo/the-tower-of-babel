@@ -18,7 +18,7 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
 
     private bool connected;
     private bool gathering;
-    private bool cameraInputLocked;
+    private bool modalInputLocked;
 
     public PlayerControlState CurrentState { get; private set; } = PlayerControlState.Locked;
     public event Action GatheringInterrupted;
@@ -65,13 +65,13 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
         EvaluateState();
     }
 
-    public void SetCameraInputLocked(bool locked)
+    public void SetModalInputLocked(bool locked)
     {
-        if (cameraInputLocked == locked)
+        if (modalInputLocked == locked)
             return;
 
-        cameraInputLocked = locked;
-        ApplyMouseLock();
+        modalInputLocked = locked;
+        ApplyControlLocks();
     }
 
     private void EvaluateState()
@@ -86,9 +86,7 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
     {
         PlayerControlState previousState = CurrentState;
         CurrentState = state;
-        bool locked = state != PlayerControlState.Moving;
-        playerController?.SetControlLocked(locked);
-        ApplyMouseLock();
+        ApplyControlLocks();
 
         if (state == PlayerControlState.Gathering)
             playerVisuals?.PlayDigging();
@@ -98,8 +96,10 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
         StateChanged?.Invoke(state);
     }
 
-    private void ApplyMouseLock()
+    private void ApplyControlLocks()
     {
-        mouseRotator?.SetControlLocked(CurrentState != PlayerControlState.Moving || cameraInputLocked);
+        bool locked = CurrentState != PlayerControlState.Moving || modalInputLocked;
+        playerController?.SetControlLocked(locked);
+        mouseRotator?.SetControlLocked(locked);
     }
 }

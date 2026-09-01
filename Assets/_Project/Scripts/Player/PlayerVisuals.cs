@@ -41,6 +41,8 @@ namespace TowerOfBabel
         };
 
         [SerializeField] private Animator animator;
+        [Tooltip("Collapses the head bone only for the locally controlled first-person avatar.")]
+        [SerializeField] private bool hideHeadForLocalPlayer = true;
 
         private bool walking;
         private bool running;
@@ -63,6 +65,7 @@ namespace TowerOfBabel
         {
             if (animator == null)
                 animator = GetComponent<Animator>();
+            HideLocalPlayerHead();
             ValidateAnimatorParameters();
         }
 
@@ -279,6 +282,36 @@ namespace TowerOfBabel
             foreach (KeyValuePair<PlayerAnimationTrigger, string> entry in TriggerNames)
                 ValidateParameter(parameters, Animator.StringToHash(entry.Value), entry.Value,
                     AnimatorControllerParameterType.Trigger);
+        }
+
+        private void HideLocalPlayerHead()
+        {
+            if (!hideHeadForLocalPlayer || GetComponentInParent<PlayerController>() == null)
+                return;
+
+            Transform head = FindHeadTransform();
+            if (head != null)
+                head.localScale = Vector3.zero;
+            else
+                Debug.LogWarning("Could not find the local player's head bone to hide it.", this);
+        }
+
+        private Transform FindHeadTransform()
+        {
+            if (animator != null && animator.isHuman)
+            {
+                Transform humanoidHead = animator.GetBoneTransform(HumanBodyBones.Head);
+                if (humanoidHead != null)
+                    return humanoidHead;
+            }
+
+            foreach (Transform candidate in GetComponentsInChildren<Transform>(true))
+            {
+                if (candidate.name == "mixamorig:Head" || candidate.name == "Head")
+                    return candidate;
+            }
+
+            return null;
         }
 
         private void ValidateParameter(Dictionary<int, AnimatorControllerParameterType> parameters, int hash,

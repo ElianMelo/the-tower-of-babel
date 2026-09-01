@@ -158,6 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   playerCamera: {fileID: 0}
+  playerVisuals: {fileID: 0}
   walkSpeed: 10
   sprintSpeed: 20
   crouchSpeed: 2.5
@@ -228,6 +229,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::PlayerControlStateMachine
   playerController: {fileID: 2894762465757621355}
   mouseRotator: {fileID: 0}
+  playerVisuals: {fileID: 0}
 --- !u!1001 &5356968984818107954
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -246,7 +248,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4758552437117259387, guid: 1c2305d92eff96a418bbfe3ebcfc964f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.8
+      value: -1.085
       objectReference: {fileID: 0}
     - target: {fileID: 4758552437117259387, guid: 1c2305d92eff96a418bbfe3ebcfc964f, type: 3}
       propertyPath: m_LocalPosition.z

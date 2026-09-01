@@ -44,7 +44,7 @@ namespace TowerOfBabel
         private CursorLockMode previousCursorLockMode;
         private bool previousCursorVisible;
         private bool cursorStateCaptured;
-        private bool cameraLockApplied;
+        private bool inputLockApplied;
 
         public bool IsVisible => visuals != null && visuals.activeSelf;
 
@@ -79,7 +79,7 @@ namespace TowerOfBabel
 
             if (cursorStateCaptured)
                 RestoreCursorState();
-            ReleaseCameraLock();
+            ReleaseInputLock();
         }
 
         public void Show()
@@ -101,8 +101,8 @@ namespace TowerOfBabel
             Cursor.visible = true;
             if (controlStateMachine != null)
             {
-                controlStateMachine.SetCameraInputLocked(true);
-                cameraLockApplied = true;
+                controlStateMachine.SetModalInputLocked(true);
+                inputLockApplied = true;
             }
             visuals.SetActive(true);
         }
@@ -119,7 +119,7 @@ namespace TowerOfBabel
                 visuals.SetActive(false);
             if (cursorStateCaptured)
                 RestoreCursorState();
-            ReleaseCameraLock();
+            ReleaseInputLock();
         }
 
         public void Toggle()
@@ -223,13 +223,13 @@ namespace TowerOfBabel
             cursorStateCaptured = false;
         }
 
-        private void ReleaseCameraLock()
+        private void ReleaseInputLock()
         {
-            if (!cameraLockApplied)
+            if (!inputLockApplied)
                 return;
 
-            controlStateMachine?.SetCameraInputLocked(false);
-            cameraLockApplied = false;
+            controlStateMachine?.SetModalInputLocked(false);
+            inputLockApplied = false;
         }
     }
 }

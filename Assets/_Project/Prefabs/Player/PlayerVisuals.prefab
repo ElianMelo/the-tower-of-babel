@@ -123,7 +123,7 @@ Transform:
   m_GameObject: {fileID: 2083268038265495766}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.8, z: 0}
+  m_LocalPosition: {x: 0, y: -0.876, z: 0}
   m_LocalScale: {x: 130, y: 130, z: 130}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -166,6 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.PlayerVisuals
   animator: {fileID: 2109873318232829492}
+  hideHeadForLocalPlayer: 1
 --- !u!1 &2084892875878626751
 GameObject:
   m_ObjectHideFlags: 0
