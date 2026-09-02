@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 8596167359093563397}
   - component: {fileID: 565484514076855596}
   - component: {fileID: 4037064959056306450}
+  - component: {fileID: 900000000000000001}
+  - component: {fileID: 2897153398365438957}
   m_Layer: 0
   m_Name: Arch
   m_TagString: Untagged
@@ -123,6 +125,7 @@ MonoBehaviour:
   shakeStrength: 0.05
   shakeSpeed: 24
   visuals: {fileID: 7422095426885229418}
+  outline: {fileID: 900000000000000001}
   meshFilter: {fileID: 5813953479370380495}
   stageMeshes:
   - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
@@ -136,3 +139,37 @@ MonoBehaviour:
   - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
   - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
   - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
+--- !u!114 &900000000000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7803406487178166736}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e9351dffeafc734f971e35967334c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
+  settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
+--- !u!65 &2897153398365438957
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7803406487178166736}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.351803, y: 1.4552007, z: 0.39999998}
+  m_Center: {x: 0.98100287, y: 0.7319102, z: 0.0000011399388}

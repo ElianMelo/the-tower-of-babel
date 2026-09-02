@@ -10,7 +10,8 @@ namespace TowerOfBabel.Buildings
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(MeshFilter))]
-    public sealed class Building : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable
+    public sealed class Building : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable,
+        IInteractionPresentation
     {
         public const int StageCount = ChunkAssetData.CompletedStage + 1;
 
@@ -27,6 +28,7 @@ namespace TowerOfBabel.Buildings
         [SerializeField, Min(0f)] private float shakeStrength = 0.05f;
         [SerializeField, Min(0f)] private float shakeSpeed = 24f;
         [SerializeField] private Transform visuals;
+        [SerializeField] private TowerOfBabel.Outline outline;
 
         [Header("Stage Meshes (0-10)")]
         [SerializeField] private MeshFilter meshFilter;
@@ -57,9 +59,11 @@ namespace TowerOfBabel.Buildings
         public byte CurrentStage => currentStage;
         public bool IsComplete => currentStage >= ChunkAssetData.CompletedStage;
         public bool IsBound => isBound;
+        public bool ShouldShowInteraction => !IsComplete;
         public ChunkKey ChunkKey => chunkKey;
         public int LocalIndex => localIndex;
         public event Action ServerRejected;
+        public event Action InteractionPresentationChanged;
 
         private bool HasLocalResources
         {
@@ -89,6 +93,7 @@ namespace TowerOfBabel.Buildings
         public void Unbind()
         {
             RestoreVisualPosition();
+            outline?.SetVisible(false);
             chunkManager = null;
             localIndex = -1;
             isBound = false;
@@ -96,10 +101,22 @@ namespace TowerOfBabel.Buildings
 
         public void ApplyStage(byte stage)
         {
-            currentStage = stage > ChunkAssetData.CompletedStage
+            byte nextStage = stage > ChunkAssetData.CompletedStage
                 ? ChunkAssetData.CompletedStage
                 : stage;
+            bool changed = currentStage != nextStage;
+            currentStage = nextStage;
             ApplyStageMesh(currentStage);
+
+            if (IsComplete)
+                outline?.SetVisible(false);
+            if (changed)
+                InteractionPresentationChanged?.Invoke();
+        }
+
+        public void SetInteractionFocused(bool focused)
+        {
+            outline?.SetVisible(focused && ShouldShowInteraction);
         }
 
         public Mesh GetStageMesh(byte stage)
@@ -163,6 +180,8 @@ namespace TowerOfBabel.Buildings
                 meshFilter = GetComponent<MeshFilter>();
             if (visuals == null)
                 visuals = transform;
+            if (outline == null)
+                outline = GetComponent<TowerOfBabel.Outline>();
         }
 
         private void RestoreVisualPosition()
@@ -174,6 +193,7 @@ namespace TowerOfBabel.Buildings
         private void OnDisable()
         {
             RestoreVisualPosition();
+            outline?.SetVisible(false);
         }
 
         private void OnValidate()

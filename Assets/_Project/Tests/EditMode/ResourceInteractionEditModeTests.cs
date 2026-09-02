@@ -8,6 +8,7 @@ using TowerOfBabel.World.Chunks;
 using UnityEngine;
 using UnityEngine.UI;
 using TowerOfBabel.Networking.Resources;
+using UnityEditor;
 
 namespace TowerOfBabel.Resources.Tests
 {
@@ -55,20 +56,144 @@ namespace TowerOfBabel.Resources.Tests
             Building building = root.AddComponent<Building>();
             SetField(building, "meshFilter", filter);
             SetField(building, "stageMeshes", meshes);
+            int presentationChanges = 0;
+            building.InteractionPresentationChanged += () => presentationChanges++;
 
             building.ApplyStage(5);
             Assert.That(Building.StageCount, Is.EqualTo(11));
             Assert.That(building.CurrentStage, Is.EqualTo(5));
             Assert.That(filter.sharedMesh, Is.SameAs(stageFive));
+            Assert.That(building.ShouldShowInteraction, Is.True);
 
             building.ApplyStage(99);
             Assert.That(building.CurrentStage, Is.EqualTo(ChunkAssetData.CompletedStage));
             Assert.That(filter.sharedMesh, Is.SameAs(stageTen));
+            Assert.That(building.ShouldShowInteraction, Is.False);
+            Assert.That(presentationChanges, Is.EqualTo(2));
 
             Object.DestroyImmediate(root);
             Object.DestroyImmediate(stageZero);
             Object.DestroyImmediate(stageFive);
             Object.DestroyImmediate(stageTen);
+        }
+
+        [Test]
+        public void TowerOutline_UsesSharedLineworkSettingsAndRestoresRenderingLayer()
+        {
+            Object settings = AssetDatabase.LoadAssetAtPath<Object>(
+                "Assets/_Project/Scripts/Buildings/OutlineSettings.asset");
+            Assert.That(settings, Is.Not.Null);
+
+            GameObject root = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Renderer renderer = root.GetComponent<Renderer>();
+            renderer.renderingLayerMask = 1u;
+            TowerOfBabel.Outline outline = root.AddComponent<TowerOfBabel.Outline>();
+            SetField(outline, "settings", settings);
+
+            outline.SetVisible(true);
+            Assert.That(outline.IsVisible, Is.True);
+            Assert.That(renderer.renderingLayerMask, Is.EqualTo(3u));
+
+            outline.SetVisible(false);
+            Assert.That(outline.IsVisible, Is.False);
+            Assert.That(renderer.renderingLayerMask, Is.EqualTo(1u));
+
+            Object.DestroyImmediate(root);
+        }
+
+        [TestCase("Assets/_Project/Prefabs/Buildings/Arch.prefab")]
+        [TestCase("Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab")]
+        [TestCase("Assets/_Project/Prefabs/Buildings/Pillar.prefab")]
+        [TestCase("Assets/_Project/Prefabs/Buildings/Step_Tile.prefab")]
+        public void TowerPrefab_HasWorkingSharedOutline(string prefabPath)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            Assert.That(prefab, Is.Not.Null);
+
+            GameObject instance = Object.Instantiate(prefab);
+            TowerOfBabel.Outline outline = instance.GetComponent<TowerOfBabel.Outline>();
+            Assert.That(outline, Is.Not.Null);
+
+            outline.SetVisible(true);
+            Assert.That(outline.IsVisible, Is.True);
+            foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
+                Assert.That(renderer.renderingLayerMask & 2u, Is.EqualTo(2u));
+
+            outline.SetVisible(false);
+            foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
+                Assert.That(renderer.renderingLayerMask & 2u, Is.Zero);
+
+            Object.DestroyImmediate(instance);
+        }
+
+        [TestCase("Assets/_Project/Prefabs/Buildings/Arch.prefab")]
+        [TestCase("Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab")]
+        [TestCase("Assets/_Project/Prefabs/Buildings/Step_Tile.prefab")]
+        public void TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(string prefabPath)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            Assert.That(prefab, Is.Not.Null);
+
+            GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject instance = Object.Instantiate(prefab);
+            GameObject player = new("Test Player");
+            try
+            {
+                instance.transform.position = new Vector3(0f, 1000f, 0f);
+                ground.name = "Test Ground";
+                ground.transform.position = new Vector3(0f, 999.9f, 0f);
+                ground.transform.localScale = new Vector3(20f, 0.2f, 20f);
+
+                Collider interactionCollider = instance.GetComponentInChildren<Collider>(true);
+                Assert.That(interactionCollider, Is.Not.Null);
+                Assert.That(interactionCollider.enabled, Is.True);
+                Assert.That(interactionCollider.isTrigger, Is.False);
+                Assert.That(interactionCollider.GetComponentInParent<Building>(), Is.SameAs(instance.GetComponent<Building>()));
+
+                Physics.SyncTransforms();
+                Vector3 origin = interactionCollider.bounds.center + Vector3.up * 10f;
+                Assert.That(Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 20f, ~0,
+                    QueryTriggerInteraction.Ignore), Is.True);
+                Assert.That(hit.collider, Is.SameAs(interactionCollider),
+                    "The interaction collider must sit above coplanar ground so the player raycast can focus the building.");
+
+                PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
+                Invoke(raycaster, "SetTarget", hit.collider.gameObject);
+                Assert.That(raycaster.CurrentTarget, Is.SameAs(interactionCollider.gameObject));
+                foreach (Renderer renderer in instance.GetComponentsInChildren<Renderer>(true))
+                    Assert.That(renderer.renderingLayerMask & 2u, Is.EqualTo(2u));
+            }
+            finally
+            {
+                Object.DestroyImmediate(player);
+                Object.DestroyImmediate(instance);
+                Object.DestroyImmediate(ground);
+            }
+        }
+
+        [Test]
+        public void Raycaster_RefreshesFocusedPresentationWithoutChangingTarget()
+        {
+            GameObject player = new("Player");
+            PlayerInteractionRaycaster raycaster = player.AddComponent<PlayerInteractionRaycaster>();
+            GameObject target = new("Tower Asset");
+            FakePresentationInteractable interactable = target.AddComponent<FakePresentationInteractable>();
+
+            Invoke(raycaster, "SetTarget", target);
+            Assert.That(interactable.IsFocused, Is.True);
+
+            SetField(raycaster, "activeInteraction", interactable);
+            SetField(raycaster, "activeInteractionBehaviour", interactable);
+            Invoke(raycaster, "CompleteInteraction");
+            Assert.That(raycaster.CurrentTarget, Is.SameAs(target));
+            Assert.That(interactable.IsFocused, Is.True);
+
+            interactable.SetShouldShow(false);
+            Assert.That(interactable.IsFocused, Is.False);
+            Assert.That(raycaster.CurrentTarget, Is.SameAs(target));
+
+            Object.DestroyImmediate(player);
+            Object.DestroyImmediate(target);
         }
 
         [Test]
@@ -241,9 +366,9 @@ namespace TowerOfBabel.Resources.Tests
             target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);
         }
 
-        private static void Invoke(object target, string method)
+        private static void Invoke(object target, string method, params object[] arguments)
         {
-            target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
+            target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, arguments);
         }
 
         private static TMP_Text CreateText(Transform parent, string name)
@@ -252,6 +377,32 @@ namespace TowerOfBabel.Resources.Tests
                 .GetComponent<TextMeshProUGUI>();
             text.transform.SetParent(parent);
             return text;
+        }
+
+        private sealed class FakePresentationInteractable : MonoBehaviour, IInteractable,
+            IInteractionPresentation
+        {
+            public string ObjectName => "Tower Asset";
+            public string DetailText => "Stage 1/10";
+            public Color DetailColor => Color.yellow;
+            public string PromptText => "Press 'E'";
+            public float Duration => 1f;
+            public bool CanInteract => true;
+            public bool ShouldShowInteraction { get; private set; } = true;
+            public bool IsFocused { get; private set; }
+            public event System.Action InteractionPresentationChanged;
+
+            public void SetShouldShow(bool shouldShow)
+            {
+                ShouldShowInteraction = shouldShow;
+                InteractionPresentationChanged?.Invoke();
+            }
+
+            public void SetInteractionFocused(bool focused) => IsFocused = focused;
+            public void BeginInteraction(GameObject interactor) { }
+            public void UpdateInteraction(float normalizedProgress) { }
+            public void CancelInteraction() { }
+            public void CompleteInteraction(GameObject interactor) { }
         }
     }
 }

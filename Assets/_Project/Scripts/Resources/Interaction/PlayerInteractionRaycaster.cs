@@ -20,6 +20,7 @@ namespace TowerOfBabel.Resources.Interaction
 
         private IInteractable currentInteractable;
         private MonoBehaviour currentInteractableBehaviour;
+        private IInteractionPresentation currentPresentation;
         private IInteractable activeInteraction;
         private MonoBehaviour activeInteractionBehaviour;
         private float interactionElapsed;
@@ -73,34 +74,68 @@ namespace TowerOfBabel.Resources.Interaction
             IInteractable interactable = interactableBehaviour as IInteractable;
 
             if (CurrentTarget == target && ReferenceEquals(currentInteractable, interactable))
+            {
+                RefreshCurrentPresentation();
                 return;
+            }
+
+            ReleaseCurrentPresentation();
 
             CurrentTarget = target;
             currentInteractable = interactable;
             currentInteractableBehaviour = interactableBehaviour;
+            currentPresentation = interactable as IInteractionPresentation;
+            if (currentPresentation != null)
+                currentPresentation.InteractionPresentationChanged += HandleInteractionPresentationChanged;
 
-            if (interactable == null)
+            RefreshCurrentPresentation();
+        }
+
+        private void RefreshCurrentPresentation()
+        {
+            if (currentInteractable == null ||
+                currentInteractableBehaviour == null ||
+                !currentInteractableBehaviour.isActiveAndEnabled ||
+                currentPresentation != null && !currentPresentation.ShouldShowInteraction)
             {
+                currentPresentation?.SetInteractionFocused(false);
                 InterfaceManager.Instance?.HideInteraction();
                 return;
             }
 
+            currentPresentation?.SetInteractionFocused(true);
             InterfaceManager.Instance?.ShowInteraction(
-                string.Format(promptFormat, interactable.ObjectName),
-                interactable.DetailText,
-                interactable.DetailColor,
-                interactable.PromptText);
+                string.Format(promptFormat, currentInteractable.ObjectName),
+                currentInteractable.DetailText,
+                currentInteractable.DetailColor,
+                currentInteractable.PromptText);
         }
 
         private void ClearTarget()
         {
-            if (CurrentTarget == null)
+            if (CurrentTarget == null && currentInteractable == null && currentPresentation == null)
                 return;
 
+            ReleaseCurrentPresentation();
             CurrentTarget = null;
             currentInteractable = null;
             currentInteractableBehaviour = null;
             InterfaceManager.Instance?.HideInteraction();
+        }
+
+        private void ReleaseCurrentPresentation()
+        {
+            if (currentPresentation == null)
+                return;
+
+            currentPresentation.InteractionPresentationChanged -= HandleInteractionPresentationChanged;
+            currentPresentation.SetInteractionFocused(false);
+            currentPresentation = null;
+        }
+
+        private void HandleInteractionPresentationChanged()
+        {
+            RefreshCurrentPresentation();
         }
 
         private void OnDisable()
@@ -167,7 +202,7 @@ namespace TowerOfBabel.Resources.Interaction
         {
             activeInteraction.CompleteInteraction(gameObject);
             FinishInteraction();
-            ClearTarget();
+            RefreshCurrentPresentation();
         }
 
         public void CancelCurrentInteraction()

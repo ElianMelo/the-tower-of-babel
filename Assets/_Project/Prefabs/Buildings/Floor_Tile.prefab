@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 2562855112472939307}
   - component: {fileID: 1458828386333967502}
   - component: {fileID: 3736364784738742340}
-  - component: {fileID: 5741485911637492083}
   - component: {fileID: 5512916851017535467}
   - component: {fileID: 8506526495336362229}
+  - component: {fileID: 900000000000000002}
+  - component: {fileID: 6012879646623519156}
   m_Layer: 0
   m_Name: Floor_Tile
   m_TagString: Untagged
@@ -93,27 +94,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &5741485911637492083
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2943884701809381777}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 4, y: 0.19999999, z: 4}
-  m_Center: {x: 2, y: -0.099999994, z: -2}
 --- !u!114 &5512916851017535467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -145,6 +125,7 @@ MonoBehaviour:
   shakeStrength: 0.05
   shakeSpeed: 24
   visuals: {fileID: 2562855112472939307}
+  outline: {fileID: 900000000000000002}
   meshFilter: {fileID: 1458828386333967502}
   stageMeshes:
   - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
@@ -158,3 +139,37 @@ MonoBehaviour:
   - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
   - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
   - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+--- !u!114 &900000000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2943884701809381777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e9351dffeafc734f971e35967334c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
+  settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
+--- !u!65 &6012879646623519156
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2943884701809381777}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4, y: 0.19999999, z: 4}
+  m_Center: {x: 2, y: -0.099999994, z: -2}

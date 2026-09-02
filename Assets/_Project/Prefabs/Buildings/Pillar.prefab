@@ -148,6 +148,7 @@ MonoBehaviour:
   shakeStrength: 0.05
   shakeSpeed: 24
   visuals: {fileID: 9086564995837652392}
+  outline: {fileID: 1429859748983638673}
   meshFilter: {fileID: 5311482485373788685}
   stageMeshes:
   - {fileID: 7622289829416560332, guid: 23c4973d53de85948b07affebeca1c44, type: 3}
@@ -173,7 +174,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e9351dffeafc734f971e35967334c71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
-  outlineLayer:
-    serializedVersion: 0
-    m_Bits: 2
-  activate: 0
+  settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
