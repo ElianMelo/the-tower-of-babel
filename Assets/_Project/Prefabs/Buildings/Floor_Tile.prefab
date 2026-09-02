@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 3736364784738742340}
   - component: {fileID: 5741485911637492083}
   - component: {fileID: 5512916851017535467}
+  - component: {fileID: 8506526495336362229}
   m_Layer: 0
   m_Name: Floor_Tile
   m_TagString: Untagged
@@ -126,3 +127,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerAsset
   assetType: 0
+--- !u!114 &8506526495336362229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2943884701809381777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0db77396aaf32945ad7890fc52f24d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Buildings.Building
+  resourceType: 0
+  resourceCostPerStage: 1
+  interactionDuration: 3
+  shakeStrength: 0.05
+  shakeSpeed: 24
+  visuals: {fileID: 2562855112472939307}
+  meshFilter: {fileID: 1458828386333967502}
+  stageMeshes:
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}

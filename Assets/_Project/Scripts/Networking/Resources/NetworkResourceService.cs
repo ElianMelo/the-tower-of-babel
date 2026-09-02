@@ -84,6 +84,35 @@ namespace TowerOfBabel.Networking.Resources
                 localActiveResource = null;
         }
 
+        public int GetLocalAmount(ResourceType resourceType)
+        {
+            return localWallet != null ? localWallet.GetAmount(resourceType) : 0;
+        }
+
+        public bool ServerHasAtLeast(NetworkConnection connection, ResourceType resourceType, int amount)
+        {
+            return IsServerStarted && connection != null && amount > 0
+                && serverResources.HasAtLeast(connection.ClientId, resourceType, amount);
+        }
+
+        public bool TryConsumeServer(NetworkConnection connection, ResourceType resourceType,
+            int amount, out int authoritativeAmount)
+        {
+            authoritativeAmount = 0;
+            if (!IsServerStarted || connection == null)
+                return false;
+
+            return serverResources.TryConsume(connection.ClientId, resourceType, amount,
+                out authoritativeAmount);
+        }
+
+        public void SendAuthoritativeAmount(NetworkConnection connection, ResourceType resourceType,
+            int amount)
+        {
+            if (IsServerStarted && connection != null)
+                UpdateWalletTargetRpc(connection, resourceType, amount);
+        }
+
         [ServerRpc(RequireOwnership = false)]
         private void RequestGatherStartServerRpc(ulong nodeId, Vector3 claimedPlayerPosition, NetworkConnection sender = null)
         {

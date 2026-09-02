@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using TMPro;
 using TowerOfBabel.Resources.Interaction;
+using TowerOfBabel.Buildings;
+using TowerOfBabel.World.Chunks;
 using UnityEngine;
 using UnityEngine.UI;
 using TowerOfBabel.Networking.Resources;
@@ -36,6 +38,37 @@ namespace TowerOfBabel.Resources.Tests
 
             Assert.That(wallet.GetAmount(ResourceType.Stone), Is.EqualTo(5));
             Object.DestroyImmediate(player);
+        }
+
+        [Test]
+        public void Building_ExposesElevenStagesAndAppliesConfiguredMesh()
+        {
+            GameObject root = new("Pillar");
+            MeshFilter filter = root.AddComponent<MeshFilter>();
+            Mesh stageZero = new();
+            Mesh stageFive = new();
+            Mesh stageTen = new();
+            Mesh[] meshes = new Mesh[Building.StageCount];
+            meshes[0] = stageZero;
+            meshes[5] = stageFive;
+            meshes[10] = stageTen;
+            Building building = root.AddComponent<Building>();
+            SetField(building, "meshFilter", filter);
+            SetField(building, "stageMeshes", meshes);
+
+            building.ApplyStage(5);
+            Assert.That(Building.StageCount, Is.EqualTo(11));
+            Assert.That(building.CurrentStage, Is.EqualTo(5));
+            Assert.That(filter.sharedMesh, Is.SameAs(stageFive));
+
+            building.ApplyStage(99);
+            Assert.That(building.CurrentStage, Is.EqualTo(ChunkAssetData.CompletedStage));
+            Assert.That(filter.sharedMesh, Is.SameAs(stageTen));
+
+            Object.DestroyImmediate(root);
+            Object.DestroyImmediate(stageZero);
+            Object.DestroyImmediate(stageFive);
+            Object.DestroyImmediate(stageTen);
         }
 
         [Test]
@@ -83,6 +116,18 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(cappedAmount, Is.EqualTo(50));
             Assert.That(store.TryAdd(7, ResourceType.Stone, 1, out int rejectedAmount), Is.False);
             Assert.That(rejectedAmount, Is.EqualTo(50));
+        }
+
+        [Test]
+        public void ServerPlayerResourceStore_ConsumesOnlyWhenFullCostIsAvailable()
+        {
+            ServerPlayerResourceStore store = new(50);
+            store.TryAdd(7, ResourceType.Stone, 2, out _);
+
+            Assert.That(store.TryConsume(7, ResourceType.Stone, 1, out int remaining), Is.True);
+            Assert.That(remaining, Is.EqualTo(1));
+            Assert.That(store.TryConsume(7, ResourceType.Stone, 2, out remaining), Is.False);
+            Assert.That(remaining, Is.EqualTo(1));
         }
 
         [Test]

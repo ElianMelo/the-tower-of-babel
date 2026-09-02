@@ -30,7 +30,7 @@ namespace TowerOfBabel
 
         [Header("References")]
         [SerializeField] private GameObject visuals;
-        [SerializeField] private List<OptionButton> options = new();
+        [SerializeField] private OptionButton optionPrefab;
         [SerializeField] private InputActionAsset inputActions;
         [SerializeField] private string toggleActionName = "Player/Emote";
         [SerializeField] private PlayerVisuals playerVisuals;
@@ -39,11 +39,10 @@ namespace TowerOfBabel
         [SerializeField, Min(1f)] private float radialRadius = 300f;
         [SerializeField] private float startAngleDegrees = 90f;
 
+        private readonly List<OptionButton> options = new();
         private InputAction toggleAction;
         private PlayerControlStateMachine controlStateMachine;
-        private CursorLockMode previousCursorLockMode;
-        private bool previousCursorVisible;
-        private bool cursorStateCaptured;
+        private CursorStateConfig? previousCursorState;
         private bool inputLockApplied;
 
         public bool IsVisible => visuals != null && visuals.activeSelf;
@@ -77,8 +76,7 @@ namespace TowerOfBabel
                 toggleAction = null;
             }
 
-            if (cursorStateCaptured)
-                RestoreCursorState();
+            RestoreCursorState();
             ReleaseInputLock();
         }
 
@@ -94,11 +92,8 @@ namespace TowerOfBabel
                 option.ToggleHover(false);
             }
 
-            previousCursorLockMode = Cursor.lockState;
-            previousCursorVisible = Cursor.visible;
-            cursorStateCaptured = true;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            previousCursorState = CursorStateConfig.Current;
+            CursorStateConfig.UnlockedVisible.Apply();
             if (controlStateMachine != null)
             {
                 controlStateMachine.SetModalInputLocked(true);
@@ -117,8 +112,7 @@ namespace TowerOfBabel
 
             if (visuals != null)
                 visuals.SetActive(false);
-            if (cursorStateCaptured)
-                RestoreCursorState();
+            RestoreCursorState();
             ReleaseInputLock();
         }
 
@@ -132,31 +126,27 @@ namespace TowerOfBabel
 
         private void BuildOptions()
         {
-            options.RemoveAll(option => option == null);
-            if (options.Count == 0)
+            if (optionPrefab == null)
             {
-                Debug.LogError("AnimationEmoteUI requires one OptionButton to use as its runtime template.", this);
+                Debug.LogError("AnimationEmoteUI requires an OptionButton prefab.", this);
                 return;
             }
 
             if (visuals == null)
-                visuals = options[0].transform.parent.gameObject;
-
-            OptionButton template = options[0];
-            Transform optionParent = template.transform.parent;
-            while (options.Count < EmoteOptions.Length)
-                options.Add(Instantiate(template, optionParent));
-
-            for (int i = 0; i < options.Count; i++)
             {
-                bool isUsed = i < EmoteOptions.Length;
-                options[i].gameObject.SetActive(isUsed);
-                if (!isUsed)
-                    continue;
+                Debug.LogError("AnimationEmoteUI requires a visuals container for its options.", this);
+                return;
+            }
 
+            options.Clear();
+
+            for (int i = 0; i < EmoteOptions.Length; i++)
+            {
                 EmoteOption definition = EmoteOptions[i];
-                options[i].name = $"EmoteOption_{definition.Trigger}";
-                options[i].Configure(definition.Label, () => SelectEmote(definition.Trigger));
+                OptionButton option = Instantiate(optionPrefab, visuals.transform);
+                option.name = $"EmoteOption_{definition.Trigger}";
+                option.Configure(definition.Label, () => SelectEmote(definition.Trigger));
+                options.Add(option);
             }
 
             LayoutOptions();
@@ -218,9 +208,11 @@ namespace TowerOfBabel
 
         private void RestoreCursorState()
         {
-            Cursor.lockState = previousCursorLockMode;
-            Cursor.visible = previousCursorVisible;
-            cursorStateCaptured = false;
+            if (!previousCursorState.HasValue)
+                return;
+
+            previousCursorState.Value.Apply();
+            previousCursorState = null;
         }
 
         private void ReleaseInputLock()

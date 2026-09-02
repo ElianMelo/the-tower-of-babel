@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "InputSystem_Actions",
     "maps": [
         {
@@ -99,7 +100,7 @@
                     "name": "Emote",
                     "type": "Button",
                     "id": "699825b8-ce3d-44ac-a667-e55f78976bb6",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false

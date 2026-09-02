@@ -22,11 +22,10 @@ namespace TowerOfBabel.World.Chunks
         public Quaternion Rotation => rotation;
         public Vector3 Scale => scale;
         public byte Stage => stage;
-        public bool UsesStageTenModel => stage >= CompletedStage;
         public Matrix4x4 ObjectToWorld => Matrix4x4.TRS(position, rotation, scale);
 
         public ChunkAssetData(int localIndex, TowerAssetType assetType, Vector3 position,
-            Quaternion rotation, Vector3 scale, byte stage = CompletedStage)
+            Quaternion rotation, Vector3 scale, byte stage = 0)
         {
             this.localIndex = localIndex;
             this.assetType = assetType;

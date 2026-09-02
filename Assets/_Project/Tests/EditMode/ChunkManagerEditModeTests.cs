@@ -64,7 +64,7 @@ namespace TowerOfBabel.World.Tests
             Assert.That(manager.CachedChunks[0].Key, Is.EqualTo(new ChunkKey(0, 1, 0)));
             Assert.That(manager.CachedChunks[0].Assets[0].AssetType, Is.EqualTo(TowerAssetType.Floor));
             Assert.That(manager.CachedChunks[0].Assets[0].LocalIndex, Is.Zero);
-            Assert.That(manager.CachedChunks[0].Assets[0].Stage, Is.EqualTo(ChunkAssetData.CompletedStage));
+            Assert.That(manager.CachedChunks[0].Assets[0].Stage, Is.Zero);
             Assert.That(manager.CachedChunks[0].Assets[0].Position, Is.EqualTo(firstAsset.transform.position));
             Assert.That(manager.CachedChunks[1].Key, Is.EqualTo(new ChunkKey(2, 3, -1)));
             Assert.That(manager.CachedChunks[1].Assets[0].AssetType, Is.EqualTo(TowerAssetType.Arch));
@@ -188,7 +188,7 @@ namespace TowerOfBabel.World.Tests
             Assert.That(renderer.LoadedChunks, Has.No.Member(new ChunkKey(0, 2, 0)));
 
             Assert.That(manager.SetAssetStage(new ChunkKey(0, 2, 0), 0, 0), Is.True);
-            Assert.That(nearPool.ActiveInstanceCount, Is.Zero);
+            Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(1));
             Assert.That(manager.SetAssetStage(new ChunkKey(0, 2, 0), 0, 10), Is.True);
             Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(1));
             Assert.That(nearPool.GetCapacity(TowerAssetType.Pillar), Is.GreaterThanOrEqualTo(1));
@@ -262,11 +262,40 @@ namespace TowerOfBabel.World.Tests
 
             Assert.That(manager.SetAssetStage(new ChunkKey(0, 0, 0), 0, 0), Is.True);
 
-            Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(1));
+            Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(2));
             Assert.That(FindActiveAssetAt(nearPool, Vector3.right), Is.SameAs(unchanged));
 
             Object.DestroyImmediate(managerObject);
             Object.DestroyImmediate(poolPrefab);
+        }
+
+        [Test]
+        public void ChunkManager_AdvancesOneStageAndNotifiesListeners()
+        {
+            ChunkManager manager = CreateInactiveChunkManager(out GameObject managerObject);
+            GameObject towerRoot = new("TowerRoot");
+            CreateTypedAsset("Floor", towerRoot.transform, Vector3.zero, TowerAssetType.Floor);
+            SetField(manager, "towerRoot", towerRoot);
+            manager.CacheChunks();
+            ChunkKey key = manager.CachedChunks[0].Key;
+            byte notifiedStage = byte.MaxValue;
+            manager.AssetStageChanged += (changedKey, localIndex, stage) =>
+            {
+                Assert.That(changedKey, Is.EqualTo(key));
+                Assert.That(localIndex, Is.Zero);
+                notifiedStage = stage;
+            };
+
+            Assert.That(manager.TryAdvanceAssetStage(key, 0, out byte appliedStage), Is.True);
+            Assert.That(appliedStage, Is.EqualTo(1));
+            Assert.That(notifiedStage, Is.EqualTo(1));
+            Assert.That(manager.CachedChunks[0].Assets[0].Stage, Is.EqualTo(1));
+
+            manager.SetAssetStage(key, 0, ChunkAssetData.CompletedStage);
+            Assert.That(manager.TryAdvanceAssetStage(key, 0, out _), Is.False);
+
+            Object.DestroyImmediate(towerRoot);
+            Object.DestroyImmediate(managerObject);
         }
 
         [Test]
@@ -297,7 +326,7 @@ namespace TowerOfBabel.World.Tests
             renderer.LoadChunk(in snapshot);
 
             Assert.That(renderer.LoadedChunkCount, Is.EqualTo(1));
-            Assert.That(renderer.LoadedInstanceCount, Is.EqualTo(1024));
+            Assert.That(renderer.LoadedInstanceCount, Is.EqualTo(1025));
             Assert.DoesNotThrow(() => InvokePrivate(renderer, "LateUpdate"));
 
             renderer.RemoveChunk(key);
@@ -378,7 +407,7 @@ namespace TowerOfBabel.World.Tests
             {
                 "Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab",
                 "Assets/_Project/Prefabs/Buildings/Step_Tile.prefab",
-                "Assets/_Project/Prefabs/Buildings/Pillar.prefab",
+                "Assets/_Project/Prefabs/Buildings/Pillar-10.prefab",
                 "Assets/_Project/Prefabs/Buildings/Arch.prefab"
             };
 

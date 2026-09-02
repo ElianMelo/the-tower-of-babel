@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TowerOfBabel.Buildings;
 using TowerOfBabel.World.Tower;
 using Unity.Burst;
 using Unity.Collections;
@@ -32,6 +33,7 @@ namespace TowerOfBabel.World.Chunks
         private readonly List<ChunkKey> chunksToRelease = new(ChunkManager.NearChunkSlotCount);
         private readonly List<PendingActivation> pendingActivations = new();
         private TowerAssetPrefabSet prefabs;
+        private ChunkManager chunkManager;
 
         public int ActiveInstanceCount => activeAssets.Count;
         public int ActiveChunkCount => activeChunks.Count;
@@ -50,15 +52,16 @@ namespace TowerOfBabel.World.Chunks
 #endif
         }
 
-        public void Configure(TowerAssetPrefabSet modelPrefabs)
+        public void Configure(TowerAssetPrefabSet modelPrefabs, ChunkManager owner = null)
         {
             if (modelPrefabs == null)
                 throw new ArgumentNullException(nameof(modelPrefabs));
-            if (ReferenceEquals(prefabs, modelPrefabs) && pools.Count > 0)
+            if (ReferenceEquals(prefabs, modelPrefabs) && chunkManager == owner && pools.Count > 0)
                 return;
 
             DisposePools();
             prefabs = modelPrefabs;
+            chunkManager = owner;
             if (poolRoot == null)
                 poolRoot = transform;
 
@@ -128,16 +131,6 @@ namespace TowerOfBabel.World.Chunks
 
             ChunkAssetData asset = chunk.Assets[localIndex];
             PooledInstance current = lease.Assets[localIndex];
-            if (!asset.UsesStageTenModel)
-            {
-                if (current != null)
-                {
-                    ReturnInstance(current, false);
-                    lease.Assets[localIndex] = null;
-                }
-                return true;
-            }
-
             if (current == null)
             {
                 if (!pools.TryGetValue(asset.AssetType, out TypePool pool))
@@ -146,6 +139,7 @@ namespace TowerOfBabel.World.Chunks
                 lease.Assets[localIndex] = current;
             }
 
+            current.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
             ApplyTransform(current.GameObject.transform, asset);
             ActivateInstance(current);
             return true;
@@ -179,10 +173,11 @@ namespace TowerOfBabel.World.Chunks
             for (int i = 0; i < assets.Count; i++)
             {
                 ChunkAssetData asset = assets[i];
-                if (!asset.UsesStageTenModel || !pools.TryGetValue(asset.AssetType, out TypePool pool))
+                if (!pools.TryGetValue(asset.AssetType, out TypePool pool))
                     continue;
 
                 PooledInstance instance = pool.Rent();
+                instance.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
                 lease.Assets[i] = instance;
                 pendingActivations.Add(new PendingActivation(instance, asset));
             }
@@ -282,6 +277,7 @@ namespace TowerOfBabel.World.Chunks
 
         private void ReturnInstance(PooledInstance instance, bool deferDisable)
         {
+            instance.Building?.Unbind();
             int removeIndex = instance.ActiveIndex;
             if (removeIndex >= 0)
             {
@@ -382,6 +378,7 @@ namespace TowerOfBabel.World.Chunks
         {
             public GameObject GameObject { get; }
             public TypePool Owner { get; }
+            public Building Building { get; }
             public int ActiveIndex { get; set; } = -1;
             public bool HasDeferredReturn { get; set; }
 
@@ -389,6 +386,7 @@ namespace TowerOfBabel.World.Chunks
             {
                 GameObject = gameObject;
                 Owner = owner;
+                Building = gameObject.GetComponent<Building>();
             }
         }
 

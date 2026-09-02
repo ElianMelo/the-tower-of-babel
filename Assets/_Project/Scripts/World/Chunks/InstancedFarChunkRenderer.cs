@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TowerOfBabel.Buildings;
 using TowerOfBabel.World.Tower;
 using Unity.Profiling;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace TowerOfBabel.World.Chunks
     }
 
     /// <summary>
-    /// Renders completed far assets in immutable, spatially-cullable instance pages.
+    /// Renders every construction stage in spatially-cullable instance pages.
     /// Pages are rebuilt only when their member chunks change.
     /// </summary>
     [DisallowMultipleComponent]
@@ -28,7 +29,7 @@ namespace TowerOfBabel.World.Chunks
         private static readonly ProfilerMarker RenderMarker = new("Tower.FarRenderer.Render");
         private static readonly ProfilerMarker RebuildMarker = new("Tower.FarRenderer.RebuildPages");
 
-        [Tooltip("One stage-10 model prefab for every tower asset type.")]
+        [Tooltip("One configured building prefab for every tower asset type.")]
         [SerializeField] private List<TowerAssetRenderModel> models = new();
         [Tooltip("Fallback data source for the four model prefabs when Models is empty.")]
         [SerializeField] private ChunkManager chunkManager;
@@ -45,7 +46,7 @@ namespace TowerOfBabel.World.Chunks
         [SerializeField, Min(0f)] private float maximumDrawDistance;
         [SerializeField] private bool useLightProbes = true;
 
-        private readonly Dictionary<TowerAssetType, TypeBatch> batches = new();
+        private readonly Dictionary<RenderBatchKey, TypeBatch> batches = new();
         private readonly HashSet<ChunkKey> loadedChunks = new();
         private readonly Dictionary<ChunkKey, PreparedChunk> preparedChunks = new();
         private readonly Plane[] frustumPlanes = new Plane[6];
@@ -126,35 +127,35 @@ namespace TowerOfBabel.World.Chunks
                 preparedChunks[snapshot.Key] = prepared;
             }
 
-            foreach (KeyValuePair<TowerAssetType, TypeBatch> pair in batches)
+            foreach (KeyValuePair<RenderBatchKey, TypeBatch> pair in batches)
             {
-                List<Matrix4x4> matrices = prepared.MatricesByType[(int)pair.Key];
-                if (matrices != null && matrices.Count > 0)
+                if (prepared.MatricesByModel.TryGetValue(pair.Key, out List<Matrix4x4> matrices) &&
+                    matrices.Count > 0)
                     pair.Value.SetChunk(snapshot.Key, prepared.CellKey, matrices);
             }
         }
 
         private PreparedChunk PrepareChunk(in FarChunkSnapshot snapshot)
         {
-            List<Matrix4x4>[] matricesByType = new List<Matrix4x4>[4];
+            Dictionary<RenderBatchKey, List<Matrix4x4>> matricesByModel = new();
             IReadOnlyList<ChunkAssetData> assets = snapshot.Assets;
             for (int i = 0; i < assets.Count; i++)
             {
                 ChunkAssetData asset = assets[i];
-                if (!asset.UsesStageTenModel)
+                RenderBatchKey batchKey = new(asset.AssetType, asset.Stage);
+                if (!batches.ContainsKey(batchKey))
                     continue;
 
-                int typeIndex = (int)asset.AssetType;
-                if ((uint)typeIndex >= (uint)matricesByType.Length ||
-                    !batches.ContainsKey(asset.AssetType))
-                    continue;
-
-                matricesByType[typeIndex] ??= new List<Matrix4x4>();
-                matricesByType[typeIndex].Add(asset.ObjectToWorld);
+                if (!matricesByModel.TryGetValue(batchKey, out List<Matrix4x4> matrices))
+                {
+                    matrices = new List<Matrix4x4>();
+                    matricesByModel.Add(batchKey, matrices);
+                }
+                matrices.Add(asset.ObjectToWorld);
             }
 
             RenderCellKey cellKey = RenderCellKey.From(snapshot.Key, cellFloorSpan, cellHorizontalSpan);
-            return new PreparedChunk(snapshot.Version, cellKey, matricesByType);
+            return new PreparedChunk(snapshot.Version, cellKey, matricesByModel);
         }
 
         public void ApplyChunkStageSnapshot(in FarChunkStageSnapshot snapshot)
@@ -186,7 +187,7 @@ namespace TowerOfBabel.World.Chunks
                 {
                     TowerAssetRenderModel model = models[i];
                     if (model != null)
-                        AddModelBatch(model.AssetType, model.Prefab);
+                        AddModelBatches(model.AssetType, model.Prefab);
                 }
                 return;
             }
@@ -202,10 +203,10 @@ namespace TowerOfBabel.World.Chunks
             }
 
             TowerAssetPrefabSet prefabs = chunkManager.AssetPrefabs;
-            AddModelBatch(TowerAssetType.Floor, prefabs.GetPrefab(TowerAssetType.Floor));
-            AddModelBatch(TowerAssetType.Stair, prefabs.GetPrefab(TowerAssetType.Stair));
-            AddModelBatch(TowerAssetType.Pillar, prefabs.GetPrefab(TowerAssetType.Pillar));
-            AddModelBatch(TowerAssetType.Arch, prefabs.GetPrefab(TowerAssetType.Arch));
+            AddModelBatches(TowerAssetType.Floor, prefabs.GetPrefab(TowerAssetType.Floor));
+            AddModelBatches(TowerAssetType.Stair, prefabs.GetPrefab(TowerAssetType.Stair));
+            AddModelBatches(TowerAssetType.Pillar, prefabs.GetPrefab(TowerAssetType.Pillar));
+            AddModelBatches(TowerAssetType.Arch, prefabs.GetPrefab(TowerAssetType.Arch));
         }
 
         private void EnsureModelBatches()
@@ -220,16 +221,11 @@ namespace TowerOfBabel.World.Chunks
                 renderCamera = Camera.main;
         }
 
-        private void AddModelBatch(TowerAssetType assetType, GameObject prefab)
+        private void AddModelBatches(TowerAssetType assetType, GameObject prefab)
         {
             if (prefab == null)
             {
-                Debug.LogError($"No stage-10 prefab is assigned for far {assetType} rendering.", this);
-                return;
-            }
-            if (batches.ContainsKey(assetType))
-            {
-                Debug.LogWarning($"Duplicate far render model for {assetType}; the later entry was ignored.", this);
+                Debug.LogError($"No building prefab is assigned for far {assetType} rendering.", this);
                 return;
             }
 
@@ -244,7 +240,20 @@ namespace TowerOfBabel.World.Chunks
                 return;
             }
 
-            batches.Add(assetType, new TypeBatch(meshFilter.sharedMesh, meshRenderer));
+            Building building = prefab.GetComponent<Building>();
+            for (byte stage = 0; stage <= ChunkAssetData.CompletedStage; stage++)
+            {
+                RenderBatchKey key = new(assetType, stage);
+                if (batches.ContainsKey(key))
+                {
+                    Debug.LogWarning($"Duplicate far render model for {assetType} stage {stage}; the later entry was ignored.", this);
+                    continue;
+                }
+
+                Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
+                if (mesh != null)
+                    batches.Add(key, new TypeBatch(mesh, meshRenderer));
+            }
         }
 
         private void DisposeBatches()
@@ -291,15 +300,34 @@ namespace TowerOfBabel.World.Chunks
         {
             public int Version { get; }
             public RenderCellKey CellKey { get; }
-            public List<Matrix4x4>[] MatricesByType { get; }
+            public Dictionary<RenderBatchKey, List<Matrix4x4>> MatricesByModel { get; }
 
             public PreparedChunk(int version, RenderCellKey cellKey,
-                List<Matrix4x4>[] matricesByType)
+                Dictionary<RenderBatchKey, List<Matrix4x4>> matricesByModel)
             {
                 Version = version;
                 CellKey = cellKey;
-                MatricesByType = matricesByType;
+                MatricesByModel = matricesByModel;
             }
+        }
+
+        private readonly struct RenderBatchKey : IEquatable<RenderBatchKey>
+        {
+            private readonly TowerAssetType assetType;
+            private readonly byte stage;
+
+            public RenderBatchKey(TowerAssetType assetType, byte stage)
+            {
+                this.assetType = assetType;
+                this.stage = stage;
+            }
+
+            public bool Equals(RenderBatchKey other) =>
+                assetType == other.assetType && stage == other.stage;
+
+            public override bool Equals(object obj) => obj is RenderBatchKey other && Equals(other);
+
+            public override int GetHashCode() => ((int)assetType * 397) ^ stage;
         }
 
         private readonly struct RenderCellKey : IEquatable<RenderCellKey>

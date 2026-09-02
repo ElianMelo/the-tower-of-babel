@@ -42,6 +42,22 @@ namespace TowerOfBabel.Networking.Resources
             return true;
         }
 
+        public bool HasAtLeast(int playerId, ResourceType resourceType, int amount)
+        {
+            return amount >= 0 && GetAmount(playerId, resourceType) >= amount;
+        }
+
+        public bool TryConsume(int playerId, ResourceType resourceType, int amount, out int authoritativeAmount)
+        {
+            authoritativeAmount = GetAmount(playerId, resourceType);
+            if (amount <= 0 || authoritativeAmount < amount)
+                return false;
+
+            authoritativeAmount -= amount;
+            resourcesByPlayer[playerId][resourceType] = authoritativeAmount;
+            return true;
+        }
+
         public void RemovePlayer(int playerId) => resourcesByPlayer.Remove(playerId);
     }
 }

@@ -24,16 +24,34 @@ namespace TowerOfBabel.World.Chunks
             this.assets = assets;
         }
 
-        internal bool TrySetStage(int localIndex, byte stage)
+        internal bool TrySetStage(int localIndex, byte stage, out byte appliedStage, out bool changed)
         {
+            appliedStage = 0;
+            changed = false;
             if ((uint)localIndex >= (uint)assets.Count)
                 return false;
 
             ChunkAssetData asset = assets[localIndex];
             asset.SetStage(stage);
+            appliedStage = asset.Stage;
+            if (assets[localIndex].Stage == appliedStage)
+                return true;
             assets[localIndex] = asset;
             version++;
+            changed = true;
             return true;
+        }
+
+        internal bool TryGetAsset(int localIndex, out ChunkAssetData asset)
+        {
+            if ((uint)localIndex < (uint)assets.Count)
+            {
+                asset = assets[localIndex];
+                return true;
+            }
+
+            asset = default;
+            return false;
         }
     }
 
@@ -92,6 +110,7 @@ namespace TowerOfBabel.World.Chunks
         public int TrackedPlayerCount => trackedPlayers.Count;
 
         public event Action<ChunkKey, ChunkKey> CurrentChunkChanged;
+        public event Action<ChunkKey, int, byte> AssetStageChanged;
 
         private void OnEnable()
         {
@@ -194,8 +213,12 @@ namespace TowerOfBabel.World.Chunks
 
         public bool SetAssetStage(ChunkKey key, int localIndex, byte stage)
         {
-            if (!chunkLookup.TryGetValue(key, out ChunkSceneCache chunk) || !chunk.TrySetStage(localIndex, stage))
+            if (!chunkLookup.TryGetValue(key, out ChunkSceneCache chunk) ||
+                !chunk.TrySetStage(localIndex, stage, out byte appliedStage, out bool changed))
                 return false;
+
+            if (!changed)
+                return true;
 
             if (loadedChunks.Contains(key))
             {
@@ -207,7 +230,30 @@ namespace TowerOfBabel.World.Chunks
                 SetFarChunkVisible(chunk, false);
                 SetFarChunkVisible(chunk, true);
             }
+            AssetStageChanged?.Invoke(key, localIndex, appliedStage);
             return true;
+        }
+
+        public bool TryGetAsset(ChunkKey key, int localIndex, out ChunkAssetData asset)
+        {
+            if (chunkLookup.Count == 0)
+                RebuildChunkLookup();
+            if (chunkLookup.TryGetValue(key, out ChunkSceneCache chunk))
+                return chunk.TryGetAsset(localIndex, out asset);
+
+            asset = default;
+            return false;
+        }
+
+        public bool TryAdvanceAssetStage(ChunkKey key, int localIndex, out byte appliedStage)
+        {
+            appliedStage = 0;
+            if (!TryGetAsset(key, localIndex, out ChunkAssetData asset) ||
+                asset.Stage >= ChunkAssetData.CompletedStage)
+                return false;
+
+            appliedStage = (byte)(asset.Stage + 1);
+            return SetAssetStage(key, localIndex, appliedStage);
         }
 
         public ChunkKey WorldToChunk(Vector3 worldPosition) =>
@@ -484,7 +530,7 @@ namespace TowerOfBabel.World.Chunks
             if (nearAssetPool == null)
                 nearAssetPool = GetComponent<NearTowerAssetPool>();
             if (nearAssetPool != null)
-                nearAssetPool.Configure(assetPrefabs);
+                nearAssetPool.Configure(assetPrefabs, this);
         }
 
         private void RefreshNearPool()
