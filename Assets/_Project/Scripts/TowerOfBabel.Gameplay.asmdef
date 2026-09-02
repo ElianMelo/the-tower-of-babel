@@ -1,23 +1,24 @@
 {
-  "name": "TowerOfBabel.Gameplay",
-  "rootNamespace": "TowerOfBabel",
-  "references": [
-    "Unity.TextMeshPro",
-    "UnityEngine.UI",
-    "Unity.InputSystem",
-    "FishNet.Runtime",
-    "NaughtyAttributes.Core",
-    "Unity.Burst",
-    "Unity.Collections",
-    "Unity.Mathematics"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [],
-  "noEngineReferences": false
+    "name": "TowerOfBabel.Gameplay",
+    "rootNamespace": "TowerOfBabel",
+    "references": [
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "Unity.InputSystem",
+        "FishNet.Runtime",
+        "NaughtyAttributes.Core",
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "LineworkLite"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
