@@ -7,6 +7,7 @@ public class InterfaceManager : MonoBehaviour
 
     [SerializeField] private InteractionUI interactionUI;
     [SerializeField] private TowerOfBabel.InventoryUI inventoryUI;
+    [SerializeField] private TowerOfBabel.UpgradeUI upgradeUI;
     [SerializeField] private TowerOfBabel.ServerStatusUI serverStatusUI;
 
     private void Awake()
@@ -19,8 +20,11 @@ public class InterfaceManager : MonoBehaviour
         }
 
         Instance = this;
+        if (upgradeUI == null)
+            upgradeUI = FindFirstObjectByType<TowerOfBabel.UpgradeUI>(FindObjectsInactive.Include);
         interactionUI?.Hide();
         inventoryUI?.Hide();
+        upgradeUI?.Hide();
         serverStatusUI?.ShowDisconnected();
     }
 
@@ -63,6 +67,21 @@ public class InterfaceManager : MonoBehaviour
     public void HideInventory()
     {
         inventoryUI?.Hide();
+    }
+
+    public void ToggleUpgrade()
+    {
+        upgradeUI?.Toggle();
+    }
+
+    public void ShowUpgrade()
+    {
+        upgradeUI?.Show();
+    }
+
+    public void HideUpgrade()
+    {
+        upgradeUI?.Hide();
     }
 
     public void ShowServerDisconnected() => serverStatusUI?.ShowDisconnected();

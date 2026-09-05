@@ -1,7 +1,9 @@
 using System.Collections;
 using System;
 using TowerOfBabel.Networking.Resources;
+using TowerOfBabel.Networking.Upgrades;
 using TowerOfBabel.Resources.Interaction;
+using TowerOfBabel.Upgrades;
 using UnityEngine;
 
 namespace TowerOfBabel.Resources
@@ -23,7 +25,17 @@ namespace TowerOfBabel.Resources
         public string DetailText => definition != null ? definition.DisplayName : "Undefined Resource";
         public Color DetailColor => isCoolingDown ? CooldownColor : AvailableColor;
         public string PromptText => CanInteract ? "Press 'E'" : "Unavailable";
-        public float Duration => definition != null ? definition.InteractionDuration : 3f;
+        public float Duration
+        {
+            get
+            {
+                float duration = definition != null ? definition.InteractionDuration : 3f;
+                NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+                return upgrades != null
+                    ? upgrades.GetLocalActionDuration(UpgradeJob.Gather, duration)
+                    : duration;
+            }
+        }
         public bool CanInteract => enabled && gameObject.activeInHierarchy && definition != null && !isCoolingDown;
         public ulong NodeId => nodeId;
         public ResourceDefinition Definition => definition;

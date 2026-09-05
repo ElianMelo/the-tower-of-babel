@@ -5,6 +5,8 @@ using FishNet;
 using FishNet.Object;
 using FishNet.Transporting;
 using TowerOfBabel.Resources;
+using TowerOfBabel.Networking.Upgrades;
+using TowerOfBabel.Upgrades;
 using UnityEngine;
 
 namespace TowerOfBabel.Networking.Resources
@@ -15,6 +17,8 @@ namespace TowerOfBabel.Networking.Resources
         private sealed class ActiveGather
         {
             public ulong NodeId;
+            public float Duration;
+            public int Production;
             public Coroutine Routine;
         }
 
@@ -126,7 +130,19 @@ namespace TowerOfBabel.Networking.Resources
                 return;
             }
 
-            ActiveGather gather = new ActiveGather { NodeId = nodeId };
+            NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+            ActiveGather gather = new ActiveGather
+            {
+                NodeId = nodeId,
+                Duration = upgrades != null
+                    ? upgrades.GetServerActionDuration(sender, UpgradeJob.Gather,
+                        node.Definition.InteractionDuration)
+                    : node.Definition.InteractionDuration,
+                Production = upgrades != null
+                    ? upgrades.GetServerProduction(sender, UpgradeJob.Gather,
+                        node.Definition.AmountGathered)
+                    : node.Definition.AmountGathered
+            };
             gather.Routine = StartCoroutine(CompleteGatherAfterDelay(sender, node, gather));
             activeGathers.Add(sender.ClientId, gather);
         }
@@ -143,11 +159,12 @@ namespace TowerOfBabel.Networking.Resources
 
         private IEnumerator CompleteGatherAfterDelay(NetworkConnection connection, Resource node, ActiveGather gather)
         {
-            yield return new WaitForSeconds(node.Definition.InteractionDuration);
+            yield return new WaitForSeconds(gather.Duration);
             activeGathers.Remove(connection.ClientId);
 
             if (!node.ServerCanGather
-                || !serverResources.TryAdd(connection.ClientId, node.Definition.ResourceType, node.Definition.AmountGathered, out int amount))
+                || !serverResources.TryAdd(connection.ClientId, node.Definition.ResourceType,
+                    gather.Production, out int amount))
             {
                 RejectGatherTargetRpc(connection, node.NodeId);
                 yield break;
@@ -156,6 +173,7 @@ namespace TowerOfBabel.Networking.Resources
             node.BeginAuthoritativeCooldown(node.Definition.RespawnCooldown);
             SetNodeCooldownObserversRpc(node.NodeId, node.Definition.RespawnCooldown);
             UpdateWalletTargetRpc(connection, node.Definition.ResourceType, amount);
+            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Gather);
         }
 
         [TargetRpc]

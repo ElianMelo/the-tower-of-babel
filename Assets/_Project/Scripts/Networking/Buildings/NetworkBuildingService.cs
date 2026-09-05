@@ -6,6 +6,8 @@ using FishNet.Object;
 using FishNet.Transporting;
 using TowerOfBabel.Buildings;
 using TowerOfBabel.Networking.Resources;
+using TowerOfBabel.Networking.Upgrades;
+using TowerOfBabel.Upgrades;
 using TowerOfBabel.World.Chunks;
 using UnityEngine;
 
@@ -18,6 +20,7 @@ namespace TowerOfBabel.Networking.Buildings
         {
             public ChunkKey ChunkKey;
             public int LocalIndex;
+            public int ResourceCost;
             public Coroutine Routine;
         }
 
@@ -106,21 +109,36 @@ namespace TowerOfBabel.Networking.Buildings
             Vector3 claimedPlayerPosition, NetworkConnection sender = null)
         {
             ChunkKey key = new(floor, x, z);
+            NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
             if (sender == null || activeBuilds.ContainsKey(sender.ClientId) ||
                 !TryGetBuildDefinition(key, localIndex, out ChunkAssetData asset, out Building definition) ||
                 asset.Stage >= ChunkAssetData.CompletedStage ||
                 Vector3.Distance(claimedPlayerPosition, asset.Position) > maximumInteractionDistance ||
                 NetworkResourceService.Instance == null ||
                 !NetworkResourceService.Instance.ServerHasAtLeast(sender, definition.ResourceType,
-                    definition.ResourceCostPerStage))
+                    upgrades != null
+                        ? upgrades.GetServerActionCost(sender, UpgradeJob.Build,
+                            definition.ResourceCostPerStage)
+                        : definition.ResourceCostPerStage))
             {
                 RejectBuildTargetRpc(sender, floor, x, z, localIndex);
                 return;
             }
 
-            ActiveBuild build = new() { ChunkKey = key, LocalIndex = localIndex };
+            int resourceCost = upgrades != null
+                ? upgrades.GetServerActionCost(sender, UpgradeJob.Build, definition.ResourceCostPerStage)
+                : definition.ResourceCostPerStage;
+            float duration = upgrades != null
+                ? upgrades.GetServerActionDuration(sender, UpgradeJob.Build, definition.InteractionDuration)
+                : definition.InteractionDuration;
+            ActiveBuild build = new()
+            {
+                ChunkKey = key,
+                LocalIndex = localIndex,
+                ResourceCost = resourceCost
+            };
             build.Routine = StartCoroutine(CompleteBuildAfterDelay(sender, build,
-                definition.InteractionDuration));
+                duration));
             activeBuilds.Add(sender.ClientId, build);
         }
 
@@ -149,7 +167,7 @@ namespace TowerOfBabel.Networking.Buildings
                 asset.Stage >= ChunkAssetData.CompletedStage ||
                 NetworkResourceService.Instance == null ||
                 !NetworkResourceService.Instance.ServerHasAtLeast(connection, definition.ResourceType,
-                    definition.ResourceCostPerStage) ||
+                    build.ResourceCost) ||
                 !chunkManager.TryAdvanceAssetStage(build.ChunkKey, build.LocalIndex, out byte appliedStage))
             {
                 RejectBuildTargetRpc(connection, build.ChunkKey.FloorIndex, build.ChunkKey.X,
@@ -158,7 +176,7 @@ namespace TowerOfBabel.Networking.Buildings
             }
 
             if (!NetworkResourceService.Instance.TryConsumeServer(connection, definition.ResourceType,
-                    definition.ResourceCostPerStage, out int authoritativeAmount))
+                    build.ResourceCost, out int authoritativeAmount))
             {
                 chunkManager.SetAssetStage(build.ChunkKey, build.LocalIndex, asset.Stage);
                 RejectBuildTargetRpc(connection, build.ChunkKey.FloorIndex, build.ChunkKey.X,
@@ -170,6 +188,7 @@ namespace TowerOfBabel.Networking.Buildings
                 build.LocalIndex, appliedStage);
             NetworkResourceService.Instance.SendAuthoritativeAmount(connection, definition.ResourceType,
                 authoritativeAmount);
+            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Build);
         }
 
         private bool TryGetBuildDefinition(ChunkKey key, int localIndex, out ChunkAssetData asset,

@@ -1,0 +1,1371 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 145eaba46f6af2743aa5a4209fedfa97, type: 3}
+  m_Name: UpgradeTreeConfig
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Upgrades.UpgradeTreeConfig
+  boards:
+  - job: 0
+    upgrades:
+    - id: gather_0_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_0_1
+      displayName: 'Production
+
+        +2'
+      row: 0
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_0_2
+      displayName: 'Efficiency
+
+        -1s'
+      row: 0
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_0_3
+      displayName: 'Production
+
+        +1'
+      row: 0
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_0_4
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 0
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_0_5
+      displayName: 'Production
+
+        +3'
+      row: 0
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_0_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_1_0
+      displayName: 'Production
+
+        +2'
+      row: 1
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_1_1
+      displayName: 'Efficiency
+
+        -1s'
+      row: 1
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_1_2
+      displayName: 'Production
+
+        +1'
+      row: 1
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_1_3
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 1
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_1_4
+      displayName: 'Production
+
+        +3'
+      row: 1
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_1_5
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 1
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_1_6
+      displayName: 'Production
+
+        +2'
+      row: 1
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_2_0
+      displayName: 'Efficiency
+
+        -1s'
+      row: 2
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_2_1
+      displayName: 'Production
+
+        +1'
+      row: 2
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_2_2
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 2
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_2_3
+      displayName: 'Production
+
+        +3'
+      row: 2
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_2_4
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 2
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_2_5
+      displayName: 'Production
+
+        +2'
+      row: 2
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_2_6
+      displayName: 'Efficiency
+
+        -1s'
+      row: 2
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_3_0
+      displayName: 'Production
+
+        +1'
+      row: 3
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_3_1
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 3
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_3_2
+      displayName: 'Production
+
+        +3'
+      row: 3
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_3_3
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 3
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_3_4
+      displayName: 'Production
+
+        +2'
+      row: 3
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_3_5
+      displayName: 'Efficiency
+
+        -1s'
+      row: 3
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_3_6
+      displayName: 'Production
+
+        +1'
+      row: 3
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_4_0
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 4
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_4_1
+      displayName: 'Production
+
+        +3'
+      row: 4
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_4_2
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 4
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_4_3
+      displayName: 'Production
+
+        +2'
+      row: 4
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_4_4
+      displayName: 'Efficiency
+
+        -1s'
+      row: 4
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_4_5
+      displayName: 'Production
+
+        +1'
+      row: 4
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_4_6
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 4
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_5_0
+      displayName: 'Production
+
+        +3'
+      row: 5
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_5_1
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 5
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_5_2
+      displayName: 'Production
+
+        +2'
+      row: 5
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_5_3
+      displayName: 'Efficiency
+
+        -1s'
+      row: 5
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_5_4
+      displayName: 'Production
+
+        +1'
+      row: 5
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_5_5
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 5
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_5_6
+      displayName: 'Production
+
+        +3'
+      row: 5
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_6_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_6_1
+      displayName: 'Production
+
+        +2'
+      row: 6
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 2
+    - id: gather_6_2
+      displayName: 'Efficiency
+
+        -1s'
+      row: 6
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: gather_6_3
+      displayName: 'Production
+
+        +1'
+      row: 6
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 1
+    - id: gather_6_4
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 6
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: gather_6_5
+      displayName: 'Production
+
+        +3'
+      row: 6
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: gather_6_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: gather_50
+      displayName: 'Level 50
+
+        Production +2'
+      row: 6
+      column: 3
+      isLevelFiftyUpgrade: 1
+      effectType: 2
+      value: 2
+  - job: 1
+    upgrades:
+    - id: process_0_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_0_1
+      displayName: 'Cost
+
+        -2'
+      row: 0
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_0_2
+      displayName: 'Production
+
+        +3'
+      row: 0
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_0_3
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_0_4
+      displayName: 'Cost
+
+        -2'
+      row: 0
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_0_5
+      displayName: 'Production
+
+        +3'
+      row: 0
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_0_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_1_0
+      displayName: 'Cost
+
+        -2'
+      row: 1
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_1_1
+      displayName: 'Production
+
+        +3'
+      row: 1
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_1_2
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 1
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_1_3
+      displayName: 'Cost
+
+        -2'
+      row: 1
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_1_4
+      displayName: 'Production
+
+        +3'
+      row: 1
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_1_5
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 1
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_1_6
+      displayName: 'Cost
+
+        -2'
+      row: 1
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_2_0
+      displayName: 'Production
+
+        +3'
+      row: 2
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_2_1
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 2
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_2_2
+      displayName: 'Cost
+
+        -2'
+      row: 2
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_2_3
+      displayName: 'Production
+
+        +3'
+      row: 2
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_2_4
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 2
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_2_5
+      displayName: 'Cost
+
+        -2'
+      row: 2
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_2_6
+      displayName: 'Production
+
+        +3'
+      row: 2
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_3_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 3
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_3_1
+      displayName: 'Cost
+
+        -2'
+      row: 3
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_3_2
+      displayName: 'Production
+
+        +3'
+      row: 3
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_3_3
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 3
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_3_4
+      displayName: 'Cost
+
+        -2'
+      row: 3
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_3_5
+      displayName: 'Production
+
+        +3'
+      row: 3
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_3_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 3
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_4_0
+      displayName: 'Cost
+
+        -2'
+      row: 4
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_4_1
+      displayName: 'Production
+
+        +3'
+      row: 4
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_4_2
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 4
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_4_3
+      displayName: 'Cost
+
+        -2'
+      row: 4
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_4_4
+      displayName: 'Production
+
+        +3'
+      row: 4
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_4_5
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 4
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_4_6
+      displayName: 'Cost
+
+        -2'
+      row: 4
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_5_0
+      displayName: 'Production
+
+        +3'
+      row: 5
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_5_1
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 5
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_5_2
+      displayName: 'Cost
+
+        -2'
+      row: 5
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_5_3
+      displayName: 'Production
+
+        +3'
+      row: 5
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_5_4
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 5
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_5_5
+      displayName: 'Cost
+
+        -2'
+      row: 5
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_5_6
+      displayName: 'Production
+
+        +3'
+      row: 5
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_6_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_6_1
+      displayName: 'Cost
+
+        -2'
+      row: 6
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_6_2
+      displayName: 'Production
+
+        +3'
+      row: 6
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_6_3
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_6_4
+      displayName: 'Cost
+
+        -2'
+      row: 6
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: process_6_5
+      displayName: 'Production
+
+        +3'
+      row: 6
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 2
+      value: 3
+    - id: process_6_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: process_50
+      displayName: 'Level 50
+
+        Cost -2'
+      row: 6
+      column: 3
+      isLevelFiftyUpgrade: 1
+      effectType: 1
+      value: -2
+  - job: 2
+    upgrades:
+    - id: build_0_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_0_1
+      displayName: 'Cost
+
+        -2'
+      row: 0
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_0_2
+      displayName: 'Efficiency
+
+        -1s'
+      row: 0
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_0_3
+      displayName: 'Cost
+
+        -1'
+      row: 0
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_0_4
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 0
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_0_5
+      displayName: 'Cost
+
+        -3'
+      row: 0
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_0_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 0
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_1_0
+      displayName: 'Cost
+
+        -2'
+      row: 1
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_1_1
+      displayName: 'Efficiency
+
+        -1s'
+      row: 1
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_1_2
+      displayName: 'Cost
+
+        -1'
+      row: 1
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_1_3
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 1
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_1_4
+      displayName: 'Cost
+
+        -3'
+      row: 1
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_1_5
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 1
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_1_6
+      displayName: 'Cost
+
+        -2'
+      row: 1
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_2_0
+      displayName: 'Efficiency
+
+        -1s'
+      row: 2
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_2_1
+      displayName: 'Cost
+
+        -1'
+      row: 2
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_2_2
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 2
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_2_3
+      displayName: 'Cost
+
+        -3'
+      row: 2
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_2_4
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 2
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_2_5
+      displayName: 'Cost
+
+        -2'
+      row: 2
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_2_6
+      displayName: 'Efficiency
+
+        -1s'
+      row: 2
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_3_0
+      displayName: 'Cost
+
+        -1'
+      row: 3
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_3_1
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 3
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_3_2
+      displayName: 'Cost
+
+        -3'
+      row: 3
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_3_3
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 3
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_3_4
+      displayName: 'Cost
+
+        -2'
+      row: 3
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_3_5
+      displayName: 'Efficiency
+
+        -1s'
+      row: 3
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_3_6
+      displayName: 'Cost
+
+        -1'
+      row: 3
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_4_0
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 4
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_4_1
+      displayName: 'Cost
+
+        -3'
+      row: 4
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_4_2
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 4
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_4_3
+      displayName: 'Cost
+
+        -2'
+      row: 4
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_4_4
+      displayName: 'Efficiency
+
+        -1s'
+      row: 4
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_4_5
+      displayName: 'Cost
+
+        -1'
+      row: 4
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_4_6
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 4
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_5_0
+      displayName: 'Cost
+
+        -3'
+      row: 5
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_5_1
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 5
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_5_2
+      displayName: 'Cost
+
+        -2'
+      row: 5
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_5_3
+      displayName: 'Efficiency
+
+        -1s'
+      row: 5
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_5_4
+      displayName: 'Cost
+
+        -1'
+      row: 5
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_5_5
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 5
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_5_6
+      displayName: 'Cost
+
+        -3'
+      row: 5
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_6_0
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 0
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_6_1
+      displayName: 'Cost
+
+        -2'
+      row: 6
+      column: 1
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -2
+    - id: build_6_2
+      displayName: 'Efficiency
+
+        -1s'
+      row: 6
+      column: 2
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 1
+    - id: build_6_3
+      displayName: 'Cost
+
+        -1'
+      row: 6
+      column: 3
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -1
+    - id: build_6_4
+      displayName: 'Efficiency
+
+        -0.5s'
+      row: 6
+      column: 4
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.5
+    - id: build_6_5
+      displayName: 'Cost
+
+        -3'
+      row: 6
+      column: 5
+      isLevelFiftyUpgrade: 0
+      effectType: 1
+      value: -3
+    - id: build_6_6
+      displayName: 'Efficiency
+
+        -0.2s'
+      row: 6
+      column: 6
+      isLevelFiftyUpgrade: 0
+      effectType: 0
+      value: 0.2
+    - id: build_50
+      displayName: 'Level 50
+
+        Cost -2'
+      row: 6
+      column: 3
+      isLevelFiftyUpgrade: 1
+      effectType: 1
+      value: -2

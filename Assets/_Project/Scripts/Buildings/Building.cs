@@ -1,8 +1,10 @@
 using System;
 using TowerOfBabel.Networking.Buildings;
 using TowerOfBabel.Networking.Resources;
+using TowerOfBabel.Networking.Upgrades;
 using TowerOfBabel.Resources;
 using TowerOfBabel.Resources.Interaction;
+using TowerOfBabel.Upgrades;
 using TowerOfBabel.World.Chunks;
 using UnityEngine;
 
@@ -44,16 +46,36 @@ namespace TowerOfBabel.Buildings
         public string ObjectName => gameObject.name;
         public string DetailText => IsComplete
             ? "Construction complete"
-            : $"Stage {currentStage}/{ChunkAssetData.CompletedStage} - {resourceCostPerStage} {resourceType}";
+            : $"Stage {currentStage}/{ChunkAssetData.CompletedStage} - {EffectiveResourceCost} {resourceType}";
         public Color DetailColor => IsComplete ? CompleteColor : HasLocalResources ? AvailableColor : UnavailableColor;
         public string PromptText => IsComplete
             ? "Complete"
-            : HasLocalResources ? "Press 'E'" : $"Need {resourceCostPerStage} {resourceType}";
-        public float Duration => interactionDuration;
+            : HasLocalResources ? "Press 'E'" : $"Need {EffectiveResourceCost} {resourceType}";
+        public float Duration => EffectiveInteractionDuration;
         public bool CanInteract => enabled && gameObject.activeInHierarchy && isBound && !IsComplete && HasLocalResources;
         public ResourceType ResourceType => resourceType;
         public int ResourceCostPerStage => resourceCostPerStage;
         public float InteractionDuration => interactionDuration;
+        public int EffectiveResourceCost
+        {
+            get
+            {
+                NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+                return upgrades != null
+                    ? upgrades.GetLocalActionCost(UpgradeJob.Build, resourceCostPerStage)
+                    : resourceCostPerStage;
+            }
+        }
+        public float EffectiveInteractionDuration
+        {
+            get
+            {
+                NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+                return upgrades != null
+                    ? upgrades.GetLocalActionDuration(UpgradeJob.Build, interactionDuration)
+                    : interactionDuration;
+            }
+        }
         public float ShakeStrength => shakeStrength;
         public float ShakeSpeed => shakeSpeed;
         public byte CurrentStage => currentStage;
@@ -70,7 +92,7 @@ namespace TowerOfBabel.Buildings
             get
             {
                 NetworkResourceService resources = NetworkResourceService.Instance;
-                return resources != null && resources.GetLocalAmount(resourceType) >= resourceCostPerStage;
+                return resources != null && resources.GetLocalAmount(resourceType) >= EffectiveResourceCost;
             }
         }
 
