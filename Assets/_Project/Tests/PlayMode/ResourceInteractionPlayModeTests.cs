@@ -10,6 +10,7 @@ using UnityEngine.TestTools;
 using UnityEngine.UI;
 using TowerOfBabel;
 using TowerOfBabel.Networking;
+using TowerOfBabel.Networking.Resources;
 using FishNet.Managing;
 using FishNet.Managing.Object;
 
@@ -145,6 +146,51 @@ namespace TowerOfBabel.Resources.Tests
 
             Object.Destroy(root);
             Object.Destroy(definition);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void GatherRejection_ReleasesLocalGatherWithOrWithoutListener(bool hasListener)
+        {
+            GameObject serviceRoot = new("Resource Service");
+            GameObject resourceRoot = new("Stone");
+            try
+            {
+                NetworkResourceService service = serviceRoot.AddComponent<NetworkResourceService>();
+                Resource resource = resourceRoot.AddComponent<Resource>();
+                SetField(resource, "nodeId", 1UL);
+                SetField(service, "localActiveResource", resource);
+                FieldInfo activeResource = typeof(NetworkResourceService).GetField(
+                    "localActiveResource", BindingFlags.Instance | BindingFlags.NonPublic);
+                int rejectionCount = 0;
+                if (hasListener)
+                {
+                    resource.ServerRejected += () =>
+                    {
+                        rejectionCount++;
+                        Assert.That(activeResource.GetValue(service), Is.Null,
+                            "Release the gather before notifying the interaction controller.");
+                    };
+                }
+
+                Invoke(service, "HandleGatherRejected", 2UL);
+                Assert.That(activeResource.GetValue(service), Is.SameAs(resource),
+                    "A rejection for another node must not cancel this gather.");
+                Assert.That(rejectionCount, Is.Zero);
+
+                Invoke(service, "HandleGatherRejected", 1UL);
+                Assert.That(activeResource.GetValue(service), Is.Null,
+                    "A rejected gather must not block subsequent gathering attempts.");
+                Assert.That(rejectionCount, Is.EqualTo(hasListener ? 1 : 0));
+
+                Invoke(service, "HandleGatherRejected", 1UL);
+                Assert.That(rejectionCount, Is.EqualTo(hasListener ? 1 : 0));
+            }
+            finally
+            {
+                Object.DestroyImmediate(resourceRoot);
+                Object.DestroyImmediate(serviceRoot);
+            }
         }
 
         [UnityTest]
@@ -291,9 +337,9 @@ namespace TowerOfBabel.Resources.Tests
             target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic).SetValue(target, value);
         }
 
-        private static void Invoke(object target, string method)
+        private static void Invoke(object target, string method, params object[] arguments)
         {
-            target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
+            target.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, arguments);
         }
 
         private static TMP_Text CreateText(Transform parent, string name)

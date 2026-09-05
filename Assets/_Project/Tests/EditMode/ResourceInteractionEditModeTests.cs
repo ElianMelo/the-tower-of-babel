@@ -244,6 +244,19 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [Test]
+        public void ServerPlayerResourceStore_CanGatherAfterSpendingAtCapacity()
+        {
+            ServerPlayerResourceStore store = new(50);
+            Assert.That(store.TryAdd(7, ResourceType.Stone, 50, out _), Is.True);
+            Assert.That(store.TryAdd(7, ResourceType.Stone, 1, out _), Is.False);
+
+            Assert.That(store.TryConsume(7, ResourceType.Stone, 3, out int remaining), Is.True);
+            Assert.That(remaining, Is.EqualTo(47));
+            Assert.That(store.TryAdd(7, ResourceType.Stone, 2, out int gathered), Is.True);
+            Assert.That(gathered, Is.EqualTo(49));
+        }
+
+        [Test]
         public void ServerPlayerResourceStore_ConsumesOnlyWhenFullCostIsAvailable()
         {
             ServerPlayerResourceStore store = new(50);

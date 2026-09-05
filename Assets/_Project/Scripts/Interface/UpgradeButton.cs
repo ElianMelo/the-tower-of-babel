@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using TMPro;
 using TowerOfBabel.Upgrades;
 using UnityEngine;
@@ -52,14 +53,35 @@ namespace TowerOfBabel
             EnsureListener();
             upgradeData = data;
             selectionCallback = onSelected;
-            SetLabel(data != null ? data.DisplayName : string.Empty);
+            SetLabel(FormatLabel(data));
             SetState(buttonState);
         }
 
         public void SetupUpgradeData(UpgradeData data)
         {
             upgradeData = data;
-            SetLabel(data != null ? data.DisplayName : string.Empty);
+            SetLabel(FormatLabel(data));
+        }
+
+        private static string FormatLabel(UpgradeData data)
+        {
+            if (data == null)
+                return string.Empty;
+
+            // Existing display names include an authored amount after the title.
+            // Keep the title, but derive the amount from the gameplay data.
+            string title = string.IsNullOrWhiteSpace(data.DisplayName)
+                ? data.IsLevelFiftyUpgrade ? "Level 50" : data.EffectType.ToString()
+                : data.DisplayName.Split('\n')[0].TrimEnd('\r');
+            float displayedValue = data.EffectType == UpgradeEffectType.Efficiency
+                ? -data.Value : data.Value;
+            string amount = displayedValue.ToString("+0.###;-0.###;0", CultureInfo.InvariantCulture);
+            if (data.EffectType == UpgradeEffectType.Efficiency)
+                amount += "s";
+
+            return data.IsLevelFiftyUpgrade
+                ? $"{title}\n{data.EffectType} {amount}"
+                : $"{title}\n{amount}";
         }
 
         public void SetState(UpgradeButtonState buttonState)

@@ -2,6 +2,7 @@ using System.Linq;
 using NUnit.Framework;
 using TowerOfBabel.Upgrades;
 using UnityEditor;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace TowerOfBabel.Resources.Tests
@@ -10,6 +11,38 @@ namespace TowerOfBabel.Resources.Tests
     {
         private const string ConfigPath = "Assets/_Project/Resources/UpgradeTreeConfig.asset";
         private const string InputPath = "Assets/InputSystem_Actions.inputactions";
+
+        [TestCase(UpgradeEffectType.Efficiency, 2f, "Efficiency\n-0.2s", false, "Efficiency\n-2s")]
+        [TestCase(UpgradeEffectType.Efficiency, 0.25f, "Efficiency\n-0.2s", false, "Efficiency\n-0.25s")]
+        [TestCase(UpgradeEffectType.Cost, -3f, "Cost\n-2", false, "Cost\n-3")]
+        [TestCase(UpgradeEffectType.Production, 4f, "Production\n+2", false, "Production\n+4")]
+        [TestCase(UpgradeEffectType.Production, 5f, "Level 50\nProduction +2", true, "Level 50\nProduction +5")]
+        public void InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(UpgradeEffectType effect,
+            float value, string displayName, bool isCapstone, string expectedLabel)
+        {
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/Interface/UpgradeButton.prefab");
+            Assert.That(prefab, Is.Not.Null);
+            GameObject instance = Object.Instantiate(prefab);
+            try
+            {
+                UpgradeButton button = instance.GetComponent<UpgradeButton>();
+                UpgradeData data = new("gather_3_3", displayName, 3, 3, effect, value, isCapstone);
+
+                button.Configure(data, null, UpgradeButtonState.CanBuy);
+                Assert.That(button.Label, Is.EqualTo(expectedLabel));
+                Assert.That(button.Data.Value, Is.EqualTo(value));
+
+                button.SetupUpgradeData(null);
+                Assert.That(button.Label, Is.Empty);
+                button.SetupUpgradeData(data);
+                Assert.That(button.Label, Is.EqualTo(expectedLabel));
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
 
         [Test]
         public void Experience_IsIncrementalPerJobAndResetsAfterLevelUp()

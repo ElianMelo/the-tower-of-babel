@@ -179,8 +179,18 @@ namespace TowerOfBabel.Networking.Resources
         [TargetRpc]
         private void RejectGatherTargetRpc(NetworkConnection connection, ulong nodeId)
         {
-            if (localActiveResource != null && localActiveResource.NodeId == nodeId)
-                localActiveResource.RejectByServer();
+            HandleGatherRejected(nodeId);
+        }
+
+        private void HandleGatherRejected(ulong nodeId)
+        {
+            if (localActiveResource == null || localActiveResource.NodeId != nodeId)
+                return;
+
+            Resource rejectedResource = localActiveResource;
+            // Rejection skips the cancel RPC, so release the local gather here.
+            localActiveResource = null;
+            rejectedResource.RejectByServer();
         }
 
         [TargetRpc]
