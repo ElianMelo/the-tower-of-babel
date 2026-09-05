@@ -65,6 +65,37 @@ namespace TowerOfBabel.Upgrades
             return changed;
         }
 
+        public bool SetLevel(int level)
+        {
+            int clampedLevel = Math.Clamp(level, 0, UpgradeTreeConfig.MaxLevel);
+            if (Level == clampedLevel && Experience == 0)
+                return false;
+
+            if (clampedLevel > Level)
+                AvailablePoints += clampedLevel - Level;
+
+            Level = clampedLevel;
+            Experience = 0;
+            return true;
+        }
+
+        public bool GrantUpgradePoints(int amount)
+        {
+            if (amount <= 0)
+                return false;
+
+            AvailablePoints = (int)Math.Min(int.MaxValue, (long)AvailablePoints + amount);
+            return true;
+        }
+
+        public void Reset()
+        {
+            Level = 0;
+            Experience = 0;
+            AvailablePoints = 0;
+            purchasedUpgradeIds.Clear();
+        }
+
         public bool CanPurchase(UpgradeTreeConfig config, string upgradeId)
         {
             return AvailablePoints > 0 && !HasPurchased(upgradeId) &&

@@ -51,6 +51,39 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [Test]
+        public void AbsoluteLevel_GrantsPointsOnlyForLevelsGainedAndResetsExperience()
+        {
+            UpgradeJobProgress progress = new(UpgradeJob.Gather);
+            progress.GainExperience(5);
+
+            Assert.That(progress.SetLevel(4), Is.True);
+            Assert.That(progress.Level, Is.EqualTo(4));
+            Assert.That(progress.Experience, Is.Zero);
+            Assert.That(progress.AvailablePoints, Is.EqualTo(4));
+
+            Assert.That(progress.SetLevel(2), Is.True);
+            Assert.That(progress.Level, Is.EqualTo(2));
+            Assert.That(progress.AvailablePoints, Is.EqualTo(4));
+        }
+
+        [Test]
+        public void CheatPointGrantAndReset_ClearTheExpectedProgression()
+        {
+            UpgradeJobProgress progress = new(UpgradeJob.Build);
+            progress.SetLevel(2);
+            progress.GrantUpgradePoints(3);
+
+            Assert.That(progress.AvailablePoints, Is.EqualTo(5));
+
+            progress.Reset();
+
+            Assert.That(progress.Level, Is.Zero);
+            Assert.That(progress.Experience, Is.Zero);
+            Assert.That(progress.AvailablePoints, Is.Zero);
+            Assert.That(progress.PurchasedUpgradeIds, Is.Empty);
+        }
+
+        [Test]
         public void PlaceholderConfig_HasSevenBySevenGridAndOneCapstonePerJob()
         {
             UpgradeTreeConfig config = LoadConfig();

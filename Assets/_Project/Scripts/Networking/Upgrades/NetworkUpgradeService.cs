@@ -99,6 +99,70 @@ namespace TowerOfBabel.Networking.Upgrades
             RequestPurchaseServerRpc(job, upgradeId);
         }
 
+        public bool RequestCheatExperience(UpgradeJob job, int amount)
+        {
+            if (!CanSendCheat(job) || amount <= 0)
+                return false;
+
+            CheatExperienceServerRpc(job, amount);
+            return true;
+        }
+
+        public bool RequestCheatLevel(UpgradeJob job, int level)
+        {
+            if (!CanSendCheat(job) || level < 0 || level > UpgradeTreeConfig.MaxLevel)
+                return false;
+
+            CheatLevelServerRpc(job, level);
+            return true;
+        }
+
+        public bool RequestCheatPoints(UpgradeJob job, int amount)
+        {
+            if (!CanSendCheat(job) || amount <= 0)
+                return false;
+
+            CheatPointsServerRpc(job, amount);
+            return true;
+        }
+
+        public bool RequestCheatPurchase(UpgradeJob job, string upgradeId)
+        {
+            if (!CanSendCheat(job) || string.IsNullOrWhiteSpace(upgradeId) || upgradeId.Length > 64)
+                return false;
+
+            CheatPurchaseServerRpc(job, upgradeId);
+            return true;
+        }
+
+        public bool RequestCheatPurchase(UpgradeJob job, int row, int column)
+        {
+            if (!CanSendCheat(job) || row < 0 || row >= UpgradeTreeConfig.GridSize ||
+                column < 0 || column >= UpgradeTreeConfig.GridSize)
+                return false;
+
+            CheatPurchaseAtServerRpc(job, row, column);
+            return true;
+        }
+
+        public bool RequestCheatReset(UpgradeJob job)
+        {
+            if (!CanSendCheat(job))
+                return false;
+
+            CheatResetServerRpc(job);
+            return true;
+        }
+
+        public bool RequestCheatResetAll()
+        {
+            if (!InstanceFinder.IsClientStarted)
+                return false;
+
+            CheatResetAllServerRpc();
+            return true;
+        }
+
         public bool ServerGrantActionExperience(NetworkConnection connection, UpgradeJob job, int amount = 1)
         {
             if (!IsServerStarted || connection == null || !IsValidJob(job) || amount <= 0)
@@ -181,6 +245,108 @@ namespace TowerOfBabel.Networking.Upgrades
             SendProgress(sender, progress);
         }
 
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatExperienceServerRpc(UpgradeJob job, int amount,
+            NetworkConnection sender = null)
+        {
+            if (sender == null || !IsValidJob(job) || amount <= 0)
+                return;
+
+            UpgradeJobProgress progress = GetOrCreateServerProgress(sender).Get(job);
+            bool changed = progress.GainExperience(amount);
+            SendProgress(sender, progress);
+            SendCheatResult(sender, changed,
+                changed ? $"{job}: gained {amount} XP." : $"{job}: XP did not change (already max level).");
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatLevelServerRpc(UpgradeJob job, int level,
+            NetworkConnection sender = null)
+        {
+            if (sender == null || !IsValidJob(job) || level < 0 || level > UpgradeTreeConfig.MaxLevel)
+                return;
+
+            UpgradeJobProgress progress = GetOrCreateServerProgress(sender).Get(job);
+            int previousLevel = progress.Level;
+            progress.SetLevel(level);
+            SendProgress(sender, progress);
+            SendCheatResult(sender, true,
+                $"{job}: level set from {previousLevel} to {progress.Level}; points {progress.AvailablePoints}.");
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatPointsServerRpc(UpgradeJob job, int amount,
+            NetworkConnection sender = null)
+        {
+            if (sender == null || !IsValidJob(job) || amount <= 0)
+                return;
+
+            UpgradeJobProgress progress = GetOrCreateServerProgress(sender).Get(job);
+            progress.GrantUpgradePoints(amount);
+            SendProgress(sender, progress);
+            SendCheatResult(sender, true,
+                $"{job}: granted {amount} upgrade points; available {progress.AvailablePoints}.");
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatPurchaseServerRpc(UpgradeJob job, string upgradeId,
+            NetworkConnection sender = null)
+        {
+            if (sender == null || config == null || !IsValidJob(job) ||
+                string.IsNullOrWhiteSpace(upgradeId) || upgradeId.Length > 64)
+                return;
+
+            PurchaseCheatUpgrade(sender, job, upgradeId);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatPurchaseAtServerRpc(UpgradeJob job, int row, int column,
+            NetworkConnection sender = null)
+        {
+            if (sender == null || config == null || !IsValidJob(job) ||
+                row < 0 || row >= UpgradeTreeConfig.GridSize ||
+                column < 0 || column >= UpgradeTreeConfig.GridSize)
+                return;
+
+            UpgradeData upgrade = config.GetGridUpgrade(job, row, column);
+            if (upgrade == null)
+            {
+                SendCheatResult(sender, false, $"{job}: no upgrade exists at [{row}][{column}].");
+                return;
+            }
+
+            PurchaseCheatUpgrade(sender, job, upgrade.Id);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatResetServerRpc(UpgradeJob job, NetworkConnection sender = null)
+        {
+            if (sender == null || !IsValidJob(job))
+                return;
+
+            UpgradeJobProgress progress = GetOrCreateServerProgress(sender).Get(job);
+            progress.Reset();
+            SendProgress(sender, progress);
+            SendCheatResult(sender, true, $"{job}: progression reset.");
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void CheatResetAllServerRpc(NetworkConnection sender = null)
+        {
+            if (sender == null)
+                return;
+
+            PlayerUpgradeProgress playerProgress = GetOrCreateServerProgress(sender);
+            foreach (UpgradeJob job in new[] { UpgradeJob.Gather, UpgradeJob.Process, UpgradeJob.Build })
+            {
+                UpgradeJobProgress progress = playerProgress.Get(job);
+                progress.Reset();
+                SendProgress(sender, progress);
+            }
+
+            SendCheatResult(sender, true, "All upgrade progression reset.");
+        }
+
         [TargetRpc]
         private void ReceiveProgressTargetRpc(NetworkConnection connection, UpgradeJob job, int level,
             int experience, int availablePoints, string[] purchasedUpgradeIds)
@@ -196,6 +362,32 @@ namespace TowerOfBabel.Networking.Upgrades
             UpgradeJobSnapshot snapshot = progress.CreateSnapshot();
             ReceiveProgressTargetRpc(connection, snapshot.Job, snapshot.Level, snapshot.Experience,
                 snapshot.AvailablePoints, snapshot.PurchasedUpgradeIds);
+        }
+
+        private void PurchaseCheatUpgrade(NetworkConnection connection, UpgradeJob job,
+            string upgradeId)
+        {
+            UpgradeJobProgress progress = GetOrCreateServerProgress(connection).Get(job);
+            bool purchased = progress.TryPurchase(config, upgradeId);
+            SendProgress(connection, progress);
+            SendCheatResult(connection, purchased, purchased
+                ? $"{job}: purchased '{upgradeId}'."
+                : $"{job}: could not purchase '{upgradeId}' (check points, reveal path, and purchase state).");
+        }
+
+        private void SendCheatResult(NetworkConnection connection, bool success, string message)
+        {
+            ReceiveCheatResultTargetRpc(connection, success, message);
+        }
+
+        [TargetRpc]
+        private void ReceiveCheatResultTargetRpc(NetworkConnection connection, bool success,
+            string message)
+        {
+            if (success)
+                Debug.Log($"[Upgrade Cheat] {message}");
+            else
+                Debug.LogWarning($"[Upgrade Cheat] {message}");
         }
 
         private void HandleRemoteConnectionState(NetworkConnection connection,
@@ -218,6 +410,11 @@ namespace TowerOfBabel.Networking.Upgrades
         private static bool IsValidJob(UpgradeJob job)
         {
             return job is UpgradeJob.Gather or UpgradeJob.Process or UpgradeJob.Build;
+        }
+
+        private static bool CanSendCheat(UpgradeJob job)
+        {
+            return InstanceFinder.IsClientStarted && IsValidJob(job);
         }
     }
 }
