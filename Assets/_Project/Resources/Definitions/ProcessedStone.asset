@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 491ba0dd3434b484aa47dad826ffc2fa, type: 3}
-  m_Name: Stone
+  m_Name: ProcessedStone
   m_EditorClassIdentifier: Assembly-CSharp::TowerOfBabel.Resources.ResourceDefinition
-  resourceId: stone
-  resourceType: 0
-  displayName: Stone
-  icon: {fileID: 21300000, guid: df473eac64e9c884a9382f8424b4967a, type: 3}
+  resourceId: processedstone
+  resourceType: 1
+  displayName: ProcessedStone
+  icon: {fileID: 21300000, guid: 55b0eb8b42b224d46b95b952ecb2d596, type: 3}
   amountGathered: 1
   interactionDuration: 1
   respawnCooldown: 1

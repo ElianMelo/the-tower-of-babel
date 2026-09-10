@@ -9,7 +9,7 @@ using UnityEngine;
 namespace TowerOfBabel.Resources
 {
     [DisallowMultipleComponent]
-    public sealed class Resource : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable
+    public sealed class Resource : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable, IInteractionAnimation
     {
         private static readonly Color AvailableColor = Color.blue;
         private static readonly Color CooldownColor = Color.red;
@@ -22,6 +22,7 @@ namespace TowerOfBabel.Resources
         private bool isCoolingDown;
 
         public string ObjectName => gameObject.name;
+        public bool UsesGatheringAnimation => true;
         public string DetailText => definition != null ? definition.DisplayName : "Undefined Resource";
         public Color DetailColor => isCoolingDown ? CooldownColor : AvailableColor;
         public string PromptText => CanInteract ? "Press 'E'" : "Unavailable";

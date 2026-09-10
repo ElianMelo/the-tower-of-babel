@@ -24,6 +24,8 @@ namespace TowerOfBabel.Resources.Interaction
         private IInteractable activeInteraction;
         private MonoBehaviour activeInteractionBehaviour;
         private float interactionElapsed;
+        private float interactionDuration;
+        private IServerInteractionCompletion serverCompletion;
         private IServerAuthoritativeInteractable authoritativeInteractable;
         private bool serverRejected;
 
@@ -37,10 +39,13 @@ namespace TowerOfBabel.Resources.Interaction
 
             if (playerStateMachine == null)
                 playerStateMachine = GetComponent<PlayerControlStateMachine>();
-            if (playerStateMachine != null)
-                playerStateMachine.GatheringInterrupted += HandleConnectionInterruptedGathering;
-
             ClearTarget();
+        }
+
+        private void OnEnable()
+        {
+            if (playerStateMachine != null)
+                playerStateMachine.InteractionInterrupted += HandleConnectionInterruptedInteraction;
         }
 
         private void Update()
@@ -146,7 +151,7 @@ namespace TowerOfBabel.Resources.Interaction
                 ClearTarget();
 
             if (playerStateMachine != null)
-                playerStateMachine.GatheringInterrupted -= HandleConnectionInterruptedGathering;
+                playerStateMachine.InteractionInterrupted -= HandleConnectionInterruptedInteraction;
         }
 
         public bool TryBeginCurrentInteraction()
@@ -154,13 +159,18 @@ namespace TowerOfBabel.Resources.Interaction
             if (activeInteraction != null || currentInteractable == null || !currentInteractable.CanInteract)
                 return false;
 
-            if (playerStateMachine == null || !playerStateMachine.BeginGathering())
+            bool gatheringAnimation = currentInteractable is IInteractionAnimation animation && animation.UsesGatheringAnimation;
+            if (playerStateMachine == null || !playerStateMachine.BeginInteraction(gatheringAnimation))
                 return false;
 
             activeInteraction = currentInteractable;
             activeInteractionBehaviour = currentInteractableBehaviour;
             interactionElapsed = 0f;
+            interactionDuration = activeInteraction.Duration;
             activeInteraction.BeginInteraction(gameObject);
+            serverCompletion = activeInteraction as IServerInteractionCompletion;
+            if (serverCompletion != null)
+                serverCompletion.ServerCompleted += HandleServerCompleted;
             authoritativeInteractable = activeInteraction as IServerAuthoritativeInteractable;
             if (authoritativeInteractable != null)
             {
@@ -190,11 +200,11 @@ namespace TowerOfBabel.Resources.Interaction
             }
 
             interactionElapsed += Time.deltaTime;
-            float normalizedProgress = Mathf.Clamp01(interactionElapsed / Mathf.Max(0.01f, activeInteraction.Duration));
+            float normalizedProgress = Mathf.Clamp01(interactionElapsed / Mathf.Max(0.01f, interactionDuration));
             activeInteraction.UpdateInteraction(normalizedProgress);
             InterfaceManager.Instance?.SetInteractionProgress(normalizedProgress);
 
-            if (normalizedProgress >= 1f)
+            if (normalizedProgress >= 1f && serverCompletion == null)
                 CompleteInteraction();
         }
 
@@ -219,6 +229,9 @@ namespace TowerOfBabel.Resources.Interaction
 
         private void FinishInteraction()
         {
+            if (serverCompletion != null)
+                serverCompletion.ServerCompleted -= HandleServerCompleted;
+            serverCompletion = null;
             if (authoritativeInteractable != null)
                 authoritativeInteractable.ServerRejected -= HandleServerRejected;
             authoritativeInteractable = null;
@@ -226,7 +239,7 @@ namespace TowerOfBabel.Resources.Interaction
             activeInteraction = null;
             activeInteractionBehaviour = null;
             interactionElapsed = 0f;
-            playerStateMachine?.EndGathering();
+            playerStateMachine?.EndInteraction();
             InterfaceManager.Instance?.HideInteractionProgress();
         }
 
@@ -236,7 +249,13 @@ namespace TowerOfBabel.Resources.Interaction
             CancelCurrentInteraction();
         }
 
-        private void HandleConnectionInterruptedGathering()
+        private void HandleServerCompleted()
+        {
+            if (activeInteraction != null)
+                CompleteInteraction();
+        }
+
+        private void HandleConnectionInterruptedInteraction()
         {
             if (activeInteraction != null)
                 CancelCurrentInteraction();

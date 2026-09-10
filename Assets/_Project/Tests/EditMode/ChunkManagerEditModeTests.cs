@@ -407,7 +407,7 @@ namespace TowerOfBabel.World.Tests
             {
                 "Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab",
                 "Assets/_Project/Prefabs/Buildings/Step_Tile.prefab",
-                "Assets/_Project/Prefabs/Buildings/Pillar-10.prefab",
+                "Assets/_Project/Prefabs/Buildings/Pillar.prefab",
                 "Assets/_Project/Prefabs/Buildings/Arch.prefab"
             };
 

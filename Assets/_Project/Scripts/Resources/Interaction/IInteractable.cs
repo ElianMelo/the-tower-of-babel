@@ -18,6 +18,17 @@ namespace TowerOfBabel.Resources.Interaction
         void CompleteInteraction(GameObject interactor);
     }
 
+    public interface IInteractionAnimation
+    {
+        bool UsesGatheringAnimation { get; }
+    }
+
+    /// <summary>Timed interactions that remain active until the server confirms completion.</summary>
+    public interface IServerInteractionCompletion
+    {
+        event Action ServerCompleted;
+    }
+
     /// <summary>
     /// Optional presentation hooks for interactables whose prompt and local feedback can change
     /// while they remain under the player's crosshair.

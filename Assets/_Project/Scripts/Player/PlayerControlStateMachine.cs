@@ -5,8 +5,9 @@ using UnityEngine;
 public enum PlayerControlState : byte
 {
     Locked,
-    Gathering,
-    Moving
+    Interacting = 1,
+    Gathering = Interacting,
+    Moving = 2
 }
 
 [DisallowMultipleComponent]
@@ -17,11 +18,17 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
     [SerializeField] private PlayerVisuals playerVisuals;
 
     private bool connected;
-    private bool gathering;
+    private bool interacting;
+    private bool useGatheringAnimation;
     private bool modalInputLocked;
 
     public PlayerControlState CurrentState { get; private set; } = PlayerControlState.Locked;
-    public event Action GatheringInterrupted;
+    public event Action InteractionInterrupted;
+    public event Action GatheringInterrupted
+    {
+        add => InteractionInterrupted += value;
+        remove => InteractionInterrupted -= value;
+    }
     public event Action<PlayerControlState> StateChanged;
 
     private void Awake()
@@ -37,31 +44,36 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
             return;
 
         connected = value;
-        if (!connected && gathering)
+        if (!connected && interacting)
         {
-            gathering = false;
-            GatheringInterrupted?.Invoke();
+            interacting = false;
+            InteractionInterrupted?.Invoke();
         }
 
         EvaluateState();
     }
 
-    public bool BeginGathering()
+    public bool BeginGathering() => BeginInteraction(true);
+
+    public bool BeginInteraction(bool playGatheringAnimation = false)
     {
-        if (!connected || gathering)
+        if (!connected || interacting || modalInputLocked)
             return false;
 
-        gathering = true;
+        interacting = true;
+        useGatheringAnimation = playGatheringAnimation;
         EvaluateState();
         return true;
     }
 
-    public void EndGathering()
+    public void EndGathering() => EndInteraction();
+
+    public void EndInteraction()
     {
-        if (!gathering)
+        if (!interacting)
             return;
 
-        gathering = false;
+        interacting = false;
         EvaluateState();
     }
 
@@ -78,7 +90,7 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
     {
         PlayerControlState state = !connected
             ? PlayerControlState.Locked
-            : gathering ? PlayerControlState.Gathering : PlayerControlState.Moving;
+            : interacting ? PlayerControlState.Interacting : PlayerControlState.Moving;
         ApplyState(state);
     }
 
@@ -88,9 +100,9 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
         CurrentState = state;
         ApplyControlLocks();
 
-        if (state == PlayerControlState.Gathering)
+        if (state == PlayerControlState.Interacting && useGatheringAnimation)
             playerVisuals?.PlayDigging();
-        else if (previousState == PlayerControlState.Gathering)
+        else if (previousState == PlayerControlState.Interacting)
             playerVisuals?.CancelAnimation();
 
         StateChanged?.Invoke(state);

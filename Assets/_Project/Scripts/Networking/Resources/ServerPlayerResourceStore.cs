@@ -59,5 +59,33 @@ namespace TowerOfBabel.Networking.Resources
         }
 
         public void RemovePlayer(int playerId) => resourcesByPlayer.Remove(playerId);
+
+        public bool CanExchange(int playerId, ResourceType source, int cost, ResourceType target, int production)
+        {
+            if (cost <= 0 || production <= 0 || !HasAtLeast(playerId, source, cost))
+                return false;
+
+            long targetAfter = (long)GetAmount(playerId, target) + production;
+            if (source == target)
+                targetAfter -= cost;
+            return targetAfter <= CapacityPerResource;
+        }
+
+        // Validate the entire exchange before changing either balance. Never truncate production.
+        public bool TryExchange(int playerId, ResourceType source, int cost, ResourceType target,
+            int production, out int sourceAmount, out int targetAmount)
+        {
+            sourceAmount = GetAmount(playerId, source);
+            targetAmount = GetAmount(playerId, target);
+            if (!CanExchange(playerId, source, cost, target, production))
+                return false;
+
+            Dictionary<ResourceType, int> resources = resourcesByPlayer[playerId];
+            resources[source] = sourceAmount - cost;
+            resources[target] = (int)((long)resources.GetValueOrDefault(target) + production);
+            sourceAmount = resources[source];
+            targetAmount = resources[target];
+            return true;
+        }
     }
 }

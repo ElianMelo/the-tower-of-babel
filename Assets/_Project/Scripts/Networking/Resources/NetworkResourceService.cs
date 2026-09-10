@@ -12,7 +12,7 @@ using UnityEngine;
 namespace TowerOfBabel.Networking.Resources
 {
     [DisallowMultipleComponent]
-    public sealed class NetworkResourceService : NetworkBehaviour
+    public sealed partial class NetworkResourceService : NetworkBehaviour
     {
         private sealed class ActiveGather
         {
@@ -56,13 +56,15 @@ namespace TowerOfBabel.Networking.Resources
         public override void OnStopServer()
         {
             ServerManager.OnRemoteConnectionState -= HandleRemoteConnectionState;
+            StopAllCoroutines();
+            activeProcesses.Clear();
             activeGathers.Clear();
             base.OnStopServer();
         }
 
         public bool RequestGatherStart(Resource resource, Vector3 playerPosition)
         {
-            if (!InstanceFinder.IsClientStarted || resource == null || localActiveResource != null)
+            if (!InstanceFinder.IsClientStarted || resource == null || localActiveResource != null || localActiveProcessor != null)
                 return false;
 
             localActiveResource = resource;
@@ -120,7 +122,7 @@ namespace TowerOfBabel.Networking.Resources
         [ServerRpc(RequireOwnership = false)]
         private void RequestGatherStartServerRpc(ulong nodeId, Vector3 claimedPlayerPosition, NetworkConnection sender = null)
         {
-            if (sender == null || activeGathers.ContainsKey(sender.ClientId)
+            if (sender == null || activeGathers.ContainsKey(sender.ClientId) || activeProcesses.ContainsKey(sender.ClientId)
                 || !nodes.TryGetValue(nodeId, out Resource node)
                 || !node.ServerCanGather
                 || Vector3.Distance(claimedPlayerPosition, node.transform.position) > maximumInteractionDistance
@@ -208,6 +210,7 @@ namespace TowerOfBabel.Networking.Resources
 
         private void RebuildNodeLookup()
         {
+            RebuildProcessorLookup();
             nodes.Clear();
             foreach (Resource node in FindObjectsByType<Resource>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
@@ -223,6 +226,7 @@ namespace TowerOfBabel.Networking.Resources
 
             if (activeGathers.Remove(connection.ClientId, out ActiveGather gather) && gather.Routine != null)
                 StopCoroutine(gather.Routine);
+            CancelServerProcess(connection.ClientId);
             serverResources.RemovePlayer(connection.ClientId);
         }
     }
