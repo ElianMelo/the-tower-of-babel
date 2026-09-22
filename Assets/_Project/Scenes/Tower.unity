@@ -556,7 +556,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000022888184
+      value: 0.0000038146973
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -2021,6 +2021,10 @@ PrefabInstance:
     - target: {fileID: 2093656629115535762, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
       propertyPath: m_LocalPosition.y
       value: 34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3170683105086291527, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+      propertyPath: m_Name
+      value: Terrain (-2 height for lake)
       objectReference: {fileID: 0}
     - target: {fileID: 6922764393439729157, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
       propertyPath: m_Name
