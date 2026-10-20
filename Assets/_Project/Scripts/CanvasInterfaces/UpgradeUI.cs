@@ -5,6 +5,7 @@ using TowerOfBabel.Upgrades;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using TowerOfBabel.Interface;
 
 namespace TowerOfBabel
 {
@@ -24,8 +25,10 @@ namespace TowerOfBabel
         [SerializeField] private InputActionAsset inputActions;
         [SerializeField] private string toggleActionName = "Player/Upgrade";
 
-        [Header("Grid Layout")]
-        [SerializeField, Min(1f)] private float cellSpacing = 112f;
+        [Header("Progress Presentation")]
+        [SerializeField] private Image experienceFill;
+        [SerializeField] private TMP_Text boardHint;
+        private Vector2 lastBoardSize;
 
         private readonly Dictionary<UpgradeJob, Dictionary<string, UpgradeButton>> boardButtons = new();
         private NetworkUpgradeService upgradeService;
@@ -61,6 +64,9 @@ namespace TowerOfBabel
         {
             if (upgradeService == null || !boardsBuilt)
                 TryBindService();
+            if (boardsBuilt && gatherBoard != null && gatherBoard.transform is RectTransform board &&
+                board.rect.size != lastBoardSize)
+                FitBoards();
         }
 
         private void OnDisable()
@@ -147,6 +153,7 @@ namespace TowerOfBabel
             BuildBoard(UpgradeJob.Process, processorBoard);
             BuildBoard(UpgradeJob.Build, builderBoard);
             boardsBuilt = true;
+            FitBoards();
             SelectBoard(selectedJob);
         }
 
@@ -180,11 +187,9 @@ namespace TowerOfBabel
                 if (rect != null)
                 {
                     rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-                    rect.anchoredPosition = data.IsLevelFiftyUpgrade
-                        ? new Vector2(0f, -4f * cellSpacing)
-                        : new Vector2(
-                            (data.Column - UpgradeTreeConfig.CenterCoordinate) * cellSpacing,
-                            (UpgradeTreeConfig.CenterCoordinate - data.Row) * cellSpacing);
+                    Rect available = ((RectTransform)board.transform).rect;
+                    rect.sizeDelta = UpgradeBoardLayout.CellSize(available);
+                    rect.anchoredPosition = UpgradeBoardLayout.Position(data, available, rect.sizeDelta);
                 }
 
                 string upgradeId = data.Id;
@@ -204,6 +209,23 @@ namespace TowerOfBabel
                     Destroy(board.transform.GetChild(i).gameObject);
             }
             boardButtons.Clear();
+        }
+
+        private void FitBoards()
+        {
+            foreach (GameObject board in new[] { gatherBoard, processorBoard, builderBoard })
+            {
+                if (board == null || board.transform is not RectTransform boardRect) continue;
+                Vector2 size = UpgradeBoardLayout.CellSize(boardRect.rect);
+                foreach (UpgradeButton view in board.GetComponentsInChildren<UpgradeButton>(true))
+                {
+                    if (view.Data == null) continue;
+                    RectTransform rect = (RectTransform)view.transform;
+                    rect.sizeDelta = size;
+                    rect.anchoredPosition = UpgradeBoardLayout.Position(view.Data, boardRect.rect, size);
+                }
+            }
+            if (gatherBoard != null) lastBoardSize = ((RectTransform)gatherBoard.transform).rect.size;
         }
 
         private void RequestPurchase(UpgradeJob job, string upgradeId)
@@ -229,7 +251,10 @@ namespace TowerOfBabel
 
                     bool isPurchased = purchased.Contains(data.Id);
                     bool isRevealed = isPurchased || IsRevealed(data, purchased);
-                    view.gameObject.SetActive(isRevealed);
+                    // Keep the roadmap visible while retaining server-authoritative reveal/purchase rules.
+                    view.gameObject.SetActive(true);
+                    view.SetupUpgradeData(data);
+                    if (!isRevealed) view.SetLabel(data.IsLevelFiftyUpgrade ? "Level 50\nCapstone" : "Unexplored\n- -");
                     if (isPurchased)
                         view.SetState(UpgradeButtonState.Purchased);
                     else
@@ -241,6 +266,18 @@ namespace TowerOfBabel
 
             if (jobTitleText != null)
                 jobTitleText.text = GetJobTitle(selectedJob);
+            SetTab(gatherButton, selectedJob == UpgradeJob.Gather);
+            SetTab(processorButton, selectedJob == UpgradeJob.Process);
+            SetTab(builderButton, selectedJob == UpgradeJob.Build);
+            if (boardHint != null)
+                boardHint.text = snapshot.AvailablePoints > 0
+                    ? "Choose a blue node to grow your skills."
+                    : "Earn experience to unlock your next upgrade.";
+            if (experienceFill != null)
+            {
+                int required = UpgradeJobProgress.GetExperienceRequired(snapshot.Level);
+                experienceFill.fillAmount = required > 0 ? Mathf.Clamp01((float)snapshot.Experience / required) : 1f;
+            }
             if (levelText != null)
                 levelText.text = $"Lv {snapshot.Level} | Pts {snapshot.AvailablePoints}";
             if (experienceText != null)
@@ -250,6 +287,13 @@ namespace TowerOfBabel
                     ? $"XP {snapshot.Experience}/{required}"
                     : "XP MAX";
             }
+        }
+
+        private static void SetTab(Button tab, bool selected)
+        {
+            if (tab == null) return;
+            var image = tab.GetComponent<UnityEngine.UI.Image>();
+            if (image != null) image.color = selected ? new Color(.24f, .84f, .48f, 1f) : Color.white;
         }
 
         private bool IsRevealed(UpgradeData data, HashSet<string> purchased)

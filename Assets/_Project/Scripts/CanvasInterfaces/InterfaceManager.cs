@@ -9,6 +9,7 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private TowerOfBabel.InventoryUI inventoryUI;
     [SerializeField] private TowerOfBabel.UpgradeUI upgradeUI;
     [SerializeField] private TowerOfBabel.ServerStatusUI serverStatusUI;
+    [SerializeField] private TowerOfBabel.AnimationEmoteUI animationEmoteUI;
 
     private void Awake()
     {
@@ -56,11 +57,14 @@ public class InterfaceManager : MonoBehaviour
 
     public void ToggleInventory()
     {
-        inventoryUI?.Toggle();
+        if (inventoryUI != null && inventoryUI.IsVisible) HideInventory();
+        else ShowInventory();
     }
 
     public void ShowInventory()
     {
+        upgradeUI?.Hide();
+        animationEmoteUI?.Hide();
         inventoryUI?.Show();
     }
 
@@ -71,17 +75,32 @@ public class InterfaceManager : MonoBehaviour
 
     public void ToggleUpgrade()
     {
-        upgradeUI?.Toggle();
+        if (upgradeUI != null && upgradeUI.IsVisible) HideUpgrade();
+        else ShowUpgrade();
     }
 
     public void ShowUpgrade()
     {
+        inventoryUI?.Hide();
+        animationEmoteUI?.Hide();
         upgradeUI?.Show();
     }
 
     public void HideUpgrade()
     {
         upgradeUI?.Hide();
+    }
+
+    public void ToggleEmotes()
+    {
+        if (animationEmoteUI == null) return;
+        if (animationEmoteUI.IsVisible) animationEmoteUI.Hide();
+        else
+        {
+            inventoryUI?.Hide();
+            upgradeUI?.Hide();
+            animationEmoteUI.Show();
+        }
     }
 
     public void ShowServerDisconnected() => serverStatusUI?.ShowDisconnected();

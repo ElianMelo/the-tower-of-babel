@@ -21,6 +21,8 @@ namespace TowerOfBabel
         [SerializeField] private Image hoverEffectImage;
         [SerializeField] private Button button;
         [SerializeField] private TMP_Text upgradeText;
+        [SerializeField] private TMP_Text stateText;
+        [SerializeField] private Image stateSurface;
 
         [SerializeField] private Color canBuy;
         [SerializeField] private Color cannotBuy;
@@ -115,6 +117,12 @@ namespace TowerOfBabel
 
         private void ApplyVisualState(bool pointerInside)
         {
+            if (stateText != null)
+                stateText.text = state == UpgradeButtonState.Purchased ? "OWNED" :
+                    state == UpgradeButtonState.CanBuy ? "1 POINT" : "LOCKED";
+            if (stateSurface != null)
+                stateSurface.color = state == UpgradeButtonState.Purchased ? new Color(.38f, .94f, .55f, .95f) :
+                    state == UpgradeButtonState.CanBuy ? new Color(.4f, .85f, 1f, 1f) : new Color(.8f, .94f, 1f, .72f);
             if (hoverEffect == null)
                 return;
 

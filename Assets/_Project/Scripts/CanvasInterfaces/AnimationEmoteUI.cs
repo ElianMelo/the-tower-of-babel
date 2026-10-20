@@ -34,6 +34,7 @@ namespace TowerOfBabel
         [SerializeField] private InputActionAsset inputActions;
         [SerializeField] private string toggleActionName = "Player/Emote";
         [SerializeField] private PlayerVisuals playerVisuals;
+        [SerializeField] private Transform optionsContainer;
 
         [Header("Radial Layout")]
         [SerializeField, Min(1f)] private float radialRadius = 300f;
@@ -143,7 +144,7 @@ namespace TowerOfBabel
             for (int i = 0; i < EmoteOptions.Length; i++)
             {
                 EmoteOption definition = EmoteOptions[i];
-                OptionButton option = Instantiate(optionPrefab, visuals.transform);
+                OptionButton option = Instantiate(optionPrefab, optionsContainer != null ? optionsContainer : visuals.transform);
                 option.name = $"EmoteOption_{definition.Trigger}";
                 option.Configure(definition.Label, () => SelectEmote(definition.Trigger));
                 options.Add(option);
@@ -203,7 +204,8 @@ namespace TowerOfBabel
 
         private void HandleTogglePerformed(InputAction.CallbackContext context)
         {
-            Toggle();
+            if (InterfaceManager.Instance != null) InterfaceManager.Instance.ToggleEmotes();
+            else Toggle();
         }
 
         private void RestoreCursorState()

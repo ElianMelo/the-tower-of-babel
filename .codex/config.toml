@@ -2,47 +2,18 @@ model_verbosity = "low"
 web_search = "live"
 sandbox_mode = "danger-full-access"
 
-[mcp_servers.ai-game-developer]
+[mcp_servers.unity]
+command = "C:\\Users\\Elian\\AppData\\Local\\Unity\\bin\\unity.exe"
+args = ["mcp","--project-path","D:\\PersonalProjects\\the-tower-of-babel"]
+
+[sandbox_workspace_write]
+network_access = true
+
+[features.network_proxy]
 enabled = true
-startup_timeout_sec = 30
-tool_timeout_sec = 300
-url = "https://ai-game.dev/mcp/p/edd989cc"
+allow_local_binding = false
 
-[mcp_servers.ai-game-developer.tools.assets-refresh]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.script-execute]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.tests-run]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.gameobject-create]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.gameobject-component-add]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.gameobject-component-modify]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.scene-save]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.gameobject-component-destroy]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.gameobject-modify]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.assets-prefab-create]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.gameobject-destroy]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.assets-prefab-open]
-approval_mode = "approve"
-
-[mcp_servers.ai-game-developer.tools.assets-prefab-close]
-approval_mode = "approve"
+[features.network_proxy.domains]
+localhost = "allow"
+"127.0.0.1" = "allow"
+"::1" = "allow"

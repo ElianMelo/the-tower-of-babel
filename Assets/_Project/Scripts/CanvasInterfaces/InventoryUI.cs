@@ -18,6 +18,9 @@ namespace TowerOfBabel
 
         private readonly Dictionary<ResourceType, ResourceInventoryDisplay> displays = new();
         private InputAction toggleAction;
+        private PlayerControlStateMachine controlStateMachine;
+        private CursorStateConfig? previousCursorState;
+        private bool inputLockApplied;
 
         public bool IsVisible => visuals != null && visuals.activeSelf;
         public InputActionAsset InputActions => inputActions;
@@ -43,6 +46,7 @@ namespace TowerOfBabel
 
         private void OnDisable()
         {
+            RestoreControls();
             if (wallet != null)
                 wallet.ResourceAmountChanged -= HandleResourceAmountChanged;
 
@@ -53,8 +57,31 @@ namespace TowerOfBabel
             }
         }
 
-        public void Show() => visuals.SetActive(true);
-        public void Hide() => visuals.SetActive(false);
+        public void Show()
+        {
+            if (visuals == null || IsVisible) return;
+            previousCursorState = CursorStateConfig.Current;
+            CursorStateConfig.UnlockedVisible.Apply();
+            controlStateMachine = FindFirstObjectByType<PlayerControlStateMachine>();
+            if (controlStateMachine != null)
+            {
+                controlStateMachine.SetModalInputLocked(true);
+                inputLockApplied = true;
+            }
+            visuals.SetActive(true);
+        }
+        public void Hide()
+        {
+            if (visuals != null) visuals.SetActive(false);
+            RestoreControls();
+        }
+        private void RestoreControls()
+        {
+            if (previousCursorState.HasValue) previousCursorState.Value.Apply();
+            previousCursorState = null;
+            if (inputLockApplied) controlStateMachine?.SetModalInputLocked(false);
+            inputLockApplied = false;
+        }
 
         public void Toggle()
         {

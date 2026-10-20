@@ -1,0 +1,571 @@
+{
+  "date": "2026-10-20",
+  "project": "D:/PersonalProjects/the-tower-of-babel",
+  "unity": "6000.3.11f1",
+  "cli": "1.0.0-beta.13",
+  "editMode": {
+    "status": "completed",
+    "duration": 0.32,
+    "summary": {
+      "total": 56,
+      "passed": 56,
+      "failed": 0,
+      "skipped": 0,
+      "inconclusive": 0
+    },
+    "results": [
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1348,545)",
+        "Status": "Passed",
+        "Duration": 0.0189357,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1120,600)",
+        "Status": "Passed",
+        "Duration": 0.0026422,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1348,905)",
+        "Status": "Passed",
+        "Duration": 0.0024796,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1980,545)",
+        "Status": "Passed",
+        "Duration": 0.002519,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.InventoryScrollIsClippedAndDataBindingsAreIntact",
+        "Status": "Passed",
+        "Duration": 0.0267769,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.MainPrefabHasAllScreensAndFunctionalWindowCloseButtons",
+        "Status": "Passed",
+        "Duration": 0.0022484,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.NodeStatesRemainReadableAndOnlyAvailableNodesCanBeClicked",
+        "Status": "Passed",
+        "Duration": 0.0026832,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.VisualsReusePrefabSourcesAndDoNotBlockButtons",
+        "Status": "Passed",
+        "Duration": 0.0078478,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Building_ExposesElevenStagesAndAppliesConfiguredMesh",
+        "Status": "Passed",
+        "Duration": 0.0031147,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.InteractionUI_ShowsAndHidesAuthoredFields",
+        "Status": "Passed",
+        "Duration": 0.0044191,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.PlayerResourceWallet_AccumulatesStone",
+        "Status": "Passed",
+        "Duration": 0.0022527,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.PlayerResourceWallet_RaisesChangedAmount",
+        "Status": "Passed",
+        "Duration": 0.0007451,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Raycaster_RefreshesFocusedPresentationWithoutChangingTarget",
+        "Status": "Passed",
+        "Duration": 0.0049279,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Resource_CancelRestoresVisualPosition",
+        "Status": "Passed",
+        "Duration": 0.0015591,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ResourceDefinition_CanUseShortTestDurations",
+        "Status": "Passed",
+        "Duration": 0.0004798,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ResourceDefinitionCollection_ExposesConfiguredDefinitions",
+        "Status": "Passed",
+        "Duration": 0.0021372,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_CanGatherAfterSpendingAtCapacity",
+        "Status": "Passed",
+        "Duration": 0.0020218,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_ConsumesOnlyWhenFullCostIsAvailable",
+        "Status": "Passed",
+        "Duration": 0.0002285,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_EnforcesPerResourceCapacity",
+        "Status": "Passed",
+        "Duration": 0.0002324,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_SeparatesPlayers",
+        "Status": "Passed",
+        "Duration": 0.0001986,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerStatusUI_ShowsConnectionStatesAndHidesWhenConnected",
+        "Status": "Passed",
+        "Duration": 0.001473,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerOutline_UsesSharedLineworkSettingsAndRestoresRenderingLayer",
+        "Status": "Passed",
+        "Duration": 0.003585,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(\"Assets/_Project/Prefabs/Buildings/Arch.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.0070169,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(\"Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.0016219,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(\"Assets/_Project/Prefabs/Buildings/Step_Tile.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.0009693,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(\"Assets/_Project/Prefabs/Buildings/Arch.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.0018336,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(\"Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.000404,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(\"Assets/_Project/Prefabs/Buildings/Pillar.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.0024436,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(\"Assets/_Project/Prefabs/Buildings/Step_Tile.prefab\")",
+        "Status": "Passed",
+        "Duration": 0.0005715,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.DuplicatedProcessors_HaveDistinctStableSceneIds",
+        "Status": "Passed",
+        "Duration": 0.0023094,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(0,0,1,1,False,0,0)",
+        "Status": "Passed",
+        "Duration": 0.0013861,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,1,1,True,0,1)",
+        "Status": "Passed",
+        "Duration": 0.0009648,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,4,2,3,True,1,7)",
+        "Status": "Passed",
+        "Duration": 0.0001767,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,2,1,False,1,0)",
+        "Status": "Passed",
+        "Duration": 0.0001536,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,49,1,2,False,3,49)",
+        "Status": "Passed",
+        "Duration": 0.000147,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,50,1,1,False,3,50)",
+        "Status": "Passed",
+        "Duration": 0.00014,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,0,1,False,3,0)",
+        "Status": "Passed",
+        "Duration": 0.0001408,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,1,0,False,3,0)",
+        "Status": "Passed",
+        "Duration": 0.0001347,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,1,1,int.MaxValue,False,3,1)",
+        "Status": "Passed",
+        "Duration": 0.0001364,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_RechecksBalancesAndKeepsPlayersIndependent",
+        "Status": "Passed",
+        "Duration": 0.0004111,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_SameResourceUsesNetAmountAtCapacity",
+        "Status": "Passed",
+        "Duration": 0.0002652,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Processor_UsesOnlyProcessUpgradesAndClampsCostAndDuration",
+        "Status": "Passed",
+        "Duration": 0.0138507,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.StoneProcessorPrefab_HasRecipeAndResolvableInteractionCollider",
+        "Status": "Passed",
+        "Duration": 0.0022236,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.AbsoluteLevel_GrantsPointsOnlyForLevelsGainedAndResetsExperience",
+        "Status": "Passed",
+        "Duration": 0.0012217,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.BuyingBottomCenterRevealsLevelFiftyUpgrade",
+        "Status": "Passed",
+        "Duration": 0.0015834,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.CheatPointGrantAndReset_ClearTheExpectedProgression",
+        "Status": "Passed",
+        "Duration": 0.0016092,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Experience_IsIncrementalPerJobAndResetsAfterLevelUp",
+        "Status": "Passed",
+        "Duration": 0.0003876,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Experience_StopsAtLevelFiftyWithFiftyPoints",
+        "Status": "Passed",
+        "Duration": 0.0013572,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InputActions_BindUpgradeToTabAndInventoryToI",
+        "Status": "Passed",
+        "Duration": 0.0043273,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,2.0f,\"Efficiency\\n-0.2s\",False,\"Efficiency\\n-2s\")",
+        "Status": "Passed",
+        "Duration": 0.0029321,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,0.25f,\"Efficiency\\n-0.2s\",False,\"Efficiency\\n-0.25s\")",
+        "Status": "Passed",
+        "Duration": 0.0010051,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Cost,-3.0f,\"Cost\\n-2\",False,\"Cost\\n-3\")",
+        "Status": "Passed",
+        "Duration": 0.0008676,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,4.0f,\"Production\\n+2\",False,\"Production\\n+4\")",
+        "Status": "Passed",
+        "Duration": 0.0008184,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,5.0f,\"Level 50\\nProduction +2\",True,\"Level 50\\nProduction +5\")",
+        "Status": "Passed",
+        "Duration": 0.0008074,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.PlaceholderConfig_HasSevenBySevenGridAndOneCapstonePerJob",
+        "Status": "Passed",
+        "Duration": 0.0012862,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Purchases_StartAtCenterAndRevealOnlyOrthogonalNeighbors",
+        "Status": "Passed",
+        "Duration": 0.0004598,
+        "Message": null,
+        "StackTrace": null
+      }
+    ]
+  },
+  "playMode": {
+    "status": "completed",
+    "duration": 10.72,
+    "summary": {
+      "total": 20,
+      "passed": 20,
+      "failed": 0,
+      "skipped": 0,
+      "inconclusive": 0
+    },
+    "results": [
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.PanelsSwitchExclusivelyAndCloseRestoresControls",
+        "Status": "Passed",
+        "Duration": 0.3743417,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.RuntimeBoardsKeepAllFiftyNodesInsideBoundsAndTabsSelectTheCorrectJob",
+        "Status": "Passed",
+        "Duration": 0.1684023,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.AuthoritativeCooldown_DisablesAndRestoresResource",
+        "Status": "Passed",
+        "Duration": 0.070222,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.ClientCancel_SendsServerCancelRequest",
+        "Status": "Passed",
+        "Duration": 0.0166305,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.DisabledResource_CancelsActiveInteraction",
+        "Status": "Passed",
+        "Duration": 0.0142248,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.GatherRejection_ReleasesLocalGatherWithOrWithoutListener(True)",
+        "Status": "Passed",
+        "Duration": 0.0062914,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.GatherRejection_ReleasesLocalGatherWithOrWithoutListener(False)",
+        "Status": "Passed",
+        "Duration": 0.0006093,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.Inventory_BuildsZeroAmountRow_AndUpdatesFromWalletEvent",
+        "Status": "Passed",
+        "Duration": 0.0180989,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.InventoryToggle_DoesNotCancelActiveGathering",
+        "Status": "Passed",
+        "Duration": 0.0093762,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.NetworkBootstrap_StartHost_StartsServerAndClient_AndSecondCallDoesNothing",
+        "Status": "Passed",
+        "Duration": 0.1634806,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.PlayerControlStateMachine_DisconnectInterruptsGatheringAndRelock",
+        "Status": "Passed",
+        "Duration": 0.0168766,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.Raycaster_StartAndSecondActionCancel_LocksAndUnlocksControls",
+        "Status": "Passed",
+        "Duration": 0.0121827,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.ResourceCompletion_DoesNotPredictWalletOrCooldown",
+        "Status": "Passed",
+        "Duration": 0.0100227,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.ServerRejection_CancelsLocallyWithoutCancelEcho",
+        "Status": "Passed",
+        "Duration": 0.018885,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.Cancellation_DisablingAndDisconnecting_DoNotConsumeOrGrantExperience",
+        "Status": "Passed",
+        "Duration": 2.6423886,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.DelayedReply_DoesNotInterruptANewerRequestOnTheSameProcessor",
+        "Status": "Passed",
+        "Duration": 1.4975952,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.HostProcessing_ExchangesOnCompletion_UpdatesWalletAndGrantsProcessExperience",
+        "Status": "Passed",
+        "Duration": 1.3495161,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.MissingMaterialsAndFullOutput_RejectStartAndRecheckAtCompletion",
+        "Status": "Passed",
+        "Duration": 1.6853239,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.ServerProcessing_AppliesProcessUpgradesAndSnapshotsRecipeAtStart",
+        "Status": "Passed",
+        "Duration": 1.1891285,
+        "Message": null,
+        "StackTrace": null
+      },
+      {
+        "FullName": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.SharedProcessor_AcceptsIndependentPlayersAndCancelsOnlyTheRequestedPlayer",
+        "Status": "Passed",
+        "Duration": 1.3835641,
+        "Message": null,
+        "StackTrace": null
+      }
+    ]
+  },
+  "visualInspection": [
+    "16:9 / 1920x1080",
+    "4:3 / 1280x960",
+    "Ultrawide / 2560x1080"
+  ],
+  "shaderErrors": 0,
+  "editorRestoredToEditMode": true
+}
