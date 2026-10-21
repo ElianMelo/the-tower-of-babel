@@ -27,4 +27,5 @@ These instructions apply to the entire `the-tower-of-babel` repository.
 ## Visual references
 
 - When asked for a visual guide or visual design changes, consult `Frutiger Reference/INDEX.md` and the relevant images in `Frutiger Reference/` first.
+- Use `Documentation/FrutigerAero/DESIGN_DIRECTION.md` for the accepted initial UI direction and future iteration priorities; it distinguishes accepted choices from superseded experiments.
 - References are grouped into `UI`, `Asset`, and `Character`. Keep this index current when adding reference images from this chat.

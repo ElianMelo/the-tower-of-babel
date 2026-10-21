@@ -1,5 +1,7 @@
 # Frutiger reference library
 
+The user accepted the initial UI version on 2026-10-21. Read [Design direction and future priorities](../Documentation/FrutigerAero/DESIGN_DIRECTION.md) for the consolidated brief. `UI/Project-Fixed-Border-Review.png` is the accepted initial review; earlier images preserve iteration history.
+
 Consult this folder before creating a visual guide or changing this project's visual design. The palette is white, blue, and green, with glossy glass, soft highlights, nature imagery, and readable Frutiger typography. Start with the **Fixed borders and bright blue tabs** section below; earlier images are retained as history.
 
 ## UI
