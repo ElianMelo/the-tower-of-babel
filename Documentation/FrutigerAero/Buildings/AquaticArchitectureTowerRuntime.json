@@ -1,0 +1,81 @@
+{
+  "frame": 800,
+  "time": 13.8592386,
+  "near": 717,
+  "far": 83912,
+  "farBatches": 44,
+  "models": [
+    {
+      "mesh": "Floor_Tile",
+      "triangles": 284,
+      "material": "Aero_WhiteMarble_Floor_Tile (Far Instanced)",
+      "normal": "AeroLP_Floor_Tile_Normal",
+      "surface": "AeroLP_Floor_Tile_Surface",
+      "geometryColors": 1.0,
+      "waterLight": 0.12,
+      "coat": 0.55,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Step_Tile",
+      "triangles": 284,
+      "material": "Aero_WhiteMarble_Step_Tile (Far Instanced)",
+      "normal": "AeroLP_Step_Tile_Normal",
+      "surface": "AeroLP_Step_Tile_Surface",
+      "geometryColors": 1.0,
+      "waterLight": 0.12,
+      "coat": 0.55,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Pillar",
+      "triangles": 764,
+      "material": "Aero_WhiteMarble_Pillar (Far Instanced)",
+      "normal": "AeroLP_Pillar_Normal",
+      "surface": "AeroLP_Pillar_Surface",
+      "geometryColors": 1.0,
+      "waterLight": 0.12,
+      "coat": 0.55,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Arch",
+      "triangles": 1680,
+      "material": "Aero_WhiteMarble_Arch (Far Instanced)",
+      "normal": "AeroLP_Arch_Normal",
+      "surface": "AeroLP_Arch_Surface",
+      "geometryColors": 0.0,
+      "waterLight": 0.12,
+      "coat": 0.55,
+      "enableInstancing": true
+    }
+  ],
+  "archColliders": 98,
+  "archCollidersWithVolume": 98,
+  "passageBlocked": false,
+  "upperPanelSolid": true,
+  "leftLegSolid": true,
+  "nearMaterials": [
+    {
+      "name": "Aero_WhiteMarble_Floor_Tile (Floor Near Instanced)",
+      "geometryColors": 1.0,
+      "waterLight": 0.12
+    },
+    {
+      "name": "Aero_WhiteMarble_Step_Tile (Stair Near Instanced)",
+      "geometryColors": 1.0,
+      "waterLight": 0.12
+    },
+    {
+      "name": "Aero_WhiteMarble_Pillar (Pillar Near Instanced)",
+      "geometryColors": 1.0,
+      "waterLight": 0.12
+    },
+    {
+      "name": "Aero_WhiteMarble_Arch (Arch Near Instanced)",
+      "geometryColors": 0.0,
+      "waterLight": 0.12
+    }
+  ],
+  "messages": []
+}

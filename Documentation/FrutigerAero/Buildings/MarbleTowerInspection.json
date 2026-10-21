@@ -1,0 +1,81 @@
+{
+  "frameCount": 1357,
+  "time": 28.2388172,
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "near": 717,
+  "far": 83912,
+  "farBatches": 44,
+  "farMaterials": [
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WhiteMarble_Floor_Tile (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/White Marble",
+        "renderQueue": 2000,
+        "enableInstancing": true,
+        "texture": "Aero_WhiteMarble"
+      }
+    },
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WhiteMarble_Step_Tile (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/White Marble",
+        "renderQueue": 2000,
+        "enableInstancing": true,
+        "texture": "Aero_WhiteMarble"
+      }
+    },
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WhiteMarble_Pillar (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/White Marble",
+        "renderQueue": 2000,
+        "enableInstancing": true,
+        "texture": "Aero_WhiteMarble"
+      }
+    },
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WhiteMarble_Arch (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/White Marble",
+        "renderQueue": 2000,
+        "enableInstancing": true,
+        "texture": "Aero_WhiteMarble"
+      }
+    }
+  ],
+  "nearMaterials": [
+    {
+      "name": "Aero_WhiteMarble_Floor_Tile (Floor Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "texture": "Aero_WhiteMarble"
+    },
+    {
+      "name": "Aero_WhiteMarble_Step_Tile (Stair Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "texture": "Aero_WhiteMarble"
+    },
+    {
+      "name": "Aero_WhiteMarble_Pillar (Pillar Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "texture": "Aero_WhiteMarble"
+    },
+    {
+      "name": "Aero_WhiteMarble_Arch (Arch Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "texture": "Aero_WhiteMarble"
+    }
+  ],
+  "messages": []
+}

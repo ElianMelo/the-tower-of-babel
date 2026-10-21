@@ -1,0 +1,258 @@
+[
+  {
+    "name": "Arch",
+    "position": [
+      -0.11063,
+      0.21301,
+      -89.9045
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "components": [
+      "UnityEngine.Transform",
+      "UnityEngine.MeshFilter",
+      "UnityEngine.MeshRenderer",
+      "TowerOfBabel.World.Tower.TowerAsset",
+      "TowerOfBabel.Buildings.Building",
+      "TowerOfBabel.Outline",
+      "UnityEngine.BoxCollider"
+    ],
+    "children": 0,
+    "mesh": "Assets/DungeonModularPack/Meshes/Arch_B.fbx",
+    "meshName": "Arch_A",
+    "vertices": 328,
+    "submeshes": 1,
+    "bounds": {
+      "center": [
+        0.981002867,
+        0.7319102,
+        1.13993883E-06
+      ],
+      "size": [
+        2.351803,
+        1.45520067,
+        0.399999976
+      ],
+      "min": [
+        -0.194898665,
+        0.00430989265,
+        -0.199998856
+      ],
+      "max": [
+        2.15690446,
+        1.45951056,
+        0.200001121
+      ]
+    },
+    "materials": [
+      {
+        "name": "M_Arch_A",
+        "path": "Assets/DungeonModularPack/Materials/M_Arch_A.mat",
+        "shader": "LB Shader/DungeonKitShader"
+      }
+    ],
+    "colliders": [
+      "{\"BoxCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"3\",\"m_Size\":{\"x\":2.3518030643463136,\"y\":1.4552006721496583,\"z\":0.3999999761581421},\"m_Center\":{\"x\":0.9810028672218323,\"y\":0.731910228729248,\"z\":0.0000011399388313293458}}}"
+    ]
+  },
+  {
+    "name": "Floor_Tile",
+    "position": [
+      -1.42325,
+      0.21301,
+      -90.29716
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "components": [
+      "UnityEngine.Transform",
+      "UnityEngine.MeshFilter",
+      "UnityEngine.MeshRenderer",
+      "TowerOfBabel.World.Tower.TowerAsset",
+      "TowerOfBabel.Buildings.Building",
+      "TowerOfBabel.Outline",
+      "UnityEngine.BoxCollider"
+    ],
+    "children": 0,
+    "mesh": "Assets/DungeonModularPack/Meshes/Tile_B.fbx",
+    "meshName": "Tile_B",
+    "vertices": 24,
+    "submeshes": 1,
+    "bounds": {
+      "center": [
+        2.0,
+        -0.099999994,
+        -2.0
+      ],
+      "size": [
+        4.0,
+        0.199999988,
+        4.0
+      ],
+      "min": [
+        0.0,
+        -0.199999988,
+        -4.0
+      ],
+      "max": [
+        4.0,
+        0.0,
+        0.0
+      ]
+    },
+    "materials": [
+      {
+        "name": "M_Tile",
+        "path": "Assets/DungeonModularPack/Materials/M_Tile.mat",
+        "shader": "LB Shader/DungeonKitShader"
+      }
+    ],
+    "colliders": [
+      "{\"BoxCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"3\",\"m_Size\":{\"x\":4.0,\"y\":0.19999998807907105,\"z\":4.0},\"m_Center\":{\"x\":2.0,\"y\":-0.09999999403953552,\"z\":-2.0}}}"
+    ]
+  },
+  {
+    "name": "Pillar",
+    "position": [
+      -0.11063,
+      0.21301,
+      -89.9045
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "components": [
+      "UnityEngine.Transform",
+      "UnityEngine.MeshFilter",
+      "UnityEngine.MeshRenderer",
+      "UnityEngine.CapsuleCollider",
+      "TowerOfBabel.World.Tower.TowerAsset",
+      "TowerOfBabel.Buildings.Building",
+      "TowerOfBabel.Outline"
+    ],
+    "children": 0,
+    "mesh": "Assets/DungeonModularPack/Meshes/Pillar_A.fbx",
+    "meshName": "Pillar_A",
+    "vertices": 417,
+    "submeshes": 1,
+    "bounds": {
+      "center": [
+        -7.4505806E-08,
+        2.0,
+        2.98023224E-08
+      ],
+      "size": [
+        0.8200468,
+        4.0,
+        0.820046365
+      ],
+      "min": [
+        -0.410023451,
+        0.0,
+        -0.410023153
+      ],
+      "max": [
+        0.410023332,
+        4.0,
+        0.4100232
+      ]
+    },
+    "materials": [
+      {
+        "name": "M_Pillar_A",
+        "path": "Assets/DungeonModularPack/Materials/M_Pillar_A.mat",
+        "shader": "LB Shader/DungeonKitShader"
+      }
+    ],
+    "colliders": [
+      "{\"CapsuleCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"2\",\"m_Radius\":0.41002339124679568,\"m_Height\":4.0,\"m_Direction\":1,\"m_Center\":{\"x\":-7.450580596923828e-8,\"y\":2.0,\"z\":2.9802322387695315e-8}}}"
+    ]
+  },
+  {
+    "name": "Step_Tile",
+    "position": [
+      -1.42325,
+      0.21301,
+      -90.29716
+    ],
+    "scale": [
+      1.0,
+      1.0,
+      0.35
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "components": [
+      "UnityEngine.Transform",
+      "UnityEngine.MeshFilter",
+      "UnityEngine.MeshRenderer",
+      "TowerOfBabel.World.Tower.TowerAsset",
+      "TowerOfBabel.Buildings.Building",
+      "TowerOfBabel.Outline",
+      "UnityEngine.BoxCollider"
+    ],
+    "children": 0,
+    "mesh": "Assets/DungeonModularPack/Meshes/Tile_B.fbx",
+    "meshName": "Tile_B",
+    "vertices": 24,
+    "submeshes": 1,
+    "bounds": {
+      "center": [
+        2.0,
+        -0.099999994,
+        -2.0
+      ],
+      "size": [
+        4.0,
+        0.199999988,
+        4.0
+      ],
+      "min": [
+        0.0,
+        -0.199999988,
+        -4.0
+      ],
+      "max": [
+        4.0,
+        0.0,
+        0.0
+      ]
+    },
+    "materials": [
+      {
+        "name": "M_Tile",
+        "path": "Assets/DungeonModularPack/Materials/M_Tile.mat",
+        "shader": "LB Shader/DungeonKitShader"
+      }
+    ],
+    "colliders": [
+      "{\"BoxCollider\":{\"m_Material\":{\"instanceID\":0},\"m_IncludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_ExcludeLayers\":{\"serializedVersion\":\"2\",\"m_Bits\":0},\"m_LayerOverridePriority\":0,\"m_IsTrigger\":false,\"m_ProvidesContacts\":false,\"m_Enabled\":true,\"serializedVersion\":\"3\",\"m_Size\":{\"x\":4.0,\"y\":0.19999998807907105,\"z\":4.0},\"m_Center\":{\"x\":2.0,\"y\":-0.09999999403953552,\"z\":-2.0}}}"
+    ]
+  }
+]

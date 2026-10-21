@@ -1,0 +1,71 @@
+{
+  "frameCount": 2189,
+  "time": 28.1518078,
+  "near": 717,
+  "far": 83912,
+  "farChunks": 959,
+  "farBatches": 44,
+  "models": [
+    {
+      "mesh": "Floor_Tile",
+      "triangles": 92,
+      "material": "Aero_WhiteMarble_Floor_Tile (Far Instanced)",
+      "normal": "AeroLP_Floor_Tile_Normal",
+      "surface": "AeroLP_Floor_Tile_Surface",
+      "ao": "AeroLP_Floor_Tile_AO",
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Step_Tile",
+      "triangles": 92,
+      "material": "Aero_WhiteMarble_Step_Tile (Far Instanced)",
+      "normal": "AeroLP_Step_Tile_Normal",
+      "surface": "AeroLP_Step_Tile_Surface",
+      "ao": "AeroLP_Step_Tile_AO",
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Pillar",
+      "triangles": 444,
+      "material": "Aero_WhiteMarble_Pillar (Far Instanced)",
+      "normal": "AeroLP_Pillar_Normal",
+      "surface": "AeroLP_Pillar_Surface",
+      "ao": "AeroLP_Pillar_AO",
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Arch",
+      "triangles": 288,
+      "material": "Aero_WhiteMarble_Arch (Far Instanced)",
+      "normal": "AeroLP_Arch_Normal",
+      "surface": "AeroLP_Arch_Surface",
+      "ao": "AeroLP_Arch_AO",
+      "enableInstancing": true
+    }
+  ],
+  "nearMaterials": [
+    {
+      "name": "Aero_WhiteMarble_Arch (Arch Near Instanced)",
+      "normal": "AeroLP_Arch_Normal",
+      "surface": "AeroLP_Arch_Surface"
+    },
+    {
+      "name": "Aero_WhiteMarble_Pillar (Pillar Near Instanced)",
+      "normal": "AeroLP_Pillar_Normal",
+      "surface": "AeroLP_Pillar_Surface"
+    },
+    {
+      "name": "Aero_WhiteMarble_Floor_Tile (Floor Near Instanced)",
+      "normal": "AeroLP_Floor_Tile_Normal",
+      "surface": "AeroLP_Floor_Tile_Surface"
+    },
+    {
+      "name": "Aero_WhiteMarble_Step_Tile (Stair Near Instanced)",
+      "normal": "AeroLP_Step_Tile_Normal",
+      "surface": "AeroLP_Step_Tile_Surface"
+    }
+  ],
+  "archColliders": 98,
+  "archCollidersWithVolume": 98,
+  "messages": []
+}

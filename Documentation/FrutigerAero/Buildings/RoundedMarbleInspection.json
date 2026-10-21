@@ -1,0 +1,63 @@
+{
+  "archCollision": {
+    "leftLegSolid": true,
+    "upperPanelSolid": true,
+    "bounds": "Center: (4.15, 1.19, 2.10), Extents: (1.18, 1.08, 0.20)",
+    "verifiedIn": "Play Mode",
+    "passageBlocked": false
+  },
+  "normal": {
+    "type": "NormalMap",
+    "sRGBTexture": false,
+    "flipGreenChannel": false,
+    "mipmapEnabled": true,
+    "maxTextureSize": 2048
+  },
+  "models": [
+    {
+      "name": "Arch",
+      "triangles": 4472,
+      "min": "(-0.19490, 0.00000, -0.20000)",
+      "max": "(2.15690, 2.15000, 0.20000)",
+      "submeshes": 1,
+      "stages": 11,
+      "allStageMeshesMatch": true,
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "normalStrength": 0.85
+    },
+    {
+      "name": "Floor_Tile",
+      "triangles": 556,
+      "min": "(0.00000, -0.20000, -4.00000)",
+      "max": "(4.00000, 0.00000, 0.00000)",
+      "submeshes": 1,
+      "stages": 11,
+      "allStageMeshesMatch": true,
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "normalStrength": 0.85
+    },
+    {
+      "name": "Pillar",
+      "triangles": 5564,
+      "min": "(-0.41002, 0.00000, -0.41002)",
+      "max": "(0.41002, 4.00000, 0.41002)",
+      "submeshes": 1,
+      "stages": 11,
+      "allStageMeshesMatch": true,
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "normalStrength": 0.85
+    },
+    {
+      "name": "Step_Tile",
+      "triangles": 528,
+      "min": "(0.00000, -0.20000, -4.00000)",
+      "max": "(4.00000, 0.00000, 0.00000)",
+      "submeshes": 1,
+      "stages": 11,
+      "allStageMeshesMatch": true,
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "normalStrength": 0.85
+    }
+  ],
+  "messages": []
+}

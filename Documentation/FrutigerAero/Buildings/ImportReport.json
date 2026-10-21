@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Arch",
+    "vertices": 1778,
+    "triangles": 1680,
+    "min": "(-0.19490, 0.00000, -0.20000)",
+    "max": "(2.15690, 2.15000, 0.20000)",
+    "rootChildren": 0,
+    "stages": 11,
+    "rootScale": "(1.00, 1.00, 1.00)",
+    "collider": "MeshCollider"
+  },
+  {
+    "name": "Floor_Tile",
+    "vertices": 312,
+    "triangles": 284,
+    "min": "(0.00000, -0.20000, -4.00000)",
+    "max": "(4.00000, 0.00000, 0.00000)",
+    "rootChildren": 0,
+    "stages": 11,
+    "rootScale": "(1.00, 1.00, 1.00)",
+    "collider": "BoxCollider"
+  },
+  {
+    "name": "Pillar",
+    "vertices": 676,
+    "triangles": 764,
+    "min": "(-0.41002, 0.00000, -0.41002)",
+    "max": "(0.41002, 4.00000, 0.41002)",
+    "rootChildren": 0,
+    "stages": 11,
+    "rootScale": "(1.00, 1.00, 1.00)",
+    "collider": "CapsuleCollider"
+  },
+  {
+    "name": "Step_Tile",
+    "vertices": 293,
+    "triangles": 284,
+    "min": "(0.00000, -0.20000, -4.00000)",
+    "max": "(4.00000, 0.00000, 0.00000)",
+    "rootChildren": 0,
+    "stages": 11,
+    "rootScale": "(1.00, 1.00, 0.35)",
+    "collider": "BoxCollider"
+  }
+]

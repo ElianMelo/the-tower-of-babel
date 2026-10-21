@@ -28,6 +28,38 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ## Asset
 
+### Building kit — white and blue only
+
+The 2026-10-21 building brief explicitly excludes green from building assets. It overrides the older blue/green UI palette for this kit.
+
+- `Asset/Building-Arch-Full-Spandrel-User.png` — user annotation: fill the area above the arch opening and provide a flat top connecting to the upper floor.
+- `Asset/Building-White-Marble-User.png` — current material brief: return to white and use gray-veined marble. Supersedes the glass and animated water direction.
+- `Asset/Building-Classical-Column-User.png` — user-supplied fluted shaft, stepped base, paired scrolls and ornate capital reference.
+- `Asset/Building-Classical-Capital-User.png` — user-supplied close-up of raised classical capital ornament. Adapt its shapes to white pearl, soft blue enamel and marine motifs; retain a low-poly silhouette with baked relief.
+- `../Assets/_Project/References/Buildings/frutiger-building-sample-2.jpg` — **primary user-selected target**: continuous rounded white architecture, broad recessed aqua glazing, polished surfaces and reflected water light. Exclude its green vegetation from building colors.
+- `../Documentation/FrutigerAero/Buildings/Previews/AquaticArchitecture-Kit.png` — current rounded white kit with integrated aqua recesses and side bands.
+- `../Documentation/FrutigerAero/Buildings/AQUATIC_ARCHITECTURE.md` — current source, geometry/material settings and verification.
+- `../Documentation/FrutigerAero/Buildings/Previews/AeroShell-Kit.png` — historical rejected pearl shell version.
+- `../Documentation/FrutigerAero/Buildings/Previews/AeroShell-Pillar.png` — historical rejected rounded capital and glazed strips.
+- `../Documentation/FrutigerAero/Buildings/AERO_SHELLS.md` — historical rejected pearl shell direction.
+- `../Documentation/FrutigerAero/Buildings/Previews/LowPolyAero-Kit.png` — historical low-poly classical kit.
+- `../Documentation/FrutigerAero/Buildings/Previews/LowPolyAero-Capital.png` — historical pearl petals and soft blue capital scrolls baked into color/normal/AO maps.
+- `../Documentation/FrutigerAero/Buildings/LOW_POLY_AERO.md` — historical classical ornament settings and previous triangle budget.
+- `../Documentation/FrutigerAero/Buildings/Previews/RoundedMarble-Kit.png` — historical rounded white marble kit, superseded by the low-poly version.
+- `../Documentation/FrutigerAero/Buildings/Previews/RoundedMarble-Arch.png` — historical rounded corners, moulding and marble relief.
+- `../Documentation/FrutigerAero/Buildings/MARBLE.md` — historical marble material and rounding settings.
+- `Asset/Building-Water-Glass-Collage-User.png` — superseded material brief: translucent white glass with blue water caustics.
+- `Asset/Building-Glass-House-User.png` — glass architecture, soft white reflections and blue water accents. Green in this image does not change the building palette restriction.
+- `../Assets/_Project/References/Buildings/frutiger-building-sample-*.jpg` — ten supplied architecture references: glossy white shells, rounded edges, blue glass and luminous trim. Vegetation and green furnishings are not part of the building palette.
+- `../Documentation/FrutigerAero/Buildings/Previews/Unity-PlayMode-Kit.png` — implemented four-piece kit and assembled bay in Unity Play Mode.
+- `../Documentation/FrutigerAero/Buildings/Previews/Blender-Kit.png` — Blender source render.
+- `../Documentation/FrutigerAero/Buildings/Previews/LayeredWater-Kit.png` — historical glass revision: model-specific transparency and 4–6 stacked water layers.
+- `../Documentation/FrutigerAero/Buildings/Previews/LayeredWater-InstanceVariation.png` — identical arches with one shared material and differing per-instance patterns.
+- `../Documentation/FrutigerAero/Buildings/Previews/LayeredWater-Motion.gif` — historical water close-up, superseded by marble.
+- `../Documentation/FrutigerAero/Buildings/LAYERED_WATER.md` — historical water material presets, shader references and validation.
+
+See [building kit notes](../Documentation/FrutigerAero/Buildings/README.md) for dimensions, prefab compatibility, editable sources and inspection results. This is an initial implementation awaiting user review.
+
 - `InventoryBackpack.png` — earlier detailed backpack, retained as a historical reference; superseded by InventorySmall.png.
 - `Stone.png` — generated raw stone resource icon.
 - `RefinedStone.png` — generated processed stone icon, used for construction costs.

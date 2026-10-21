@@ -1,0 +1,66 @@
+{
+  "frameCount": 1660,
+  "time": 39.6294823,
+  "near": 717,
+  "far": 83912,
+  "farBatches": 44,
+  "models": [
+    {
+      "mesh": "Floor_Tile",
+      "triangles": 556,
+      "material": "Aero_WhiteMarble_Floor_Tile (Far Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Step_Tile",
+      "triangles": 528,
+      "material": "Aero_WhiteMarble_Step_Tile (Far Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Pillar",
+      "triangles": 5564,
+      "material": "Aero_WhiteMarble_Pillar (Far Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Arch",
+      "triangles": 4472,
+      "material": "Aero_WhiteMarble_Arch (Far Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85,
+      "enableInstancing": true
+    }
+  ],
+  "archColliders": 98,
+  "archCollidersWithVolume": 98,
+  "nearMaterials": [
+    {
+      "name": "Aero_WhiteMarble_Floor_Tile (Floor Near Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85
+    },
+    {
+      "name": "Aero_WhiteMarble_Step_Tile (Stair Near Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85
+    },
+    {
+      "name": "Aero_WhiteMarble_Pillar (Pillar Near Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85
+    },
+    {
+      "name": "Aero_WhiteMarble_Arch (Arch Near Instanced)",
+      "normalMap": "Aero_WhiteMarble_Normal",
+      "strength": 0.85
+    }
+  ],
+  "messages": []
+}

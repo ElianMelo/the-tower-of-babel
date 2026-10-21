@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Aero_WhiteMarble_Pillar
+  m_Shader: {fileID: 4800000, guid: 14de9626145ecad49859e52ad2becdf7, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BakedAO:
+        m_Texture: {fileID: 2800000, guid: 82752f476347fb548a017a31f7a34d3e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BakedNormal:
+        m_Texture: {fileID: 2800000, guid: db6ac35bbabaaa04185c2ade4fbba21c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BakedSurface:
+        m_Texture: {fileID: 2800000, guid: 66713e87d762b9c48be56bac4a5b0ea4, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MarbleMap:
+        m_Texture: {fileID: 2800000, guid: 03e39243ace618f439bd117383732e02, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: c5b8b2d3d13861b43b513ca854550ca6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _PaletteMap:
+        m_Texture: {fileID: 2800000, guid: c2372f64652ee3c4f80760ccd9f023c2, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WaterLightMap:
+        m_Texture: {fileID: 2800000, guid: 553a5cb7f0b7e2141b85a9f589e2203e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AOStrength: 0.1
+    - _AeroGloss: 0
+    - _BakedStrength: 0.65
+    - _Cull: 2
+    - _DetailStrength: 0.08
+    - _MarbleScale: 0.28
+    - _NormalStrength: 0.12
+    - _PatternSeed: 23.83
+    - _PearlCoat: 0.55
+    - _Smoothness: 0.8
+    - _TextureAspect: 1.5003663
+    - _UseGeometryColors: 1
+    - _VeinStrength: 0.1
+    - _WaterLightStrength: 0.12
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _DetailTint: {r: 0.72, g: 0.83, b: 0.95, a: 1}
+    - _GlazeColor: {r: 0.26, g: 0.74, b: 0.9, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

@@ -1,0 +1,36 @@
+{
+  "playing": false,
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "dirty": false,
+  "runInBackground": false,
+  "shader": "TowerOfBabel/Buildings/Water Glass",
+  "enableInstancing": true,
+  "previewClock": -1.0,
+  "shaderErrors": [],
+  "prefabs": [
+    {
+      "name": "Arch",
+      "material": "Aero_BuildingAtlas",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "submeshes": 1
+    },
+    {
+      "name": "Floor_Tile",
+      "material": "Aero_BuildingAtlas",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "submeshes": 1
+    },
+    {
+      "name": "Pillar",
+      "material": "Aero_BuildingAtlas",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "submeshes": 1
+    },
+    {
+      "name": "Step_Tile",
+      "material": "Aero_BuildingAtlas",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "submeshes": 1
+    }
+  ]
+}

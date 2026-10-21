@@ -1,0 +1,84 @@
+{
+  "frame": 2066,
+  "time": 26.0829086,
+  "near": 717,
+  "far": 83912,
+  "farBatches": 44,
+  "models": [
+    {
+      "mesh": "Floor_Tile",
+      "triangles": 92,
+      "material": "Aero_WhiteMarble_Floor_Tile (Far Instanced)",
+      "normal": "AeroLP_Floor_Tile_Normal",
+      "surface": "AeroLP_Floor_Tile_Surface",
+      "coat": 0.8,
+      "gloss": 0.5,
+      "veins": 0.16,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Step_Tile",
+      "triangles": 92,
+      "material": "Aero_WhiteMarble_Step_Tile (Far Instanced)",
+      "normal": "AeroLP_Step_Tile_Normal",
+      "surface": "AeroLP_Step_Tile_Surface",
+      "coat": 0.8,
+      "gloss": 0.5,
+      "veins": 0.16,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Pillar",
+      "triangles": 444,
+      "material": "Aero_WhiteMarble_Pillar (Far Instanced)",
+      "normal": "AeroLP_Pillar_Normal",
+      "surface": "AeroLP_Pillar_Surface",
+      "coat": 0.8,
+      "gloss": 0.5,
+      "veins": 0.16,
+      "enableInstancing": true
+    },
+    {
+      "mesh": "Arch",
+      "triangles": 288,
+      "material": "Aero_WhiteMarble_Arch (Far Instanced)",
+      "normal": "AeroLP_Arch_Normal",
+      "surface": "AeroLP_Arch_Surface",
+      "coat": 0.8,
+      "gloss": 0.5,
+      "veins": 0.16,
+      "enableInstancing": true
+    }
+  ],
+  "archColliders": 98,
+  "archCollidersWithVolume": 98,
+  "passageBlocked": false,
+  "upperPanelSolid": true,
+  "nearMaterials": [
+    {
+      "name": "Aero_WhiteMarble_Step_Tile (Stair Near Instanced)",
+      "normal": "AeroLP_Step_Tile_Normal",
+      "coat": 0.8,
+      "gloss": 0.5
+    },
+    {
+      "name": "Aero_WhiteMarble_Pillar (Pillar Near Instanced)",
+      "normal": "AeroLP_Pillar_Normal",
+      "coat": 0.8,
+      "gloss": 0.5
+    },
+    {
+      "name": "Aero_WhiteMarble_Floor_Tile (Floor Near Instanced)",
+      "normal": "AeroLP_Floor_Tile_Normal",
+      "coat": 0.8,
+      "gloss": 0.5
+    },
+    {
+      "name": "Aero_WhiteMarble_Arch (Arch Near Instanced)",
+      "normal": "AeroLP_Arch_Normal",
+      "coat": 0.8,
+      "gloss": 0.5
+    }
+  ],
+  "messages": []
+}

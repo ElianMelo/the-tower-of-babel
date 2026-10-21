@@ -44,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8453861318134773522}
-  m_Mesh: {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
+  m_Mesh: {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
 --- !u!23 &7949656416258168519
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bbad3fe44a0b0274aa3f9a13236504e4, type: 2}
+  - {fileID: 2100000, guid: fef0718b2fa9de54eb9d0d21d6c523cb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -151,17 +151,17 @@ MonoBehaviour:
   outline: {fileID: 1429859748983638673}
   meshFilter: {fileID: 5311482485373788685}
   stageMeshes:
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
-  - {fileID: 7622289829416560332, guid: 6960f8470214d0e4793b0100d7775dcb, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
 --- !u!114 &1429859748983638673
 MonoBehaviour:
   m_ObjectHideFlags: 0

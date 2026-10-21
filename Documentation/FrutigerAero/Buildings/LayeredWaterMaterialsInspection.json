@@ -1,0 +1,50 @@
+{
+  "shader": "TowerOfBabel/Buildings/Water Glass",
+  "variants": [
+    {
+      "name": "Arch",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WaterGlass_Arch.mat",
+      "opacity": 0.23,
+      "transparency": 0.77,
+      "waterLayers": 6,
+      "depth": 0.28,
+      "speed": 0.7,
+      "rootChildren": 0,
+      "submeshes": 1
+    },
+    {
+      "name": "Floor_Tile",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WaterGlass_Floor_Tile.mat",
+      "opacity": 0.5,
+      "transparency": 0.5,
+      "waterLayers": 5,
+      "depth": 0.12,
+      "speed": 0.52,
+      "rootChildren": 0,
+      "submeshes": 1
+    },
+    {
+      "name": "Pillar",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WaterGlass_Pillar.mat",
+      "opacity": 0.34,
+      "transparency": 0.659999967,
+      "waterLayers": 6,
+      "depth": 0.35,
+      "speed": 0.62,
+      "rootChildren": 0,
+      "submeshes": 1
+    },
+    {
+      "name": "Step_Tile",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WaterGlass_Step_Tile.mat",
+      "opacity": 0.4,
+      "transparency": 0.6,
+      "waterLayers": 4,
+      "depth": 0.09,
+      "speed": 0.85,
+      "rootChildren": 0,
+      "submeshes": 1
+    }
+  ],
+  "errors": []
+}

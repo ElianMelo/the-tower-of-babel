@@ -44,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 481190122475769794}
-  m_Mesh: {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  m_Mesh: {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
 --- !u!23 &2138501384674733591
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6fea00e2bb949774490a2196bed36fe5, type: 2}
+  - {fileID: 2100000, guid: 4b1db2a873939914c8efae5389e86d92, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -128,17 +128,17 @@ MonoBehaviour:
   outline: {fileID: 900000000000000003}
   meshFilter: {fileID: 4200043039238331101}
   stageMeshes:
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
-  - {fileID: 1123829968433646515, guid: 28e05133da4356a4481dc9bd40ad9986, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
 --- !u!114 &900000000000000003
 MonoBehaviour:
   m_ObjectHideFlags: 0

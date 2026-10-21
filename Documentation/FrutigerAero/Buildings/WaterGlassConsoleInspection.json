@@ -1,0 +1,60 @@
+{
+  "success": true,
+  "command": "command console get",
+  "data": {
+    "command": "console get",
+    "parameters": {
+      "tail": "30",
+      "level": "error"
+    },
+    "result": {
+      "entries": [
+        {
+          "seq": 15,
+          "timestampUtc": "2026-10-21T20:24:17.9330135Z",
+          "level": "error",
+          "logType": "Exception",
+          "message": "MissingReferenceException: The object of type 'TowerOfBabel.Outline' has been destroyed but you are still trying to access it.\nYour script should either check if it is null or you should not destroy the object.",
+          "stackTrace": "UnityEngine.Object+MarshalledUnityObject.TryThrowEditorNullExceptionObject (UnityEngine.Object unityObj, System.String parameterName) (at <1b6535aa091d41cf8b3ca222ed9ceef0>:0)\nUnityEngine.Bindings.ThrowHelper.ThrowNullReferenceException (System.Object obj) (at <1b6535aa091d41cf8b3ca222ed9ceef0>:0)\nUnityEngine.Component.get_gameObject () (at <1b6535aa091d41cf8b3ca222ed9ceef0>:0)\nUnityEngine.Component.GetComponentsInChildren[T] (System.Boolean includeInactive) (at <1b6535aa091d41cf8b3ca222ed9ceef0>:0)\nTowerOfBabel.Outline.CacheRenderers () (at Assets/_Project/Scripts/Buildings/Outline.cs:55)\nTowerOfBabel.Outline.SetVisible (System.Boolean visible) (at Assets/_Project/Scripts/Buildings/Outline.cs:28)\nTowerOfBabel.Buildings.Building.SetInteractionFocused (System.Boolean focused) (at Assets/_Project/Scripts/Buildings/Building.cs:143)\nTowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster.ReleaseCurrentPresentation () (at Assets/_Project/Scripts/Resources/Interaction/PlayerInteractionRaycaster.cs:138)\nTowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster.ClearTarget () (at Assets/_Project/Scripts/Resources/Interaction/PlayerInteractionRaycaster.cs:125)\nTowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster.OnDisable () (at Assets/_Project/Scripts/Resources/Interaction/PlayerInteractionRaycaster.cs:152)\n",
+          "seeded": false
+        },
+        {
+          "seq": 17,
+          "timestampUtc": "2026-10-21T20:47:27.0071136Z",
+          "level": "error",
+          "logType": "Error",
+          "message": "ExecuteCommandByName: No command named 'console --tail' is available. Run 'unity command' to list the commands this instance exposes.",
+          "stackTrace": "UnityEngine.Debug:LogError (object)\nUnity.Pipeline.BasePipelineServer:CommandNotFound (Unity.Pipeline.BasePipelineServer/RawCommandMiss) (at ./Library/PackageCache/com.unity.pipeline@f311b58065e4/Runtime/Common/BasePipelineServer.cs:3034)\nUnity.Pipeline.BasePipelineServer:ResolveRawCommand (System.Collections.Generic.IReadOnlyList`1<string>,Unity.Pipeline.Commands.CommandIndex) (at ./Library/PackageCache/com.unity.pipeline@f311b58065e4/Runtime/Common/BasePipelineServer.cs:2971)\nUnity.Pipeline.Commands.DefaultCommandExecutor:Bind (Unity.Pipeline.Commands.CommandRequest,Newtonsoft.Json.Linq.JObject&) (at ./Library/PackageCache/com.unity.pipeline@f311b58065e4/Runtime/CommandExecution/CommandExecutor/DefaultCommandExecutor.cs:61)\nUnity.Pipeline.Commands.DefaultCommandExecutor:Execute (Unity.Pipeline.Commands.CommandRequest) (at ./Library/PackageCache/com.unity.pipeline@f311b58065e4/Runtime/CommandExecution/CommandExecutor/DefaultCommandExecutor.cs:27)\nUnity.Pipeline.BasePipelineServer/<HandleExecRequest>d__148:MoveNext () (at ./Library/PackageCache/com.unity.pipeline@f311b58065e4/Runtime/Common/BasePipelineServer.cs:2462)\nSystem.Runtime.CompilerServices.AsyncTaskMethodBuilder`1<int>:SetResult (int)\nUnity.Pipeline.MaxLengthStream/<ReadAsync>d__6:MoveNext () (at ./Library/PackageCache/com.unity.pipeline@f311b58065e4/Runtime/Common/MaxLengthStream.cs:46)\nSystem.Threading._ThreadPoolWaitCallback:PerformWaitCallback ()\n",
+          "seeded": false
+        }
+      ],
+      "cursor": 17,
+      "session": "e388d7149eae4dc08eaf85fd7eaee3ba",
+      "returned": 2,
+      "dropped": false,
+      "reset": false,
+      "counts": {
+        "error": 2,
+        "warn": 3,
+        "log": 12
+      },
+      "groundTruth": {
+        "sampledUtc": "2026-10-21T20:49:01.8884817Z",
+        "ageMs": 281,
+        "compilationFailed": false,
+        "compiling": false,
+        "consoleErrors": 1,
+        "consoleWarnings": 0,
+        "consoleLogs": 0,
+        "seeded": true
+      }
+    },
+    "target": {
+      "host": "127.0.0.1",
+      "port": 7800,
+      "projectPath": "D:\\PersonalProjects\\the-tower-of-babel"
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

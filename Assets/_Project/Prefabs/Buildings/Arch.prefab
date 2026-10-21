@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 565484514076855596}
   - component: {fileID: 4037064959056306450}
   - component: {fileID: 900000000000000001}
-  - component: {fileID: 2897153398365438957}
+  - component: {fileID: 2327294347683195545}
   m_Layer: 0
   m_Name: Arch
   m_TagString: Untagged
@@ -44,7 +44,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7803406487178166736}
-  m_Mesh: {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
+  m_Mesh: {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
 --- !u!23 &8596167359093563397
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a78bae7c419ee824da495d5128d26260, type: 2}
+  - {fileID: 2100000, guid: 6f37f54db43fdad48af27eed2c32f420, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -128,17 +128,17 @@ MonoBehaviour:
   outline: {fileID: 900000000000000001}
   meshFilter: {fileID: 5813953479370380495}
   stageMeshes:
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
-  - {fileID: -6450097684484097987, guid: b46d649167d8011428ac9bc81ba4af3f, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
 --- !u!114 &900000000000000001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -152,8 +152,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
   settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
---- !u!65 &2897153398365438957
-BoxCollider:
+--- !u!64 &2327294347683195545
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -170,6 +170,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2.351803, y: 1.4552007, z: 0.39999998}
-  m_Center: {x: 0.98100287, y: 0.7319102, z: 0.0000011399388}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}

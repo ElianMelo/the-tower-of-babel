@@ -1,0 +1,34 @@
+[
+  {
+    "type": "Floor",
+    "count": 357,
+    "mesh": "Floor_Tile",
+    "material": "Aero_BuildingAtlas (Floor Near Instanced)",
+    "submeshes": 1,
+    "collider": "BoxCollider"
+  },
+  {
+    "type": "Stair",
+    "count": 164,
+    "mesh": "Step_Tile",
+    "material": "Aero_BuildingAtlas (Stair Near Instanced)",
+    "submeshes": 1,
+    "collider": "BoxCollider"
+  },
+  {
+    "type": "Pillar",
+    "count": 98,
+    "mesh": "Pillar",
+    "material": "Aero_BuildingAtlas (Pillar Near Instanced)",
+    "submeshes": 1,
+    "collider": "CapsuleCollider"
+  },
+  {
+    "type": "Arch",
+    "count": 98,
+    "mesh": "Arch",
+    "material": "Aero_BuildingAtlas (Arch Near Instanced)",
+    "submeshes": 1,
+    "collider": "MeshCollider"
+  }
+]

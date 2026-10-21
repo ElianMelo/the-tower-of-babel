@@ -1,0 +1,45 @@
+{
+  "variants": [
+    {
+      "name": "Arch",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WhiteMarble_Arch.mat",
+      "smoothness": 0.82,
+      "submeshes": 1,
+      "children": 0,
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000
+    },
+    {
+      "name": "Floor_Tile",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WhiteMarble_Floor_Tile.mat",
+      "smoothness": 0.88,
+      "submeshes": 1,
+      "children": 0,
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000
+    },
+    {
+      "name": "Pillar",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WhiteMarble_Pillar.mat",
+      "smoothness": 0.8,
+      "submeshes": 1,
+      "children": 0,
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000
+    },
+    {
+      "name": "Step_Tile",
+      "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_WhiteMarble_Step_Tile.mat",
+      "smoothness": 0.85,
+      "submeshes": 1,
+      "children": 0,
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000
+    }
+  ],
+  "texture": {
+    "width": 2048,
+    "height": 1365
+  },
+  "messages": []
+}

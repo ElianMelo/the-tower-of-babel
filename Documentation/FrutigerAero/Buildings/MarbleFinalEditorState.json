@@ -1,0 +1,46 @@
+{
+  "project": "D:/PersonalProjects/the-tower-of-babel/Assets",
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "dirty": false,
+  "playing": false,
+  "runInBackground": false,
+  "materials": [
+    {
+      "name": "Arch",
+      "material": "Aero_WhiteMarble_Arch",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "submeshes": 1,
+      "stages": 11
+    },
+    {
+      "name": "Floor_Tile",
+      "material": "Aero_WhiteMarble_Floor_Tile",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "submeshes": 1,
+      "stages": 11
+    },
+    {
+      "name": "Pillar",
+      "material": "Aero_WhiteMarble_Pillar",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "submeshes": 1,
+      "stages": 11
+    },
+    {
+      "name": "Step_Tile",
+      "material": "Aero_WhiteMarble_Step_Tile",
+      "shader": "TowerOfBabel/Buildings/White Marble",
+      "renderQueue": 2000,
+      "enableInstancing": true,
+      "submeshes": 1,
+      "stages": 11
+    }
+  ],
+  "messages": []
+}

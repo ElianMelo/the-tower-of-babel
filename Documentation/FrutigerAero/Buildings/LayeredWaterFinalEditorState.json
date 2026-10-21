@@ -1,0 +1,54 @@
+{
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "dirty": false,
+  "playing": false,
+  "runInBackground": false,
+  "temporaryCameras": 0,
+  "variants": [
+    {
+      "name": "Arch",
+      "material": "Aero_WaterGlass_Arch",
+      "opacity": 0.23,
+      "layers": 6.0,
+      "clock": -1.0,
+      "instancing": true,
+      "submeshes": 1,
+      "stageCount": 11,
+      "children": 0
+    },
+    {
+      "name": "Floor_Tile",
+      "material": "Aero_WaterGlass_Floor_Tile",
+      "opacity": 0.5,
+      "layers": 5.0,
+      "clock": -1.0,
+      "instancing": true,
+      "submeshes": 1,
+      "stageCount": 11,
+      "children": 0
+    },
+    {
+      "name": "Pillar",
+      "material": "Aero_WaterGlass_Pillar",
+      "opacity": 0.34,
+      "layers": 6.0,
+      "clock": -1.0,
+      "instancing": true,
+      "submeshes": 1,
+      "stageCount": 11,
+      "children": 0
+    },
+    {
+      "name": "Step_Tile",
+      "material": "Aero_WaterGlass_Step_Tile",
+      "opacity": 0.4,
+      "layers": 4.0,
+      "clock": -1.0,
+      "instancing": true,
+      "submeshes": 1,
+      "stageCount": 11,
+      "children": 0
+    }
+  ],
+  "messages": []
+}

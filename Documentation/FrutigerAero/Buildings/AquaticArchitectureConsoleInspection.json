@@ -1,0 +1,43 @@
+{
+  "success": true,
+  "command": "command console get",
+  "data": {
+    "command": "console get",
+    "parameters": {
+      "since": "67",
+      "since_session": "e388d7149eae4dc08eaf85fd7eaee3ba",
+      "tail": "30",
+      "level": "error"
+    },
+    "result": {
+      "entries": [],
+      "cursor": 68,
+      "session": "e388d7149eae4dc08eaf85fd7eaee3ba",
+      "returned": 0,
+      "dropped": false,
+      "reset": false,
+      "counts": {
+        "error": 3,
+        "warn": 3,
+        "log": 62
+      },
+      "groundTruth": {
+        "sampledUtc": "2026-10-21T23:41:27.4821444Z",
+        "ageMs": 44,
+        "compilationFailed": false,
+        "compiling": false,
+        "consoleErrors": 0,
+        "consoleWarnings": 0,
+        "consoleLogs": 1,
+        "seeded": true
+      }
+    },
+    "target": {
+      "host": "127.0.0.1",
+      "port": 7800,
+      "projectPath": "D:\\PersonalProjects\\the-tower-of-babel"
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

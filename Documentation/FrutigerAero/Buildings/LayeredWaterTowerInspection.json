@@ -1,0 +1,107 @@
+{
+  "frameCount": 1334,
+  "time": 35.5333672,
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "cached": 84629,
+  "near": 717,
+  "far": 83912,
+  "farChunks": 959,
+  "farBatches": 44,
+  "farMaterialTypes": [
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WaterGlass_Floor_Tile (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/Water Glass",
+        "opacity": 0.5,
+        "layers": 5.0,
+        "seed": 12.0999994,
+        "variation": 1.0,
+        "clock": -1.0,
+        "enableInstancing": true
+      }
+    },
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WaterGlass_Step_Tile (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/Water Glass",
+        "opacity": 0.4,
+        "layers": 4.0,
+        "seed": 35.5599976,
+        "variation": 1.0,
+        "clock": -1.0,
+        "enableInstancing": true
+      }
+    },
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WaterGlass_Pillar (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/Water Glass",
+        "opacity": 0.34,
+        "layers": 6.0,
+        "seed": 23.83,
+        "variation": 1.0,
+        "clock": -1.0,
+        "enableInstancing": true
+      }
+    },
+    {
+      "count": 11,
+      "material": {
+        "name": "Aero_WaterGlass_Arch (Far Instanced)",
+        "shader": "TowerOfBabel/Buildings/Water Glass",
+        "opacity": 0.23,
+        "layers": 6.0,
+        "seed": 0.37,
+        "variation": 1.0,
+        "clock": -1.0,
+        "enableInstancing": true
+      }
+    }
+  ],
+  "nearMaterialTypes": [
+    {
+      "name": "Aero_WaterGlass_Floor_Tile (Floor Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "opacity": 0.5,
+      "layers": 5.0,
+      "seed": 12.0999994,
+      "variation": 1.0,
+      "clock": -1.0,
+      "enableInstancing": true
+    },
+    {
+      "name": "Aero_WaterGlass_Step_Tile (Stair Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "opacity": 0.4,
+      "layers": 4.0,
+      "seed": 35.5599976,
+      "variation": 1.0,
+      "clock": -1.0,
+      "enableInstancing": true
+    },
+    {
+      "name": "Aero_WaterGlass_Pillar (Pillar Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "opacity": 0.34,
+      "layers": 6.0,
+      "seed": 23.83,
+      "variation": 1.0,
+      "clock": -1.0,
+      "enableInstancing": true
+    },
+    {
+      "name": "Aero_WaterGlass_Arch (Arch Near Instanced)",
+      "shader": "TowerOfBabel/Buildings/Water Glass",
+      "opacity": 0.23,
+      "layers": 6.0,
+      "seed": 0.37,
+      "variation": 1.0,
+      "clock": -1.0,
+      "enableInstancing": true
+    }
+  ],
+  "messages": []
+}
