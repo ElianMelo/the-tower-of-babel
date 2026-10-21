@@ -307,7 +307,7 @@ namespace TowerOfBabel
 
             foreach (Transform candidate in GetComponentsInChildren<Transform>(true))
             {
-                if (candidate.name == "mixamorig:Head" || candidate.name == "Head")
+                if (candidate.name == "mixamorig:Head" || candidate.name == "Head" || candidate.name == "Bip001 Head")
                     return candidate;
             }
 

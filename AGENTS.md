@@ -23,3 +23,8 @@ These instructions apply to the entire `the-tower-of-babel` repository.
 - Use Unity EditMode tests or other checks that do not enter Play Mode during implementation. Run relevant PlayMode tests through the automated test runner only after implementation is complete.
 - If tests cannot run, report the blocker and the tests that remain unexecuted. Do not claim validation succeeded.
 - Documentation-only or project-context changes do not require artificial code tests; verify the resulting instructions directly.
+
+## Visual references
+
+- When asked for a visual guide or visual design changes, consult `Frutiger Reference/INDEX.md` and the relevant images in `Frutiger Reference/` first.
+- References are grouped into `UI`, `Asset`, and `Character`. Keep this index current when adding reference images from this chat.

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace TowerOfBabel.Interface
 {
-    public enum AeroIconKind { Leaf, Tower, Cube, Music, Globe, Bag, Close, Arrow, Sparkle, Pickaxe }
+    public enum AeroIconKind { Leaf, Tower, Cube, Music, Globe, Bag, Close, Arrow, Sparkle, Pickaxe, Gear }
 
     /// <summary>Resolution-independent pictograms; each authored icon is reused through a prefab.</summary>
     [RequireComponent(typeof(CanvasRenderer))]
@@ -44,6 +44,18 @@ namespace TowerOfBabel.Interface
                     Disc(mesh,new(.28f,.26f),.13f); Disc(mesh,new(.62f,.32f),.13f); break;
                 case AeroIconKind.Pickaxe:
                     Line(mesh,.28f,.19f,.68f,.73f,.075f); Line(mesh,.31f,.75f,.67f,.8f,.08f); Line(mesh,.67f,.8f,.83f,.6f,.065f); break;
+                case AeroIconKind.Gear:
+                    for(int i=0;i<24;i++)
+                    {
+                        float a=i*Mathf.PI*2/24,b=(i+1)*Mathf.PI*2/24;
+                        Line(mesh,.5f+Mathf.Cos(a)*.25f,.5f+Mathf.Sin(a)*.25f,.5f+Mathf.Cos(b)*.25f,.5f+Mathf.Sin(b)*.25f,.065f);
+                    }
+                    for(int i=0;i<8;i++)
+                    {
+                        float a=i*Mathf.PI/4;
+                        Line(mesh,.5f+Mathf.Cos(a)*.25f,.5f+Mathf.Sin(a)*.25f,.5f+Mathf.Cos(a)*.38f,.5f+Mathf.Sin(a)*.38f,.11f);
+                    }
+                    break;
                 case AeroIconKind.Sparkle:
                     Triangle(mesh,new(.5f,.9f),new(.4f,.5f),new(.6f,.5f)); Triangle(mesh,new(.5f,.1f),new(.4f,.5f),new(.6f,.5f));
                     Triangle(mesh,new(.1f,.5f),new(.5f,.4f),new(.5f,.6f)); Triangle(mesh,new(.9f,.5f),new(.5f,.4f),new(.5f,.6f)); break;

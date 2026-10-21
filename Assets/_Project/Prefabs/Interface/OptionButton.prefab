@@ -8,6 +8,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 580806842763091565, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 2100000, guid: e97c9d8c359f5d14494a34e0143881ad, type: 2}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -34,11 +38,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 190
+      value: 136
       objectReference: {fileID: 0}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 64
+      value: 44
       objectReference: {fileID: 0}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_LocalPosition.x
@@ -91,6 +95,26 @@ PrefabInstance:
     - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_text
       value: Dance
+      objectReference: {fileID: 0}
+    - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: m_fontSize
+      value: 18
+      objectReference: {fileID: 0}
+    - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.035
+      objectReference: {fileID: 0}
+    - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Name
@@ -151,7 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c290c2d0310b2114c83fe85717601d0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.OptionButton
-  hoverEffect: {fileID: 2682230747741937455}
+  hoverEffect: {fileID: 0}
   button: {fileID: 4437831655074014091}
   optionText: {fileID: 608190975877568762}
 --- !u!1001 &8832839397164029198
@@ -263,11 +287,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
---- !u!1 &2682230747741937455 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
-  m_PrefabInstance: {fileID: 8832839397164029198}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &6232120713368774272 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3235973114755724174, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}

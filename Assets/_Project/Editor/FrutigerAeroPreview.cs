@@ -20,17 +20,19 @@ public static class FrutigerAeroPreview
         if(screen=="Upgrade")
         {
             var config=AssetDatabase.LoadAssetAtPath<UpgradeTreeConfig>("Assets/_Project/Resources/UpgradeTreeConfig.asset");
-            var board=(RectTransform)visuals.Find("BoardWell/GatherBoard");
-            Vector2 size=UpgradeBoardLayout.CellSize(board.rect);
+            var board=(RectTransform)visuals.Find("BoardWell/Viewport/GatherBoard");
+            Vector2 size=UpgradeBoardLayout.NodeSize;
             foreach(var data in config.GetUpgrades(UpgradeJob.Gather))
             {
                 var go=Spawn("Assets/_Project/Prefabs/Interface/UpgradeButton.prefab",board);
-                var view=go.GetComponent<UpgradeButton>(); view.Configure(data,null,UpgradeButtonState.CannotBuy);
-                if(data.IsLevelFiftyUpgrade || data.Row!=3 || data.Column!=3) view.SetLabel(data.IsLevelFiftyUpgrade ? "Level 50\nCapstone" : "Unexplored\n- -");
+                var view=go.GetComponent<UpgradeButton>(); view.Configure(data,null,UpgradeButtonState.CanBuy);
+                go.SetActive(!data.IsLevelFiftyUpgrade && data.Row==3 && data.Column==3);
+                view.BindTooltip(visuals.Find("UpgradeTooltip").GetComponent<UpgradeTooltip>());
                 var rect=(RectTransform)go.transform; rect.anchorMin=rect.anchorMax=rect.pivot=new(.5f,.5f);
-                rect.sizeDelta=size; rect.anchoredPosition=UpgradeBoardLayout.Position(data,board.rect,size);
+                rect.sizeDelta=size; rect.anchoredPosition=UpgradeBoardLayout.TreePosition(data);
             }
         }
+        if(screen=="Upgrade") visuals.Find("BoardWell/Viewport/GatherBoard").GetComponent<AeroTreeConnections>()?.Refresh();
         if(screen=="Inventory")
         {
             var definitions=AssetDatabase.LoadAssetAtPath<ResourceDefinitionCollection>("Assets/_Project/Resources/Definitions/ResourceDefinitions.asset");
@@ -47,7 +49,7 @@ public static class FrutigerAeroPreview
                 var go=Spawn("Assets/_Project/Prefabs/Interface/OptionButton.prefab",content);
                 go.GetComponent<OptionButton>().Configure(labels[i],null);
                 float radians=(90-i*60)*Mathf.Deg2Rad;
-                ((RectTransform)go.transform).anchoredPosition=new Vector2(Mathf.Cos(radians),Mathf.Sin(radians))*240;
+                ((RectTransform)go.transform).anchoredPosition=new Vector2(Mathf.Cos(radians),Mathf.Sin(radians))*130;
             }
         }
         Canvas.ForceUpdateCanvases(); EditorApplication.QueuePlayerLoopUpdate();
@@ -66,4 +68,5 @@ public static class FrutigerAeroPreview
         var go=(GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(path),parent);
         go.name="_AeroPreview_"+go.name; go.hideFlags=HideFlags.DontSaveInEditor; return go;
     }
+
 }

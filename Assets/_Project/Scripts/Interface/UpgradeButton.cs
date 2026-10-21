@@ -15,7 +15,7 @@ namespace TowerOfBabel
         Purchased
     }
 
-    public sealed class UpgradeButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+    public sealed class UpgradeButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
     {
         [SerializeField] private GameObject hoverEffect;
         [SerializeField] private Image hoverEffectImage;
@@ -23,6 +23,10 @@ namespace TowerOfBabel
         [SerializeField] private TMP_Text upgradeText;
         [SerializeField] private TMP_Text stateText;
         [SerializeField] private Image stateSurface;
+        [SerializeField] private Material availableMaterial;
+        [SerializeField] private Material lockedMaterial;
+        [SerializeField] private Material purchasedMaterial;
+        [SerializeField] private UnityEngine.UI.Outline availableOutline;
 
         [SerializeField] private Color canBuy;
         [SerializeField] private Color cannotBuy;
@@ -32,6 +36,15 @@ namespace TowerOfBabel
         private UpgradeButtonState state;
         private Action selectionCallback;
         private bool listenerRegistered;
+        private TowerOfBabel.Interface.UpgradeTooltip tooltip;
+        public void BindTooltip(TowerOfBabel.Interface.UpgradeTooltip value) => tooltip=value;
+        private void OnDisable() => tooltip?.Hide(this);
+
+        private void Update()
+        {
+            if (state == UpgradeButtonState.CanBuy && availableOutline != null)
+                availableOutline.effectColor = new Color(.65f, .96f, 1f, .7f + .25f * Mathf.Sin(Time.unscaledTime * 4f));
+        }
 
         public UpgradeData Data => upgradeData;
         public UpgradeButtonState State => state;
@@ -103,12 +116,16 @@ namespace TowerOfBabel
         public void OnPointerEnter(PointerEventData eventData)
         {
             ApplyVisualState(true);
+            tooltip?.Show(this,eventData.position);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             ApplyVisualState(false);
+            tooltip?.Hide(this);
         }
+
+        public void OnPointerMove(PointerEventData eventData) => tooltip?.Move(eventData.position);
 
         public void ToggleHover(bool isActive)
         {
@@ -117,12 +134,18 @@ namespace TowerOfBabel
 
         private void ApplyVisualState(bool pointerInside)
         {
+            bool available = state == UpgradeButtonState.CanBuy;
+            if (availableOutline != null) availableOutline.enabled = available;
+            if (upgradeText != null) upgradeText.color = available ? Color.white : new Color(.035f,.22f,.34f,1);
+            if (stateText != null) stateText.color = available ? Color.white : new Color(.14f,.37f,.47f,1);
+            if (stateSurface != null && availableMaterial != null)
+                stateSurface.material = available ? availableMaterial : state == UpgradeButtonState.Purchased ? purchasedMaterial : lockedMaterial;
             if (stateText != null)
                 stateText.text = state == UpgradeButtonState.Purchased ? "OWNED" :
                     state == UpgradeButtonState.CanBuy ? "1 POINT" : "LOCKED";
             if (stateSurface != null)
                 stateSurface.color = state == UpgradeButtonState.Purchased ? new Color(.38f, .94f, .55f, .95f) :
-                    state == UpgradeButtonState.CanBuy ? new Color(.4f, .85f, 1f, 1f) : new Color(.8f, .94f, 1f, .72f);
+                    state == UpgradeButtonState.CanBuy ? Color.white : new Color(.8f, .94f, 1f, .72f);
             if (hoverEffect == null)
                 return;
 

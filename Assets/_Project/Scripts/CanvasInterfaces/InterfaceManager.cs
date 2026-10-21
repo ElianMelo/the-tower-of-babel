@@ -10,6 +10,7 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] private TowerOfBabel.UpgradeUI upgradeUI;
     [SerializeField] private TowerOfBabel.ServerStatusUI serverStatusUI;
     [SerializeField] private TowerOfBabel.AnimationEmoteUI animationEmoteUI;
+    [SerializeField] private TowerOfBabel.Interface.AeroDock menuLauncher;
 
     private void Awake()
     {
@@ -35,9 +36,14 @@ public class InterfaceManager : MonoBehaviour
             Instance = null;
     }
 
-    public void ShowInteraction(string objectName, string detail, Color detailColor, string prompt)
+    public void ShowInteraction(string objectName, string detail, Color detailColor, string prompt,TowerOfBabel.Resources.ResourceType? resourceType=null)
     {
-        interactionUI.Show(objectName, detail, detailColor, prompt);
+        interactionUI.Show(objectName, detail, detailColor, prompt,resourceType);
+    }
+
+    public void ShowInteraction(string objectName,string detail,Color detailColor,string prompt,TowerOfBabel.Resources.Interaction.InteractionResourceData resources)
+    {
+        interactionUI.Show(objectName,detail,detailColor,prompt,resources);
     }
 
     public void SetInteractionProgress(float normalizedProgress)
@@ -63,6 +69,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ShowInventory()
     {
+        menuLauncher?.Close();
         upgradeUI?.Hide();
         animationEmoteUI?.Hide();
         inventoryUI?.Show();
@@ -81,6 +88,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ShowUpgrade()
     {
+        menuLauncher?.Close();
         inventoryUI?.Hide();
         animationEmoteUI?.Hide();
         upgradeUI?.Show();
@@ -93,6 +101,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ToggleEmotes()
     {
+        menuLauncher?.Close();
         if (animationEmoteUI == null) return;
         if (animationEmoteUI.IsVisible) animationEmoteUI.Hide();
         else
@@ -102,6 +111,8 @@ public class InterfaceManager : MonoBehaviour
             animationEmoteUI.Show();
         }
     }
+
+    public void HideEmotes() => animationEmoteUI?.Hide();
 
     public void ShowServerDisconnected() => serverStatusUI?.ShowDisconnected();
     public void ShowServerConnecting() => serverStatusUI?.ShowConnecting();

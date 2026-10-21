@@ -13,7 +13,7 @@ namespace TowerOfBabel.Buildings
     [DisallowMultipleComponent]
     [RequireComponent(typeof(MeshFilter))]
     public sealed class Building : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable,
-        IInteractionPresentation
+        IInteractionPresentation, IInteractionResource
     {
         public const int StageCount = ChunkAssetData.CompletedStage + 1;
 
@@ -44,6 +44,8 @@ namespace TowerOfBabel.Buildings
         private bool isBound;
 
         public string ObjectName => gameObject.name;
+        public ResourceType InteractionResourceType => resourceType;
+        public InteractionResourceData InteractionResources => InteractionResourceData.Build(resourceType,EffectiveResourceCost);
         public string DetailText => IsComplete
             ? "Construction complete"
             : $"Stage {currentStage}/{ChunkAssetData.CompletedStage} - {EffectiveResourceCost} {resourceType}";

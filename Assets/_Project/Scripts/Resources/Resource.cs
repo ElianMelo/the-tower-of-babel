@@ -9,7 +9,7 @@ using UnityEngine;
 namespace TowerOfBabel.Resources
 {
     [DisallowMultipleComponent]
-    public sealed class Resource : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable, IInteractionAnimation
+    public sealed class Resource : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable, IInteractionAnimation, IInteractionResource
     {
         private static readonly Color AvailableColor = Color.blue;
         private static readonly Color CooldownColor = Color.red;
@@ -40,6 +40,9 @@ namespace TowerOfBabel.Resources
         public bool CanInteract => enabled && gameObject.activeInHierarchy && definition != null && !isCoolingDown;
         public ulong NodeId => nodeId;
         public ResourceDefinition Definition => definition;
+        public ResourceType InteractionResourceType => definition!=null ? definition.ResourceType : ResourceType.Stone;
+        public InteractionResourceData InteractionResources => definition!=null ? InteractionResourceData.Gather(InteractionResourceType,
+            NetworkUpgradeService.Instance!=null ? NetworkUpgradeService.Instance.GetLocalProduction(UpgradeJob.Gather,definition.AmountGathered) : definition.AmountGathered) : default;
         public bool ServerCanGather => CanInteract;
         public event Action ServerRejected;
 

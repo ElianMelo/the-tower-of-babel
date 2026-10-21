@@ -113,7 +113,8 @@ namespace TowerOfBabel.Resources.Interaction
                 string.Format(promptFormat, currentInteractable.ObjectName),
                 currentInteractable.DetailText,
                 currentInteractable.DetailColor,
-                currentInteractable.PromptText);
+                currentInteractable.PromptText,
+                (currentInteractable as IInteractionResource)?.InteractionResources ?? default);
         }
 
         private void ClearTarget()

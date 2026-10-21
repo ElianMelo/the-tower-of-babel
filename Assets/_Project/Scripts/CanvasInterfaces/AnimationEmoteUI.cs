@@ -48,6 +48,33 @@ namespace TowerOfBabel
 
         public bool IsVisible => visuals != null && visuals.activeSelf;
 
+        private void LateUpdate()
+        {
+            if(IsVisible) CenterOnPlayer();
+        }
+
+        public void CenterOnPlayer()
+        {
+            if(visuals==null) return;
+            var rect=(RectTransform)visuals.transform;
+            var parent=(RectTransform)rect.parent;
+            var canvas=GetComponentInParent<Canvas>();
+            var uiCamera=canvas!=null && canvas.renderMode!=RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
+            var camera=Camera.main;
+            Vector2 screen=new(Screen.width*.5f,Screen.height*.5f);
+            if(playerVisuals!=null && camera!=null)
+            {
+                var body=playerVisuals.GetComponentInParent<CharacterController>();
+                Vector3 center=body!=null ? body.transform.TransformPoint(body.center) : playerVisuals.transform.position+Vector3.up;
+                var projected=camera.WorldToScreenPoint(center);
+                // In first person the player's body is behind the near plane; the reticle is its screen center.
+                if(projected.z>camera.nearClipPlane && projected.x>=0 && projected.x<=Screen.width && projected.y>=0 && projected.y<=Screen.height)
+                    screen=projected;
+            }
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parent,screen,uiCamera,out var local);
+            rect.anchoredPosition=local;
+        }
+
         private void Awake()
         {
             ResolveReferences();
@@ -101,6 +128,7 @@ namespace TowerOfBabel
                 inputLockApplied = true;
             }
             visuals.SetActive(true);
+            CenterOnPlayer();
         }
 
         public void Hide()

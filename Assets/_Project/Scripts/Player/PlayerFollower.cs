@@ -57,7 +57,7 @@ public class PlayerFollower : MonoBehaviour
     {
         foreach (Transform candidate in player.GetComponentsInChildren<Transform>(true))
         {
-            if (candidate.name == "mixamorig:Head" || candidate.name == "Head")
+            if (candidate.name == "mixamorig:Head" || candidate.name == "Head" || candidate.name == "Bip001 Head")
                 return candidate;
         }
 

@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-20",
+  "scope": "Frutiger regular and bold font replacement",
+  "editMode": {
+    "total": 63,
+    "passed": 63,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "playMode": {
+    "total": 23,
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "fontChecks": [
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.AllAuthoredGameplayAndConsoleTextUsesFrutiger",
+      "Status": "Passed",
+      "Duration": 0.024207,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.RegularAndBoldUseSuppliedFacesWithMatchingAtlasSettings",
+      "Status": "Passed",
+      "Duration": 0.0044331,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.TowerSceneHasNoOldFontOverrides",
+      "Status": "Passed",
+      "Duration": 0.2725662,
+      "Message": null,
+      "StackTrace": null
+    }
+  ],
+  "runtimeFontChecks": [
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.GeneratedMenuEntriesKeepFrutigerRegularAndBold",
+      "Status": "Passed",
+      "Duration": 0.32852,
+      "Message": null,
+      "StackTrace": null
+    }
+  ],
+  "textOverflow": {
+    "emotes": 0,
+    "upgrade": 0,
+    "inventory": 0
+  },
+  "editorRestoredTo": "Tower scene, clean, Edit Mode"
+}

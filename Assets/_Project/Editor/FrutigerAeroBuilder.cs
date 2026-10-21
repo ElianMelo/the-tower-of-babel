@@ -15,7 +15,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 /// <summary>Authors real nested prefabs. The runtime only instantiates data-driven rows/nodes.</summary>
-public static class FrutigerAeroBuilder
+public static partial class FrutigerAeroBuilder
 {
     public const string Root = "Assets/_Project/UI/FrutigerAero";
     public const string InterfacePath = Root + "/Prefabs/FrutigerInterface.prefab";
@@ -39,7 +39,7 @@ public static class FrutigerAeroBuilder
         System.IO.Directory.CreateDirectory(Root + "/Materials");
         System.IO.Directory.CreateDirectory(Root + "/Prefabs/Screens");
         AssetDatabase.Refresh();
-        font=AssetDatabase.LoadAssetAtPath<TMP_FontAsset>("Assets/_Project/Fonts/LiberationSans SDF.asset");
+        font=AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FrutigerFontBuilder.RegularPath);
         var importer=(TextureImporter)AssetImporter.GetAtPath(Root+"/Art/AeroLandscape.png");
         importer.textureType=TextureImporterType.Sprite;
         importer.spriteImportMode=SpriteImportMode.Single;
@@ -86,6 +86,7 @@ public static class FrutigerAeroBuilder
         Set(manager,"interactionUI",interaction); Set(manager,"inventoryUI",inventory);
         Set(manager,"upgradeUI",upgrade); Set(manager,"serverStatusUI",server);
         Set(manager,"animationEmoteUI",emotes);
+        Set(manager,"menuLauncher",hud.GetComponentInChildren<AeroDock>(true));
         foreach(Transform child in root.Cast<Transform>().ToArray())
             PrefabUtility.SaveAsPrefabAssetAndConnect(child.gameObject,Root+"/Prefabs/Screens/"+child.name+".prefab",InteractionMode.AutomatedAction);
 
@@ -119,6 +120,7 @@ public static class FrutigerAeroBuilder
         EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
         AssetDatabase.SaveAssets();
         Selection.activeGameObject=instance;
+        ApplyInteractiveRevision();
         Debug.Log("Frutiger Aero: replaced all six interface areas with nested prefab components.");
     }
 
@@ -175,6 +177,7 @@ public static class FrutigerAeroBuilder
         Set(view,"hoverEffect",hover.gameObject); Set(view,"hoverEffectImage",hover.GetComponent<UnityEngine.UI.Image>());
         SetColor(view,"canBuy",new(.65f,.95f,1,.65f)); SetColor(view,"cannotBuy",new(.65f,.8f,.85f,.25f)); SetColor(view,"alreadyBrought",new(.65f,1,.7f,.55f));
         SaveAt(node,"Assets/_Project/Prefabs/Interface/UpgradeButton.prefab");
+        StyleUpgradeNode();
 
         var option=Button("OptionButton",null,"Dance"); option.sizeDelta=new(190,64);
         var optionView=option.gameObject.AddComponent<OptionButton>();
@@ -197,23 +200,7 @@ public static class FrutigerAeroBuilder
 
     private static void BuildHud(RectTransform parent)
     {
-        var brand=Panel("Brand",parent,glass,25); At(brand,30,26,340,76);
-        var orb=Orb("Tower",brand,AeroIconKind.Tower,Blue); At(orb,10,10,56,56);
-        LabelAt("Name",brand,"THE TOWER OF BABEL",19,Ink,80,13,245,26,FontStyles.Bold);
-        LabelAt("Caption",brand,"A little progress. A little closer.",14,Muted,80,41,245,22);
-        var dock=Panel("ShortcutDock",parent,glass,28);
-        Anchor(dock,new(.5f,0),new(.5f,0),new(.5f,0),new(0,24),new(690,70));
-        var upgrades=Button("Upgrades",dock,"TAB   Upgrades"); At(upgrades,12,10,214,50);
-        var inventory=Button("Inventory",dock,"I   Inventory"); At(inventory,238,10,214,50);
-        var emotes=Button("Emotes",dock,"R   Emotes"); At(emotes,464,10,214,50);
-        // These callbacks resolve the scene manager after prefab instantiation.
-        var actions=dock.gameObject.AddComponent<AeroDock>();
-        UnityEventTools.AddPersistentListener(upgrades.GetComponent<UnityEngine.UI.Button>().onClick,actions.Upgrades);
-        UnityEventTools.AddPersistentListener(inventory.GetComponent<UnityEngine.UI.Button>().onClick,actions.Inventory);
-        UnityEventTools.AddPersistentListener(emotes.GetComponent<UnityEngine.UI.Button>().onClick,actions.Emotes);
-        var crosshair=Orb("Focus",parent,AeroIconKind.Sparkle,Color.white);
-        Anchor(crosshair,new(.5f,.5f),new(.5f,.5f),new(.5f,.5f),Vector2.zero,new(14,14));
-        crosshair.GetComponent<UnityEngine.UI.Image>().enabled=false;
+        ConfigureMenuLauncher(parent);
     }
 
     private static InteractionUI BuildInteraction(RectTransform parent)
@@ -262,32 +249,8 @@ public static class FrutigerAeroBuilder
     {
         var controller=Container("Inventory",parent); Stretch(controller);
         var ui=controller.gameObject.AddComponent<InventoryUI>();
-        var visuals=Window(controller,"Inventory","Everything you need to build something great.",ui.Hide);
-        Set(ui,"visuals",visuals.gameObject); Set(ui,"inputActions",input); Set(ui,"definitionCollection",definitions);
-        Set(ui,"resourcePrefab",AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Interface/ResourceInventory.prefab"));
-        var rail=Panel("NatureRail",visuals,white,24); At(rail,28,128,300,0); Bottom(rail,28);
-        var art=Inst("Landscape",rail); At(art,14,14,272,184);
-        var orb=Orb("InventoryOrb",rail,AeroIconKind.Bag,Green); At(orb,112,222,76,76);
-        LabelAt("Heading",rail,"Make room for possibility",24,Ink,24,330,252,76,FontStyles.Bold);
-        LabelAt("Description",rail,"Gather resources, refine materials and bring the tower to life.",19,Muted,24,424,252,100);
-        var hint=Panel("KeyHint",rail,green,18); Anchor(hint,new(.5f,0),new(.5f,0),new(.5f,0),new(0,26),new(246,50));
-        var hintText=Label("Hint",hint,"I  /  ESC   Close inventory",16,Color.white); Stretch(hintText.rectTransform,10,10,4,4); hintText.alignment=TextAlignmentOptions.Center;
-        LabelAt("ResourcesTitle",visuals,"Your resources",28,Ink,364,136,650,42,FontStyles.Bold);
-        LabelAt("ResourcesSubtitle",visuals,"Available materials in your backpack",18,Muted,364,184,760,30);
-        var scroll=Container("ResourceScroll",visuals); Stretch(scroll,356,28,238,88);
-        var sr=scroll.gameObject.AddComponent<UnityEngine.UI.ScrollRect>(); sr.horizontal=false; sr.vertical=true;
-        sr.movementType=UnityEngine.UI.ScrollRect.MovementType.Clamped; sr.scrollSensitivity=32;
-        var viewport=Container("Viewport",scroll); Stretch(viewport);
-        var viewportImage=viewport.gameObject.AddComponent<UnityEngine.UI.Image>(); viewportImage.color=Color.white;
-        var mask=viewport.gameObject.AddComponent<UnityEngine.UI.Mask>(); mask.showMaskGraphic=false;
-        var content=Container("Resources",viewport);
-        Anchor(content,new(0,1),new(1,1),new(.5f,1),Vector2.zero,Vector2.zero);
-        var list=content.gameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>(); list.spacing=14;
-        list.padding=new RectOffset(8,8,8,8); list.childControlWidth=true; list.childControlHeight=true; list.childForceExpandWidth=true; list.childForceExpandHeight=false;
-        var fitter=content.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>(); fitter.verticalFit=UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
-        sr.viewport=viewport; sr.content=content; Set(ui,"targetListResources",content);
-        LabelFooter(visuals,"Gather. Refine. Build.","Your inventory updates as you play.");
-        visuals.gameObject.SetActive(false); return ui;
+        ConfigureCompactInventory(controller,ui,input,definitions);
+        return ui;
     }
 
     private static UpgradeUI BuildUpgrade(RectTransform parent,InputActionAsset input)
@@ -332,17 +295,8 @@ public static class FrutigerAeroBuilder
     {
         var controller=Container("AnimationEmote",parent); Stretch(controller);
         var ui=controller.gameObject.AddComponent<AnimationEmoteUI>();
-        var visuals=Window(controller,"A moment to express yourself","Choose a dance and make the world a little brighter.",ui.Hide);
-        Set(ui,"visuals",visuals.gameObject); Set(ui,"inputActions",input); SetFloat(ui,"radialRadius",240);
-        Set(ui,"optionPrefab",AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Interface/OptionButton.prefab").GetComponent<OptionButton>());
-        var art=Inst("Landscape",visuals); Stretch(art,30,30,126,30); art.GetComponent<UnityEngine.UI.Image>().color=new(1,1,1,.34f);
-        var options=Container("Options",visuals); Stretch(options,150,150,190,90); Set(ui,"optionsContainer",options);
-        var center=Orb("EmoteOrb",options,AeroIconKind.Music,Green);
-        Anchor(center,new(.5f,.5f),new(.5f,.5f),new(.5f,.5f),Vector2.zero,new(128,128));
-        var title=Label("CenterLabel",options,"FEEL GOOD",18,Ink);
-        Anchor(title.rectTransform,new(.5f,.5f),new(.5f,.5f),new(.5f,.5f),new(0,-94),new(220,35)); title.alignment=TextAlignmentOptions.Center;
-        LabelFooter(visuals,"R  /  ESC   Close emotes","Select any dance to begin.");
-        visuals.gameObject.SetActive(false); return ui;
+        ConfigureQuickEmotes(controller,ui,input);
+        return ui;
     }
 
     private static RectTransform Window(RectTransform controller,string title,string subtitle,UnityAction close)

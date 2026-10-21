@@ -8,7 +8,7 @@ using UnityEngine;
 namespace TowerOfBabel.Resources
 {
     [DisallowMultipleComponent]
-    public sealed class ResourceProcessor : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable, IServerInteractionCompletion
+    public sealed class ResourceProcessor : MonoBehaviour, IInteractable, IServerAuthoritativeInteractable, IServerInteractionCompletion, IInteractionResource
     {
         [Header("Recipe")]
         [SerializeField] private ResourceDefinition sourceResource;
@@ -22,6 +22,9 @@ namespace TowerOfBabel.Resources
         private string resolvedId;
 
         public ResourceDefinition SourceResource => sourceResource;
+        public ResourceType InteractionResourceType => sourceResource!=null ? sourceResource.ResourceType : ResourceType.Stone;
+        public InteractionResourceData InteractionResources => sourceResource!=null && targetResource!=null
+            ? InteractionResourceData.Process(sourceResource.ResourceType,EffectiveSourceAmount,targetResource.ResourceType,EffectiveTargetAmount) : default;
         public ResourceDefinition TargetResource => targetResource;
         public int SourceAmount => sourceAmount;
         public int TargetAmount => targetAmount;

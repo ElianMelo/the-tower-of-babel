@@ -28,6 +28,8 @@ namespace TowerOfBabel
         [Header("Progress Presentation")]
         [SerializeField] private Image experienceFill;
         [SerializeField] private TMP_Text boardHint;
+        [SerializeField] private UnityEngine.UI.ScrollRect treeScroll;
+        [SerializeField] private UpgradeTooltip tooltip;
         private Vector2 lastBoardSize;
 
         private readonly Dictionary<UpgradeJob, Dictionary<string, UpgradeButton>> boardButtons = new();
@@ -113,6 +115,7 @@ namespace TowerOfBabel
 
         public void Hide()
         {
+            tooltip?.Hide();
             if (visuals != null)
                 visuals.SetActive(false);
             RestoreCursorState();
@@ -133,6 +136,8 @@ namespace TowerOfBabel
 
         private void SelectBoard(UpgradeJob job)
         {
+            tooltip?.Hide();
+            bool changed=selectedJob!=job;
             selectedJob = job;
             if (gatherBoard != null)
                 gatherBoard.SetActive(job == UpgradeJob.Gather);
@@ -140,6 +145,12 @@ namespace TowerOfBabel
                 processorBoard.SetActive(job == UpgradeJob.Process);
             if (builderBoard != null)
                 builderBoard.SetActive(job == UpgradeJob.Build);
+            if(treeScroll!=null)
+            {
+                treeScroll.StopMovement();
+                treeScroll.content=(RectTransform)(job==UpgradeJob.Gather ? gatherBoard : job==UpgradeJob.Process ? processorBoard : builderBoard).transform;
+                if(changed) treeScroll.content.anchoredPosition=Vector2.zero;
+            }
             RefreshSelectedBoard();
         }
 
@@ -187,14 +198,14 @@ namespace TowerOfBabel
                 if (rect != null)
                 {
                     rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
-                    Rect available = ((RectTransform)board.transform).rect;
-                    rect.sizeDelta = UpgradeBoardLayout.CellSize(available);
-                    rect.anchoredPosition = UpgradeBoardLayout.Position(data, available, rect.sizeDelta);
+                    rect.sizeDelta = UpgradeBoardLayout.NodeSize;
+                    rect.anchoredPosition = UpgradeBoardLayout.TreePosition(data);
                 }
 
                 string upgradeId = data.Id;
                 view.Configure(data, () => RequestPurchase(job, upgradeId),
                     UpgradeButtonState.CannotBuy);
+                view.BindTooltip(tooltip);
                 views.Add(data.Id, view);
             }
         }
@@ -216,13 +227,13 @@ namespace TowerOfBabel
             foreach (GameObject board in new[] { gatherBoard, processorBoard, builderBoard })
             {
                 if (board == null || board.transform is not RectTransform boardRect) continue;
-                Vector2 size = UpgradeBoardLayout.CellSize(boardRect.rect);
+                Vector2 size = UpgradeBoardLayout.NodeSize;
                 foreach (UpgradeButton view in board.GetComponentsInChildren<UpgradeButton>(true))
                 {
                     if (view.Data == null) continue;
                     RectTransform rect = (RectTransform)view.transform;
                     rect.sizeDelta = size;
-                    rect.anchoredPosition = UpgradeBoardLayout.Position(view.Data, boardRect.rect, size);
+                    rect.anchoredPosition = UpgradeBoardLayout.TreePosition(view.Data);
                 }
             }
             if (gatherBoard != null) lastBoardSize = ((RectTransform)gatherBoard.transform).rect.size;
@@ -230,6 +241,7 @@ namespace TowerOfBabel
 
         private void RequestPurchase(UpgradeJob job, string upgradeId)
         {
+            tooltip?.Hide();
             upgradeService?.RequestPurchase(job, upgradeId);
         }
 
@@ -239,6 +251,7 @@ namespace TowerOfBabel
                 return;
 
             UpgradeJobSnapshot snapshot = upgradeService.GetLocalSnapshot(selectedJob);
+            tooltip?.Hide();
             HashSet<string> purchased = new(snapshot.PurchasedUpgradeIds ?? System.Array.Empty<string>());
             if (boardButtons.TryGetValue(selectedJob, out Dictionary<string, UpgradeButton> views))
             {
@@ -251,10 +264,8 @@ namespace TowerOfBabel
 
                     bool isPurchased = purchased.Contains(data.Id);
                     bool isRevealed = isPurchased || IsRevealed(data, purchased);
-                    // Keep the roadmap visible while retaining server-authoritative reveal/purchase rules.
-                    view.gameObject.SetActive(true);
+                    view.gameObject.SetActive(isRevealed);
                     view.SetupUpgradeData(data);
-                    if (!isRevealed) view.SetLabel(data.IsLevelFiftyUpgrade ? "Level 50\nCapstone" : "Unexplored\n- -");
                     if (isPurchased)
                         view.SetState(UpgradeButtonState.Purchased);
                     else
@@ -266,13 +277,15 @@ namespace TowerOfBabel
 
             if (jobTitleText != null)
                 jobTitleText.text = GetJobTitle(selectedJob);
+            foreach(var board in new[]{gatherBoard,processorBoard,builderBoard})
+                board?.GetComponent<AeroTreeConnections>()?.Refresh();
             SetTab(gatherButton, selectedJob == UpgradeJob.Gather);
             SetTab(processorButton, selectedJob == UpgradeJob.Process);
             SetTab(builderButton, selectedJob == UpgradeJob.Build);
             if (boardHint != null)
                 boardHint.text = snapshot.AvailablePoints > 0
-                    ? "Choose a blue node to grow your skills."
-                    : "Earn experience to unlock your next upgrade.";
+                    ? "Drag to explore. Hover a skill for details. Click blue skills to unlock."
+                    : "Drag to explore. Earn experience to unlock your next skill.";
             if (experienceFill != null)
             {
                 int required = UpgradeJobProgress.GetExperienceRequired(snapshot.Level);
@@ -293,7 +306,10 @@ namespace TowerOfBabel
         {
             if (tab == null) return;
             var image = tab.GetComponent<UnityEngine.UI.Image>();
-            if (image != null) image.color = selected ? new Color(.24f, .84f, .48f, 1f) : Color.white;
+            // The blue glass material supplies the color; multiplying it by green made selected tabs dark teal.
+            if (image != null) image.color = Color.white;
+            var outline=tab.GetComponent<UnityEngine.UI.Outline>();
+            if(outline!=null) outline.enabled=selected;
         }
 
         private bool IsRevealed(UpgradeData data, HashSet<string> purchased)

@@ -64,7 +64,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_AdditionalShaderChannelsFlag: 3
+  m_AdditionalShaderChannelsFlag: 23
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -126,6 +126,7 @@ MonoBehaviour:
   upgradeUI: {fileID: 5984499745749871317}
   serverStatusUI: {fileID: 4860899109523595232}
   animationEmoteUI: {fileID: 9169425280859690738}
+  menuLauncher: {fileID: 4196842628050042987}
 --- !u!1001 &2386867209380890657
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -336,6 +337,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 74b8443f8f3b42b4eba0867611de3906, type: 3}
+--- !u!114 &4196842628050042987 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1225893223126246380, guid: 74b8443f8f3b42b4eba0867611de3906, type: 3}
+  m_PrefabInstance: {fileID: 3115665511029695367}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b968bb101b7a03b4f86e838d2533a1f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroDock
 --- !u!224 &8444688688764744737 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6776966192172668838, guid: 74b8443f8f3b42b4eba0867611de3906, type: 3}

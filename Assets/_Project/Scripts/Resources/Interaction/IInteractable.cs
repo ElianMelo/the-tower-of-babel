@@ -23,6 +23,13 @@ namespace TowerOfBabel.Resources.Interaction
         bool UsesGatheringAnimation { get; }
     }
 
+    /// <summary>The resource shown alongside a gather, recipe, or construction prompt.</summary>
+    public interface IInteractionResource
+    {
+        ResourceType InteractionResourceType { get; }
+        InteractionResourceData InteractionResources { get; }
+    }
+
     /// <summary>Timed interactions that remain active until the server confirms completion.</summary>
     public interface IServerInteractionCompletion
     {

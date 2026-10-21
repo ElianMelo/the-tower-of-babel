@@ -113,6 +113,15 @@
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Menus",
+                    "type": "Button",
+                    "id": "3f3db961-b1ed-477f-a08e-3e5c76ee437a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -531,6 +540,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Upgrade",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c9c98ef6-f668-4f39-ab60-357f3e668291",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menus",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

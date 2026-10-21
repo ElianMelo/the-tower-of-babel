@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 namespace TowerOfBabel.Interface
 {
@@ -9,16 +10,22 @@ namespace TowerOfBabel.Interface
         protected override void OnPopulateMesh(VertexHelper mesh)
         {
             mesh.Clear();
-            Vector2 cell=UpgradeBoardLayout.CellSize(rectTransform.rect);
-            Vector2 stride=cell+Vector2.one*9;
-            for(int row=0;row<7;row++)
-            for(int column=0;column<7;column++)
+            var nodes=GetComponentsInChildren<UpgradeButton>(true).Where(n=>n.gameObject.activeSelf && n.Data!=null).ToArray();
+            for(int i=0;i<nodes.Length;i++)
+            for(int j=i+1;j<nodes.Length;j++)
             {
-                Vector2 p=new((column-3)*stride.x,(3.5f-row)*stride.y);
-                if(column<6) Line(mesh,p+new Vector2(cell.x/2,0),p+new Vector2(stride.x-cell.x/2,0));
-                if(row<6 || row==6 && column==3) Line(mesh,p-new Vector2(0,cell.y/2),p-new Vector2(0,stride.y-cell.y/2));
+                var a=nodes[i].Data; var b=nodes[j].Data;
+                int rowA=a.IsLevelFiftyUpgrade ? 7 : a.Row, rowB=b.IsLevelFiftyUpgrade ? 7 : b.Row;
+                if(Mathf.Abs(rowA-rowB)+Mathf.Abs(a.Column-b.Column)!=1) continue;
+                var p=((RectTransform)nodes[i].transform).anchoredPosition;
+                var q=((RectTransform)nodes[j].transform).anchoredPosition;
+                var direction=(q-p).normalized;
+                var half=UpgradeBoardLayout.NodeSize*.5f;
+                var inset=new Vector2(direction.x*half.x,direction.y*half.y);
+                Line(mesh,p+inset,q-inset);
             }
         }
+        public void Refresh() => SetVerticesDirty();
         private void Line(VertexHelper mesh,Vector2 a,Vector2 b)
         {
             Vector2 direction=(b-a).normalized; Vector2 normal=new(-direction.y,direction.x); normal*=.9f;

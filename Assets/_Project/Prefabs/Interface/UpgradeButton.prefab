@@ -18,7 +18,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5414784615364078567, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_fontSize
-      value: 10
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 5414784615364078567, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_fontColor.b
@@ -34,7 +34,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5414784615364078567, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_fontSizeBase
-      value: 10
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 5414784615364078567, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_VerticalAlignment
@@ -70,11 +70,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7643737932248601009, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -12
+      value: -18
       objectReference: {fileID: 0}
     - target: {fileID: 7643737932248601009, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 14
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 7643737932248601009, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -110,7 +110,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7643737932248601009, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 3
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7643737932248601009, guid: 05195381b8b4d2643a413c819e48ce4d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -159,11 +159,11 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 1a6034351c36c2b4ab4efacc1727ea9d, type: 2}
     - target: {fileID: 821977199020389758, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -8
+      value: -18
       objectReference: {fileID: 0}
     - target: {fileID: 821977199020389758, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_SizeDelta.y
-      value: -25
+      value: -35
       objectReference: {fileID: 0}
     - target: {fileID: 821977199020389758, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -195,11 +195,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 150
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 66
+      value: 96
       objectReference: {fileID: 0}
     - target: {fileID: 1300385708086671170, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_LocalPosition.x
@@ -257,7 +257,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_fontSize
-      value: 16
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_fontColor.b
@@ -281,11 +281,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_fontSizeBase
-      value: 16
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3051489076366102312, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_enableAutoSizing
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4924428282569671676, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: cornerRadius
@@ -308,6 +308,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1212549630307781754}
+    - targetCorrespondingSourceObject: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8682891907703843287}
   m_SourcePrefab: {fileID: 100100000, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
 --- !u!224 &410490399075634287 stripped
 RectTransform:
@@ -364,15 +367,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e63dc14b60f51fd4ab225b3bece409b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.UpgradeButton
-  hoverEffect: {fileID: 3480676968406461388}
-  hoverEffectImage: {fileID: 6416660210533301068}
+  hoverEffect: {fileID: 0}
+  hoverEffectImage: {fileID: 0}
   button: {fileID: 578233180897251188}
   upgradeText: {fileID: 4458755064195314693}
   stateText: {fileID: 6801685125802856112}
   stateSurface: {fileID: 2285242016967042368}
+  availableMaterial: {fileID: 2100000, guid: 13e2240f51bef704799d1d10489e10f3, type: 2}
+  lockedMaterial: {fileID: 2100000, guid: 1a6034351c36c2b4ab4efacc1727ea9d, type: 2}
+  purchasedMaterial: {fileID: 2100000, guid: dee41dc6c2d708a46b8cdee521ba392b, type: 2}
+  availableOutline: {fileID: 8682891907703843287}
   canBuy: {r: 0.65, g: 0.95, b: 1, a: 0.65}
   cannotBuy: {r: 0.65, g: 0.8, b: 0.85, a: 0.25}
   alreadyBrought: {r: 0.65, g: 1, b: 0.7, a: 0.55}
+--- !u!114 &8682891907703843287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8572488322065528256}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.65, g: 0.96, b: 1, a: 1}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1001 &8061556890468901357
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -482,24 +504,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
---- !u!1 &3480676968406461388 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
-  m_PrefabInstance: {fileID: 8061556890468901357}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &4830140427002368611 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3235973114755724174, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
   m_PrefabInstance: {fileID: 8061556890468901357}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6416660210533301068 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3957794570359020193, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
-  m_PrefabInstance: {fileID: 8061556890468901357}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3480676968406461388}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image

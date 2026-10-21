@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1537272195930701091}
   - component: {fileID: 3957794570359020193}
   - component: {fileID: 8841846865999251248}
+  - component: {fileID: 7361071518172826027}
   m_Layer: 0
   m_Name: GlassPanel
   m_TagString: Untagged
@@ -90,3 +91,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroGlassGeometry
   cornerRadius: 18
   borderWidth: 1.5
+  hoverFill: 0
+  borderMotion: 0.18
+  surfaceFlow: 0.8
+--- !u!114 &7361071518172826027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6894375534579436065}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0160bc4a95658174d8bb739f930a9274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroHoverFeedback
+  surface: {fileID: 8841846865999251248}
+  trackScreenPointer: 1

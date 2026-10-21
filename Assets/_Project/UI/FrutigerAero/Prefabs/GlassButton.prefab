@@ -101,6 +101,22 @@ PrefabInstance:
       value: GlassButton
       objectReference: {fileID: 0}
     - target: {fileID: 8841846865999251248, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      propertyPath: edgeWave
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8841846865999251248, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      propertyPath: hoverFill
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8841846865999251248, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      propertyPath: surfaceFlow
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8841846865999251248, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      propertyPath: borderMotion
+      value: 0.015
+      objectReference: {fileID: 0}
+    - target: {fileID: 8841846865999251248, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
       propertyPath: cornerRadius
       value: 22
       objectReference: {fileID: 0}
@@ -114,6 +130,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2287814579274986585}
+    - targetCorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5658472738300521021}
+    - targetCorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4151314944319463069}
   m_SourcePrefab: {fileID: 100100000, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
 --- !u!114 &580806842763091565 stripped
 MonoBehaviour:
@@ -131,6 +153,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3235973114755724174, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
   m_PrefabInstance: {fileID: 4531634486541714636}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4924428282569671676 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8841846865999251248, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+  m_PrefabInstance: {fileID: 4531634486541714636}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7011585147832815341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a46c52abe6119c4cb44911f18ff8695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroGlassGeometry
 --- !u!1 &7011585147832815341 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
@@ -180,6 +213,33 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5658472738300521021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7011585147832815341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b36fa5c913f494a48a7f4288586a5091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroButtonJuice
+  duration: 0.34
+--- !u!114 &4151314944319463069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7011585147832815341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0160bc4a95658174d8bb739f930a9274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroHoverFeedback
+  surface: {fileID: 4924428282569671676}
+  trackScreenPointer: 0
 --- !u!1001 &7024556378527098063
 PrefabInstance:
   m_ObjectHideFlags: 0
