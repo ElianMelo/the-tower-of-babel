@@ -1,0 +1,112 @@
+{
+  "note": "Initial new-feature compilation lacked explicit URP/Core assembly references; fixed in TowerOfBabel.Rendering.asmdef. The final authoring renders and instanced captures produced no new graph/shader errors. FishNet obsolete-API warnings are pre-existing.",
+  "cursor": 149,
+  "session": "e388d7149eae4dc08eaf85fd7eaee3ba",
+  "groundTruth": {
+    "sampledUtc": "2026-10-22T00:54:45.1655664Z",
+    "ageMs": 21,
+    "compilationFailed": false,
+    "compiling": false,
+    "consoleErrors": 0,
+    "consoleWarnings": 2,
+    "consoleLogs": 1,
+    "seeded": true
+  },
+  "entries": [
+    {
+      "seq": 131,
+      "level": "log",
+      "message": "Local server is starting for Tugboat. Listening on port 7770."
+    },
+    {
+      "seq": 132,
+      "level": "log",
+      "message": "Local client is starting for Tugboat. Server IP is localhost, port is 7770."
+    },
+    {
+      "seq": 133,
+      "level": "log",
+      "message": "Local server is started for Tugboat."
+    },
+    {
+      "seq": 134,
+      "level": "log",
+      "message": "Remote connection started for Id 0."
+    },
+    {
+      "seq": 135,
+      "level": "log",
+      "message": "Local client is started for Tugboat."
+    },
+    {
+      "seq": 136,
+      "level": "log",
+      "message": "Local client is stopping for Tugboat."
+    },
+    {
+      "seq": 137,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(3,29): error CS0234: The type or namespace name 'RenderGraphModule' does not exist in the namespace 'UnityEngine.Rendering' (are you missing an assembly reference?)"
+    },
+    {
+      "seq": 138,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(4,29): error CS0234: The type or namespace name 'Universal' does not exist in the namespace 'UnityEngine.Rendering' (are you missing an assembly reference?)"
+    },
+    {
+      "seq": 139,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(9,56): error CS0246: The type or namespace name 'ScriptableRendererFeature' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 140,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(19,46): error CS0246: The type or namespace name 'ScriptableRenderer' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 141,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(19,79): error CS0246: The type or namespace name 'RenderingData' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 142,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(24,42): error CS0246: The type or namespace name 'ScriptableRenderPass' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 143,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(27,30): error CS0246: The type or namespace name 'ProfilingSampler' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 144,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(34,52): error CS0246: The type or namespace name 'RenderGraph' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 145,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(34,77): error CS0246: The type or namespace name 'ContextContainer' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 146,
+      "level": "error",
+      "message": "Assets\\_Project\\Scripts\\Rendering\\BuildingGlassRendererFeature.cs(31,24): error CS0246: The type or namespace name 'RendererListHandle' could not be found (are you missing a using directive or an assembly reference?)"
+    },
+    {
+      "seq": 147,
+      "level": "warn",
+      "message": "Assets\\FishNet\\Upgrading\\UpgradeFromMirrorMenu.cs(44,37): warning CS0618: 'PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup)' is obsolete: 'Use GetScriptingDefineSymbols(NamedBuildTarget buildTarget) instead'"
+    },
+    {
+      "seq": 148,
+      "level": "warn",
+      "message": "Assets\\FishNet\\Upgrading\\UpgradeFromMirrorMenu.cs(66,17): warning CS0618: 'PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup, string)' is obsolete: 'Use SetScriptingDefineSymbols(NamedBuildTarget buildTarget, string defines) instead'"
+    },
+    {
+      "seq": 149,
+      "level": "log",
+      "message": "Default prefab generator found 12 prefabs in 434ms."
+    }
+  ]
+}

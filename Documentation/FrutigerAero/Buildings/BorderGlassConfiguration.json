@@ -1,0 +1,81 @@
+{
+  "renderers": [
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "features": [
+        {
+          "name": "ScreenSpaceAmbientOcclusion",
+          "type": "ScreenSpaceAmbientOcclusion"
+        },
+        {
+          "name": "FreeOutline",
+          "type": "FreeOutline"
+        },
+        {
+          "name": "StylizedWater3.StylizedWaterRenderFeature",
+          "type": "StylizedWaterRenderFeature"
+        },
+        {
+          "name": "Building Glass Borders",
+          "type": "BuildingGlassRendererFeature"
+        }
+      ]
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "features": [
+        {
+          "name": "FreeOutline",
+          "type": "FreeOutline"
+        },
+        {
+          "name": "StylizedWater3.StylizedWaterRenderFeature",
+          "type": "StylizedWaterRenderFeature"
+        },
+        {
+          "name": "Building Glass Borders",
+          "type": "BuildingGlassRendererFeature"
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Arch",
+      "enableInstancing": true,
+      "transmission": 0.86,
+      "thickness": 0.12,
+      "glassPass": 1,
+      "borderGlass": 1.0,
+      "keyword": true
+    },
+    {
+      "name": "Floor_Tile",
+      "enableInstancing": true,
+      "transmission": 0.91,
+      "thickness": 0.085,
+      "glassPass": 1,
+      "borderGlass": 1.0,
+      "keyword": true
+    },
+    {
+      "name": "Pillar",
+      "enableInstancing": true,
+      "transmission": 0.87,
+      "thickness": 0.1,
+      "glassPass": 1,
+      "borderGlass": 1.0,
+      "keyword": true
+    },
+    {
+      "name": "Step_Tile",
+      "enableInstancing": true,
+      "transmission": 0.92,
+      "thickness": 0.065,
+      "glassPass": 1,
+      "borderGlass": 1.0,
+      "keyword": true
+    }
+  ],
+  "shaderMessages": []
+}

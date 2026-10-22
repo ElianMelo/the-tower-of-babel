@@ -33,12 +33,18 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 The 2026-10-21 building brief explicitly excludes green from building assets. It overrides the older blue/green UI palette for this kit.
 
 - `Asset/Building-Arch-Full-Spandrel-User.png` — user annotation: fill the area above the arch opening and provide a flat top connecting to the upper floor.
-- `Asset/Building-White-Marble-User.png` — current material brief: return to white and use gray-veined marble. Supersedes the glass and animated water direction.
+- `Asset/Building-White-Marble-User.png` — white base with gray-veined marble. The latest shader request retains this white core and reintroduces controlled moving water in aqua glazing and borders; the earlier full-glass experiments remain historical.
 - `Asset/Building-Classical-Column-User.png` — user-supplied fluted shaft, stepped base, paired scrolls and ornate capital reference.
 - `Asset/Building-Classical-Capital-User.png` — user-supplied close-up of raised classical capital ornament. Adapt its shapes to white pearl, soft blue enamel and marine motifs; retain a low-poly silhouette with baked relief.
 - `../Assets/_Project/References/Buildings/frutiger-building-sample-2.jpg` — **primary user-selected target**: continuous rounded white architecture, broad recessed aqua glazing, polished surfaces and reflected water light. Exclude its green vegetation from building colors.
-- `../Documentation/FrutigerAero/Buildings/Previews/AquaticArchitecture-Kit.png` — current rounded white kit with integrated aqua recesses and side bands.
-- `../Documentation/FrutigerAero/Buildings/AQUATIC_ARCHITECTURE.md` — current source, geometry/material settings and verification.
+- `../Documentation/FrutigerAero/Buildings/Previews/AeroFlow-Kit.png` — current restored opaque aquatic finish. The user rejected the subsequent see-through borders and requested this solution again.
+- `../Documentation/FrutigerAero/Buildings/Previews/BorderGlass-Kit.png` — historical rejected see-through aqua recesses and refracting borders.
+- `../Documentation/FrutigerAero/Buildings/Previews/BorderGlass-Floor.png` — historical rejected clear slab rim.
+- `../Documentation/FrutigerAero/Buildings/BORDER_GLASS.md` — rejected glass pass; disabled and removed from active renderers.
+- `../Documentation/FrutigerAero/Buildings/Previews/AeroFlow-Motion.gif` — current two-layer moving caustic and ripple preview.
+- `../Documentation/FrutigerAero/Buildings/AERO_FLOW_SHADER.md` — current restored water-flow shader research, material settings and verification.
+- `../Documentation/FrutigerAero/Buildings/Previews/AquaticArchitecture-Kit.png` — current geometry with the earlier static finish.
+- `../Documentation/FrutigerAero/Buildings/AQUATIC_ARCHITECTURE.md` — current geometry source and earlier finish verification.
 - `../Documentation/FrutigerAero/Buildings/Previews/AeroShell-Kit.png` — historical rejected pearl shell version.
 - `../Documentation/FrutigerAero/Buildings/Previews/AeroShell-Pillar.png` — historical rejected rounded capital and glazed strips.
 - `../Documentation/FrutigerAero/Buildings/AERO_SHELLS.md` — historical rejected pearl shell direction.

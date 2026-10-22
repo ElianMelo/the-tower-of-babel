@@ -1,0 +1,329 @@
+{
+  "note": "The initial read-only observer queried _WaterLight instead of _WaterLightMap. Corrected helper and repeat live inspection succeeded. Observer errors are preserved here before clearing their console noise.",
+  "initialCursor": 81,
+  "session": "e388d7149eae4dc08eaf85fd7eaee3ba",
+  "cursor": 130,
+  "compilation": {
+    "sampledUtc": "2026-10-22T00:16:16.7336082Z",
+    "ageMs": 64,
+    "compilationFailed": false,
+    "compiling": false,
+    "consoleErrors": 48,
+    "consoleWarnings": 0,
+    "consoleLogs": 1,
+    "seeded": true
+  },
+  "entries": [
+    {
+      "seq": 82,
+      "timestampUtc": "2026-10-22T00:11:54.5290115Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 83,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 84,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 85,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 86,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 87,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 88,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 89,
+      "timestampUtc": "2026-10-22T00:11:54.5311491Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 90,
+      "timestampUtc": "2026-10-22T00:11:54.5326934Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 91,
+      "timestampUtc": "2026-10-22T00:11:54.5326934Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 92,
+      "timestampUtc": "2026-10-22T00:11:54.5326934Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 93,
+      "timestampUtc": "2026-10-22T00:11:54.5326934Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 94,
+      "timestampUtc": "2026-10-22T00:11:54.5326934Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 95,
+      "timestampUtc": "2026-10-22T00:11:54.5337092Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 96,
+      "timestampUtc": "2026-10-22T00:11:54.5337092Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 97,
+      "timestampUtc": "2026-10-22T00:11:54.5337092Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 98,
+      "timestampUtc": "2026-10-22T00:11:54.5337092Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 99,
+      "timestampUtc": "2026-10-22T00:11:54.5337092Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 100,
+      "timestampUtc": "2026-10-22T00:11:54.5347451Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 101,
+      "timestampUtc": "2026-10-22T00:11:54.5347451Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 102,
+      "timestampUtc": "2026-10-22T00:11:54.5347451Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 103,
+      "timestampUtc": "2026-10-22T00:11:54.5347451Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 104,
+      "timestampUtc": "2026-10-22T00:11:54.5362486Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 105,
+      "timestampUtc": "2026-10-22T00:11:54.5362486Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 106,
+      "timestampUtc": "2026-10-22T00:11:54.5367885Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 107,
+      "timestampUtc": "2026-10-22T00:11:54.5367885Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 108,
+      "timestampUtc": "2026-10-22T00:11:54.5367885Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 109,
+      "timestampUtc": "2026-10-22T00:11:54.5373018Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 110,
+      "timestampUtc": "2026-10-22T00:11:54.5373018Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 111,
+      "timestampUtc": "2026-10-22T00:11:54.5373018Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 112,
+      "timestampUtc": "2026-10-22T00:11:54.5373018Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 113,
+      "timestampUtc": "2026-10-22T00:11:54.5373018Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 114,
+      "timestampUtc": "2026-10-22T00:11:54.5383161Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 115,
+      "timestampUtc": "2026-10-22T00:11:54.5383161Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 116,
+      "timestampUtc": "2026-10-22T00:11:54.5383161Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 117,
+      "timestampUtc": "2026-10-22T00:11:54.5383161Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 118,
+      "timestampUtc": "2026-10-22T00:11:54.5383161Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 119,
+      "timestampUtc": "2026-10-22T00:11:54.5383161Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 120,
+      "timestampUtc": "2026-10-22T00:11:54.5393308Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 121,
+      "timestampUtc": "2026-10-22T00:11:54.5393308Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 122,
+      "timestampUtc": "2026-10-22T00:11:54.5393308Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 123,
+      "timestampUtc": "2026-10-22T00:11:54.5393308Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 124,
+      "timestampUtc": "2026-10-22T00:11:54.5393308Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 125,
+      "timestampUtc": "2026-10-22T00:11:54.5408346Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Far Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 126,
+      "timestampUtc": "2026-10-22T00:11:54.5509176Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Floor_Tile (Floor Near Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 127,
+      "timestampUtc": "2026-10-22T00:11:54.5509176Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Step_Tile (Stair Near Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 128,
+      "timestampUtc": "2026-10-22T00:11:54.5520931Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Pillar (Pillar Near Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    },
+    {
+      "seq": 129,
+      "timestampUtc": "2026-10-22T00:11:54.5520931Z",
+      "level": "error",
+      "message": "Material 'Aero_WhiteMarble_Arch (Arch Near Instanced)' with Shader 'TowerOfBabel/Buildings/Aquatic Finish' doesn't have a texture property '_WaterLight'"
+    }
+  ],
+  "final": {
+    "entries": [],
+    "cursor": 130,
+    "session": "e388d7149eae4dc08eaf85fd7eaee3ba",
+    "returned": 0,
+    "dropped": false,
+    "reset": false,
+    "counts": {
+      "error": 51,
+      "warn": 3,
+      "log": 76
+    },
+    "groundTruth": {
+      "sampledUtc": "2026-10-22T00:16:28.0519609Z",
+      "ageMs": 72,
+      "compilationFailed": false,
+      "compiling": false,
+      "consoleErrors": 0,
+      "consoleWarnings": 0,
+      "consoleLogs": 0,
+      "seeded": true
+    }
+  }
+}

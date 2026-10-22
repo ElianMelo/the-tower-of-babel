@@ -1,12 +1,12 @@
 # Frutiger Aero building kit
 
-Aquatic architecture revision, 2026-10-21; awaiting user review.
+Opaque aquatic finish restored, 2026-10-21. The subsequent see-through border experiment was rejected by the user.
 
 The primary target is now `frutiger-building-sample-2.jpg`, explicitly selected by the user. The kit also follows the ten images in `Assets/_Project/References/Buildings/` and the supplied red arch annotation, preserved at `Frutiger Reference/Asset/Building-Arch-Full-Spandrel-User.png`. The building palette is white with blue details. No green colors occur in its eight-color palette. Older UI references using green do not override this building brief.
 
-![Unity white marble kit](Previews/AquaticArchitecture-Kit.png)
+![Restored aquatic finish kit](Previews/AeroFlow-Kit.png)
 
-See [the current aquatic architecture revision](AQUATIC_ARCHITECTURE.md) for the visual direction, texture settings, editable source and current inspection results. The earlier glass/water and high-triangle rounded versions are superseded.
+See [the current aquatic finish](AERO_FLOW_SHADER.md) for moving water, material controls and verification. [Aquatic architecture](AQUATIC_ARCHITECTURE.md) remains the current geometry direction. [See-through borders](BORDER_GLASS.md) are a rejected experiment retained as history.
 
 ## Design
 
@@ -15,23 +15,23 @@ See [the current aquatic architecture revision](AQUATIC_ARCHITECTURE.md) for the
 - **Pillar:** continuous white support with restrained integral aqua collars and a smooth shaft.
 - **Step_Tile:** matching white tread with a rounded white nosing and aqua side band.
 
-All assets use one root MeshFilter, one root MeshRenderer and one submesh. Each model has its own opaque material preset using the shared `TowerOfBabel/Buildings/White Marble` shader. This keeps all details compatible with the existing far renderer, which renders submesh zero only. All four presets support GPU instancing.
+All assets use one root MeshFilter, one root MeshRenderer and one submesh. Each model has one opaque preset using the shared `TowerOfBabel/Buildings/Aquatic Finish` shader. The active finish supports the existing instanced renderer and submesh zero. The glass keyword is disabled on all four presets and the extra renderer feature has been removed from both PC and mobile renderers.
 
-## Current white marble finish
+## Current aquatic finish
 
-The latest user reference is preserved in `Frutiger Reference/Asset/Building-White-Marble-User.png` and imported directly as the marble texture. This revision supersedes the transparent glass and animated water direction.
+The white marble reference remains the subtle base texture. The latest shader request reintroduces controlled water animation in the blue glazing and narrow borders while retaining the white architectural forms.
 
-- Predominantly white stone with gray veins from the supplied image and restrained pale blue inlays.
-- Opaque URP PBR lighting, polished dielectric reflections, shadows, depth and depth-normal passes.
+- Predominantly white stone with faint gray veins, aqua recesses and frosted glass borders.
+- Opaque URP PBR lighting, clear coat, soft Fresnel edges, shadows, depth and matching animated depth normals.
 - Triplanar marble mapping combines with unique UV0 baked color/normal/AO maps. Mirror wrapping softens marble repeat boundaries; per-building offsets vary vein placement. UV1 retains palette coordinates.
-- Vein strength 0.10, scale 0.28 repeats per metre, inlay tint strength 0.10; polish varies slightly by model. No water animation or transparency is active.
+- Vein strength 0.10, scale 0.28 repeats per metre, inlay tint strength 0.10; polish and water intensity vary by model. Flowing ripple normals and two apparent caustic layers use stable per-instance variation. Glazing remains opaque; fine water detail fades out by 85 m. Border width/strength are restored to 0.11 m/0.7.
 - The current low-poly revision changes mesh detail while retaining prefab structure, outer bounds and gameplay configuration.
 
-The current revision reduces the four-model triangle total from the earlier 10,620-triangle rounded kit to 3,012 (71.6%) and uses actual rounded shells and recessed panels, with baked normals and AO. See [low-poly geometry and baked detail](LOW_POLY_AERO.md). The [earlier classical low-poly revision](LOW_POLY_AERO.md) and [rounded geometry notes](MARBLE.md#rounded-geometry-and-normal-map) are retained as history.
+The geometry reduces the four-model triangle total from the earlier 10,620-triangle rounded kit to 3,012 (71.6%) and uses actual rounded shells and recessed panels, with baked normals and AO. This shader revision does not change the meshes. See [current geometry](AQUATIC_ARCHITECTURE.md). The [earlier classical low-poly revision](LOW_POLY_AERO.md) and [rounded geometry notes](MARBLE.md#rounded-geometry-and-normal-map) are retained as history.
 
-![White marble arch](Previews/AquaticArchitecture-Arch.png)
+![Animated aqua arch](Previews/AeroFlow-Motion.gif)
 
-The shader uses the supplied image directly. Current material and validation details are in [AQUATIC_ARCHITECTURE.md](AQUATIC_ARCHITECTURE.md). The desktop Editor was validated; no mobile build was performed.
+The shader retains the supplied marble image and generated seamless technical water fields. The animation above shows the restored opaque finish; current material details are in [AERO_FLOW_SHADER.md](AERO_FLOW_SHADER.md). The desktop Editor was inspected; no mobile build was performed.
 
 The current material is authored and rendered in Unity. The low-poly Blender source contains the high-detail geometry used to bake the ornament; final marble lighting and material controls are authored in Unity.
 
@@ -58,9 +58,13 @@ The arch's upper plane is calculated from the current tower generator: a 6-metre
 - `Tools/BuildingAero/build_aquatic_architecture.py` — current Blender MCP source, using `build_lowpoly_baked.py` for geometry, UV, bake and FBX helpers. `build_assets.py` retains the previous rounded version.
 - `Tools/BuildingAero/ImportBuildingAero.cs` — Unity MCP `script eval_file` authoring snippet for import and prefab updates. Run in Edit Mode in this project.
 - `Tools/BuildingAero/BuildReviewScene.cs` — Unity MCP authoring snippet that reconstructs the studio scene. Requires a saved current scene.
-- `Assets/_Project/Shaders/BuildingWhiteMarble.shader` — current opaque instanced URP marble shader.
+- `Assets/_Project/Shaders/BuildingAquaticFinish.shader` and `BuildingAquaticFlow.hlsl` — current opaque instanced URP marble/glaze shader and moving water helpers.
+- `Assets/_Project/Shaders/BuildingWhiteMarble.shader` — historical static marble shader, retained as an alternative.
 - `Tools/BuildingAero/ApplyWhiteMarble.cs` — current Unity MCP material, texture-import and prefab configuration.
-- `Tools/BuildingAero/CaptureWhiteMarble.cs` — current static review captures; restores the camera afterward.
+- `Tools/BuildingAero/CaptureWhiteMarble.cs` — current `AeroFlow-*` still review captures; restores the camera afterward.
+- `Tools/BuildingAero/RestoreAquaticFinish.cs` — restores the opaque presets and removes the rejected glass feature from the project renderers.
+- `Tools/BuildingAero/ConfigureBorderGlass.cs` and `CaptureBorderGlass.cs` — historical rejected glass authoring; do not run unless the user requests that experiment again.
+- `Tools/BuildingAero/CaptureAquaticFlow.cs`, `CaptureLiveAquaticFlow.cs` and `assemble_aquatic_previews.py` — controlled and live-clock visual captures, instance comparisons and animated preview assembly.
 - `Tools/BuildingAero/bake_marble_normal.py` — Cycles tangent-space normal-map bake for vein relief and mineral grain.
 - `Assets/_Project/Shaders/BuildingWaterGlass.shader` — superseded instanced URP water-glass shader, retained as iteration history.
 - `Tools/BuildingAero/make_caustics.py` — reproducible seamless caustic texture generation.
@@ -72,7 +76,7 @@ The FBX exporter uses baked axes and units; import uses baked axis conversion wi
 
 ## Current validation
 
-The current revision was inspected in Unity Edit Mode and the live Tower: all four low-poly meshes and baked maps, all construction-stage slots, working arch collision, 717 nearby pieces and 44 far batches. No new runtime errors occurred. The original clean Tower scene is restored in Edit Mode. See [current inspection records](AQUATIC_ARCHITECTURE.md#validation).
+The opaque aquatic finish was restored through Unity API changes and inspected in Edit Mode renders. Shader/C# compilation are clean; all four glass keywords are off and both renderer features are removed. No automated tests or Play Mode session were run for the restoration. The original clean Tower scene is restored in Edit Mode. See [restoration record](AquaticFinishRestored.json) and [aquatic finish verification](AERO_FLOW_SHADER.md#verification).
 
 ## Historical validation
 

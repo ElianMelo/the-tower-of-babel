@@ -14,7 +14,7 @@ foreach(var name in new[]{"Arch","Floor_Tile","Pillar","Step_Tile"}){
         surface=material.GetTexture("_BakedSurface")?.name,normal=material.GetTexture("_BakedNormal")?.name,ao=material.GetTexture("_BakedAO")?.name,
         material.enableInstancing,material.renderQueue,collider=root.GetComponent<Collider>().GetType().Name});
 }
-var shader=Shader.Find("TowerOfBabel/Buildings/White Marble");
+var shader=Shader.Find("TowerOfBabel/Buildings/Aquatic Finish");
 var report=new{models=rows,messages=ShaderUtil.GetShaderMessages(shader).Select(x=>new{x.message,severity=x.severity.ToString()}).ToArray()};
-System.IO.File.WriteAllText("Documentation/FrutigerAero/Buildings/AquaticArchitectureInspection.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));
+System.IO.File.WriteAllText("Documentation/FrutigerAero/Buildings/AeroFlowInspection.json",Newtonsoft.Json.JsonConvert.SerializeObject(report,Newtonsoft.Json.Formatting.Indented));
 return report;

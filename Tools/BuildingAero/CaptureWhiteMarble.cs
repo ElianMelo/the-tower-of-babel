@@ -13,9 +13,9 @@ const string output="Documentation/FrutigerAero/Buildings/Previews";
 System.IO.Directory.CreateDirectory(output);
 Action<string,Vector3,Vector3,float> capture=(name,pos,look,zoom)=>{
     camera.transform.position=pos;camera.transform.LookAt(look);camera.orthographicSize=zoom;
-    camera.targetTexture=rt;camera.Render();RenderTexture.active=rt;
+    camera.targetTexture=rt;for(int warm=0;warm<6;warm++)camera.Render();RenderTexture.active=rt;
     texture.ReadPixels(new Rect(0,0,1400,1050),0,0);texture.Apply();
-    System.IO.File.WriteAllBytes(output+"/AquaticArchitecture-"+name+".png",texture.EncodeToPNG());
+    System.IO.File.WriteAllBytes(output+"/AeroFlow-"+name+".png",texture.EncodeToPNG());
 };
 try{
     capture("Kit",new Vector3(15,11.3f,-23),new Vector3(1.25f,2.3f,-.3f),6.3f);
@@ -39,5 +39,5 @@ try{
     camera.targetTexture=target;RenderTexture.active=active;
     UnityEngine.Object.DestroyImmediate(rt);UnityEngine.Object.DestroyImmediate(texture);
 }
-var shader=Shader.Find("TowerOfBabel/Buildings/White Marble");
+var shader=Shader.Find("TowerOfBabel/Buildings/Aquatic Finish");
 return new{shader=shader.name,messages=ShaderUtil.GetShaderMessages(shader).Select(x=>new{x.message,severity=x.severity.ToString()}).ToArray()};

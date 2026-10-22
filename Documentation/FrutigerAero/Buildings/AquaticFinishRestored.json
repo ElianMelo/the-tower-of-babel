@@ -1,0 +1,66 @@
+{
+  "restored": "Opaque aquatic finish with layered moving water; see-through glass rejected by user",
+  "renderers": [
+    {
+      "path": "Assets/Settings/PC_Renderer.asset",
+      "features": [
+        "ScreenSpaceAmbientOcclusion",
+        "FreeOutline",
+        "StylizedWaterRenderFeature"
+      ],
+      "removed": 1
+    },
+    {
+      "path": "Assets/Settings/Mobile_Renderer.asset",
+      "features": [
+        "FreeOutline",
+        "StylizedWaterRenderFeature"
+      ],
+      "removed": 1
+    }
+  ],
+  "materials": [
+    {
+      "name": "Arch",
+      "shader": "TowerOfBabel/Buildings/Aquatic Finish",
+      "seeThrough": 0.0,
+      "keyword": false,
+      "borderWidth": 0.11,
+      "borderStrength": 0.7,
+      "clock": -1.0,
+      "enableInstancing": true
+    },
+    {
+      "name": "Floor_Tile",
+      "shader": "TowerOfBabel/Buildings/Aquatic Finish",
+      "seeThrough": 0.0,
+      "keyword": false,
+      "borderWidth": 0.11,
+      "borderStrength": 0.7,
+      "clock": -1.0,
+      "enableInstancing": true
+    },
+    {
+      "name": "Pillar",
+      "shader": "TowerOfBabel/Buildings/Aquatic Finish",
+      "seeThrough": 0.0,
+      "keyword": false,
+      "borderWidth": 0.11,
+      "borderStrength": 0.7,
+      "clock": -1.0,
+      "enableInstancing": true
+    },
+    {
+      "name": "Step_Tile",
+      "shader": "TowerOfBabel/Buildings/Aquatic Finish",
+      "seeThrough": 0.0,
+      "keyword": false,
+      "borderWidth": 0.11,
+      "borderStrength": 0.7,
+      "clock": -1.0,
+      "enableInstancing": true
+    }
+  ],
+  "compilationFailed": false,
+  "shaderMessages": []
+}

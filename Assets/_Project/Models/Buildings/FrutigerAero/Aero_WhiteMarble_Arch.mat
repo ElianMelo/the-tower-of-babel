@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Aero_WhiteMarble_Arch
-  m_Shader: {fileID: 4800000, guid: 14de9626145ecad49859e52ad2becdf7, type: 3}
+  m_Shader: {fileID: 4800000, guid: e34f42ac5a3426d49ab8881910cd94e3, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -47,8 +47,16 @@ Material:
         m_Texture: {fileID: 2800000, guid: c2372f64652ee3c4f80760ccd9f023c2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _WaterField:
+        m_Texture: {fileID: 2800000, guid: 86208202b5cf2d648bc1a541322edf84, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _WaterLightMap:
         m_Texture: {fileID: 2800000, guid: 553a5cb7f0b7e2141b85a9f589e2203e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _WaterRippleNormal:
+        m_Texture: {fileID: 2800000, guid: 8533f55bb26d39145a7034fcf7c60339, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -56,9 +64,27 @@ Material:
     - _AOStrength: 0.1
     - _AeroGloss: 0
     - _BakedStrength: 0.65
+    - _BorderGlass: 0
     - _Cull: 2
+    - _DebugAlbedo: 0
     - _DetailStrength: 0.08
+    - _FlowDistortion: 0.9
+    - _FlowSpeed: 0.075
+    - _GlassBorderStrength: 0.7
+    - _GlassBorderWidth: 0.11
+    - _GlassEdgeStrength: 0.15
+    - _GlassIOR: 1.45
+    - _GlassRefraction: 0.8
+    - _GlassThickness: 0.12
+    - _GlassTransmission: 0.86
+    - _GlazeReflection: 0.25
+    - _InnerCausticStrength: 0.4
+    - _InnerDepth: 0.06
+    - _InstanceVariation: 1
+    - _InteriorStrength: 0.45
     - _MarbleScale: 0.28
+    - _ModelKind: 0
+    - _MotionTime: -1
     - _NormalStrength: 0.12
     - _PatternSeed: 0.37
     - _PearlCoat: 0.55
@@ -66,10 +92,16 @@ Material:
     - _TextureAspect: 1.5003663
     - _UseGeometryColors: 0
     - _VeinStrength: 0.1
+    - _WaterDetailDistance: 85
     - _WaterLightStrength: 0.12
+    - _WaterNormalStrength: 0.035
+    - _WaterScale: 0.85
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _DetailTint: {r: 0.72, g: 0.83, b: 0.95, a: 1}
+    - _GlassTint: {r: 0.68, g: 0.93, b: 1, a: 1}
     - _GlazeColor: {r: 0.26, g: 0.74, b: 0.9, a: 1}
+    - _WaterDeepColor: {r: 0.08, g: 0.48, b: 0.7, a: 1}
+    - _WaterLightColor: {r: 0.53, g: 0.88, b: 0.98, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,6 +1,6 @@
 # Aquatic architecture revision
 
-Current revision, 2026-10-21; awaiting user review. The user identified `Assets/_Project/References/Buildings/frutiger-building-sample-2.jpg` as the specific target after rejecting the pearl-shell version. This direction supersedes [AERO_SHELLS.md](AERO_SHELLS.md).
+Current geometry revision, 2026-10-21. The user identified `Assets/_Project/References/Buildings/frutiger-building-sample-2.jpg` as the specific target after rejecting the pearl-shell version. This direction supersedes [AERO_SHELLS.md](AERO_SHELLS.md). The geometry was subsequently retained and the finish updated in [Aquatic finish shader](AERO_FLOW_SHADER.md); static-water material descriptions and captures below document the earlier finish.
 
 ![Current Unity kit](Previews/AquaticArchitecture-Kit.png)
 
@@ -29,7 +29,7 @@ Color boundaries on the pillar and slabs come from UV1 coordinates attached to t
 - `Tools/BuildingAero/build_aquatic_architecture.py`: current Blender MCP source. Call `build()`, `bake_one(name)` for the four models, then `finish()`. It reuses the earlier geometry/bake helpers without rebuilding their historical scenes.
 - `ImportBuildingAero.cs` and `ApplyWhiteMarble.cs`: Unity MCP import/material/prefab authoring.
 - `TuneAquaticReview.cs`: dedicated review-scene lighting and baked studio reflection capture. Reflection fixtures use layer 31 and are hidden from the review camera. These fixtures, environment settings and studio materials are confined to the review scene and do not change Tower lighting.
-- `CaptureWhiteMarble.cs`: current `AquaticArchitecture-*` images, including a perspective assembly view. Restores camera/material settings and disables asynchronous shader compilation during capture.
+- `CaptureWhiteMarble.cs`: captures the current `AeroFlow-*` views, including a perspective assembly view. Earlier `AquaticArchitecture-*` images below preserve the static finish. Restores camera/material settings and disables asynchronous shader compilation during capture.
 
 ## Validation
 
