@@ -56,6 +56,7 @@ for(int i=0;i<names.Length;i++){
     if(material==null){material=new Material(shader);AssetDatabase.CreateAsset(material,path);}
     material.shader=shader;material.shaderKeywords=Array.Empty<string>();material.enableInstancing=true;
     material.SetFloat("_BorderGlass",0);material.DisableKeyword("_AERO_BORDER_GLASS");
+    material.SetFloat("_RadialFloor",0); // Only tower renderer clones enable per-instance bending.
     material.SetTexture("_MarbleMap",texture);
     material.SetTexture("_NormalMap",AssetDatabase.LoadAssetAtPath<Texture2D>(dir+"/Aero_WhiteMarble_Normal.png"));
     material.SetFloat("_NormalStrength",.12f);

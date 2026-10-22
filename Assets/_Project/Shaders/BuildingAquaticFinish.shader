@@ -50,6 +50,8 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
         _GlassIOR("Glass index of refraction", Range(1,2)) = 1.45
         _GlassTint("Glass absorption tint", Color) = (.68,.93,1,1)
         _PatternSeed("Model variation seed", Float) = 0
+        [HideInInspector] _RadialFloor("Tower radial floor", Float) = 0
+        [HideInInspector] _RadialFloorCenter("Tower floor center XZ", Vector) = (0,0,0,0)
         [Enum(UnityEngine.Rendering.CullMode)] _Cull("Cull", Float) = 2
     }
     SubShader
@@ -80,6 +82,8 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             float _GlassThickness,_GlassRefraction,_GlassIOR;
             half _BorderGlass,_GlassTransmission;
             half4 _GlassTint;
+            float _RadialFloor;
+            float4 _RadialFloorCenter;
         CBUFFER_END
         struct Attributes
         {
@@ -88,6 +92,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             float4 tangentOS:TANGENT;
             float2 uv:TEXCOORD0;
             float2 paletteUV:TEXCOORD1;
+            float3 floorPatch:TEXCOORD2;
             UNITY_VERTEX_INPUT_INSTANCE_ID
         };
         struct Varyings
@@ -104,10 +109,13 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             UNITY_VERTEX_INPUT_INSTANCE_ID
             UNITY_VERTEX_OUTPUT_STEREO
         };
+        #include "BuildingRadialFloor.hlsl"
         Varyings Vert(Attributes input)
         {
             Varyings o=(Varyings)0;
             UNITY_SETUP_INSTANCE_ID(input);
+            float3 unbentPosition=input.positionOS.xyz;
+            BendRadialFloor(input);
             UNITY_TRANSFER_INSTANCE_ID(input,o);
             UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
             VertexPositionInputs p=GetVertexPositionInputs(input.positionOS.xyz);
@@ -115,7 +123,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             o.normalWS=TransformObjectToWorldNormal(input.normalOS);
             o.tangentWS=half4(TransformObjectToWorldDir(input.tangentOS.xyz),input.tangentOS.w*GetOddNegativeScale());
             o.paletteUV=input.paletteUV;
-            o.positionOS=input.positionOS.xyz;
+            o.positionOS=_RadialFloor>1.5?input.floorPatch:unbentPosition;
             o.uv=input.uv;o.fog=ComputeFogFactor(p.positionCS.z);
             float3 origin=TransformObjectToWorld(float3(0,0,0));
             float3 q=frac(floor(origin*32+.5)*float3(.1031,.1030,.0973)+_PatternSeed*.137);

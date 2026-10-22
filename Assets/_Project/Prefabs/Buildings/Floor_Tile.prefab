@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5512916851017535467}
   - component: {fileID: 8506526495336362229}
   - component: {fileID: 900000000000000002}
-  - component: {fileID: 6012879646623519156}
+  - component: {fileID: 5738932744482199347}
   m_Layer: 0
   m_Name: Floor_Tile
   m_TagString: Untagged
@@ -152,8 +152,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
   settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
---- !u!65 &6012879646623519156
-BoxCollider:
+--- !u!64 &5738932744482199347
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -170,6 +170,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 4, y: 0.19999999, z: 4}
-  m_Center: {x: 2, y: -0.099999994, z: -2}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6343086628222001670, guid: d0b1bfdfbf07f0540978e486f65dc665, type: 3}

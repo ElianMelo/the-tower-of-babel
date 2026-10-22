@@ -69,6 +69,10 @@ namespace TowerOfBabel.World.Chunks
         [SerializeField, Min(0.01f)] private float floorHeight = 6f;
         [SerializeField] private List<ChunkSceneCache> cachedChunks = new();
         [SerializeField] private TowerAssetPrefabSet assetPrefabs = new();
+        [SerializeField] private bool radialFloors;
+        [SerializeField] private Vector2 floorCenter;
+        [SerializeField] private float floorRadialDepth = 3.9f;
+        [SerializeField] private float floorArcLength = 3.351032f;
         [Tooltip("Component implementing IFarChunkRenderer. Defaults to one on this GameObject.")]
         [SerializeField] private MonoBehaviour farChunkRendererComponent;
         [Tooltip("Growable per-type pool used for the 3x3x3 near neighborhood.")]
@@ -107,6 +111,10 @@ namespace TowerOfBabel.World.Chunks
             }
         }
         public TowerAssetPrefabSet AssetPrefabs => assetPrefabs;
+        public bool RadialFloors => radialFloors;
+        public Vector2 FloorCenter => floorCenter;
+        public float FloorRadialDepth => floorRadialDepth;
+        public float FloorArcLength => floorArcLength;
         public int TrackedPlayerCount => trackedPlayers.Count;
 
         public event Action<ChunkKey, ChunkKey> CurrentChunkChanged;
@@ -209,7 +217,46 @@ namespace TowerOfBabel.World.Chunks
             assetPrefabs.SetPrefab(TowerAssetType.Stair, generator.GetModelPrefab(TowerAssetType.Stair));
             assetPrefabs.SetPrefab(TowerAssetType.Pillar, generator.GetModelPrefab(TowerAssetType.Pillar));
             assetPrefabs.SetPrefab(TowerAssetType.Arch, generator.GetModelPrefab(TowerAssetType.Arch));
+            radialFloors = TowerFloorLayout.SupportsRadialFloor(generator.GetModelPrefab(TowerAssetType.Floor));
+            floorCenter = generator.center;
+            floorRadialDepth = generator.tileDecreaseRate;
+            floorArcLength = generator.radius * generator.tileAngle * Mathf.Deg2Rad;
         }
+
+#if UNITY_EDITOR
+        /// <summary>Rebuild only floor data while retaining the other assets and their stages.</summary>
+        public void ReplaceCachedFloors(IEnumerable<ChunkAssetData> floors)
+        {
+            if (Application.isPlaying) throw new InvalidOperationException("Rebuild floor data in Edit Mode.");
+            var grouped = new Dictionary<ChunkKey, List<ChunkAssetData>>();
+            void Add(ChunkAssetData asset)
+            {
+                ChunkKey key = WorldToChunk(asset.Position);
+                if (!grouped.TryGetValue(key, out var list)) grouped.Add(key, list = new List<ChunkAssetData>());
+                list.Add(asset);
+            }
+            foreach (var chunk in cachedChunks)
+                foreach (var asset in chunk.Assets)
+                    if (asset.AssetType != TowerAssetType.Floor) Add(asset);
+            foreach (var asset in floors) Add(asset);
+            var keys = new List<ChunkKey>(grouped.Keys); keys.Sort(); cachedChunks.Clear();
+            foreach (var key in keys)
+            {
+                var list = grouped[key];
+                list.Sort((a, b) =>
+                {
+                    int value = a.AssetType.CompareTo(b.AssetType);
+                    if (value == 0) value = CompareVector(a.Position, b.Position);
+                    return value;
+                });
+                for (int i = 0; i < list.Count; i++) { var asset = list[i]; asset.SetLocalIndex(i); list[i] = asset; }
+                cachedChunks.Add(new ChunkSceneCache(key, list));
+            }
+            RebuildChunkLookup(); visibilityInitialized = false;
+            UnityEditor.EditorUtility.SetDirty(this);
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
+        }
+#endif
 
         public bool SetAssetStage(ChunkKey key, int localIndex, byte stage)
         {

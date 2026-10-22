@@ -34,6 +34,7 @@ namespace TowerOfBabel.World.Chunks
         private readonly List<PendingActivation> pendingActivations = new();
         private TowerAssetPrefabSet prefabs;
         private ChunkManager chunkManager;
+        private readonly RadialFloorMeshCache floorMeshes = new();
 
         public int ActiveInstanceCount => activeAssets.Count;
         public int ActiveChunkCount => activeChunks.Count;
@@ -141,6 +142,7 @@ namespace TowerOfBabel.World.Chunks
 
             current.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
             ApplyTransform(current.GameObject.transform, asset);
+            ConfigureFloorGeometry(current, asset);
             ActivateInstance(current);
             return true;
         }
@@ -216,7 +218,10 @@ namespace TowerOfBabel.World.Chunks
                 }
 
                 for (int i = 0; i < count; i++)
+                {
+                    ConfigureFloorGeometry(pendingActivations[i].Instance, pendingActivations[i].Asset);
                     ActivateInstance(pendingActivations[i].Instance);
+                }
             }
 
             LastPositionedAssetCount = count;
@@ -302,7 +307,7 @@ namespace TowerOfBabel.World.Chunks
                 Debug.LogError($"Near tower pool has no prefab for {assetType}.", this);
                 return;
             }
-            pools.Add(assetType, new TypePool(assetType, prefab, poolRoot));
+            pools.Add(assetType, new TypePool(assetType, prefab, poolRoot, chunkManager));
         }
 
         private void DisposePools()
@@ -311,6 +316,7 @@ namespace TowerOfBabel.World.Chunks
             foreach (TypePool pool in pools.Values)
                 pool.Dispose();
             pools.Clear();
+            floorMeshes.Dispose();
         }
 
         private void OnDestroy()
@@ -322,6 +328,20 @@ namespace TowerOfBabel.World.Chunks
         {
             instanceTransform.SetPositionAndRotation(asset.Position, asset.Rotation);
             instanceTransform.localScale = WorldToLocalScale(asset.Scale, poolRoot.lossyScale);
+        }
+
+        private void ConfigureFloorGeometry(PooledInstance instance, ChunkAssetData asset)
+        {
+            if (asset.AssetType != TowerAssetType.Floor || chunkManager == null || !chunkManager.RadialFloors) return;
+            var collider = instance.GameObject.GetComponent<MeshCollider>();
+            if (collider == null) return;
+            var filter = instance.GameObject.GetComponent<MeshFilter>();
+            Mesh source = instance.Building != null ? instance.Building.GetStageMesh(asset.Stage) : filter.sharedMesh;
+            float radius = Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), chunkManager.FloorCenter);
+            Mesh mesh = floorMeshes.Get(source, radius, asset.Scale);
+            filter.sharedMesh = mesh;
+            collider.sharedMesh = mesh;
+            instance.GameObject.GetComponent<MeshRenderer>().localBounds = mesh.bounds;
         }
 
         private static Vector3 WorldToLocalScale(Vector3 worldScale, Vector3 parentScale)
@@ -395,6 +415,7 @@ namespace TowerOfBabel.World.Chunks
             private readonly TowerAssetType assetType;
             private readonly GameObject prefab;
             private readonly Transform root;
+            private readonly ChunkManager chunkManager;
             private readonly Stack<PooledInstance> available = new();
             private readonly List<PooledInstance> instances = new();
             private readonly List<PooledInstance> deferredReturns = new();
@@ -402,11 +423,12 @@ namespace TowerOfBabel.World.Chunks
 
             public int Capacity => instances.Count;
 
-            public TypePool(TowerAssetType assetType, GameObject prefab, Transform root)
+            public TypePool(TowerAssetType assetType, GameObject prefab, Transform root, ChunkManager chunkManager)
             {
                 this.assetType = assetType;
                 this.prefab = prefab;
                 this.root = root;
+                this.chunkManager = chunkManager;
             }
 
             public PooledInstance Rent()
@@ -485,6 +507,8 @@ namespace TowerOfBabel.World.Chunks
                             };
                             if (runtime.HasProperty("_ReceiveShadows"))
                                 runtime.SetFloat("_ReceiveShadows", 0f);
+                            if (assetType == TowerAssetType.Floor && chunkManager != null)
+                                TowerFloorLayout.ConfigureMaterial(runtime, chunkManager.RadialFloors, chunkManager.FloorCenter, true);
                             runtimeMaterials.Add(source, runtime);
                         }
                         materials[materialIndex] = runtime;

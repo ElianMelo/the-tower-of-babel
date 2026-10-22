@@ -83,6 +83,14 @@ foreach(var name in new[]{"Arch","Floor_Tile","Pillar","Step_Tile"})
         var stages=serialized.FindProperty("stageMeshes");
         for(int i=0;i<stages.arraySize;i++)stages.GetArrayElementAtIndex(i).objectReferenceValue=mesh;
         serialized.ApplyModifiedPropertiesWithoutUndo();
+        if(name=="Floor_Tile")
+        {
+            var oldBox=root.GetComponent<BoxCollider>();
+            if(oldBox!=null)UnityEngine.Object.DestroyImmediate(oldBox);
+            var collider=root.GetComponent<MeshCollider>();
+            if(collider==null)collider=root.AddComponent<MeshCollider>();
+            collider.sharedMesh=mesh;collider.convex=false;
+        }
         if(name=="Arch")
         {
             // A full box would obstruct the arch's opening. Use its solid panel mesh.

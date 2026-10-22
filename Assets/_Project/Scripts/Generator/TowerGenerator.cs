@@ -30,34 +30,29 @@ public class TowerGenerator : MonoBehaviour
 
     private float baseHeight = 0f;
     private List<Vector3> stairs = new();
+    private readonly RadialFloorMeshCache floorMeshes = new();
 
     public bool IsBusy { get; private set; }
     public Transform TowerParent => parent;
 
     public void FillCurrentLevelFloor(float floorRadius, float baseLevel)
     {
-        float currentRadius = floorRadius;
-        float currentTileAngle = tileAngle;
-        int index = 0;
-        while (currentRadius > 0)
+        float arcLength = radius * tileAngle * Mathf.Deg2Rad;
+        Mesh template = TowerFloorLayout.SupportsRadialFloor(floorTileObject)
+            ? floorTileObject.GetComponent<MeshFilter>().sharedMesh : null;
+        foreach (var sector in TowerFloorLayout.Build(center, baseLevel, floorRadius,
+                     tileDecreaseRate, arcLength, floorTileObject.transform.localScale.y))
         {
-            currentTileAngle = tileAngle / (currentRadius / radius);
-
-            float angleRad = currentTileAngle * Mathf.Deg2Rad;
-            for (float angle = 0f; angle < Mathf.PI * 2f; angle += angleRad)
+            GameObject instance = CreateTowerAsset(floorTileObject, TowerAssetType.Floor, sector.Position, sector.Rotation);
+            instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x,
+                sector.Scale.y / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
+            if (template != null)
             {
-                Vector2 point = CalculatePillarPoint(angle, currentRadius);
-                Vector2 dir = (center - point).normalized;
-                float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
-                yAngle -= 90f;
-                CreateTowerAsset(
-                    floorTileObject,
-                    TowerAssetType.Floor,
-                    new Vector3(point.x, baseLevel + (index * 0.0001f), point.y),
-                    Quaternion.Euler(0, yAngle, 0));
-                index++;
+                Mesh mesh = floorMeshes.Get(template, sector.Radius, sector.Scale);
+                instance.GetComponent<MeshFilter>().sharedMesh = mesh;
+                var collider = instance.GetComponent<MeshCollider>();
+                if (collider != null) collider.sharedMesh = mesh;
             }
-            currentRadius -= tileDecreaseRate;
         }
     }
 
@@ -140,6 +135,7 @@ public class TowerGenerator : MonoBehaviour
                     DestroyImmediate(parent.GetChild(i).gameObject);
             }
             stairs.Clear();
+            floorMeshes.Dispose();
         }
         finally
         {
@@ -213,6 +209,8 @@ public class TowerGenerator : MonoBehaviour
             Mathf.Sin(value)
         ) * radius;
     }
+
+    private void OnDestroy() => floorMeshes.Dispose();
 
     public GameObject GetModelPrefab(TowerAssetType assetType)
     {

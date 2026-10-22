@@ -181,6 +181,7 @@ namespace TowerOfBabel.World.Chunks
         private void BuildModelBatches()
         {
             DisposeBatches();
+            if (chunkManager == null) chunkManager = GetComponent<ChunkManager>();
             if (models.Count > 0)
             {
                 for (int i = 0; i < models.Count; i++)
@@ -252,7 +253,7 @@ namespace TowerOfBabel.World.Chunks
 
                 Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
                 if (mesh != null)
-                    batches.Add(key, new TypeBatch(mesh, meshRenderer));
+                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType == TowerAssetType.Floor ? chunkManager : null));
             }
         }
 
@@ -383,12 +384,13 @@ namespace TowerOfBabel.World.Chunks
         {
             private readonly Mesh mesh;
             private readonly Material material;
+            private readonly Bounds meshBounds;
             private readonly Dictionary<RenderCellKey, RenderCell> cells = new();
             private readonly Dictionary<ChunkKey, RenderCellKey> cellByChunk = new();
 
             public int Count { get; private set; }
 
-            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer)
+            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, ChunkManager floorOwner)
             {
                 this.mesh = mesh;
                 Material sourceMaterial = sourceRenderer.sharedMaterial;
@@ -400,6 +402,13 @@ namespace TowerOfBabel.World.Chunks
                 };
                 if (material.HasProperty("_ReceiveShadows"))
                     material.SetFloat("_ReceiveShadows", 0f);
+                meshBounds = mesh.bounds;
+                if (floorOwner != null)
+                {
+                    TowerFloorLayout.ConfigureMaterial(material, floorOwner.RadialFloors, floorOwner.FloorCenter);
+                    if (floorOwner.RadialFloors)
+                        meshBounds = TowerFloorLayout.ConservativeBounds(mesh.bounds, floorOwner.FloorRadialDepth, floorOwner.FloorArcLength);
+                }
             }
 
             public void SetChunk(ChunkKey owner, RenderCellKey cellKey, List<Matrix4x4> matrices)
@@ -447,7 +456,7 @@ namespace TowerOfBabel.World.Chunks
                 foreach (RenderCell cell in cells.Values)
                 {
                     using (RebuildMarker.Auto())
-                        cell.RebuildIfDirty(mesh.bounds, useLightProbes);
+                        cell.RebuildIfDirty(meshBounds, useLightProbes);
 
                     IReadOnlyList<RenderPage> pages = cell.Pages;
                     for (int i = 0; i < pages.Count; i++)

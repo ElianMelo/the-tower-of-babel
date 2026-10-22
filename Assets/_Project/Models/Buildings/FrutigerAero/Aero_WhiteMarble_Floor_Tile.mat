@@ -88,6 +88,7 @@ Material:
     - _NormalStrength: 0.12
     - _PatternSeed: 12.099999
     - _PearlCoat: 0.55
+    - _RadialFloor: 0
     - _Smoothness: 0.88
     - _TextureAspect: 1.5003663
     - _UseGeometryColors: 1
@@ -101,6 +102,7 @@ Material:
     - _DetailTint: {r: 0.72, g: 0.83, b: 0.95, a: 1}
     - _GlassTint: {r: 0.68, g: 0.93, b: 1, a: 1}
     - _GlazeColor: {r: 0.26, g: 0.74, b: 0.9, a: 1}
+    - _RadialFloorCenter: {r: 0, g: 0, b: 0, a: 0}
     - _WaterDeepColor: {r: 0.08, g: 0.48, b: 0.7, a: 1}
     - _WaterLightColor: {r: 0.53, g: 0.88, b: 0.98, a: 1}
   m_BuildTextureStacks: []

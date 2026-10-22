@@ -35,6 +35,10 @@ def pillar(count=24,sculpt=False):
     return color_bands(obj,'Pillar')
 
 def slab(step=False):
+    if not step:
+        exec(compile((ROOT/'Tools/BuildingAero/radial_floor_patch.py').read_text(),'radial_patch','exec'),globals())
+        verts,faces=radial_floor_patch()
+        return color_bands(mesh_obj('White_RadialDeckPatch',verts,faces,0),'Tile')
     verts=[];stretch=1/.35 if step else 1
     levels=[(-.20,.055),(-.18,.015),(-.15,0),(-.08,0),(-.03,.018),(0,.055)]
     for y,inset in levels:
