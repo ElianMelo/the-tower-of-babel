@@ -319,14 +319,14 @@ namespace TowerOfBabel.World.Tests
             List<ChunkAssetData> assets = new(1025);
             for (int i = 0; i < 1024; i++)
                 assets.Add(new ChunkAssetData(i, TowerAssetType.Floor, Vector3.right * i,
-                    Quaternion.identity, Vector3.one));
+                    Quaternion.identity, Vector3.one, 1));
             assets.Add(new ChunkAssetData(1024, TowerAssetType.Floor, Vector3.zero,
                 Quaternion.identity, Vector3.one, 0));
             FarChunkSnapshot snapshot = new(key, assets);
             renderer.LoadChunk(in snapshot);
 
             Assert.That(renderer.LoadedChunkCount, Is.EqualTo(1));
-            Assert.That(renderer.LoadedInstanceCount, Is.EqualTo(1025));
+            Assert.That(renderer.LoadedInstanceCount, Is.EqualTo(1024), "Stage zero must stay near-only.");
             Assert.DoesNotThrow(() => InvokePrivate(renderer, "LateUpdate"));
 
             renderer.RemoveChunk(key);
@@ -375,12 +375,12 @@ namespace TowerOfBabel.World.Tests
             List<ChunkAssetData> visibleAssets = new()
             {
                 new ChunkAssetData(0, TowerAssetType.Floor, new Vector3(0f, 0f, 10f),
-                    Quaternion.identity, Vector3.one)
+                    Quaternion.identity, Vector3.one, 1)
             };
             List<ChunkAssetData> hiddenAssets = new()
             {
                 new ChunkAssetData(0, TowerAssetType.Floor, new Vector3(0f, 0f, -100f),
-                    Quaternion.identity, Vector3.one)
+                    Quaternion.identity, Vector3.one, 10)
             };
             FarChunkSnapshot visible = new(new ChunkKey(0, 0, 0), visibleAssets);
             FarChunkSnapshot hidden = new(new ChunkKey(0, 10, 0), hiddenAssets);

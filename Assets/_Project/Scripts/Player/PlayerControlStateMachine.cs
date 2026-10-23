@@ -23,6 +23,7 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
     private bool modalInputLocked;
 
     public PlayerControlState CurrentState { get; private set; } = PlayerControlState.Locked;
+    public bool CanScanConstruction => connected && !modalInputLocked;
     public event Action InteractionInterrupted;
     public event Action GatheringInterrupted
     {

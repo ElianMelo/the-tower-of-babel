@@ -142,6 +142,8 @@ namespace TowerOfBabel.World.Chunks
             for (int i = 0; i < assets.Count; i++)
             {
                 ChunkAssetData asset = assets[i];
+                // Blueprints exist only in the near pool; built stages remain visible at distance.
+                if (asset.Stage == 0) continue;
                 RenderBatchKey batchKey = new(asset.AssetType, asset.Stage);
                 if (!batches.ContainsKey(batchKey))
                     continue;

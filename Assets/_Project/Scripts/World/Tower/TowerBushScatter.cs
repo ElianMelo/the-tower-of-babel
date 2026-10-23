@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TowerOfBabel.World.Chunks;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -21,6 +22,7 @@ namespace TowerOfBabel.World.Tower
         [SerializeField, HideInInspector] private List<Placement> placements = new();
         private readonly List<Batch> batches = new();
         private readonly Plane[] planes = new Plane[6];
+        private ChunkManager chunkManager;
 
         [Serializable]
         public struct Placement
@@ -54,6 +56,7 @@ namespace TowerOfBabel.World.Tower
 
         private sealed class Batch
         {
+            public int floor;
             public Mesh mesh;
             public Material material;
             public Matrix4x4[] matrices;
@@ -64,6 +67,21 @@ namespace TowerOfBabel.World.Tower
         public IReadOnlyList<GameObject> BushPrefabs => bushPrefabs;
         public float StairClearance => stairClearance;
         public int BatchCount => batches.Count;
+        public int DrawnBatchCount { get; private set; }
+
+        public bool CanShowFloor(int floor)
+        {
+            if (chunkManager == null)
+            {
+                foreach (var manager in FindObjectsByType<ChunkManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                {
+                    if (manager.gameObject.scene != gameObject.scene) continue;
+                    chunkManager = manager;
+                    break;
+                }
+            }
+            return chunkManager != null && chunkManager.IsFloorVisible(floor) && chunkManager.IsFloorComplete(floor);
+        }
 
         [ContextMenu("Regenerate exterior bushes")]
         private void Regenerate() => Generate(GetComponent<TowerGenerator>());
@@ -201,7 +219,7 @@ namespace TowerOfBabel.World.Tower
                 for (int start=0; start<list.Count; start+=1023)
                 {
                     int count=Mathf.Min(1023,list.Count-start);
-                    var batch=new Batch {mesh=prefab.GetComponent<MeshFilter>().sharedMesh,material=prefab.GetComponent<MeshRenderer>().sharedMaterial,
+                    var batch=new Batch {floor=pair.Key.floor,mesh=prefab.GetComponent<MeshFilter>().sharedMesh,material=prefab.GetComponent<MeshRenderer>().sharedMaterial,
                         matrices=new Matrix4x4[count],bounds=new Bounds(list[start].position,Vector3.zero)};
                     for (int j=0; j<count; j++)
                     {
@@ -217,15 +235,18 @@ namespace TowerOfBabel.World.Tower
 
         public void Draw(Camera camera)
         {
+            DrawnBatchCount = 0;
             if (camera==null) return;
             GeometryUtility.CalculateFrustumPlanes(camera,planes);
             foreach (var batch in batches)
             {
+                if (Application.isPlaying && !CanShowFloor(batch.floor)) continue;
                 if (batch.bounds.SqrDistance(camera.transform.position)>visibleDistance*visibleDistance ||
                     !GeometryUtility.TestPlanesAABB(planes,batch.bounds)) continue;
                 var settings=new RenderParams(batch.material) {camera=camera,worldBounds=batch.bounds,layer=gameObject.layer,
                     shadowCastingMode=ShadowCastingMode.On,receiveShadows=true,lightProbeUsage=LightProbeUsage.Off};
                 Graphics.RenderMeshInstanced(settings,batch.mesh,0,batch.matrices);
+                DrawnBatchCount++;
             }
         }
 

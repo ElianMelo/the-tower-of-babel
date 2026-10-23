@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
+using TowerOfBabel.Buildings;
+using TowerOfBabel.World.Chunks;
 
 namespace TowerOfBabel.Resources.Interaction
 {
@@ -15,6 +18,13 @@ namespace TowerOfBabel.Resources.Interaction
 
         [SerializeField] private string promptFormat = "{0}";
         [SerializeField] private PlayerControlStateMachine playerStateMachine;
+
+        [Header("Construction scan")]
+        [SerializeField, Min(0.1f)] private float constructionScanRadius = 15f;
+        public const float ConstructionScanDuration = 2f;
+        private readonly List<Building> scannedBuildings = new();
+        private ChunkManager constructionChunks;
+        private float scanExpiresAt;
 
         public GameObject CurrentTarget { get; private set; }
 
@@ -50,6 +60,9 @@ namespace TowerOfBabel.Resources.Interaction
 
         private void Update()
         {
+            RefreshConstructionScan();
+            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+                ScanNearbyConstruction();
             if (activeInteraction != null)
             {
                 UpdateActiveInteraction();
@@ -70,6 +83,44 @@ namespace TowerOfBabel.Resources.Interaction
 
             if (currentInteractable != null && currentInteractable.CanInteract && Input.GetKeyDown(KeyCode.E))
                 TryBeginCurrentInteraction();
+        }
+
+        public bool ScanNearbyConstruction()
+        {
+            if (playerStateMachine == null || !playerStateMachine.CanScanConstruction)
+                return false;
+            ClearConstructionScan();
+            if (constructionChunks == null)
+                constructionChunks = FindFirstObjectByType<ChunkManager>();
+            if (constructionChunks == null) return false;
+            constructionChunks.GetNearbyConstruction(transform.position, constructionScanRadius, scannedBuildings);
+            scanExpiresAt = Time.unscaledTime + ConstructionScanDuration;
+            foreach (Building building in scannedBuildings) building.SetScanHighlighted(true);
+            return true;
+        }
+
+        private void RefreshConstructionScan()
+        {
+            if (Time.unscaledTime >= scanExpiresAt || playerStateMachine == null ||
+                !playerStateMachine.CanScanConstruction)
+            {
+                ClearConstructionScan();
+                return;
+            }
+            for (int i = scannedBuildings.Count - 1; i >= 0; i--)
+            {
+                Building building = scannedBuildings[i];
+                if (building != null && building.IsConstructionAvailable) continue;
+                if (building != null) building.SetScanHighlighted(false);
+                scannedBuildings.RemoveAt(i);
+            }
+        }
+
+        private void ClearConstructionScan()
+        {
+            foreach (Building building in scannedBuildings)
+                if (building != null) building.SetScanHighlighted(false);
+            scannedBuildings.Clear();
         }
 
         private void SetTarget(GameObject target)
@@ -146,6 +197,7 @@ namespace TowerOfBabel.Resources.Interaction
 
         private void OnDisable()
         {
+            ClearConstructionScan();
             if (activeInteraction != null)
                 CancelCurrentInteraction();
             else

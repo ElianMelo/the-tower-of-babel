@@ -18,6 +18,8 @@ The default saved layout contains **158 bushes across 17 terraces**: 76 small, 5
 
 ## Wind and rendering
 
+During gameplay, each terrace's bushes stay hidden until every cached construction asset on that floor reaches stage 10 and the floor is unlocked. The instanced renderer checks completion before submitting each terrace batch. Completion reveals the bushes immediately; rollback hides them again. Edit Mode authoring previews continue to show the foliage layout.
+
 The opaque URP shader bends upper foliage in two slow sine/cosine waves and adds smaller leaf flutter. Vertex alpha increases the response with height, keeping the base effectively anchored. World position changes each plant's phase and green tone, avoiding synchronized motion. Forward lighting, shadow casting, depth and depth normals all use the same displaced geometry.
 
 The scene stores placement data on the generator, outside the temporary construction hierarchy. It therefore survives `ConfigureTower` clearing its generated objects after caching. Runtime rendering batches by terrace and size, with frustum and 150 m distance culling. The current layout uses 46 possible batches before culling. No per-bush GameObject, collider, Update loop, network identity or persistent building ID is created at runtime. The construction cache remains at 85,032 assets.
@@ -34,4 +36,6 @@ The scene stores placement data on the generator, outside the temporary construc
 
 `TowerBushPreview.Capture()` renders actual assets, sampled shader motion and a completed representative section of cached tower geometry in a disposable Edit Mode scene. The preview does not build the live tower or alter construction stages. The source Tower scene and camera state remain unchanged after capture.
 
-`BushInspection.json` records zero bush colliders, zero overlaps against 21,120 cached stairs, a minimum wall clearance of approximately 0.563 m and a minimum ledge margin of approximately 0.164 m, including the reserved wind footprint. Compilation and shader inspection passed. No automated tests or Play Mode sessions were run. Live instanced rendering, traversal and multiplayer startup remain unverified.
+The initial authoring inspection in `BushInspection.json` records zero bush colliders, zero overlaps against 21,120 cached stairs, a minimum wall clearance of approximately 0.563 m and a minimum ledge margin of approximately 0.164 m, including the reserved wind footprint. Compilation and shader inspection passed at that time.
+
+The subsequent progression integration passed 25 relevant Edit Mode checks and 5 Play Mode checks. Using the actual bush mesh and material, the runtime rendering check confirms zero submitted bush batches before completion, one terrace after its last asset reaches stage 10, additional terraces after their completion, and immediate hiding after rollback. Traversal and multiplayer startup were not rechecked in this foliage change.

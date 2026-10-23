@@ -45,6 +45,8 @@ namespace TowerOfBabel.Buildings
         private AeroInteractionMotion interactionMotion;
         private PillarConstructionMotion constructionMotion;
         private bool isBound;
+        private bool interactionFocused;
+        private bool scanHighlighted;
 
         public string ObjectName => gameObject.name;
         public ResourceType InteractionResourceType => resourceType;
@@ -57,7 +59,9 @@ namespace TowerOfBabel.Buildings
             ? "Complete"
             : HasLocalResources ? "Press 'E'" : $"Need {EffectiveResourceCost} {resourceType}";
         public float Duration => EffectiveInteractionDuration;
-        public bool CanInteract => enabled && gameObject.activeInHierarchy && isBound && !IsComplete && HasLocalResources;
+        public bool CanInteract => IsConstructionAvailable && HasLocalResources;
+        public bool IsConstructionAvailable => isActiveAndEnabled && isBound && !IsComplete &&
+            chunkManager != null && chunkManager.CanConstructAsset(chunkKey, localIndex);
         public ResourceType ResourceType => resourceType;
         public int ResourceCostPerStage => resourceCostPerStage;
         public float InteractionDuration => interactionDuration;
@@ -86,7 +90,7 @@ namespace TowerOfBabel.Buildings
         public byte CurrentStage => currentStage;
         public bool IsComplete => currentStage >= ChunkAssetData.CompletedStage;
         public bool IsBound => isBound;
-        public bool ShouldShowInteraction => !IsComplete;
+        public bool ShouldShowInteraction => IsConstructionAvailable;
         public ChunkKey ChunkKey => chunkKey;
         public int LocalIndex => localIndex;
         public event Action ServerRejected;
@@ -109,15 +113,20 @@ namespace TowerOfBabel.Buildings
 
         public void Bind(ChunkManager owner, ChunkKey key, int assetLocalIndex, byte stage)
         {
+            Unbind();
             chunkManager = owner;
             chunkKey = key;
             localIndex = assetLocalIndex;
             isBound = owner != null && assetLocalIndex >= 0;
+            if (chunkManager != null) chunkManager.ConstructionFloorChanged += HandleConstructionFloorChanged;
             ApplyStage(stage,false);
         }
 
         public void Unbind()
         {
+            if (chunkManager != null) chunkManager.ConstructionFloorChanged -= HandleConstructionFloorChanged;
+            interactionFocused = false;
+            scanHighlighted = false;
             interactionMotion?.Stop(true);
             constructionMotion?.ResetImmediately();
             outline?.SetVisible(false);
@@ -142,15 +151,32 @@ namespace TowerOfBabel.Buildings
             if (changed) constructionMotion?.ConfirmStage(previousMesh,previousStage,currentStage,
                 animate && Application.isPlaying && isActiveAndEnabled);
 
-            if (IsComplete)
-                outline?.SetVisible(false);
+            RefreshOutline();
             if (changed)
                 InteractionPresentationChanged?.Invoke();
         }
 
         public void SetInteractionFocused(bool focused)
         {
-            outline?.SetVisible(focused && ShouldShowInteraction);
+            interactionFocused = focused;
+            RefreshOutline();
+        }
+
+        public void SetScanHighlighted(bool highlighted)
+        {
+            scanHighlighted = highlighted;
+            RefreshOutline();
+        }
+
+        private void RefreshOutline()
+        {
+            outline?.SetVisible((interactionFocused || scanHighlighted) && IsConstructionAvailable);
+        }
+
+        private void HandleConstructionFloorChanged()
+        {
+            RefreshOutline();
+            InteractionPresentationChanged?.Invoke();
         }
 
         public Mesh GetStageMesh(byte stage)
@@ -233,9 +259,16 @@ namespace TowerOfBabel.Buildings
 
         private void OnDisable()
         {
+            interactionFocused = false;
+            scanHighlighted = false;
             interactionMotion?.Stop(true);
             constructionMotion?.ResetImmediately();
             outline?.SetVisible(false);
+        }
+
+        private void OnDestroy()
+        {
+            if (chunkManager != null) chunkManager.ConstructionFloorChanged -= HandleConstructionFloorChanged;
         }
 
         private void OnValidate()

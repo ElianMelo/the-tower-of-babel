@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using NaughtyAttributes;
+using TowerOfBabel.Buildings;
 using TowerOfBabel.Players;
 using TowerOfBabel.World.Tower;
 using UnityEngine;
@@ -87,6 +88,8 @@ namespace TowerOfBabel.World.Chunks
         private readonly HashSet<ChunkKey> desiredChunks = new();
         private readonly Dictionary<ChunkKey, HashSet<PlayerInstance>> playersByChunk = new();
         private readonly Dictionary<uint, PlayerInstance> trackedPlayers = new();
+        private readonly Dictionary<int, int> unfinishedAssetsByFloor = new();
+        private int? activeConstructionFloor;
 
         private ChunkKey currentChunk;
         private bool hasCurrentChunk;
@@ -116,9 +119,18 @@ namespace TowerOfBabel.World.Chunks
         public float FloorRadialDepth => floorRadialDepth;
         public float FloorArcLength => floorArcLength;
         public int TrackedPlayerCount => trackedPlayers.Count;
+        public int? ActiveConstructionFloor
+        {
+            get
+            {
+                if (chunkLookup.Count == 0) RebuildChunkLookup();
+                return activeConstructionFloor;
+            }
+        }
 
         public event Action<ChunkKey, ChunkKey> CurrentChunkChanged;
         public event Action<ChunkKey, int, byte> AssetStageChanged;
+        public event Action ConstructionFloorChanged;
 
         private void OnEnable()
         {
@@ -260,12 +272,22 @@ namespace TowerOfBabel.World.Chunks
 
         public bool SetAssetStage(ChunkKey key, int localIndex, byte stage)
         {
+            if (!TryGetAsset(key, localIndex, out ChunkAssetData previous))
+                return false;
             if (!chunkLookup.TryGetValue(key, out ChunkSceneCache chunk) ||
                 !chunk.TrySetStage(localIndex, stage, out byte appliedStage, out bool changed))
                 return false;
 
             if (!changed)
                 return true;
+
+            bool wasComplete = previous.Stage >= ChunkAssetData.CompletedStage;
+            bool isComplete = appliedStage >= ChunkAssetData.CompletedStage;
+            if (wasComplete != isComplete)
+            {
+                unfinishedAssetsByFloor[key.FloorIndex] += isComplete ? -1 : 1;
+                RefreshConstructionFloor();
+            }
 
             if (loadedChunks.Contains(key))
             {
@@ -295,12 +317,44 @@ namespace TowerOfBabel.World.Chunks
         public bool TryAdvanceAssetStage(ChunkKey key, int localIndex, out byte appliedStage)
         {
             appliedStage = 0;
-            if (!TryGetAsset(key, localIndex, out ChunkAssetData asset) ||
+            if (!CanConstructAsset(key, localIndex) ||
+                !TryGetAsset(key, localIndex, out ChunkAssetData asset) ||
                 asset.Stage >= ChunkAssetData.CompletedStage)
                 return false;
 
             appliedStage = (byte)(asset.Stage + 1);
             return SetAssetStage(key, localIndex, appliedStage);
+        }
+
+        public bool CanConstructAsset(ChunkKey key, int localIndex) =>
+            TryGetAsset(key, localIndex, out ChunkAssetData asset) &&
+            asset.Stage < ChunkAssetData.CompletedStage && activeConstructionFloor == key.FloorIndex;
+
+        public bool IsFloorVisible(int floorIndex)
+        {
+            int? unlockedFloor = ActiveConstructionFloor;
+            return !unlockedFloor.HasValue || floorIndex <= unlockedFloor.Value;
+        }
+
+        public bool IsFloorComplete(int floorIndex)
+        {
+            if (chunkLookup.Count == 0) RebuildChunkLookup();
+            return unfinishedAssetsByFloor.TryGetValue(floorIndex, out int unfinished) && unfinished == 0;
+        }
+
+        // Query the materialized neighborhood, never instantiate distant assets for a scan.
+        public void GetNearbyConstruction(Vector3 origin, float radius, List<Building> results)
+        {
+            results.Clear();
+            if (nearAssetPool == null) return;
+            float squaredRadius = Mathf.Max(0f, radius) * Mathf.Max(0f, radius);
+            foreach (GameObject asset in nearAssetPool.ActiveAssets)
+            {
+                if (asset == null || !asset.TryGetComponent(out Building building) ||
+                    !building.IsConstructionAvailable) continue;
+                if ((asset.transform.position - origin).sqrMagnitude <= squaredRadius)
+                    results.Add(building);
+            }
         }
 
         public ChunkKey WorldToChunk(Vector3 worldPosition) =>
@@ -499,6 +553,8 @@ namespace TowerOfBabel.World.Chunks
         {
             ResolveFarChunkRenderer();
             ChunkGrid.GetNeighborhood(center, NearChunkRadius, desiredChunks);
+            // Locked floors have neither visible near objects nor interaction/walking colliders.
+            desiredChunks.RemoveWhere(key => !IsFloorVisible(key.FloorIndex));
             if (!visibilityInitialized || force)
             {
                 for (int i = 0; i < cachedChunks.Count; i++)
@@ -539,12 +595,31 @@ namespace TowerOfBabel.World.Chunks
         private void RebuildChunkLookup()
         {
             chunkLookup.Clear();
+            unfinishedAssetsByFloor.Clear();
             for (int i = 0; i < cachedChunks.Count; i++)
             {
                 ChunkSceneCache chunk = cachedChunks[i];
-                if (chunk != null)
-                    chunkLookup[chunk.Key] = chunk;
+                if (chunk == null) continue;
+                chunkLookup[chunk.Key] = chunk;
+                unfinishedAssetsByFloor.TryGetValue(chunk.Key.FloorIndex, out int unfinished);
+                foreach (ChunkAssetData asset in chunk.Assets)
+                    if (asset.Stage < ChunkAssetData.CompletedStage) unfinished++;
+                unfinishedAssetsByFloor[chunk.Key.FloorIndex] = unfinished;
             }
+            RefreshConstructionFloor();
+        }
+
+        private void RefreshConstructionFloor()
+        {
+            int? nextFloor = null;
+            foreach (var pair in unfinishedAssetsByFloor)
+                if (pair.Value > 0 && (!nextFloor.HasValue || pair.Key < nextFloor.Value))
+                    nextFloor = pair.Key;
+            if (nextFloor == activeConstructionFloor) return;
+            activeConstructionFloor = nextFloor;
+            if (visibilityInitialized && hasCurrentChunk)
+                ApplyTowerVisibility(currentChunk, true);
+            ConstructionFloorChanged?.Invoke();
         }
 
         private void ResolveFarChunkRenderer()
@@ -600,7 +675,7 @@ namespace TowerOfBabel.World.Chunks
             if (farChunkRenderer == null)
                 return;
 
-            if (visible)
+            if (visible && IsFloorVisible(chunk.Key.FloorIndex))
             {
                 FarChunkSnapshot snapshot = new(chunk.Key, chunk.Assets, chunk.Version);
                 farChunkRenderer.LoadChunk(in snapshot);

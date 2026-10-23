@@ -63,7 +63,7 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(Building.StageCount, Is.EqualTo(11));
             Assert.That(building.CurrentStage, Is.EqualTo(5));
             Assert.That(filter.sharedMesh, Is.SameAs(stageFive));
-            Assert.That(building.ShouldShowInteraction, Is.True);
+            Assert.That(building.ShouldShowInteraction, Is.False, "Unbound building models cannot be interacted with.");
 
             building.ApplyStage(99);
             Assert.That(building.CurrentStage, Is.EqualTo(ChunkAssetData.CompletedStage));
@@ -137,9 +137,17 @@ namespace TowerOfBabel.Resources.Tests
             GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Cube);
             GameObject instance = Object.Instantiate(prefab);
             GameObject player = new("Test Player");
+            GameObject owner = new("Building data owner");
+            owner.SetActive(false);
             try
             {
                 instance.transform.position = new Vector3(0f, 1000f, 0f);
+                var manager = owner.AddComponent<ChunkManager>();
+                if (instance.GetComponent<TowerOfBabel.World.Tower.TowerAsset>() == null)
+                    instance.AddComponent<TowerOfBabel.World.Tower.TowerAsset>();
+                SetField(manager, "towerRoot", instance);
+                manager.CacheChunks();
+                instance.GetComponent<Building>().Bind(manager, manager.CachedChunks[0].Key, 0, 0);
                 ground.name = "Test Ground";
                 ground.transform.position = new Vector3(0f, 999.9f, 0f);
                 ground.transform.localScale = new Vector3(20f, 0.2f, 20f);
@@ -168,6 +176,7 @@ namespace TowerOfBabel.Resources.Tests
                 Object.DestroyImmediate(player);
                 Object.DestroyImmediate(instance);
                 Object.DestroyImmediate(ground);
+                Object.DestroyImmediate(owner);
             }
         }
 

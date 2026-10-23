@@ -72,7 +72,7 @@ namespace TowerOfBabel.Networking.Buildings
 
         public bool RequestBuildStart(Building building, Vector3 playerPosition)
         {
-            if (!InstanceFinder.IsClientStarted || building == null || !building.IsBound ||
+            if (!InstanceFinder.IsClientStarted || building == null || !building.CanInteract ||
                 localActiveBuilding != null)
                 return false;
 
@@ -112,6 +112,7 @@ namespace TowerOfBabel.Networking.Buildings
             NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
             if (sender == null || activeBuilds.ContainsKey(sender.ClientId) ||
                 !TryGetBuildDefinition(key, localIndex, out ChunkAssetData asset, out Building definition) ||
+                !chunkManager.CanConstructAsset(key, localIndex) ||
                 asset.Stage >= ChunkAssetData.CompletedStage ||
                 Vector3.Distance(claimedPlayerPosition, asset.Position) > maximumInteractionDistance ||
                 NetworkResourceService.Instance == null ||
@@ -164,6 +165,7 @@ namespace TowerOfBabel.Networking.Buildings
 
             if (!TryGetBuildDefinition(build.ChunkKey, build.LocalIndex, out ChunkAssetData asset,
                     out Building definition) ||
+                !chunkManager.CanConstructAsset(build.ChunkKey, build.LocalIndex) ||
                 asset.Stage >= ChunkAssetData.CompletedStage ||
                 NetworkResourceService.Instance == null ||
                 !NetworkResourceService.Instance.ServerHasAtLeast(connection, definition.ResourceType,
