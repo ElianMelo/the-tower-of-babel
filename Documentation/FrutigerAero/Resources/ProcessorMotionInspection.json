@@ -1,0 +1,45 @@
+{
+  "states": [
+    {
+      "label": "Idle",
+      "feedVisible": false,
+      "outputVisible": false
+    },
+    {
+      "label": "Entering",
+      "feedVisible": true,
+      "outputVisible": false
+    },
+    {
+      "label": "Working",
+      "feedVisible": true,
+      "outputVisible": false
+    },
+    {
+      "label": "Consumed",
+      "feedVisible": false,
+      "outputVisible": false
+    },
+    {
+      "label": "Cancelled",
+      "feedVisible": false,
+      "outputVisible": false
+    },
+    {
+      "label": "Complete",
+      "feedVisible": false,
+      "outputVisible": true
+    },
+    {
+      "label": "Collected",
+      "feedVisible": false,
+      "outputVisible": false
+    }
+  ],
+  "fixedCollider": true,
+  "originalScene": "Assets/_Project/Scenes/Tower.unity",
+  "isDirty": false,
+  "playing": false,
+  "compileFailed": false,
+  "shaderMessages": []
+}

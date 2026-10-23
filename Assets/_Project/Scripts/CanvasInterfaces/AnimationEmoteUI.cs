@@ -46,7 +46,7 @@ namespace TowerOfBabel
         private CursorStateConfig? previousCursorState;
         private bool inputLockApplied;
 
-        public bool IsVisible => visuals != null && visuals.activeSelf;
+        public bool IsVisible => TowerOfBabel.Interface.AeroPanelMotion.IsVisible(visuals);
 
         private void LateUpdate()
         {
@@ -127,7 +127,7 @@ namespace TowerOfBabel
                 controlStateMachine.SetModalInputLocked(true);
                 inputLockApplied = true;
             }
-            visuals.SetActive(true);
+            TowerOfBabel.Interface.AeroPanelMotion.SetVisible(visuals, true);
             CenterOnPlayer();
         }
 
@@ -139,8 +139,7 @@ namespace TowerOfBabel
                     option.ToggleHover(false);
             }
 
-            if (visuals != null)
-                visuals.SetActive(false);
+            TowerOfBabel.Interface.AeroPanelMotion.SetVisible(visuals, false);
             RestoreCursorState();
             ReleaseInputLock();
         }

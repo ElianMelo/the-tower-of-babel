@@ -36,6 +36,7 @@ namespace TowerOfBabel
         private UpgradeButtonState state;
         private Action selectionCallback;
         private bool listenerRegistered;
+        private bool hasState;
         private TowerOfBabel.Interface.UpgradeTooltip tooltip;
         public void BindTooltip(TowerOfBabel.Interface.UpgradeTooltip value) => tooltip=value;
         private void OnDisable() => tooltip?.Hide(this);
@@ -66,6 +67,7 @@ namespace TowerOfBabel
         public void Configure(UpgradeData data, Action onSelected, UpgradeButtonState buttonState)
         {
             EnsureListener();
+            hasState = false;
             upgradeData = data;
             selectionCallback = onSelected;
             SetLabel(FormatLabel(data));
@@ -101,10 +103,13 @@ namespace TowerOfBabel
 
         public void SetState(UpgradeButtonState buttonState)
         {
+            bool purchasedNow = hasState && state == UpgradeButtonState.CanBuy && buttonState == UpgradeButtonState.Purchased;
             state = buttonState;
+            hasState = true;
             if (button != null)
                 button.interactable = state == UpgradeButtonState.CanBuy;
             ApplyVisualState(false);
+            if (purchasedNow) GetComponent<TowerOfBabel.Interface.AeroButtonJuice>()?.Celebrate();
         }
 
         public void SetLabel(string label)

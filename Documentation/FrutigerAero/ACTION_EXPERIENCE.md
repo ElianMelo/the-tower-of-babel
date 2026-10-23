@@ -1,0 +1,40 @@
+# Action experience feedback
+
+Motion review: [Edit Mode animation preview](Previews/Experience-Sequence.gif). The animation uses the same controller and prefabs as gameplay, with a sample receipt and actual 3D resource models in a disposable review scene.
+
+Completed gathering, processing and construction stages produce 35 pearlescent 3D soap bubbles at the asset. A leveling gain produces 350, double the previous 175-bubble celebration. Regular gains stay at 35 at every level; counts never compound with level. The leveling burst uses 2.5 times the ordinary initial radius and outward drift. Bubbles are sphere meshes in world space with depth occlusion and view-dependent thin-film highlights. They emerge at the visible stone, processor output tray or construction location, float, then curve toward the camera and the bottom-left XP bar.
+
+Each bubble has a random size multiplier between 0.8 and 1.2 on its 0.18-metre base diameter. Emission delay, direction, radial distance, rise, weave amplitude, phase, frequency and float/flight duration also vary. Nominal float and flight durations are 0.72 and 0.56 seconds, with an emission window of 0.33 seconds. The destination follows the current camera and the actual bar fill endpoint; perspective scaling keeps approaching bubbles from covering the screen. Arrivals create expanding UI pop rings, restrained bar motion, a green fill pulse, counting XP and soft rising-pitch sounds. Sounds are spaced by at least 45 milliseconds.
+
+The glass bar displays the profession, current level, actual XP and completed action. A cyan ghost fill previews incoming XP while the green fill and count catch up. A darker lower band adds depth. The bar remains for five seconds after collection, then fades. White outlined action text floats at the task and above the bar; reaching a new level adds a larger ripple and a pale-green level/upgrade-point caption. The interface keeps its existing blue glass, fixed silhouettes, small action icons and Frutiger typography.
+
+The current layout places the 560 × 104 reward popup 24 units from the safe area's left edge and 28 units from the bottom. Its backing, glass and arrival glow share identical bounds and 25-unit corner radii. The interaction prompt is reduced from 720 × 182 to 560 × 140, centered 166 units above the bottom, with a 34-unit vertical gap from the reward card before its gentle float. Recipe icons, quantities, action text and the progress track are fitted to the smaller card. Reward captions center over the popup and fit its width; task-origin captions start above the interaction band. The source-prefab layouts and authoring functions both preserve these adjustments.
+
+## Authoritative behavior
+
+- The three existing success branches pass the task location and actual production/stage description into `NetworkUpgradeService.ServerGrantActionExperience`. Rejected or canceled actions never issue a receipt.
+- An owner-targeted reliable RPC sends a completion receipt before the normal authoritative progression snapshot. The visual listener holds the old displayed value until collection; the gameplay progression and upgrade screen still update immediately.
+- Actual gains come from the before/after progression totals, including rollover. The bubble count represents one reward visually and does not multiply the XP award. A receipt whose final level exceeds its previous level uses the larger burst. Maximum-level actions still celebrate with the regular burst and `MAX LEVEL`, awarding no fictitious XP.
+- `ActionExperienceUI` only displays receipts. It never grants XP, changes inventory, sends client reward claims, or modifies the progression model.
+- Bubbles, rings and captions are pooled (350/12/6 by default). A regular reward uses 35 bubbles; a leveling reward uses all 350. World bubbles live outside the Canvas hierarchy and have no colliders. A FIFO sequences receipts, speeding up when more than two are waiting. An extreme backlog of 24 waiting receipts coalesces stale queued visuals into the latest receipt's authoritative starting state.
+- Disconnect, disable and scene destruction clear transient effects and unsubscribe listeners. The HUD ignores raycasts and uses unscaled time; other controls remain usable. World bubbles keep their real positions even behind the camera; only their floating UI caption can fall back to screen center. Safe-area insets and a bounded bar width protect the HUD. Presentation advances in LateUpdate after the player camera follower.
+
+## Assets and tuning
+
+`Assets/_Project/UI/FrutigerAero/Prefabs/Screens/ActionExperience.prefab` is nested in the existing `FrutigerInterface.prefab`. It references shared `ExperienceBar`, `ExperienceWorldBubble`, `ExperiencePop` and `ExperienceFloatingText` prefabs. The world spheres use `TowerOfBabel/World/Experience Bubble`, shared instanced material and a 480-triangle mesh. Pop rings keep the UI bubble shader. The older 2D bubble prefab remains unused. No downloaded particle pack or new package is required.
+
+Tune bubble count, float/flight duration, visible duration, shake strength and sound in the ActionExperience screen's `ActionExperienceUI` inspector. Set `Play Sounds` off to silence this effect. The attached 2D AudioSource controls its volume. The defaults keep the shake on the bar and leave the gameplay camera steady.
+
+`Bubble Count` defaults to 35 and `Level Up Bubble Multiplier` to 10. `ActionExperienceBuilder.ApplyWorldBubbles()` creates the world sphere assets and updates the existing screen's references and burst counts. `Tower of Babel > UI > Apply Experience Bubble Counts` updates only the counts. Sound pitch uses normalized burst progress, keeping its range bounded.
+
+`Tower of Babel > UI > Build Action Experience Feedback` authors these assets and attaches the screen to the existing interface without rebuilding other menus or saving the Tower scene. The main interface rebuild also reattaches the existing screen. `ActionExperiencePreview.Capture()` renders a disposable preview scene and restores the original scene, selection, render targets and shader compilation setting. Passing `true` also writes animation frames beneath `Temp/ExperienceFeedback`.
+
+## Validation and limits
+
+Unity C# compilation passed after the final implementation changes. The bubble shader reported no compiler diagnostics. Prefab inspection found all controller references assigned and no raycast targets in the new screen. Edit Mode renders cover floating, collection flight, arrival and a level-0-to-1 transition (`9/10` to `0/20`). Temporary preview objects were removed and the original Tower scene remained clean in Edit Mode. Its pre-existing on-disk scene changes were preserved.
+
+The layout revision was also rendered with both panels visible at 1920 × 1080, 1280 × 960 and 2560 × 1080. Measured card bounds do not overlap at any of these sizes. Backing and arrival-glow bounds match the reward card within 0.01 UI units. Recipe and progress content were visually reviewed in the compact prompt.
+
+The world-space revision compiled cleanly and was rendered with the actual controller and prefab. At 0.55 seconds, ordinary level-0 and level-2 gains each had 35 active world bubbles; a leveling gain had 350. Their measured camera-depth ranges were about 1.24 metres and 3.30 metres respectively. No 2D bubble Images were active. Collection reached the correct totals and the level-up sample completed at `0/20 XP`. Both panels remained separate. See `ExperienceWorldInspection.json`, `Previews/Experience-Float.png` and `Previews/Experience-LevelUpFloat.png`; the older `ExperienceBurstInspection.json` is historical.
+
+No automated tests were created or run, following the user's standing preference. No Play Mode session was entered. Network delivery, live timing with real completed actions, synthesized sound and interactive screen resizing still need gameplay verification under the project's allowed validation workflow. The review images sample the actual UI animation in Edit Mode and do not claim that live gameplay was exercised.

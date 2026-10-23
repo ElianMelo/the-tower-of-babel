@@ -91,6 +91,47 @@ public static partial class FrutigerAeroBuilder
         Set(ui,"fallbackIcon",orb.Find("PickaxeIcon").gameObject); Set(ui,"processAction",process.gameObject); Set(ui,"buildAction",build.gameObject);
         Set(ui,"definitions",AssetDatabase.LoadAssetAtPath<TowerOfBabel.Resources.ResourceDefinitionCollection>("Assets/_Project/Resources/Definitions/ResourceDefinitions.asset"));
         summary.gameObject.SetActive(false);
+        ConfigureCompactActionPrompt(root);
+    }
+
+    public static void ConfigureCompactActionPrompt(RectTransform root)
+    {
+        var visuals=(RectTransform)root.Find("Visuals");
+        Anchor(visuals,new(.5f,0),new(.5f,0),new(.5f,0),new(0,166),new(560,140));
+        visuals.GetComponent<AeroGlassGeometry>().CornerRadius=22;
+        At((RectTransform)visuals.Find("ActionIcon"),18,16,48,48);
+        foreach(string name in new[]{"PickaxeIcon","ProcessIcon","BuildIcon"})
+            Stretch((RectTransform)visuals.Find("ActionIcon/"+name),8,8,8,8);
+        At((RectTransform)visuals.Find("ObjectName"),82,13,264,30);
+        At((RectTransform)visuals.Find("Detail"),82,46,264,40);
+        At((RectTransform)visuals.Find("Prompt"),18,97,430,24);
+        At((RectTransform)visuals.Find("Progress"),18,96,524,34);
+        var percentage=visuals.Find("Progress/Percentage").GetComponent<TMP_Text>();
+        percentage.rectTransform.sizeDelta=new(60,18); percentage.fontSize=14;
+        var track=(RectTransform)visuals.Find("Progress/ProgressTrack");
+        track.sizeDelta=new(0,9);
+        Stretch((RectTransform)track.Find("Fill"),2,2,2,2);
+        foreach(var item in new[]{("ObjectName",18f,22f),("Detail",13f,16f),("Prompt",12f,15f)})
+        {
+            var text=visuals.Find(item.Item1).GetComponent<TMP_Text>();
+            text.fontSize=item.Item3; text.enableAutoSizing=true;
+            text.fontSizeMin=item.Item2; text.fontSizeMax=item.Item3;
+            text.textWrappingMode=item.Item1=="Detail" ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
+            text.overflowMode=TextOverflowModes.Ellipsis;
+        }
+        var summary=(RectTransform)visuals.Find("ResourceSummary");
+        Anchor(summary,new(1,1),new(1,1),new(1,1),new(-14,-12),new(184,78));
+        At((RectTransform)summary.Find("RecipeArrow"),80,28,20,20);
+        foreach(string name in new[]{"Source","Result"})
+        {
+            var slot=(RectTransform)summary.Find(name);
+            At(slot,name=="Source" ? 0 : 112,0,68,78);
+            At((RectTransform)slot.Find("Caption"),0,0,68,16);
+            At((RectTransform)slot.Find("Icon"),17,18,34,34);
+            At((RectTransform)slot.Find("Amount"),0,56,68,20);
+            slot.Find("Caption").GetComponent<TMP_Text>().fontSize=12;
+            slot.Find("Amount").GetComponent<TMP_Text>().fontSize=16;
+        }
     }
 
     private static void ConfigurePanelSurfaceFeedback()

@@ -1,0 +1,103 @@
+{
+  "stoneGuidPreserved": true,
+  "processorGuidPreserved": true,
+  "assets": [
+    {
+      "prefab": "Assets/_Project/Prefabs/Resources/Stone.prefab",
+      "rootPosition": "(-6.00, 1.50, -99.70)",
+      "rootScale": "(1.00, 1.00, 1.00)",
+      "meshes": [
+        {
+          "name": "Visuals",
+          "triangles": 960,
+          "uvs": 2592
+        }
+      ],
+      "colliders": [
+        {
+          "name": "Visuals",
+          "type": "SphereCollider",
+          "parent": "Stone"
+        }
+      ]
+    },
+    {
+      "prefab": "Assets/_Project/Prefabs/Processor/StoneProcessor.prefab",
+      "rootPosition": "(-9.00, 1.50, -99.70)",
+      "rootScale": "(1.00, 1.00, 1.00)",
+      "meshes": [
+        {
+          "name": "Housing",
+          "triangles": 2760,
+          "uvs": 5542
+        },
+        {
+          "name": "PressHead",
+          "triangles": 188,
+          "uvs": 384
+        },
+        {
+          "name": "RollerLeft",
+          "triangles": 2072,
+          "uvs": 3584
+        },
+        {
+          "name": "RollerRight",
+          "triangles": 2072,
+          "uvs": 3584
+        },
+        {
+          "name": "StatusLight_0",
+          "triangles": 188,
+          "uvs": 396
+        },
+        {
+          "name": "StatusLight_1",
+          "triangles": 188,
+          "uvs": 396
+        },
+        {
+          "name": "StatusLight_2",
+          "triangles": 188,
+          "uvs": 396
+        }
+      ],
+      "colliders": [
+        {
+          "name": "Visuals",
+          "type": "BoxCollider",
+          "parent": "StoneProcessor"
+        }
+      ]
+    }
+  ],
+  "textures": [
+    {
+      "name": "Resource_Ceramic",
+      "texture": "Assets/_Project/Models/Resources/Textures/ProcessorAtlas-Imagegen.png"
+    },
+    {
+      "name": "Resource_BlueMetal",
+      "texture": "Assets/_Project/Models/Resources/Textures/ProcessorAtlas-Imagegen.png"
+    },
+    {
+      "name": "Resource_Steel",
+      "texture": "Assets/_Project/Models/Resources/Textures/ProcessorAtlas-Imagegen.png"
+    },
+    {
+      "name": "Resource_Glow",
+      "texture": "Assets/_Project/Models/Resources/Textures/ProcessorAtlas-Imagegen.png"
+    },
+    {
+      "name": "Resource_Stone",
+      "texture": "Assets/_Project/Models/Resources/Textures/StoneSurface-Imagegen.png"
+    },
+    {
+      "name": "Resource_Refined",
+      "texture": "Assets/_Project/Models/Resources/Textures/StoneSurface-Imagegen.png"
+    }
+  ],
+  "sceneDirty": false,
+  "playing": false,
+  "compileFailed": false
+}

@@ -50,6 +50,9 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
         _GlassIOR("Glass index of refraction", Range(1,2)) = 1.45
         _GlassTint("Glass absorption tint", Color) = (.68,.93,1,1)
         _PatternSeed("Model variation seed", Float) = 0
+        [PerRendererData] _BuildMode("Incoming chunk dissolve", Float) = 0
+        [PerRendererData] _BuildReveal("Construction reveal", Range(0,1)) = 1
+        [PerRendererData] _BuildClock("Construction clock", Float) = 0
         [HideInInspector] _RadialFloor("Tower radial floor", Float) = 0
         [HideInInspector] _RadialFloorCenter("Tower floor center XZ", Vector) = (0,0,0,0)
         [Enum(UnityEngine.Rendering.CullMode)] _Cull("Cull", Float) = 2
@@ -85,6 +88,11 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             float _RadialFloor;
             float4 _RadialFloorCenter;
         CBUFFER_END
+        UNITY_INSTANCING_BUFFER_START(Construction)
+            UNITY_DEFINE_INSTANCED_PROP(float,_BuildMode)
+            UNITY_DEFINE_INSTANCED_PROP(float,_BuildReveal)
+            UNITY_DEFINE_INSTANCED_PROP(float,_BuildClock)
+        UNITY_INSTANCING_BUFFER_END(Construction)
         struct Attributes
         {
             float4 positionOS:POSITION;
@@ -179,14 +187,45 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             half3 baked=SAMPLE_TEXTURE2D(_BakedSurface,sampler_BakedSurface,input.uv).rgb;
             return lerp(baked,lerp(half3(1,1,1),_GlazeColor.rgb,step(.2,input.paletteUV.x)),_UseGeometryColors);
         }
-        void ClipGlassFromCore(Varyings input)
+        float ConstructionHash(float3 p)
         {
+            p=frac(p*.1031); p+=dot(p,p.yzx+33.33); return frac((p.x+p.y)*p.z);
+        }
+        float ConstructionNoise(float3 p)
+        {
+            float3 cell=floor(p),f=frac(p); f=f*f*(3-2*f);
+            return lerp(lerp(lerp(ConstructionHash(cell),ConstructionHash(cell+float3(1,0,0)),f.x),
+                             lerp(ConstructionHash(cell+float3(0,1,0)),ConstructionHash(cell+float3(1,1,0)),f.x),f.y),
+                        lerp(lerp(ConstructionHash(cell+float3(0,0,1)),ConstructionHash(cell+float3(1,0,1)),f.x),
+                             lerp(ConstructionHash(cell+float3(0,1,1)),ConstructionHash(cell+float3(1,1,1)),f.x),f.y),f.z);
+        }
+        half ClipConstruction(Varyings input)
+        {
+            float mode=UNITY_ACCESS_INSTANCED_PROP(Construction,_BuildMode);
+            if (mode<.5) return 0;
+            float reveal=UNITY_ACCESS_INSTANCED_PROP(Construction,_BuildReveal);
+            float clock=UNITY_ACCESS_INSTANCED_PROP(Construction,_BuildClock);
+            // This branch runs only on incoming chunk renderers. Permanent
+            // pillar pieces remain solid in forward, depth and shadow passes.
+            float noise=ConstructionNoise(input.positionOS*10.5+float3(5.2+clock*.2,13.8,2.1-clock*.15));
+            half edge=0;
+            if (mode>.5)
+            {
+                float d=reveal*1.12-.06-noise; clip(d);
+                edge=(1-smoothstep(0,.08,d))*step(.001,reveal)*step(reveal,.999);
+            }
+            return edge;
+        }
+        half ClipGlassFromCore(Varyings input)
+        {
+            half edge=ClipConstruction(input);
             #if defined(_AERO_BORDER_GLASS)
                 // Small distant borders use the original opaque finish. Both passes use
                 // the same instance-origin distance, so this cannot leave missing pixels.
                 if(distance(GetCameraPositionWS(),input.originSeed.xyz)<_WaterDetailDistance)
                     clip(.35-GlassRegion(input,ArchitecturalColor(input)));
             #endif
+            return edge;
         }
         ENDHLSL
         Pass
@@ -215,7 +254,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             {
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                ClipGlassFromCore(input);
+                half buildEdge=ClipGlassFromCore(input);
                 half3 n=normalize(input.normalWS);
                 float3 p=MarblePosition(input);
                 half stone=lerp(1,Marble(p,n),_VeinStrength);
@@ -234,6 +273,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 half3 interior=lerp(_WaterDeepColor.rgb,_WaterLightColor.rgb,saturate(water.y));
                 bakedColor=lerp(bakedColor,interior,glass*_InteriorStrength);
                 surface.albedo=stone*bakedColor*lerp(_BaseColor.rgb,_DetailTint.rgb,mask*_DetailStrength);
+                surface.albedo=lerp(surface.albedo,half3(.04,.5,.85),buildEdge*.85);
                 surface.alpha=1;surface.metallic=0;surface.specular=half3(.04,.04,.04);
                 half enamel=saturate((bakedColor.b-bakedColor.r)*2);
                 surface.smoothness=lerp(_Smoothness,.96,glass);surface.normalTS=half3(0,0,1);
@@ -245,6 +285,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 half rim=pow(1-saturate(dot(n,view)),3);
                 surface.emission=half3(.42,.78,1)*water.x*_WaterLightStrength*(1-glass*.7);
                 surface.emission+=_WaterLightColor.rgb*glass*(water.x*_InnerCausticStrength+rim*_GlassEdgeStrength);
+                surface.emission+=half3(.08,.65,1)*buildEdge*.65;
                 data.shadowCoord=TransformWorldToShadowCoord(input.positionWS);
                 data.bakedGI=SampleSH(n);data.shadowMask=half4(1,1,1,1);
                 data.vertexLighting=VertexLighting(input.positionWS,n);

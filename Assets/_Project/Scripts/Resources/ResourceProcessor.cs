@@ -20,6 +20,8 @@ namespace TowerOfBabel.Resources
         [Tooltip("Optional unique ID. When empty, uses the scene and hierarchy path. Set explicitly for runtime-spawned processors.")]
         [SerializeField] private string processorId;
         private string resolvedId;
+        private ProcessorWorkAnimation workAnimation;
+        private ProcessorWorkAnimation WorkAnimation => workAnimation!=null ? workAnimation : workAnimation=GetComponent<ProcessorWorkAnimation>();
 
         public ResourceDefinition SourceResource => sourceResource;
         public ResourceType InteractionResourceType => sourceResource!=null ? sourceResource.ResourceType : ResourceType.Stone;
@@ -30,6 +32,7 @@ namespace TowerOfBabel.Resources
         public int TargetAmount => targetAmount;
         public float InteractionDuration => interactionDuration;
         public string ProcessorId => resolvedId ??= ResolveId();
+        public Vector3 FeedbackPosition => WorkAnimation!=null ? WorkAnimation.FeedbackPosition : transform.position;
         public bool ServerCanProcess => isActiveAndEnabled && sourceResource != null && targetResource != null
             && sourceAmount > 0 && targetAmount > 0 && interactionDuration > 0f
             && !float.IsNaN(interactionDuration) && !float.IsInfinity(interactionDuration);
@@ -57,15 +60,16 @@ namespace TowerOfBabel.Resources
             && NetworkResourceService.Instance.CanExchangeLocal(sourceResource.ResourceType, EffectiveSourceAmount,
                 targetResource.ResourceType, EffectiveTargetAmount);
 
-        public void BeginInteraction(GameObject interactor) { }
-        public void UpdateInteraction(float normalizedProgress) { }
-        public void CancelInteraction() { }
-        public void CompleteInteraction(GameObject interactor) { }
+        public void BeginInteraction(GameObject interactor) => WorkAnimation?.BeginWork();
+        public void UpdateInteraction(float normalizedProgress) => WorkAnimation?.SetProgress(normalizedProgress);
+        public void CancelInteraction() => WorkAnimation?.StopWork();
+        public void CompleteInteraction(GameObject interactor) => WorkAnimation?.StopWork(true);
         public bool RequestServerStart(GameObject interactor) => interactor != null && CanInteract
             && NetworkResourceService.Instance.RequestProcessStart(this, interactor.transform.position);
         public void RequestServerCancel() => NetworkResourceService.Instance?.RequestProcessCancel(this);
-        public void RejectByServer() => ServerRejected?.Invoke();
-        public void CompleteByServer() => ServerCompleted?.Invoke();
+        public void RejectByServer() { WorkAnimation?.StopWork(); ServerRejected?.Invoke(); }
+        public void CompleteByServer() { WorkAnimation?.StopWork(true); ServerCompleted?.Invoke(); }
+        private void OnDisable() => WorkAnimation?.ResetImmediately();
 
         private string ResolveId()
         {

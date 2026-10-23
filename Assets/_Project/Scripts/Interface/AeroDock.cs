@@ -51,12 +51,14 @@ namespace TowerOfBabel.Interface
             controls = FindFirstObjectByType<PlayerControlStateMachine>();
             controls?.SetModalInputLocked(true);
             IsExpanded = true;
+            AeroUIAudio.Play(AeroUICue.Open);
             if (menuList != null) menuList.SetActive(true);
         }
         public void Close()
         {
             if (!IsExpanded) return;
             IsExpanded = false;
+            AeroUIAudio.Play(AeroUICue.Close);
             if (listGroup != null) listGroup.blocksRaycasts = false;
             controls?.SetModalInputLocked(false);
             if (previousCursor.HasValue) previousCursor.Value.Apply();
@@ -67,7 +69,8 @@ namespace TowerOfBabel.Interface
             if (menuList == null) return;
             menuList.SetActive(amount > 0 || IsExpanded);
             float eased = Mathf.SmoothStep(0, 1, amount);
-            menuList.transform.localScale = new Vector3(1, Mathf.Lerp(.25f, 1, eased), 1);
+            // Fade the list without squashing its text or changing its hit rectangles.
+            menuList.transform.localScale = Vector3.one;
             if (listGroup == null) return;
             listGroup.alpha = eased;
             listGroup.interactable = IsExpanded;

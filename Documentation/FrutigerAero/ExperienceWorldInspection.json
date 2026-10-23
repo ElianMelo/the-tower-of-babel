@@ -1,0 +1,69 @@
+{
+  "samples": [
+    {
+      "Name": "Float",
+      "activeWorldBubbles": 35,
+      "uiBubbles": 0,
+      "minDiameter": 0.144469559,
+      "maxDiameter": 0.2092838,
+      "depthRange": 1.23648167,
+      "overlap": false,
+      "experience": "5 / 10 XP"
+    },
+    {
+      "Name": "Flight",
+      "activeWorldBubbles": 35,
+      "uiBubbles": 0,
+      "minDiameter": 0.0349843241,
+      "maxDiameter": 0.19694759,
+      "depthRange": 3.82098436,
+      "overlap": false,
+      "experience": "5 / 10 XP"
+    },
+    {
+      "Name": "Arrival",
+      "activeWorldBubbles": 0,
+      "uiBubbles": 0,
+      "minDiameter": 0.0,
+      "maxDiameter": 0.0,
+      "depthRange": 0.0,
+      "overlap": false,
+      "experience": "6 / 10 XP"
+    },
+    {
+      "Name": "HigherLevelFloat",
+      "activeWorldBubbles": 35,
+      "uiBubbles": 0,
+      "minDiameter": 0.144469559,
+      "maxDiameter": 0.2092838,
+      "depthRange": 1.23648167,
+      "overlap": false,
+      "experience": "5 / 30 XP"
+    },
+    {
+      "Name": "LevelUpFloat",
+      "activeWorldBubbles": 350,
+      "uiBubbles": 0,
+      "minDiameter": 0.13729319,
+      "maxDiameter": 0.2158605,
+      "depthRange": 3.29558659,
+      "overlap": false,
+      "experience": "9 / 10 XP"
+    },
+    {
+      "Name": "LevelUp",
+      "activeWorldBubbles": 0,
+      "uiBubbles": 0,
+      "minDiameter": 0.0,
+      "maxDiameter": 0.0,
+      "depthRange": 0.0,
+      "overlap": false,
+      "experience": "0 / 20 XP"
+    }
+  ],
+  "shaderMessages": [],
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "isDirty": false,
+  "playing": false,
+  "compileFailed": false
+}

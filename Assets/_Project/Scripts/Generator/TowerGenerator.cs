@@ -195,6 +195,8 @@ public class TowerGenerator : MonoBehaviour
             }
             Physics.SyncTransforms();
             RemoveBlockingFloor();
+            // Decoration data survives ConfigureTower's removal of temporary construction objects.
+            GetComponent<TowerBushScatter>()?.Generate(this);
         }
         finally
         {

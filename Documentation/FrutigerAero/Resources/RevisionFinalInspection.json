@@ -1,0 +1,26 @@
+{
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "isDirty": false,
+  "playing": false,
+  "compiling": false,
+  "compileFailed": false,
+  "sourcePosition": "(-0.11, 0.21, -89.90)",
+  "pillarCollider": "CapsuleCollider",
+  "pillarChildren": 0,
+  "chunkMotion": true,
+  "library": 80,
+  "baseBubbles": 35,
+  "levelMultiplier": 10,
+  "worldBubblePrefab": true,
+  "idleStones": [
+    {
+      "name": "FeedStone",
+      "visible": false
+    },
+    {
+      "name": "OutputStone",
+      "visible": false
+    }
+  ],
+  "previewLeftovers": []
+}

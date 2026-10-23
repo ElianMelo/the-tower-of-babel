@@ -21,6 +21,8 @@ namespace TowerOfBabel.Networking.Upgrades
 
         public UpgradeTreeConfig Config => config;
         public event Action<UpgradeJob, UpgradeJobSnapshot> LocalProgressChanged;
+        public event Action<ActionExperienceReward> LocalActionReward;
+        public event Action LocalSessionStopped;
 
         private void Awake()
         {
@@ -61,6 +63,7 @@ namespace TowerOfBabel.Networking.Upgrades
 
         public override void OnStopClient()
         {
+            LocalSessionStopped?.Invoke();
             ResetLocalProgress();
             base.OnStopClient();
         }
@@ -163,17 +166,32 @@ namespace TowerOfBabel.Networking.Upgrades
             return true;
         }
 
-        public bool ServerGrantActionExperience(NetworkConnection connection, UpgradeJob job, int amount = 1)
+        public bool ServerGrantActionExperience(NetworkConnection connection, UpgradeJob job, int amount = 1,
+            Vector3 worldPosition = default, string actionLabel = null)
         {
             if (!IsServerStarted || connection == null || !IsValidJob(job) || amount <= 0)
                 return false;
 
             UpgradeJobProgress progress = GetOrCreateServerProgress(connection).Get(job);
-            if (!progress.GainExperience(amount))
-                return false;
+            int previousLevel = progress.Level;
+            int previousExperience = progress.Experience;
+            bool changed = progress.GainExperience(amount);
+            // The receipt precedes the snapshot so the HUD can hold its old fill until bubbles arrive.
+            // Max-level actions still celebrate, but their receipt contains zero awarded XP.
+            ReceiveActionRewardTargetRpc(connection, job, worldPosition, actionLabel ?? job.ToString(),
+                previousLevel, previousExperience, progress.Level, progress.Experience);
+            if (changed)
+                SendProgress(connection, progress);
+            return changed;
+        }
 
-            SendProgress(connection, progress);
-            return true;
+        [TargetRpc]
+        private void ReceiveActionRewardTargetRpc(NetworkConnection connection, UpgradeJob job,
+            Vector3 worldPosition, string actionLabel, int previousLevel, int previousExperience,
+            int level, int experience)
+        {
+            LocalActionReward?.Invoke(new ActionExperienceReward(job, worldPosition, actionLabel,
+                previousLevel, previousExperience, level, experience));
         }
 
         public float GetServerEffect(NetworkConnection connection, UpgradeJob job,

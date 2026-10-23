@@ -5,13 +5,14 @@ namespace TowerOfBabel.Interface
 {
     /// <summary>Pointer-following glass light for buttons and draggable or scrollable surfaces.</summary>
     [DisallowMultipleComponent]
-    public sealed class AeroHoverFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
+    public sealed class AeroHoverFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler, ISelectHandler, IDeselectHandler
     {
         [SerializeField] private AeroGlassGeometry surface;
         [SerializeField] private bool trackScreenPointer;
         private UnityEngine.UI.Selectable selectable;
         private UnityEngine.UI.ScrollRect scroll;
         private bool inside;
+        private bool focused;
         private Vector2 origin=new(.5f,.5f);
         private bool originChanged;
         public float Strength { get; private set; }
@@ -25,7 +26,19 @@ namespace TowerOfBabel.Interface
             selectable=GetComponent<UnityEngine.UI.Selectable>();
             scroll=GetComponent<UnityEngine.UI.ScrollRect>();
         }
-        public void OnPointerEnter(PointerEventData data) { inside=true; Track(data); }
+        public void OnPointerEnter(PointerEventData data)
+        {
+            if(selectable==null) Resolve();
+            if(!inside && selectable!=null && selectable.IsInteractable()) AeroUIAudio.Play(AeroUICue.Hover);
+            inside=true; Track(data);
+        }
+        public void OnSelect(BaseEventData data)
+        {
+            focused=true; origin=new(.5f,.5f); originChanged=true;
+            if(selectable==null) Resolve();
+            if(selectable!=null && selectable.IsInteractable()) AeroUIAudio.Play(AeroUICue.Hover);
+        }
+        public void OnDeselect(BaseEventData data) => focused=false;
         public void OnPointerMove(PointerEventData data) => Track(data);
         public void OnPointerExit(PointerEventData data) => inside=false;
         private void Track(PointerEventData data)
@@ -54,12 +67,19 @@ namespace TowerOfBabel.Interface
                 if(inside) Track(mouse.position.ReadValue(),camera);
             }
             bool enabledControl=(selectable==null || selectable.IsInteractable()) && (scroll==null || scroll.isActiveAndEnabled);
-            float target=inside && enabledControl ? 1 : 0;
+            float target=(inside || focused) && enabledControl ? 1 : 0;
             float next=Mathf.MoveTowards(Strength,target,Time.unscaledDeltaTime/(target>Strength ? .12f : .18f));
             if(!Mathf.Approximately(next,Strength) || originChanged)
             { Strength=next; surface?.SetHover(Strength,origin); originChanged=false; }
         }
         private void OnDisable()
-        { inside=false; Strength=0; originChanged=false; surface?.SetHover(0,origin); }
+        { inside=focused=false; Strength=0; originChanged=false; surface?.SetHover(0,origin); }
+#if UNITY_EDITOR
+        public void SampleEditorHover(float strength, Vector2 point)
+        {
+            if(Application.isPlaying) return;
+            Resolve(); Strength=Mathf.Clamp01(strength); origin=point; surface?.SetHover(Strength,origin);
+        }
+#endif
     }
 }

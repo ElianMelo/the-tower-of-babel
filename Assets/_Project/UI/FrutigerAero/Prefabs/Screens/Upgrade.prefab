@@ -99,13 +99,49 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9028026501434080114}
+    - targetCorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5578224826960276661}
   m_SourcePrefab: {fileID: 100100000, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
 --- !u!1 &5022399844462907054 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
   m_PrefabInstance: {fileID: 8502447739547766}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &9028026501434080114
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5022399844462907054}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &5578224826960276661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5022399844462907054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 0
+  playSounds: 0
+  allowInteraction: 1
+  siblingStagger: 0
+  revealDuration: 0.24
+  dismissDuration: 0.14
 --- !u!224 &7055698569330940115 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7058500270431365285, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
@@ -210,13 +246,49 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8655595665048167594}
+    - targetCorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6785359552147283891}
   m_SourcePrefab: {fileID: 100100000, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
 --- !u!1 &5006786632732237507 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
   m_PrefabInstance: {fileID: 60445687407517723}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &8655595665048167594
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5006786632732237507}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &6785359552147283891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5006786632732237507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 0
+  playSounds: 0
+  allowInteraction: 1
+  siblingStagger: 0
+  revealDuration: 0.24
+  dismissDuration: 0.14
 --- !u!224 &6999275043485010110 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7058500270431365285, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
@@ -670,6 +742,10 @@ PrefabInstance:
       propertyPath: m_HorizontalAlignment
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5658472738300521021, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 6506502249199175893}
     - target: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Name
       value: GatherButton
@@ -1222,6 +1298,10 @@ PrefabInstance:
       propertyPath: m_HorizontalAlignment
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5658472738300521021, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 6456705875377443293}
     - target: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Name
       value: ProcessorButton
@@ -1412,6 +1492,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1269432932277137293, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3087299758277470485}
+    - targetCorrespondingSourceObject: {fileID: 1269432932277137293, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8216373529192988092}
+    - targetCorrespondingSourceObject: {fileID: 1269432932277137293, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8508471404343396774}
   m_SourcePrefab: {fileID: 100100000, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
 --- !u!1 &4259787409525128771 stripped
 GameObject:
@@ -1445,6 +1531,36 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!225 &8216373529192988092
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4259787409525128771}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &8508471404343396774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4259787409525128771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 1
+  playSounds: 1
+  allowInteraction: 1
+  siblingStagger: 0
+  revealDuration: 0.24
+  dismissDuration: 0.14
 --- !u!224 &6740559685445010510 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8578063993743496576, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
@@ -2248,13 +2364,49 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6112397197897669222}
+    - targetCorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 992685241355446736}
   m_SourcePrefab: {fileID: 100100000, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
 --- !u!1 &1728985057000282500 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5020689921863384792, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
   m_PrefabInstance: {fileID: 5932230671970412380}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &6112397197897669222
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728985057000282500}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &992685241355446736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1728985057000282500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 0
+  playSounds: 0
+  allowInteraction: 1
+  siblingStagger: 0
+  revealDuration: 0.24
+  dismissDuration: 0.14
 --- !u!224 &3722032422380261369 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7058500270431365285, guid: c6071e50a989a694c9cad669a424eb4e, type: 3}
@@ -4311,6 +4463,10 @@ PrefabInstance:
       propertyPath: m_HorizontalAlignment
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5658472738300521021, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 2842223688352714249}
     - target: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Name
       value: BuilderButton
@@ -4580,6 +4736,10 @@ PrefabInstance:
       propertyPath: cornerRadius
       value: 24
       objectReference: {fileID: 0}
+    - target: {fileID: 5658472738300521021, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 5506839873102377417}
     - target: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Name
       value: CloseButton

@@ -44,7 +44,7 @@ namespace TowerOfBabel
         private bool inputLockApplied;
         private bool boardsBuilt;
 
-        public bool IsVisible => visuals != null && visuals.activeSelf;
+        public bool IsVisible => AeroPanelMotion.IsVisible(visuals);
         public UpgradeJob SelectedJob => selectedJob;
 
         private void Awake()
@@ -110,14 +110,13 @@ namespace TowerOfBabel
                 controlStateMachine.SetModalInputLocked(true);
                 inputLockApplied = true;
             }
-            visuals.SetActive(true);
+            AeroPanelMotion.SetVisible(visuals, true);
         }
 
         public void Hide()
         {
             tooltip?.Hide();
-            if (visuals != null)
-                visuals.SetActive(false);
+            AeroPanelMotion.SetVisible(visuals, false);
             RestoreCursorState();
             ReleaseInputLock();
         }

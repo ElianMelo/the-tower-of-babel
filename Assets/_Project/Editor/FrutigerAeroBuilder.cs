@@ -121,6 +121,8 @@ public static partial class FrutigerAeroBuilder
         AssetDatabase.SaveAssets();
         Selection.activeGameObject=instance;
         ApplyInteractiveRevision();
+        ActionExperienceBuilder.AttachToInterface();
+        AeroUIJuiceAuthoring.Apply();
         Debug.Log("Frutiger Aero: replaced all six interface areas with nested prefab components.");
     }
 

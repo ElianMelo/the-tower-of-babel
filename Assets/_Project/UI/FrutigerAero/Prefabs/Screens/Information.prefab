@@ -106,13 +106,49 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3235973114755724174, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
       insertIndex: -1
       addedObject: {fileID: 970966120178579317}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6300161383137295879}
+    - targetCorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4686653070983240062}
   m_SourcePrefab: {fileID: 100100000, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
 --- !u!1 &1585613395048124323 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6894375534579436065, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}
   m_PrefabInstance: {fileID: 5308764287558321538}
   m_PrefabAsset: {fileID: 0}
+--- !u!225 &6300161383137295879
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1585613395048124323}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
+--- !u!114 &4686653070983240062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1585613395048124323}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 0
+  playSounds: 0
+  allowInteraction: 0
+  siblingStagger: 0
+  revealDuration: 0.24
+  dismissDuration: 0.14
 --- !u!224 &7297230633125492236 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3235973114755724174, guid: eaf5245bee92e0347a65bb52fe0be248, type: 3}

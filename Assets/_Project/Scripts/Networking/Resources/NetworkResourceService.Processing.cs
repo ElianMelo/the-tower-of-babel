@@ -161,7 +161,9 @@ namespace TowerOfBabel.Networking.Resources
             UpdateWalletTargetRpc(connection, process.Source, sourceAmount);
             if (process.Source != process.Target)
                 UpdateWalletTargetRpc(connection, process.Target, targetAmount);
-            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Process);
+            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Process,
+                worldPosition: process.Processor.FeedbackPosition,
+                actionLabel: $"Processed {process.Production} {process.Processor.TargetResource.DisplayName}");
             FinishProcessTargetRpc(connection, id, process.RequestId, true);
         }
 

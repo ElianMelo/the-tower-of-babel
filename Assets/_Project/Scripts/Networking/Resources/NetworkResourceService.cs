@@ -175,7 +175,9 @@ namespace TowerOfBabel.Networking.Resources
             node.BeginAuthoritativeCooldown(node.Definition.RespawnCooldown);
             SetNodeCooldownObserversRpc(node.NodeId, node.Definition.RespawnCooldown);
             UpdateWalletTargetRpc(connection, node.Definition.ResourceType, amount);
-            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Gather);
+            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Gather,
+                worldPosition: node.FeedbackPosition,
+                actionLabel: $"Gathered {gather.Production} {node.Definition.DisplayName}");
         }
 
         [TargetRpc]

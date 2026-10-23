@@ -303,7 +303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00002670288
+      value: -0.0000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -796,6 +796,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 244548076532040849, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4283906057
+      objectReference: {fileID: 0}
+    - target: {fileID: 244548076532040849, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 746469959040034900, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -912,6 +920,14 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 4256387843815352680, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4283906057
+      objectReference: {fileID: 0}
+    - target: {fileID: 4256387843815352680, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 6745431260275522790, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4283906057
@@ -929,6 +945,14 @@ PrefabInstance:
       value: 4286078500
       objectReference: {fileID: 0}
     - target: {fileID: 8946956111360578674, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 9092715123247523980, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4286078500
+      objectReference: {fileID: 0}
+    - target: {fileID: 9092715123247523980, guid: d2021435e8c252f4795660ee59fdd111, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
@@ -1266,6 +1290,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &452950332 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1024560205301068166, guid: 4ce092e6a855a4341a9996f2660925ee, type: 3}
+  m_PrefabInstance: {fileID: 171425985}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &539594824
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1330,15 +1359,93 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5922868413498109815, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+      propertyPath: m_TerrainData
+      value: 
+      objectReference: {fileID: 15600000, guid: 22c2c434b8c89f4439163516d3397445, type: 2}
+    - target: {fileID: 5922868413498109815, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+      propertyPath: m_MaterialTemplate
+      value: 
+      objectReference: {fileID: 2100000, guid: 38630c68ae37bc4439d1bdad5162d9bb, type: 2}
+    - target: {fileID: 5922868413498109815, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+      propertyPath: m_HeightmapPixelError
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6922764393439729157, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
       propertyPath: m_Name
       value: Terrain
       objectReference: {fileID: 0}
+    - target: {fileID: 8814696795601263895, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+      propertyPath: m_TerrainData
+      value: 
+      objectReference: {fileID: 15600000, guid: 22c2c434b8c89f4439163516d3397445, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3170683105086291527, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 594692780}
   m_SourcePrefab: {fileID: 100100000, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+--- !u!1 &594692776 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3170683105086291527, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+  m_PrefabInstance: {fileID: 539594824}
+  m_PrefabAsset: {fileID: 0}
+--- !u!218 &594692779 stripped
+Terrain:
+  m_CorrespondingSourceObject: {fileID: 5922868413498109815, guid: 0d7396d643f85aa41b6b7713f86f912b, type: 3}
+  m_PrefabInstance: {fileID: 539594824}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &594692780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594692776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f86e80021b077904d960c395cb2d8330, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.AeroTowerTerrain
+  targetTerrain: {fileID: 594692779}
+  sourceTerrainData: {fileID: 15600000, guid: 5272bceeaa3552440b818dd01c1e2448, type: 2}
+  generatedTerrainData: {fileID: 15600000, guid: 22c2c434b8c89f4439163516d3397445, type: 2}
+  boundaryMarkers:
+  - {fileID: 445655991}
+  - {fileID: 1206388798}
+  - {fileID: 1584106972}
+  - {fileID: 699957540}
+  minimumTowerRadius: 96
+  clearingPadding: 12
+  clearingElevation: 0
+  mountainHeight: 88
+  wavelength: 260
+  foothillWidth: 105
+  foothillSetback: 16
+  perimeterBlend: 65
+  seed: 17
+  oceanSurface: {fileID: 452950332}
+  lakeDepth: 3
+  lakeShoreWidth: 18
+  lakes:
+  - offset: {x: 147, y: 92}
+    radii: {x: 28, y: 21}
+    rotation: 24
+  - offset: {x: -150, y: 66}
+    radii: {x: 24, y: 18}
+    rotation: -32
+  - offset: {x: -61, y: -169}
+    radii: {x: 29, y: 20}
+    rotation: 12
+  - offset: {x: 150, y: -57}
+    radii: {x: 21, y: 16}
+    rotation: -25
+  grassFeather: 14
+  grassSlopeLimit: 32
+  clearingCenter: {x: -0.23990548, y: 0.0133936815}
+  clearingRadius: 108
 --- !u!1001 &649019440
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -517909,6 +518016,7 @@ GameObject:
   - component: {fileID: 1902623590}
   - component: {fileID: 1902623591}
   - component: {fileID: 1902623592}
+  - component: {fileID: 1902623593}
   m_Layer: 0
   m_Name: TowerGenerator
   m_TagString: Untagged
@@ -517975,6 +518083,1453 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::ConfigureTower
   towerGenerator: {fileID: 1902623591}
   chunkManager: {fileID: 1114320928}
+--- !u!114 &1902623593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1902623589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fa8c1c65e72afe40a11b1c737740262, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerBushScatter
+  bushPrefabs:
+  - {fileID: 5035646291857263348, guid: 2a79b5d8a8f57d64b8b4cf2f65fccec2, type: 3}
+  - {fileID: 6493948318805345125, guid: 5ee56ff9f2c696145bd918d3edc19366, type: 3}
+  - {fileID: 6524587373382966238, guid: 363bd59448c90f243be5691520714215, type: 3}
+  seed: 7319
+  terraceCoverage: 0.78
+  averageClusterSpacing: 58
+  wallClearance: 0.55
+  edgeClearance: 0.15
+  stairClearance: 0.7
+  windAllowance: 0.2
+  visibleDistance: 150
+  placements:
+  - variant: 0
+    floor: 2
+    position: {x: -21.490318, y: 12.2, z: 89.181625}
+    scale: {x: 0.84802455, y: 1.0017785, z: 0.8384803}
+    yaw: 144.93506
+    footprint: 0.47745347
+    height: 0.45150962
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 0
+    floor: 2
+    position: {x: -43.96739, y: 12.2, z: 81.02955}
+    scale: {x: 0.96961766, y: 1.0140868, z: 1.0070915}
+    yaw: 180.38393
+    footprint: 0.53189135
+    height: 0.45705712
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 1
+    floor: 2
+    position: {x: -46.225933, y: 12.2, z: 78.991}
+    scale: {x: 1.2258626, y: 1.1295396, z: 1.1148815}
+    yaw: 357.0598
+    footprint: 0.9265747
+    height: 0.86981016
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 0
+    floor: 2
+    position: {x: 66.63837, y: 12.2, z: 62.97174}
+    scale: {x: 0.98166335, y: 0.96849406, z: 1.0352466}
+    yaw: 111.18127
+    footprint: 0.53197265
+    height: 0.4365081
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 1
+    floor: 2
+    position: {x: -83.67336, y: 12.2, z: 36.611843}
+    scale: {x: 0.9069494, y: 0.92432976, z: 0.86425596}
+    yaw: 259.50882
+    footprint: 0.70325136
+    height: 0.71178687
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 2
+    floor: 2
+    position: {x: -36.910873, y: 12.2, z: -84.067604}
+    scale: {x: 0.84095013, y: 0.892932, z: 0.8819588}
+    yaw: 228.46964
+    footprint: 0.9118532
+    height: 0.897742
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 1
+    floor: 2
+    position: {x: -46.570503, y: 12.2, z: -78.85207}
+    scale: {x: 1.0328047, y: 1.2081198, z: 1.0470544}
+    yaw: 131.8579
+    footprint: 0.84008926
+    height: 0.9303214
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 1
+    floor: 2
+    position: {x: -44.484013, y: 12.2, z: -80.19058}
+    scale: {x: 1.1637495, y: 1.0998828, z: 1.212594}
+    yaw: 350.22733
+    footprint: 0.9130594
+    height: 0.84697276
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 0
+    floor: 2
+    position: {x: -38.25717, y: 12.2, z: 82.82851}
+    scale: {x: 0.772794, y: 0.8566973, z: 0.8107135}
+    yaw: 50.103176
+    footprint: 0.43624562
+    height: 0.38612038
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 1
+    floor: 2
+    position: {x: -65.97385, y: 12.2, z: -63.35768}
+    scale: {x: 1.0525541, y: 0.9889135, z: 0.99967545}
+    yaw: 355.3902
+    footprint: 0.7993915
+    height: 0.76152
+    wallRadius: 90
+    floorRadius: 93
+  - variant: 1
+    floor: 4
+    position: {x: 76.18795, y: 24.2, z: -45.612324}
+    scale: {x: 1.0214514, y: 0.92140836, z: 1.022246}
+    yaw: 103.988106
+    footprint: 0.7685672
+    height: 0.7095372
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 1
+    floor: 4
+    position: {x: 73.89805, y: 24.2, z: -49.171097}
+    scale: {x: 1.0353059, y: 1.0185711, z: 0.978288}
+    yaw: 320.67612
+    footprint: 0.7954644
+    height: 0.7843581
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 0
+    floor: 4
+    position: {x: 80.09417, y: 24.2, z: -39.021442}
+    scale: {x: 1.2361705, y: 1.2710057, z: 1.1669495}
+    yaw: 180.9577
+    footprint: 0.65812826
+    height: 0.57285255
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 2
+    floor: 4
+    position: {x: -80.89342, y: 24.2, z: 36.102573}
+    scale: {x: 0.78014773, y: 0.7899722, z: 0.90356994}
+    yaw: 158.63187
+    footprint: 0.9092289
+    height: 0.79422754
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 1
+    floor: 4
+    position: {x: 68.02013, y: 24.2, z: 57.1316}
+    scale: {x: 0.86261034, y: 0.879095, z: 0.81957424}
+    yaw: 196.24275
+    footprint: 0.66886157
+    height: 0.6769535
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 1
+    floor: 4
+    position: {x: -79.53198, y: 24.2, z: -38.52581}
+    scale: {x: 0.97149795, y: 1.0332879, z: 0.9401466}
+    yaw: 84.78058
+    footprint: 0.761937
+    height: 0.79569083
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 0
+    floor: 4
+    position: {x: -86.615456, y: 24.2, z: -19.049568}
+    scale: {x: 0.9964123, y: 0.9616932, z: 0.899563}
+    yaw: 227.62029
+    footprint: 0.5179231
+    height: 0.4334429
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 0
+    floor: 4
+    position: {x: 13.30176, y: 24.2, z: -88.23547}
+    scale: {x: 1.0353607, y: 1.1049907, z: 0.95122623}
+    yaw: 270.19394
+    footprint: 0.55930924
+    height: 0.49802822
+    wallRadius: 87
+    floorRadius: 90
+  - variant: 1
+    floor: 8
+    position: {x: 41.252983, y: 48.2, z: 71.96945}
+    scale: {x: 0.99328446, y: 0.94452405, z: 1.016197}
+    yaw: 22.094185
+    footprint: 0.7697329
+    height: 0.7273376
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -71.82147, y: 48.2, z: -40.96618}
+    scale: {x: 0.9914418, y: 1.0338913, z: 1.1793139}
+    yaw: 145.19656
+    footprint: 0.5921271
+    height: 0.46598315
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 1
+    floor: 8
+    position: {x: -72.99402, y: 48.2, z: -38.947323}
+    scale: {x: 0.8983719, y: 0.8725255, z: 1.0265627}
+    yaw: 44.872597
+    footprint: 0.76125795
+    height: 0.6718946
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -70.06944, y: 48.2, z: -42.88982}
+    scale: {x: 0.94418776, y: 1.0670778, z: 0.9381489}
+    yaw: 106.96796
+    footprint: 0.5219353
+    height: 0.48094055
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 1
+    floor: 8
+    position: {x: -82.46508, y: 48.2, z: -3.6612625}
+    scale: {x: 0.9552636, y: 1.0443417, z: 1.0007614}
+    yaw: 47.31447
+    footprint: 0.7808739
+    height: 0.8042029
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -74.06977, y: 48.2, z: 37.74347}
+    scale: {x: 1.27751, y: 1.1514491, z: 1.2143565}
+    yaw: 289.28723
+    footprint: 0.64772487
+    height: 0.5189674
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 1
+    floor: 8
+    position: {x: -74.695114, y: 48.2, z: 36.00863}
+    scale: {x: 0.9919618, y: 0.9440666, z: 1.0780389}
+    yaw: 57.446106
+    footprint: 0.80498844
+    height: 0.72698534
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 1
+    floor: 8
+    position: {x: 78.34403, y: 48.2, z: 25.89019}
+    scale: {x: 1.0607531, y: 0.997372, z: 0.9256225}
+    yaw: 218.42166
+    footprint: 0.80576944
+    height: 0.7680335
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -40.05262, y: 48.2, z: -72.59838}
+    scale: {x: 1.1429559, y: 1.2003261, z: 1.1380194}
+    yaw: 14.974092
+    footprint: 0.6135338
+    height: 0.5409967
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: 37.525673, y: 48.2, z: 74.08145}
+    scale: {x: 0.90308577, y: 0.87596756, z: 0.94229317}
+    yaw: 76.32163
+    footprint: 0.4830942
+    height: 0.39480564
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -37.462543, y: 48.2, z: 73.52536}
+    scale: {x: 0.8972309, y: 0.7620836, z: 0.9006837}
+    yaw: 185.17032
+    footprint: 0.44672123
+    height: 0.34347722
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -39.23638, y: 48.2, z: 72.75328}
+    scale: {x: 1.1924584, y: 1.1345903, z: 1.034938}
+    yaw: 197.60786
+    footprint: 0.6165619
+    height: 0.511369
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 1
+    floor: 8
+    position: {x: -64.50616, y: 48.2, z: 52.002254}
+    scale: {x: 0.9342138, y: 0.8380684, z: 0.80868083}
+    yaw: 258.55484
+    footprint: 0.7015827
+    height: 0.64536065
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -67.207115, y: 48.2, z: 48.48678}
+    scale: {x: 1.1488943, y: 1.0551274, z: 1.0666529}
+    yaw: 144.57327
+    footprint: 0.5864345
+    height: 0.4755544
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 0
+    floor: 8
+    position: {x: -33.421627, y: 48.2, z: -75.521454}
+    scale: {x: 0.7917649, y: 0.8920483, z: 0.7834988}
+    yaw: 216.92694
+    footprint: 0.43712422
+    height: 0.40205336
+    wallRadius: 81
+    floorRadius: 84
+  - variant: 2
+    floor: 10
+    position: {x: 21.596361, y: 60.2, z: -76.718254}
+    scale: {x: 0.84365535, y: 0.80957454, z: 0.87575346}
+    yaw: 337.40933
+    footprint: 0.8900226
+    height: 0.81393546
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: 24.634512, y: 60.2, z: -75.59342}
+    scale: {x: 0.9703214, y: 0.9279504, z: 0.9151726}
+    yaw: 24.630634
+    footprint: 0.5026492
+    height: 0.4182347
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 2
+    floor: 10
+    position: {x: -16.108036, y: 60.2, z: 78.14923}
+    scale: {x: 0.9253313, y: 0.87071425, z: 0.99986637}
+    yaw: 92.99324
+    footprint: 1.0054389
+    height: 0.87540454
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: -74.84266, y: 60.2, z: -26.260103}
+    scale: {x: 1.082948, y: 1.0537692, z: 1.1047921}
+    yaw: 53.13375
+    footprint: 0.57175213
+    height: 0.4749423
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 2
+    floor: 10
+    position: {x: -74.58404, y: 60.2, z: -28.180113}
+    scale: {x: 0.967085, y: 0.9550633, z: 0.9286051}
+    yaw: 294.63055
+    footprint: 0.995054
+    height: 0.96020794
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 1
+    floor: 10
+    position: {x: 47.01187, y: 60.2, z: -63.936268}
+    scale: {x: 1.0204152, y: 1.0348011, z: 0.9311198}
+    yaw: 192.72058
+    footprint: 0.79019934
+    height: 0.7968561
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: 44.53539, y: 60.2, z: -65.475105}
+    scale: {x: 0.7830753, y: 0.8598046, z: 0.75372815}
+    yaw: 100.31658
+    footprint: 0.42783606
+    height: 0.38752085
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 2
+    floor: 10
+    position: {x: -41.774757, y: 60.2, z: 67.73945}
+    scale: {x: 0.8651972, y: 0.8722152, z: 0.9337821}
+    yaw: 65.37106
+    footprint: 0.9507961
+    height: 0.8769136
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: -19.886375, y: 60.2, z: 77.59676}
+    scale: {x: 0.9134551, y: 0.79114556, z: 0.812785}
+    yaw: 45.98179
+    footprint: 0.45670676
+    height: 0.3565757
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 1
+    floor: 10
+    position: {x: 62.443092, y: 60.2, z: 49.38992}
+    scale: {x: 1.1002337, y: 1.1322658, z: 1.0632311}
+    yaw: 131.59058
+    footprint: 0.85531414
+    height: 0.8719095
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: 61.417995, y: 60.2, z: 50.823177}
+    scale: {x: 0.7803989, y: 0.90394264, z: 0.78236467}
+    yaw: 120.53804
+    footprint: 0.4364315
+    height: 0.40741423
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: 58.435574, y: 60.2, z: 53.92653}
+    scale: {x: 0.76974607, y: 0.8172284, z: 0.81428325}
+    yaw: 65.629295
+    footprint: 0.42951825
+    height: 0.36833143
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: 59.996464, y: 60.2, z: 53.443657}
+    scale: {x: 0.8480711, y: 0.84588444, z: 0.8373709}
+    yaw: 111.050835
+    footprint: 0.44628987
+    height: 0.38124692
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 10
+    position: {x: -39.197144, y: 60.2, z: -68.86118}
+    scale: {x: 0.954772, y: 0.8535506, z: 1.0067925}
+    yaw: 17.094719
+    footprint: 0.49968642
+    height: 0.38470215
+    wallRadius: 78
+    floorRadius: 81
+  - variant: 0
+    floor: 12
+    position: {x: -66.74827, y: 72.2, z: 36.595978}
+    scale: {x: 0.95863366, y: 0.9660093, z: 1.0055834}
+    yaw: 300.20026
+    footprint: 0.52178305
+    height: 0.43538818
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 0
+    floor: 12
+    position: {x: -67.70774, y: 72.2, z: 35.48839}
+    scale: {x: 1.0444165, y: 1.1400224, z: 1.0369507}
+    yaw: 202.62866
+    footprint: 0.56927466
+    height: 0.5138173
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 0
+    floor: 12
+    position: {x: -65.15282, y: 72.2, z: -39.903957}
+    scale: {x: 1.207958, y: 1.0147532, z: 1.124975}
+    yaw: 32.97819
+    footprint: 0.5976591
+    height: 0.45735747
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 1
+    floor: 12
+    position: {x: -57.244007, y: 72.2, z: -51.090786}
+    scale: {x: 1.0382429, y: 1.0826869, z: 0.9421499}
+    yaw: 58.208725
+    footprint: 0.8099663
+    height: 0.83373094
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 1
+    floor: 12
+    position: {x: -54.515804, y: 72.2, z: -54.12664}
+    scale: {x: 1.2199913, y: 1.2087891, z: 1.1081804}
+    yaw: 84.57856
+    footprint: 0.93906873
+    height: 0.93083686
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 2
+    floor: 12
+    position: {x: 54.962826, y: 72.2, z: 53.38083}
+    scale: {x: 0.84266424, y: 0.842064, z: 0.938878}
+    yaw: 178.56142
+    footprint: 0.9490027
+    height: 0.8466
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 1
+    floor: 12
+    position: {x: 53.550365, y: 72.2, z: 55.02287}
+    scale: {x: 1.0380603, y: 0.9056976, z: 0.9151094}
+    yaw: 247.249
+    footprint: 0.7744641
+    height: 0.697439
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 1
+    floor: 12
+    position: {x: 57.643047, y: 72.2, z: 50.19387}
+    scale: {x: 1.0098032, y: 1.006765, z: 0.8595658}
+    yaw: 334.18918
+    footprint: 0.7785266
+    height: 0.7752667
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 1
+    floor: 12
+    position: {x: -69.39832, y: 72.2, z: -32.53066}
+    scale: {x: 0.987519, y: 0.9878398, z: 1.0281361}
+    yaw: 158.31958
+    footprint: 0.78522015
+    height: 0.76069325
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 0
+    floor: 12
+    position: {x: -68.12958, y: 72.2, z: -36.082367}
+    scale: {x: 1.1878717, y: 1.0831935, z: 1.0260558}
+    yaw: 290.0883
+    footprint: 0.60478383
+    height: 0.48820406
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 2
+    floor: 12
+    position: {x: -37.162933, y: 72.2, z: 67.08192}
+    scale: {x: 0.98776126, y: 0.84540766, z: 0.82549304}
+    yaw: 12.565818
+    footprint: 0.9903133
+    height: 0.84996164
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 0
+    floor: 12
+    position: {x: -50.3382, y: 72.2, z: -58.45896}
+    scale: {x: 1.1148119, y: 0.99394244, z: 1.0087416}
+    yaw: 21.211208
+    footprint: 0.5630608
+    height: 0.44797787
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 0
+    floor: 12
+    position: {x: -49.0291, y: 72.2, z: -59.696426}
+    scale: {x: 1.0988393, y: 0.95289975, z: 0.9693346}
+    yaw: 193.81178
+    footprint: 0.54963315
+    height: 0.4294796
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 2
+    floor: 12
+    position: {x: 32.257847, y: 72.2, z: 69.50522}
+    scale: {x: 0.870762, y: 0.9276108, z: 0.8903194}
+    yaw: 79.56508
+    footprint: 0.92574006
+    height: 0.9326076
+    wallRadius: 75
+    floorRadius: 78
+  - variant: 0
+    floor: 14
+    position: {x: 70.169876, y: 84.2, z: 21.197325}
+    scale: {x: 1.1497734, y: 1.0815886, z: 0.9985651}
+    yaw: 259.2533
+    footprint: 0.59201396
+    height: 0.4874807
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 2
+    floor: 14
+    position: {x: 30.994518, y: 84.2, z: -67.10027}
+    scale: {x: 0.8090998, y: 0.86922866, z: 0.87415534}
+    yaw: 112.42291
+    footprint: 0.9006247
+    height: 0.87391096
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 0
+    floor: 14
+    position: {x: 33.254417, y: 84.2, z: -66.52727}
+    scale: {x: 0.8651978, y: 0.80980533, z: 0.8171853}
+    yaw: 196.16887
+    footprint: 0.44467032
+    height: 0.3649858
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 0
+    floor: 14
+    position: {x: 51.039684, y: 84.2, z: 52.491543}
+    scale: {x: 0.89834756, y: 0.7948092, z: 0.85751265}
+    yaw: 253.91716
+    footprint: 0.452503
+    height: 0.35822693
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 0
+    floor: 14
+    position: {x: 73.50581, y: 84.2, z: 10.343398}
+    scale: {x: 1.1181048, y: 1.0472105, z: 1.0408491}
+    yaw: 256.83438
+    footprint: 0.5747904
+    height: 0.4719862
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 1
+    floor: 14
+    position: {x: -43.884705, y: 84.2, z: 59.217327}
+    scale: {x: 1.0523956, y: 1.0605298, z: 0.9980217}
+    yaw: 241.74205
+    footprint: 0.81362414
+    height: 0.8166687
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 1
+    floor: 14
+    position: {x: 36.936188, y: 84.2, z: 63.459034}
+    scale: {x: 0.88911545, y: 0.7978417, z: 0.9188407}
+    yaw: 125.705284
+    footprint: 0.6847505
+    height: 0.6143838
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 2
+    floor: 14
+    position: {x: -63.720795, y: 84.2, z: -37.03117}
+    scale: {x: 1.0797088, y: 1.0515391, z: 1.0890293}
+    yaw: 0.18598555
+    footprint: 1.1157346
+    height: 1.0572034
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 0
+    floor: 14
+    position: {x: -62.239822, y: 84.2, z: -40.11401}
+    scale: {x: 1.0431068, y: 1.0482757, z: 1.1056105}
+    yaw: 200.14139
+    footprint: 0.5709209
+    height: 0.47246632
+    wallRadius: 72
+    floorRadius: 75
+  - variant: 2
+    floor: 16
+    position: {x: -30.894756, y: 96.2, z: -63.39522}
+    scale: {x: 0.92790014, y: 0.8318892, z: 0.86192536}
+    yaw: 11.273926
+    footprint: 0.93784064
+    height: 0.83637035
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 0
+    floor: 16
+    position: {x: -31.276854, y: 96.2, z: 63.5498}
+    scale: {x: 0.95180655, y: 0.88725144, z: 0.97034377}
+    yaw: 270.7455
+    footprint: 0.4945167
+    height: 0.39989138
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 1
+    floor: 16
+    position: {x: -29.473185, y: 96.2, z: 64.15617}
+    scale: {x: 1.0363543, y: 1.0064589, z: 0.9643099}
+    yaw: 33.977657
+    footprint: 0.7936412
+    height: 0.775031
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 0
+    floor: 16
+    position: {x: 36.539246, y: 96.2, z: -60.38907}
+    scale: {x: 0.7976738, y: 0.8991966, z: 0.77718717}
+    yaw: 112.999565
+    footprint: 0.44048464
+    height: 0.40527517
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 0
+    floor: 16
+    position: {x: -25.814316, y: 96.2, z: 65.81878}
+    scale: {x: 1.065118, y: 0.94833803, z: 0.963823}
+    yaw: 18.716793
+    footprint: 0.53770214
+    height: 0.4274236
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 0
+    floor: 16
+    position: {x: -27.841167, y: 96.2, z: 65.50071}
+    scale: {x: 1.1435734, y: 1.1248212, z: 1.0037283}
+    yaw: 284.80646
+    footprint: 0.5986346
+    height: 0.506966
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 1
+    floor: 16
+    position: {x: -63.05649, y: 96.2, z: -31.608103}
+    scale: {x: 0.8942122, y: 0.81380194, z: 0.84670264}
+    yaw: 145.03264
+    footprint: 0.6738656
+    height: 0.6266741
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 0
+    floor: 16
+    position: {x: 52.58415, y: 96.2, z: 47.869434}
+    scale: {x: 1.1652583, y: 1.0064683, z: 1.1826764}
+    yaw: 161.43373
+    footprint: 0.5877412
+    height: 0.45362338
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 2
+    floor: 16
+    position: {x: 54.47224, y: 96.2, z: 45.241344}
+    scale: {x: 0.9851936, y: 0.9359878, z: 0.9135212}
+    yaw: 63.914944
+    footprint: 1.0062946
+    height: 0.94102967
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 0
+    floor: 16
+    position: {x: 50.655693, y: 96.2, z: 49.26916}
+    scale: {x: 0.7954778, y: 0.7960036, z: 0.9482857}
+    yaw: 5.726744
+    footprint: 0.4690595
+    height: 0.35876524
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 1
+    floor: 16
+    position: {x: -39.814915, y: 96.2, z: -58.420662}
+    scale: {x: 1.1679564, y: 1.1286354, z: 1.1285992}
+    yaw: 307.56546
+    footprint: 0.89329636
+    height: 0.86911386
+    wallRadius: 69
+    floorRadius: 72
+  - variant: 1
+    floor: 22
+    position: {x: -58.37014, y: 132.2, z: -20.078459}
+    scale: {x: 1.071748, y: 1.1266432, z: 1.1871898}
+    yaw: 95.46546
+    footprint: 0.9038912
+    height: 0.86757976
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: -60.32196, y: 132.2, z: -12.359962}
+    scale: {x: 1.1218507, y: 1.0536109, z: 1.0117886}
+    yaw: 359.15445
+    footprint: 0.5772945
+    height: 0.47487095
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: -59.18364, y: 132.2, z: -17.338179}
+    scale: {x: 1.110823, y: 1.0871724, z: 1.0065948}
+    yaw: 27.32587
+    footprint: 0.58040345
+    height: 0.48999736
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 2
+    floor: 22
+    position: {x: -18.910685, y: 132.2, z: 58.838615}
+    scale: {x: 0.99203944, y: 0.89375293, z: 0.9695609}
+    yaw: 241.27869
+    footprint: 1.0035392
+    height: 0.8985673
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 2
+    floor: 22
+    position: {x: 54.66176, y: 132.2, z: -28.587751}
+    scale: {x: 1.0414395, y: 0.94658566, z: 0.9152061}
+    yaw: 45.775223
+    footprint: 1.0551773
+    height: 0.95168465
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: -10.71088, y: 132.2, z: 60.834698}
+    scale: {x: 1.1760566, y: 1.1735377, z: 1.1576103}
+    yaw: 74.222755
+    footprint: 0.61899203
+    height: 0.5289229
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: -44.187214, y: 132.2, z: 43.55261}
+    scale: {x: 0.9630356, y: 1.0066376, z: 1.0958852}
+    yaw: 326.72513
+    footprint: 0.5594154
+    height: 0.45369968
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: -47.285835, y: 132.2, z: 40.376286}
+    scale: {x: 1.0683167, y: 1.038955, z: 0.9524316}
+    yaw: 260.20523
+    footprint: 0.5568707
+    height: 0.46826538
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 2
+    floor: 22
+    position: {x: -41.711357, y: 132.2, z: 45.435333}
+    scale: {x: 0.8115434, y: 0.82259256, z: 0.94106084}
+    yaw: 309.76804
+    footprint: 0.9469232
+    height: 0.8270236
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: 41.909153, y: 132.2, z: -45.01503}
+    scale: {x: 1.0864793, y: 1.0745419, z: 0.99674755}
+    yaw: 125.21799
+    footprint: 0.56992286
+    height: 0.4843047
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 0
+    floor: 22
+    position: {x: -61.702545, y: 132.2, z: -7.3230057}
+    scale: {x: 0.90796477, y: 1.0357274, z: 1.0590997}
+    yaw: 350.71356
+    footprint: 0.5532135
+    height: 0.46681067
+    wallRadius: 60
+    floorRadius: 63
+  - variant: 1
+    floor: 24
+    position: {x: 25.27771, y: 144.2, z: 53.057392}
+    scale: {x: 1.0481893, y: 1.2530935, z: 1.1787692}
+    yaw: 54.518494
+    footprint: 0.9243683
+    height: 0.9649537
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 0
+    floor: 24
+    position: {x: 28.096592, y: 144.2, z: 51.109726}
+    scale: {x: 1.0573753, y: 0.98343354, z: 1.0421323}
+    yaw: 310.57782
+    footprint: 0.54219127
+    height: 0.44324142
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 0
+    floor: 24
+    position: {x: -47.502666, y: 144.2, z: 33.87109}
+    scale: {x: 1.1663376, y: 1.0737058, z: 1.1689341}
+    yaw: 206.32558
+    footprint: 0.5966983
+    height: 0.48392785
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 0
+    floor: 24
+    position: {x: -46.817516, y: 144.2, z: 35.158527}
+    scale: {x: 1.0878938, y: 1.0122267, z: 1.0518873}
+    yaw: 206.2092
+    footprint: 0.557922
+    height: 0.45621872
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 0
+    floor: 24
+    position: {x: 48.039062, y: 144.2, z: 33.58618}
+    scale: {x: 1.1085157, y: 0.9758771, z: 1.1307381}
+    yaw: 71.6436
+    footprint: 0.5646518
+    height: 0.43983567
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 1
+    floor: 24
+    position: {x: 49.96489, y: 144.2, z: 30.784845}
+    scale: {x: 1.0104839, y: 0.9505719, z: 0.94109434}
+    yaw: 303.52527
+    footprint: 0.76767707
+    height: 0.7319948
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 1
+    floor: 24
+    position: {x: -55.202522, y: 144.2, z: -19.657162}
+    scale: {x: 1.1227207, y: 1.1052666, z: 1.125375}
+    yaw: 270.9309
+    footprint: 0.8642844
+    height: 0.85111856
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 1
+    floor: 24
+    position: {x: -54.020596, y: 144.2, z: -22.717896}
+    scale: {x: 1.1025448, y: 1.1000373, z: 0.9657322}
+    yaw: 60.64131
+    footprint: 0.85018945
+    height: 0.84709173
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 2
+    floor: 24
+    position: {x: -39.288883, y: 144.2, z: 43.7047}
+    scale: {x: 0.89210826, y: 0.7945647, z: 0.8521847}
+    yaw: 156.60269
+    footprint: 0.90061814
+    height: 0.7988448
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 2
+    floor: 24
+    position: {x: -25.505661, y: 144.2, z: -52.810085}
+    scale: {x: 1.0775903, y: 0.9389698, z: 0.90805537}
+    yaw: 47.303852
+    footprint: 1.0837103
+    height: 0.9440277
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 0
+    floor: 24
+    position: {x: 37.119453, y: 144.2, z: 45.91379}
+    scale: {x: 0.9861956, y: 1.1520325, z: 1.013996}
+    yaw: 117.17312
+    footprint: 0.5617366
+    height: 0.5192303
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 0
+    floor: 24
+    position: {x: 39.810417, y: 144.2, z: 42.9662}
+    scale: {x: 1.1464182, y: 1.0300217, z: 1.0964382}
+    yaw: 173.97932
+    footprint: 0.58060426
+    height: 0.46423906
+    wallRadius: 57
+    floorRadius: 60
+  - variant: 1
+    floor: 26
+    position: {x: 19.201284, y: 156.2, z: -52.557426}
+    scale: {x: 0.87656134, y: 0.7979323, z: 0.81357664}
+    yaw: 13.571535
+    footprint: 0.660603
+    height: 0.61445355
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 1
+    floor: 26
+    position: {x: 48.512478, y: 156.2, z: -26.940329}
+    scale: {x: 1.0362192, y: 1.001534, z: 1.0174646}
+    yaw: 327.6191
+    footprint: 0.79257905
+    height: 0.7712385
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 0
+    floor: 26
+    position: {x: 46.143345, y: 156.2, z: -30.526325}
+    scale: {x: 0.8687648, y: 0.900922, z: 0.8312035}
+    yaw: 208.15125
+    footprint: 0.4640592
+    height: 0.4060528
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 0
+    floor: 26
+    position: {x: -42.52584, y: 156.2, z: 36.02432}
+    scale: {x: 0.81909573, y: 0.91681933, z: 0.844233}
+    yaw: 277.25977
+    footprint: 0.4592227
+    height: 0.41321787
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 1
+    floor: 26
+    position: {x: -55.50694, y: 156.2, z: -4.26807}
+    scale: {x: 1.1536981, y: 1.0775062, z: 1.1553619}
+    yaw: 61.704594
+    footprint: 0.8758719
+    height: 0.8297415
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 0
+    floor: 26
+    position: {x: -55.4343, y: 156.2, z: -2.1729555}
+    scale: {x: 1.0970423, y: 1.1007506, z: 0.96497893}
+    yaw: 41.293873
+    footprint: 0.57861614
+    height: 0.49611714
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 0
+    floor: 26
+    position: {x: 39.320194, y: 156.2, z: -39.383705}
+    scale: {x: 1.134912, y: 1.0527906, z: 1.0536858}
+    yaw: 23.754284
+    footprint: 0.5813983
+    height: 0.47450122
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 1
+    floor: 26
+    position: {x: -44.255814, y: 156.2, z: -34.193775}
+    scale: {x: 0.793496, y: 0.81252605, z: 0.823565}
+    yaw: 240.65889
+    footprint: 0.63323057
+    height: 0.6256916
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 1
+    floor: 26
+    position: {x: 12.338201, y: 156.2, z: -54.45909}
+    scale: {x: 0.90661496, y: 0.8197719, z: 0.78348434}
+    yaw: 89.84232
+    footprint: 0.68214864
+    height: 0.6312713
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 0
+    floor: 26
+    position: {x: 10.495896, y: 156.2, z: -54.95547}
+    scale: {x: 0.8322436, y: 0.82790565, z: 0.95766425}
+    yaw: 8.616512
+    footprint: 0.47850442
+    height: 0.37314376
+    wallRadius: 54
+    floorRadius: 57
+  - variant: 1
+    floor: 28
+    position: {x: -48.31241, y: 168.2, z: 21.902618}
+    scale: {x: 0.8676251, y: 0.89528066, z: 0.8124203}
+    yaw: 332.62457
+    footprint: 0.67496496
+    height: 0.68941736
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 0
+    floor: 28
+    position: {x: -29.783611, y: 168.2, z: -43.185978}
+    scale: {x: 1.0584937, y: 1.1533549, z: 1.2228179}
+    yaw: 26.9724
+    footprint: 0.630235
+    height: 0.51982635
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 1
+    floor: 28
+    position: {x: -38.70767, y: 168.2, z: -35.753967}
+    scale: {x: 1.1198535, y: 1.1935478, z: 1.0800982}
+    yaw: 80.60857
+    footprint: 0.87878466
+    height: 0.91910017
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 1
+    floor: 28
+    position: {x: -40.320404, y: 168.2, z: -33.77963}
+    scale: {x: 0.98817474, y: 0.9842312, z: 1.1335456}
+    yaw: 339.7312
+    footprint: 0.84474736
+    height: 0.75791436
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 0
+    floor: 28
+    position: {x: 31.952063, y: 168.2, z: 41.472164}
+    scale: {x: 0.86251813, y: 0.9332743, z: 0.92521393}
+    yaw: 95.58517
+    footprint: 0.48897478
+    height: 0.42063427
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 2
+    floor: 28
+    position: {x: 44.68569, y: 168.2, z: 27.984566}
+    scale: {x: 0.96627957, y: 1.1349462, z: 0.9871425}
+    yaw: 143.19878
+    footprint: 1.0477066
+    height: 1.1410599
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 1
+    floor: 28
+    position: {x: 42.898552, y: 168.2, z: 30.253864}
+    scale: {x: 0.890655, y: 0.9483499, z: 0.88233846}
+    yaw: 113.00643
+    footprint: 0.698742
+    height: 0.73028374
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 2
+    floor: 28
+    position: {x: -36.910923, y: 168.2, z: -37.55364}
+    scale: {x: 0.88664174, y: 0.9795574, z: 0.8768526}
+    yaw: 145.83601
+    footprint: 0.93307173
+    height: 0.984834
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 0
+    floor: 28
+    position: {x: -34.986256, y: 168.2, z: -39.50661}
+    scale: {x: 1.0082772, y: 0.9408667, z: 0.9875259}
+    yaw: 219.05411
+    footprint: 0.51763475
+    height: 0.4240562
+    wallRadius: 51
+    floorRadius: 54
+  - variant: 0
+    floor: 30
+    position: {x: 47.54409, y: 180.2, z: 14.234886}
+    scale: {x: 1.088878, y: 1.0227404, z: 0.95021915}
+    yaw: 241.56111
+    footprint: 0.56034636
+    height: 0.46095732
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 1
+    floor: 30
+    position: {x: 46.79501, y: 180.2, z: 16.24044}
+    scale: {x: 1.018659, y: 1.0147332, z: 1.0519823}
+    yaw: 171.17184
+    footprint: 0.80422854
+    height: 0.78140265
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 0
+    floor: 30
+    position: {x: -30.803078, y: 180.2, z: -39.8205}
+    scale: {x: 0.798233, y: 0.84055704, z: 0.8725565}
+    yaw: 349.57953
+    footprint: 0.45322517
+    height: 0.37884584
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 1
+    floor: 30
+    position: {x: -33.382824, y: 180.2, z: -36.568947}
+    scale: {x: 0.9558831, y: 1.0450248, z: 1.004966}
+    yaw: 108.62394
+    footprint: 0.78341377
+    height: 0.8047289
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 0
+    floor: 30
+    position: {x: 11.990354, y: 180.2, z: -48.236546}
+    scale: {x: 1.1198937, y: 1.1404693, z: 1.064337}
+    yaw: 232.70665
+    footprint: 0.5940267
+    height: 0.5140187
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 2
+    floor: 30
+    position: {x: 10.02075, y: 180.2, z: -48.732647}
+    scale: {x: 0.8120643, y: 0.85720706, z: 0.89570606}
+    yaw: 210.54369
+    footprint: 0.9161378
+    height: 0.8618246
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 1
+    floor: 30
+    position: {x: 21.12407, y: 180.2, z: -45.054028}
+    scale: {x: 1.1417317, y: 1.0465539, z: 1.2417644}
+    yaw: 314.32095
+    footprint: 0.91906655
+    height: 0.8059064
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 0
+    floor: 30
+    position: {x: 19.194983, y: 180.2, z: -45.868904}
+    scale: {x: 1.0797176, y: 1.0230308, z: 1.092488}
+    yaw: 217.5415
+    footprint: 0.56158406
+    height: 0.4610882
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 1
+    floor: 30
+    position: {x: 22.825167, y: 180.2, z: -43.814175}
+    scale: {x: 0.96529907, y: 0.9666198, z: 0.96373475}
+    yaw: 196.63097
+    footprint: 0.7450603
+    height: 0.7443526
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 1
+    floor: 30
+    position: {x: 26.373957, y: 180.2, z: 42.260403}
+    scale: {x: 0.83795375, y: 0.9107439, z: 0.96800953}
+    yaw: 256.87817
+    footprint: 0.73543435
+    height: 0.70132494
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 2
+    floor: 30
+    position: {x: 22.914146, y: 180.2, z: 44.20724}
+    scale: {x: 0.8688852, y: 0.92064553, z: 0.87684953}
+    yaw: 264.36835
+    footprint: 0.91314805
+    height: 0.92560476
+    wallRadius: 48
+    floorRadius: 51
+  - variant: 0
+    floor: 34
+    position: {x: -16.37839, y: 204.2, z: 40.048367}
+    scale: {x: 0.83109075, y: 0.84684503, z: 0.9840313}
+    yaw: 209.7837
+    footprint: 0.4909079
+    height: 0.3816799
+    wallRadius: 42
+    floorRadius: 45
+  - variant: 0
+    floor: 34
+    position: {x: 25.408056, y: 204.2, z: -35.583057}
+    scale: {x: 0.8678898, y: 0.9745745, z: 1.0407896}
+    yaw: 238.8647
+    footprint: 0.53499997
+    height: 0.4392486
+    wallRadius: 42
+    floorRadius: 45
+  - variant: 0
+    floor: 34
+    position: {x: 21.422255, y: 204.2, z: -38.35244}
+    scale: {x: 1.2275364, y: 1.0727905, z: 1.1680466}
+    yaw: 289.52335
+    footprint: 0.61566395
+    height: 0.48351532
+    wallRadius: 42
+    floorRadius: 45
+  - variant: 1
+    floor: 34
+    position: {x: -43.46967, y: 204.2, z: -4.8349504}
+    scale: {x: 1.1764499, y: 0.99125856, z: 1.0019243}
+    yaw: 187.32138
+    footprint: 0.8706756
+    height: 0.76332587
+    wallRadius: 42
+    floorRadius: 45
+  - variant: 0
+    floor: 36
+    position: {x: 37.161957, y: 216.2, z: -17.553755}
+    scale: {x: 0.7763014, y: 0.8364375, z: 0.90593976}
+    yaw: 194.62543
+    footprint: 0.46330947
+    height: 0.37698913
+    wallRadius: 39
+    floorRadius: 42
+  - variant: 0
+    floor: 36
+    position: {x: -18.816362, y: 216.2, z: -35.626427}
+    scale: {x: 1.2134988, y: 1.2044008, z: 1.1750021}
+    yaw: 78.513275
+    footprint: 0.63739914
+    height: 0.54283315
+    wallRadius: 39
+    floorRadius: 42
+  - variant: 1
+    floor: 36
+    position: {x: -8.997633, y: 216.2, z: 40.053722}
+    scale: {x: 0.9419264, y: 0.9083718, z: 1.0201608}
+    yaw: 199.71942
+    footprint: 0.76476806
+    height: 0.6994983
+    wallRadius: 39
+    floorRadius: 42
+  - variant: 1
+    floor: 38
+    position: {x: -34.52577, y: 228.2, z: -14.890339}
+    scale: {x: 0.9891619, y: 0.8688556, z: 0.98005515}
+    yaw: 127.88976
+    footprint: 0.73914677
+    height: 0.6690686
+    wallRadius: 36
+    floorRadius: 39
+  - variant: 0
+    floor: 38
+    position: {x: -37.57871, y: 228.2, z: -4.099914}
+    scale: {x: 1.1747113, y: 1.1581577, z: 1.1854904}
+    yaw: 354.4713
+    footprint: 0.6189985
+    height: 0.521991
+    wallRadius: 36
+    floorRadius: 39
+  - variant: 1
+    floor: 38
+    position: {x: -37.877193, y: 228.2, z: -2.3749573}
+    scale: {x: 0.84613925, y: 0.8049387, z: 0.8695914}
+    yaw: 130.23691
+    footprint: 0.65802044
+    height: 0.61984885
+    wallRadius: 36
+    floorRadius: 39
+  - variant: 1
+    floor: 38
+    position: {x: 29.779558, y: 228.2, z: -23.350742}
+    scale: {x: 0.8225485, y: 0.77060753, z: 0.8187356}
+    yaw: 203.8584
+    footprint: 0.6242659
+    height: 0.5934119
+    wallRadius: 36
+    floorRadius: 39
+  - variant: 0
+    floor: 40
+    position: {x: 21.018522, y: 240.2, z: 27.904251}
+    scale: {x: 1.0182076, y: 1.0039365, z: 1.0251774}
+    yaw: 297.7805
+    footprint: 0.53577095
+    height: 0.45248228
+    wallRadius: 33
+    floorRadius: 36
+  - variant: 1
+    floor: 40
+    position: {x: 18.257683, y: 240.2, z: 29.394773}
+    scale: {x: 0.922003, y: 1.0039569, z: 0.9397958}
+    yaw: 235.0499
+    footprint: 0.73795086
+    height: 0.7731043
+    wallRadius: 33
+    floorRadius: 36
+  - variant: 0
+    floor: 40
+    position: {x: 23.689293, y: 240.2, z: 24.676897}
+    scale: {x: 1.1081442, y: 1.1057773, z: 1.1444054}
+    yaw: 268.5844
+    footprint: 0.59509766
+    height: 0.49838272
+    wallRadius: 33
+    floorRadius: 36
+  - variant: 1
+    floor: 40
+    position: {x: -17.113142, y: 240.2, z: 30.180511}
+    scale: {x: 0.8610696, y: 1.0046078, z: 0.9434586}
+    yaw: 263.7551
+    footprint: 0.7401746
+    height: 0.7736055
+    wallRadius: 33
+    floorRadius: 36
+  - variant: 2
+    floor: 40
+    position: {x: -24.231369, y: 240.2, z: 24.96732}
+    scale: {x: 1.0081973, y: 0.9484061, z: 1.0237331}
+    yaw: 354.97226
+    footprint: 1.0408202
+    height: 0.9535149
+    wallRadius: 33
+    floorRadius: 36
+  - variant: 0
+    floor: 40
+    position: {x: -14.926646, y: 240.2, z: -30.768969}
+    scale: {x: 1.2735139, y: 1.0760903, z: 1.0770377}
+    yaw: 206.21474
+    footprint: 0.63134736
+    height: 0.48500258
+    wallRadius: 33
+    floorRadius: 36
+  - variant: 1
+    floor: 42
+    position: {x: 13.129895, y: 252.2, z: -28.922577}
+    scale: {x: 0.95882285, y: 1.088374, z: 0.9715147}
+    yaw: 45.995846
+    footprint: 0.7729638
+    height: 0.8381103
+    wallRadius: 30
+    floorRadius: 33
+  - variant: 1
+    floor: 42
+    position: {x: 9.850366, y: 252.2, z: -30.186842}
+    scale: {x: 1.21145, y: 1.1395597, z: 1.2611958}
+    yaw: 13.489371
+    footprint: 0.9487741
+    height: 0.8775263
+    wallRadius: 30
+    floorRadius: 33
+  - variant: 0
+    floor: 42
+    position: {x: 23.469618, y: 252.2, z: -21.695076}
+    scale: {x: 0.88905615, y: 0.9124142, z: 0.965961}
+    yaw: 21.087246
+    footprint: 0.49811715
+    height: 0.41123244
+    wallRadius: 30
+    floorRadius: 33
+  - variant: 1
+    floor: 42
+    position: {x: 21.67016, y: 252.2, z: -23.105974}
+    scale: {x: 1.0603122, y: 0.9933284, z: 1.107055}
+    yaw: 198.055
+    footprint: 0.8314255
+    height: 0.76491976
+    wallRadius: 30
+    floorRadius: 33
+  - variant: 1
+    floor: 42
+    position: {x: -23.377337, y: 252.2, z: 21.888268}
+    scale: {x: 1.0639341, y: 0.95971674, z: 1.0605958}
+    yaw: 209.51228
+    footprint: 0.8000566
+    height: 0.73903686
+    wallRadius: 30
+    floorRadius: 33
+  - variant: 2
+    floor: 42
+    position: {x: -21.859453, y: 252.2, z: 23.242039}
+    scale: {x: 0.91628194, y: 0.8382205, z: 0.84784484}
+    yaw: 40.422916
+    footprint: 0.9294474
+    height: 0.8427357
+    wallRadius: 30
+    floorRadius: 33
+  - variant: 1
+    floor: 42
+    position: {x: 17.262434, y: 252.2, z: 26.759743}
+    scale: {x: 0.90365356, y: 0.78951234, z: 0.82399225}
+    yaw: 104.41993
+    footprint: 0.6744041
+    height: 0.6079697
+    wallRadius: 30
+    floorRadius: 33
 --- !u!1 &2045154390
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,8 +27,10 @@ namespace TowerOfBabel.Buildings
 
         [Header("Interaction")]
         [SerializeField, Min(0.01f)] private float interactionDuration = 3f;
-        [SerializeField, Min(0f)] private float shakeStrength = 0.05f;
-        [SerializeField, Min(0f)] private float shakeSpeed = 24f;
+        [SerializeField, Min(0f), InspectorName("Weave Strength")] private float shakeStrength = 0.05f;
+        [SerializeField, Min(0f), InspectorName("Weave Tempo")]
+        [Tooltip("Higher values weave faster; 24 is one gentle cycle in about 2.6 seconds.")]
+        private float shakeSpeed = 24f;
         [SerializeField] private Transform visuals;
         [SerializeField] private TowerOfBabel.Outline outline;
 
@@ -40,7 +42,8 @@ namespace TowerOfBabel.Buildings
         private ChunkKey chunkKey;
         private int localIndex = -1;
         private byte currentStage;
-        private Vector3 visualsStartPosition;
+        private AeroInteractionMotion interactionMotion;
+        private PillarConstructionMotion constructionMotion;
         private bool isBound;
 
         public string ObjectName => gameObject.name;
@@ -101,7 +104,6 @@ namespace TowerOfBabel.Buildings
         private void Awake()
         {
             ResolveReferences();
-            visualsStartPosition = visuals.localPosition;
             ApplyStageMesh(currentStage);
         }
 
@@ -111,26 +113,34 @@ namespace TowerOfBabel.Buildings
             chunkKey = key;
             localIndex = assetLocalIndex;
             isBound = owner != null && assetLocalIndex >= 0;
-            ApplyStage(stage);
+            ApplyStage(stage,false);
         }
 
         public void Unbind()
         {
-            RestoreVisualPosition();
+            interactionMotion?.Stop(true);
+            constructionMotion?.ResetImmediately();
             outline?.SetVisible(false);
             chunkManager = null;
             localIndex = -1;
             isBound = false;
         }
 
-        public void ApplyStage(byte stage)
+        public void ApplyStage(byte stage) => ApplyStage(stage,true);
+
+        private void ApplyStage(byte stage,bool animate)
         {
+            ResolveReferences();
+            byte previousStage=currentStage;
+            Mesh previousMesh=meshFilter!=null ? meshFilter.sharedMesh : null;
             byte nextStage = stage > ChunkAssetData.CompletedStage
                 ? ChunkAssetData.CompletedStage
                 : stage;
             bool changed = currentStage != nextStage;
             currentStage = nextStage;
             ApplyStageMesh(currentStage);
+            if (changed) constructionMotion?.ConfirmStage(previousMesh,previousStage,currentStage,
+                animate && Application.isPlaying && isActiveAndEnabled);
 
             if (IsComplete)
                 outline?.SetVisible(false);
@@ -153,24 +163,29 @@ namespace TowerOfBabel.Buildings
 
         public void BeginInteraction(GameObject interactor)
         {
-            visualsStartPosition = visuals.localPosition;
+            ResolveReferences();
+            if (constructionMotion!=null) { constructionMotion.BeginWork(currentStage); return; }
+            if (interactionMotion == null)
+                interactionMotion = GetComponent<AeroInteractionMotion>() ?? gameObject.AddComponent<AeroInteractionMotion>();
+            interactionMotion.Begin(visuals, shakeStrength, shakeSpeed);
         }
 
         public void UpdateInteraction(float normalizedProgress)
         {
-            float phase = Time.time * shakeSpeed;
-            Vector3 offset = new(Mathf.Sin(phase), 0f, Mathf.Cos(phase * 0.83f));
-            visuals.localPosition = visualsStartPosition + offset * shakeStrength;
+            interactionMotion?.SetProgress(normalizedProgress);
+            constructionMotion?.SetProgress(normalizedProgress);
         }
 
         public void CancelInteraction()
         {
             RestoreVisualPosition();
+            constructionMotion?.ResetImmediately();
         }
 
         public void CompleteInteraction(GameObject interactor)
         {
             RestoreVisualPosition();
+            constructionMotion?.FinishWork();
             NetworkBuildingService.Instance?.NotifyLocalInteractionFinished(this);
         }
 
@@ -187,6 +202,7 @@ namespace TowerOfBabel.Buildings
 
         public void RejectByServer()
         {
+            constructionMotion?.ResetImmediately();
             ServerRejected?.Invoke();
         }
 
@@ -206,17 +222,19 @@ namespace TowerOfBabel.Buildings
                 visuals = transform;
             if (outline == null)
                 outline = GetComponent<TowerOfBabel.Outline>();
+            if (constructionMotion == null)
+                constructionMotion = GetComponent<PillarConstructionMotion>();
         }
 
         private void RestoreVisualPosition()
         {
-            if (visuals != null)
-                visuals.localPosition = visualsStartPosition;
+            interactionMotion?.Stop();
         }
 
         private void OnDisable()
         {
-            RestoreVisualPosition();
+            interactionMotion?.Stop(true);
+            constructionMotion?.ResetImmediately();
             outline?.SetVisible(false);
         }
 

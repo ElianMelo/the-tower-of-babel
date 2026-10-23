@@ -13,10 +13,14 @@ namespace TowerOfBabel.Interface
         [SerializeField] private TMP_Text status;
         private RectTransform rect;
         private UpgradeButton owner;
-        public bool IsVisible => group!=null && group.alpha>0;
+        public bool IsVisible => owner != null;
         public string Description => description!=null ? description.text : string.Empty;
-        private void Awake() { rect=(RectTransform)transform; Hide(); }
-        private void OnDisable() => Hide();
+        private void Awake() { rect=(RectTransform)transform; owner=null; if(group!=null) group.alpha=0; }
+        private void OnDisable() { owner=null; if(group!=null) group.alpha=0; }
+        private void Update()
+        {
+            if(group!=null) group.alpha = Mathf.MoveTowards(group.alpha, owner!=null ? 1 : 0, Time.unscaledDeltaTime / .12f);
+        }
         public void Show(UpgradeButton source,Vector2 screenPosition)
         {
             if(source==null || source.Data==null) return;
@@ -26,7 +30,8 @@ namespace TowerOfBabel.Interface
             description.text=Describe(source.Data);
             status.text=source.State==UpgradeButtonState.Purchased ? "OWNED  •  Permanent bonus" :
                 source.State==UpgradeButtonState.CanBuy ? "AVAILABLE  •  Click to unlock" : "REVEALED  •  Earn an upgrade point";
-            group.alpha=1; group.blocksRaycasts=false; group.interactable=false;
+            if(!Application.isPlaying) group.alpha=1;
+            group.blocksRaycasts=false; group.interactable=false;
             transform.SetAsLastSibling();
             Move(screenPosition);
         }
@@ -44,7 +49,7 @@ namespace TowerOfBabel.Interface
         public void Hide(UpgradeButton source=null)
         {
             if(source!=null && source!=owner) return;
-            owner=null; if(group!=null) group.alpha=0;
+            owner=null; if(group!=null && !Application.isPlaying) group.alpha=0;
         }
         public static string Describe(UpgradeData data)
         {

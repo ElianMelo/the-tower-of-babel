@@ -1132,6 +1132,10 @@ PrefabInstance:
       propertyPath: m_text
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 5658472738300521021, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      propertyPath: icon
+      value: 
+      objectReference: {fileID: 4114991820296660114}
     - target: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       propertyPath: m_Name
       value: CloseButton
@@ -1680,6 +1684,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1269432932277137293, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4863935841301413738}
+    - targetCorrespondingSourceObject: {fileID: 1269432932277137293, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3246036051739926942}
+    - targetCorrespondingSourceObject: {fileID: 1269432932277137293, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3433136947804127630}
   m_SourcePrefab: {fileID: 100100000, guid: c7c9a4fe4d0dee84d98f696c449ae146, type: 3}
 --- !u!224 &614404538972455512 stripped
 RectTransform:
@@ -1718,3 +1728,33 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!225 &3246036051739926942
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7930914715629172821}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &3433136947804127630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7930914715629172821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 1
+  playSounds: 1
+  allowInteraction: 1
+  siblingStagger: 0
+  revealDuration: 0.24
+  dismissDuration: 0.14

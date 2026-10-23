@@ -6,6 +6,8 @@ Current geometry revision, 2026-10-21. The user identified `Assets/_Project/Refe
 
 The reference supplies the seamless white frames, curved aqua recesses, polished surfaces and soft reflected water light. Green vegetation is excluded from the building kit under the standing palette constraint.
 
+The pillar now has a [separate construction progression](PILLAR_CONSTRUCTION.md): sparse blueprint guides at stage 0, nine partial solid meshes and the unchanged completed mesh at stage 10. The earlier statement that all stage slots use the completed mesh is superseded for the pillar only.
+
 - Arch: rounded outer corners, a curved elliptical passage and actual shallow glazing pockets on both faces. The aqua panels sit inside beveled white surrounds. The full spandrel, flat top and floor connection height remain intact. Bubble badges, orbital engraving and raised blue opening wires are removed.
 - Pillar: a continuous white support with restrained integral aqua collars, a smooth shaft and simpler bearing surfaces. Painted vertical streaks and bubble ornaments are removed. Fine shaft relief remains in its baked normal map.
 - Floor and step: smoother rounded corners, uninterrupted white walking surfaces and aqua bands formed by the side geometry. Etched ripple decorations and overlay trim are removed.

@@ -12,8 +12,10 @@ namespace TowerOfBabel.Resources
         [SerializeField, Min(1)] private int amountGathered = 1;
         [SerializeField, Min(0.1f)] private float interactionDuration = 3f;
         [SerializeField, Min(0f)] private float respawnCooldown = 5f;
-        [SerializeField, Min(0f)] private float shakeStrength = 0.05f;
-        [SerializeField, Min(0f)] private float shakeSpeed = 24f;
+        [SerializeField, Min(0f), InspectorName("Weave Strength")] private float shakeStrength = 0.05f;
+        [SerializeField, Min(0f), InspectorName("Weave Tempo")]
+        [Tooltip("Higher values weave faster; 24 is one gentle cycle in about 2.6 seconds.")]
+        private float shakeSpeed = 24f;
 
         public string ResourceId => resourceId;
         public ResourceType ResourceType => resourceType;

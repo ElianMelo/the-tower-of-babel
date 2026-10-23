@@ -130,6 +130,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4845489785591559735}
+    - targetCorrespondingSourceObject: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1409396943520756088}
+    - targetCorrespondingSourceObject: {fileID: 7011585147832815341, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6243468864660018171}
   m_SourcePrefab: {fileID: 100100000, guid: 2f88b6715ebb0d043814d55fcf22e094, type: 3}
 --- !u!114 &608190975877568762 stripped
 MonoBehaviour:
@@ -178,6 +184,36 @@ MonoBehaviour:
   hoverEffect: {fileID: 0}
   button: {fileID: 4437831655074014091}
   optionText: {fileID: 608190975877568762}
+--- !u!225 &1409396943520756088
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4857005576593627455}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &6243468864660018171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4857005576593627455}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c19824e278881d43be5f4cbed6cd766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Interface.AeroPanelMotion
+  animateTransform: 0
+  playSounds: 0
+  allowInteraction: 1
+  siblingStagger: 0.025
+  revealDuration: 0.24
+  dismissDuration: 0.14
 --- !u!1001 &8832839397164029198
 PrefabInstance:
   m_ObjectHideFlags: 0

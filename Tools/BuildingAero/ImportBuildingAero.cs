@@ -81,8 +81,11 @@ foreach(var name in new[]{"Arch","Floor_Tile","Pillar","Step_Tile"})
         var serialized=new SerializedObject(building);
         serialized.FindProperty("meshFilter").objectReferenceValue=filter;
         var stages=serialized.FindProperty("stageMeshes");
-        for(int i=0;i<stages.arraySize;i++)stages.GetArrayElementAtIndex(i).objectReferenceValue=mesh;
+        var construction=name=="Pillar" ? AssetDatabase.LoadAllAssetsAtPath(dir+"/Construction/PillarStages.fbx").OfType<Mesh>().ToArray() : Array.Empty<Mesh>();
+        for(int i=0;i<stages.arraySize;i++)
+            stages.GetArrayElementAtIndex(i).objectReferenceValue=i<10 ? construction.FirstOrDefault(m=>m.name=="Pillar_Stage_"+i.ToString("00")) ?? mesh : mesh;
         serialized.ApplyModifiedPropertiesWithoutUndo();
+        if(name=="Pillar" && construction.Length==10) filter.sharedMesh=building.GetStageMesh(0);
         if(name=="Floor_Tile")
         {
             var oldBox=root.GetComponent<BoxCollider>();

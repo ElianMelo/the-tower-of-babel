@@ -18,7 +18,7 @@ namespace TowerOfBabel.Resources
         [SerializeField] private GameObject visuals;
         [SerializeField] private ulong nodeId;
 
-        private Vector3 visualsStartPosition;
+        private AeroInteractionMotion interactionMotion;
         private bool isCoolingDown;
 
         public string ObjectName => gameObject.name;
@@ -40,6 +40,16 @@ namespace TowerOfBabel.Resources
         public bool CanInteract => enabled && gameObject.activeInHierarchy && definition != null && !isCoolingDown;
         public ulong NodeId => nodeId;
         public ResourceDefinition Definition => definition;
+        public Vector3 FeedbackPosition
+        {
+            get
+            {
+                var filter=visuals!=null ? visuals.GetComponent<MeshFilter>() : null;
+                if (filter==null || filter.sharedMesh==null) return transform.position;
+                var bounds=filter.sharedMesh.bounds;
+                return filter.transform.TransformPoint(bounds.center+Vector3.up*bounds.extents.y*.6f);
+            }
+        }
         public ResourceType InteractionResourceType => definition!=null ? definition.ResourceType : ResourceType.Stone;
         public InteractionResourceData InteractionResources => definition!=null ? InteractionResourceData.Gather(InteractionResourceType,
             NetworkUpgradeService.Instance!=null ? NetworkUpgradeService.Instance.GetLocalProduction(UpgradeJob.Gather,definition.AmountGathered) : definition.AmountGathered) : default;
@@ -50,23 +60,19 @@ namespace TowerOfBabel.Resources
         {
             if (visuals == null)
                 visuals = gameObject;
-
-            visualsStartPosition = visuals.transform.localPosition;
         }
 
         public void BeginInteraction(GameObject interactor)
         {
-            visualsStartPosition = visuals.transform.localPosition;
+            if (definition == null || visuals == null) return;
+            if (interactionMotion == null)
+                interactionMotion = GetComponent<AeroInteractionMotion>() ?? gameObject.AddComponent<AeroInteractionMotion>();
+            interactionMotion.Begin(visuals.transform, definition.ShakeStrength, definition.ShakeSpeed);
         }
 
         public void UpdateInteraction(float normalizedProgress)
         {
-            if (definition == null || visuals == null)
-                return;
-
-            float phase = Time.time * definition.ShakeSpeed;
-            Vector3 offset = new Vector3(Mathf.Sin(phase), 0f, Mathf.Cos(phase * 0.83f));
-            visuals.transform.localPosition = visualsStartPosition + offset * definition.ShakeStrength;
+            interactionMotion?.SetProgress(normalizedProgress);
         }
 
         public void CancelInteraction()
@@ -104,6 +110,7 @@ namespace TowerOfBabel.Resources
 
         private IEnumerator CooldownRoutine(float duration)
         {
+            interactionMotion?.Stop(true);
             isCoolingDown = true;
             visuals.SetActive(false);
             yield return new WaitForSeconds(duration);
@@ -113,13 +120,12 @@ namespace TowerOfBabel.Resources
 
         private void RestoreVisualPosition()
         {
-            if (visuals != null)
-                visuals.transform.localPosition = visualsStartPosition;
+            interactionMotion?.Stop();
         }
 
         private void OnDisable()
         {
-            RestoreVisualPosition();
+            interactionMotion?.Stop(true);
         }
     }
 }

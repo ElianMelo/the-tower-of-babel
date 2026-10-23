@@ -188,7 +188,9 @@ namespace TowerOfBabel.Networking.Buildings
                 build.LocalIndex, appliedStage);
             NetworkResourceService.Instance.SendAuthoritativeAmount(connection, definition.ResourceType,
                 authoritativeAmount);
-            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Build);
+            NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Build,
+                worldPosition: asset.Position+Vector3.up*.75f,
+                actionLabel: $"Built {asset.AssetType} · stage {appliedStage}/{ChunkAssetData.CompletedStage}");
         }
 
         private bool TryGetBuildDefinition(ChunkKey key, int localIndex, out ChunkAssetData asset,

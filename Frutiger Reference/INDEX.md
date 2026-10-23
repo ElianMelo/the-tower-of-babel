@@ -28,7 +28,49 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ## Asset
 
+### Stone and processor workshop
+
+- `../Documentation/FrutigerAero/Resources/Previews/Stone-Processor-Idle.png` — textured three-rock resource and rounded white/blue processing machine, modeled in Blender.
+- `../Documentation/FrutigerAero/Resources/Previews/Stone-Processor-World.png` — current prefab instances grounded in the Tower scene.
+- `../Documentation/FrutigerAero/Resources/Previews/Processor-Working.gif` — sampled roller, press, feed stone, status-light and completion motion. See [asset and animation notes](../Documentation/FrutigerAero/Resources/RESOURCE_WORKSHOP.md) and [generated texture prompts](../Documentation/FrutigerAero/Resources/TexturePrompts.md).
+
+### Exterior tower foliage
+
+- `../Documentation/FrutigerAero/Foliage/Previews/Bush-Sizes.png` — three green broadleaf shrub shapes in small, medium and large sizes.
+- `../Documentation/FrutigerAero/Foliage/Previews/Bush-Wind.gif` — sampled slow wind bending and leaf flutter, with anchored bases.
+- `../Documentation/FrutigerAero/Foliage/Previews/Bush-Terrace.png` — irregular detail clusters on the outer terrace, outside the wall and clear of the stairs. See [placement and rendering notes](../Documentation/FrutigerAero/Foliage/BUSHES.md).
+
+### Tower terrain landscape
+
+- `../Assets/_Project/UI/FrutigerAero/Art/AeroLandscape.png` — existing nature reference for optimistic green hills, clear blue skies and soft transitions; its historical menu placement is still superseded.
+- `../Documentation/FrutigerAero/Previews/Terrain-Overview.png` — current green circular tower clearing, small lakes and flowing green mountains, based on the four boundary pillars.
+- `../Documentation/FrutigerAero/Previews/Terrain-Clearing.png` — current flat 108-metre-radius grass-free footprint.
+- `../Documentation/FrutigerAero/Previews/Terrain-Ground.png` and `../Documentation/FrutigerAero/Previews/Terrain-Mountains.png` — ground-level rounded ridgeline reviews.
+- `../Documentation/FrutigerAero/Previews/Terrain-Lake-1.png` through `Terrain-Lake-4.png` — four small basins exposing the existing turquoise ocean, with rounded green banks. The clearing stays green without grass blades; this supersedes its pearl ground color.
+
+These are Edit Mode captures of the actual generated landscape. See [terrain direction and generator settings](../Documentation/FrutigerAero/TERRAIN_LANDSCAPE.md).
+
+### Interaction motion
+
+- `../Documentation/FrutigerAero/Previews/Interaction-Weave.gif` — current gentle figure-eight sway, buoyant rise and slight tilt on the stone and pillar; sampled in a disposable Edit Mode scene. See [motion notes](../Documentation/FrutigerAero/INTERACTION_WEAVE.md). This replaces the fast gathering/construction shake while keeping colliders and placement fixed.
+
+### Action experience feedback
+
+- `Asset/ExperienceBubble-User.png` — supplied soap bubble reference: translucent center, pastel cyan/pink thin-film rim and broad white reflections. Used for the procedural XP bubble shader.
+- `../Documentation/FrutigerAero/Previews/Experience-Float.png` — actual 3D sphere bubbles emerging from the resource, with randomized sizes and motion before collection.
+- `../Documentation/FrutigerAero/Previews/Experience-Flight.png` — bubbles curving toward the bottom XP bar.
+- `../Documentation/FrutigerAero/Previews/Experience-Arrival.png` — current bottom-left reward popup with aligned backing/glass, collection ripple, animated count and floating action text; the compact interaction prompt remains separately visible.
+- `../Documentation/FrutigerAero/Previews/Experience-LevelUp.png` — level transition and upgrade-point celebration.
+- `../Documentation/FrutigerAero/Previews/Experience-LevelUpFloat.png` — wider 350-bubble burst for XP that levels up; regular XP uses 35 bubbles at every level. This supersedes the 175-bubble canvas burst.
+- `../Documentation/FrutigerAero/Previews/Experience-LevelUp-1280x960.png` and `../Documentation/FrutigerAero/Previews/Experience-LevelUp-2560x1080.png` — current layout at 4:3 and ultrawide aspect ratios.
+
+These are sampled Edit Mode visual previews, not live gameplay captures. See [feedback and tuning notes](../Documentation/FrutigerAero/ACTION_EXPERIENCE.md).
+
 ### Building kit — white and blue only
+
+- `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Lineup.png` — pillar-only stages 0–10: sparse blue guides and scattered, irregular chunks filling in a seeded random order. Horizontal slices and staggered radial columns are superseded.
+- `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Sequence.gif` — static stage sequence.
+- `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Chunks-Arrival.gif` — separate chunks form with a Unity dissolve, then fly and turn into their exact pillar positions. Existing pieces remain solid. See [pillar construction notes](../Documentation/FrutigerAero/Buildings/PILLAR_CONSTRUCTION.md). Other building prefabs retain their stage setup.
 
 The 2026-10-21 building brief explicitly excludes green from building assets. It overrides the older blue/green UI palette for this kit.
 
@@ -120,3 +162,8 @@ These three action icons match InventorySmall and UpgradesSmall and are shared b
 - `UI/Project-Fixed-Border-Review.png` — corrected blue tabs and stationary glass outlines.
 
 This supersedes the animated-outline direction above. Selected tabs retain their original blue glass and use the pale green outline to indicate selection. Glass silhouettes and alpha coverage stay fixed. A soft cyan-white reflection travels around the perimeter; gentle interior flow and popup floating remain.
+
+## Overall UI feedback review
+
+- `../Documentation/FrutigerAero/Previews/UI-Feedback.gif` — sampled window reveals, buoyant icon/ripple feedback, changing inventory amounts and radial emotes.
+- `../Documentation/FrutigerAero/UI_FEEDBACK.md` — current motion timings and feedback behavior. Whole-button shaking is superseded by icon movement within stationary controls.

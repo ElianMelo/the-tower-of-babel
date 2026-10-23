@@ -6,6 +6,16 @@ Primary visual reference: [accepted initial UI](Previews/Fixed-Border-Review.png
 
 ## Visual identity to preserve
 
+The [stone and processor models](Resources/RESOURCE_WORKSHOP.md) use a silvery faceted rock cluster and a rounded pearl-white/azure machine with visible steel rollers and cyan status lights. Generated textures supply the surface detail. The hopper and tray are empty at idle: raw stone enters during use, and processed stone appears only after confirmation. Keep the housing, interaction collider and resource rules fixed.
+
+The [pillar construction sequence](Buildings/PILLAR_CONSTRUCTION.md) fills irregular chunks across the whole shape in a fixed random order. Incoming chunks form outside the pillar through a cyan dissolve, then fly and turn into their correct positions. Existing pieces remain solid. Preserve the sparse blueprint and original completed mesh; horizontal slices and staggered column patterns are superseded.
+
+The [tower landscape](TERRAIN_LANDSCAPE.md) uses a flat green circular clearing without grass blades inside the four boundary pillars and smooth green sine/cosine hills around it. Four small lakes outside the clearing reveal the existing ocean surface. Preserve gradual transitions and matte meadow surfaces; keep the playable center and tower placement stable. Green ground supersedes the earlier pearl-colored clearing.
+
+[Small, medium and large bushes](Foliage/BUSHES.md) add irregular green clusters to exterior tower terraces. Keep their canopies and wind motion outside the walls, on supported ledges and clear of stair routes. Plants have no colliders and remain separate from the repeating white/blue architecture.
+
+Task completion has a reusable [bubble-to-XP-bar feedback sequence](ACTION_EXPERIENCE.md): real 3D pearlescent spheres emerge from the asset, float and collect into the bottom-left glass bar. Regular gains use 35; leveling gains use 350 with wider spread. Vary sizes by 0.8–1.2 and randomize motion. Preserve the cyan ghost fill, counting XP, floating captions and level-up ripples. Align the popup's backing and glass bounds, and keep the 560 × 140 interaction card above it. Reward presentation stays local to the player and progression remains server-authoritative.
+
 - Frutiger Aero: optimistic nature-and-technology imagery, glossy rounded glass, white highlights, blue surfaces, and green accents.
 - Transparent backgrounds should let the world remain visible while preserving readable text and clear controls. Give each menu proportions and behavior appropriate to its purpose.
 - Use the supplied Frutiger regular and bold faces throughout the interface, including runtime-generated labels and popups.
@@ -13,6 +23,8 @@ Primary visual reference: [accepted initial UI](Previews/Fixed-Border-Review.png
 - Keep the generated small Inventory, Upgrades, Gather, Process, and Build icon family: bold cyan outlines, broad blue/green shapes, and simple white gloss. Review at the actual 36–68 unit display size. Current imports are uncompressed 64 × 64 sprites; generated source canvases are larger.
 
 ## Color and motion decisions
+
+World gathering and the remaining construction assets use a [slow buoyant weave](INTERACTION_WEAVE.md) instead of fast positional shaking. The pillar now uses the incoming-chunk assembly described above. Animate only the presentation: keep source transforms, colliders and construction placement stable. This is separate from the fixed silhouettes of UI panels.
 
 | Element | Accepted direction |
 | --- | --- |
@@ -22,10 +34,12 @@ Primary visual reference: [accepted initial UI](Previews/Fixed-Border-Review.png
 | Border animation | A soft cyan-white light travels around a stationary rounded outline. Keep edge positions, shape, and alpha coverage fixed. |
 | Background motion | Gentle flowing refraction behind the content. Keep text, node positions, hit targets, and masks stable. |
 | Interaction popup | A gentle whole-popup float plus the traveling border light. Refreshing the target must not restart the float or accumulate positional drift. |
-| Click feedback | A short, restrained shake/scale response and an aqua-green ripple. Current limits are about 0.85° rotation and 1.8% scale. |
+| Click feedback | A soft press/release ripple with a buoyant icon. Button rectangles, labels and silhouettes stay fixed; only the icon compresses and rises. This supersedes the earlier whole-button shake/scale. |
 | Animation timing | UI feedback continues with unscaled time when gameplay time is paused. |
 
 Current popup float is up to 4 UI units vertically and 1.1 horizontally. Treat these values as initial tuning references; evaluate future changes at gameplay scale before increasing motion.
+
+The [overall UI feedback pass](UI_FEEDBACK.md) adds reversible window reveals, staggered row/option fades, keyboard focus light, inventory number and delta animation, confirmed purchase pulses and quiet glass sounds. Brief window opening/dismissal is separate from hover: steady panels still keep their fixed outlines. Emotes and prompts fade without competing with their existing positioning or float.
 
 ## Screen behavior to preserve
 
