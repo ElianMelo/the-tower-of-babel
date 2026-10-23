@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using TowerOfBabel.World.Tower;
 using UnityEngine;
 
 namespace TowerOfBabel.Buildings
 {
-    /// <summary>Incoming chunks form with dissolve, then fly into the fixed pillar.</summary>
+    /// <summary>Shared construction presentation: incoming chunks form, then fly into their fixed building.</summary>
     [DisallowMultipleComponent,RequireComponent(typeof(MeshFilter),typeof(MeshRenderer))]
     public sealed class PillarConstructionMotion : MonoBehaviour
     {
@@ -26,6 +27,14 @@ namespace TowerOfBabel.Buildings
         private bool presenting,confirmed,wasForceRenderingOff;
         private float visualProgress,targetProgress,clock,confirmationAge;
         private int activePieces,targetStage;
+        private RadialFloorMeshCache radialMeshes;
+        private float radialRadius;
+        private Vector3 radialScale;
+
+        public void ConfigureRadialFloor(RadialFloorMeshCache meshes,float radius,Vector3 scale)
+        {
+            radialMeshes=meshes; radialRadius=radius; radialScale=scale;
+        }
 
         private void Awake() => enabled=false;
 
@@ -33,9 +42,9 @@ namespace TowerOfBabel.Buildings
         {
             if (presentation!=null) return;
             source=GetComponent<MeshFilter>(); sourceRenderer=GetComponent<MeshRenderer>(); properties=new MaterialPropertyBlock();
-            presentation=new GameObject("Pillar incoming chunks"); presentation.hideFlags=HideFlags.DontSave;
+            presentation=new GameObject(gameObject.name+" incoming chunks"); presentation.hideFlags=HideFlags.DontSave;
             UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(presentation,gameObject.scene);
-            var go=new GameObject("Existing pillar stage",typeof(MeshFilter),typeof(MeshRenderer));
+            var go=new GameObject("Existing building stage",typeof(MeshFilter),typeof(MeshRenderer));
             go.transform.SetParent(presentation.transform,false); go.layer=gameObject.layer;
             baseMesh=go.GetComponent<MeshFilter>(); baseRenderer=go.GetComponent<MeshRenderer>();
             CopySettings(baseRenderer); presentation.SetActive(false);
@@ -66,8 +75,10 @@ namespace TowerOfBabel.Buildings
                     var renderer=go.GetComponent<MeshRenderer>(); CopySettings(renderer);
                     pool.Add(new FlyingPiece {Pivot=pivot.transform,MeshTransform=go.transform,Filter=go.GetComponent<MeshFilter>(),Renderer=renderer});
                 }
-                var item=pool[activePieces++]; item.Filter.sharedMesh=piece.Mesh; item.Renderer.SetSharedMaterials(materials);
-                item.Center=piece.Mesh.bounds.center; item.MeshTransform.localPosition=-item.Center;
+                var item=pool[activePieces++];
+                Mesh mesh=radialMeshes!=null ? radialMeshes.Get(piece.Mesh,radialRadius,radialScale) : piece.Mesh;
+                item.Filter.sharedMesh=mesh; item.Renderer.SetSharedMaterials(materials);
+                item.Center=mesh.bounds.center; item.MeshTransform.localPosition=-item.Center;
                 float angle=Range(0,Mathf.PI*2),radius=Range(1,2.1f);
                 item.Offset=new Vector3(Mathf.Cos(angle)*radius,Range(.25f,1.2f),Mathf.Sin(angle)*radius);
                 item.Rotation=Quaternion.Euler(Range(-45,45),Range(-70,70),Range(-45,45));
@@ -85,6 +96,7 @@ namespace TowerOfBabel.Buildings
         }
         public void SetProgress(float progress) => targetProgress=Mathf.Clamp01(progress);
         public void FinishWork() => targetProgress=1;
+        public void CancelWork() { if (!confirmed) ResetImmediately(); }
 
         public void ConfirmStage(Mesh previous,int fromStage,int toStage,bool animate)
         {
@@ -119,7 +131,7 @@ namespace TowerOfBabel.Buildings
                 item.Pivot.localRotation=Quaternion.Slerp(item.Rotation,Quaternion.identity,flight);
                 item.Pivot.localScale=Vector3.one*Mathf.Lerp(.8f,1,form);
                 sourceRenderer.GetPropertyBlock(properties);
-                // Only the incoming piece uses dissolve. The existing pillar stays solid.
+                // Only the incoming piece uses dissolve. The existing building stays solid.
                 properties.SetFloat("_BuildMode",1); properties.SetFloat("_BuildReveal",form);
                 properties.SetFloat("_BuildClock",clock);
                 item.Renderer.SetPropertyBlock(properties);

@@ -1,6 +1,6 @@
 # Pillar chunks, formation and arrival
 
-The pillar is divided into 80 closed, irregular Voronoi chunks of different sizes. Seeded random selection fills scattered areas across the whole pillar, without horizontal lifts, radial columns or a bottom-to-top pattern. Stage 0 keeps the accepted sparse blueprint; stages 1–9 add eight chunks each; the final stage 10 uses the unchanged original complete pillar and fills the remaining eight. The percentage labels refer to piece counts, not equal volume.
+The pillar is divided into 80 closed, irregular Voronoi chunks of different sizes. Seeded random selection fills scattered areas across the whole pillar, without horizontal lifts, radial columns or a bottom-to-top pattern. Stage 0 keeps the accepted sparse blueprint; stages 1–9 add eight chunks each; the final stage 10 uses the unchanged original complete pillar and fills the remaining eight. The percentage labels refer to piece counts, not equal volume. The [arch now reuses the same controller and library structure](ARCH_CONSTRUCTION.md) with its own chunks.
 
 ## Animation sequence
 
@@ -11,7 +11,7 @@ The pillar is divided into 80 closed, irregular Voronoi chunks of different size
 
 The shader is enabled only on the incoming chunk renderers through a material property block. The permanent pillar and the previous-stage presentation keep `_BuildMode=0`; there is no whole-pillar dissolve or outgoing-stage crossfade. Formation finishes before flight starts for each piece. The eight arrivals are staggered across interaction progress.
 
-`PillarConstructionMotion` is attached only to the pillar prefab. `Building` supplies interaction progress, cancellation, local completion and authoritative stage changes. Cancel/reject/unbind/disable removes transient pieces and restores the source renderer. Initial pool binding applies the saved mesh immediately; nearby live stage changes can play the assembly sequence. Distant instanced batches retain their static stage meshes. No inventory or stage authority is moved into the animation.
+`PillarConstructionMotion` is shared by the pillar and arch prefabs, each with its own library. `Building` supplies interaction progress, cancellation, local completion and authoritative stage changes. Cancel/reject/unbind/disable removes transient pieces and restores the source renderer. Initial pool binding applies the saved mesh immediately; nearby live stage changes can play the assembly sequence. Distant instanced batches retain their static stage meshes. No inventory or stage authority is moved into the animation.
 
 ## Models and assets
 

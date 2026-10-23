@@ -40,6 +40,7 @@ public class TowerGenerator : MonoBehaviour
         float arcLength = radius * tileAngle * Mathf.Deg2Rad;
         Mesh template = TowerFloorLayout.SupportsRadialFloor(floorTileObject)
             ? floorTileObject.GetComponent<MeshFilter>().sharedMesh : null;
+        Mesh walkingTemplate=floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? template;
         foreach (var sector in TowerFloorLayout.Build(center, baseLevel, floorRadius,
                      tileDecreaseRate, arcLength, floorTileObject.transform.localScale.y))
         {
@@ -51,7 +52,7 @@ public class TowerGenerator : MonoBehaviour
                 Mesh mesh = floorMeshes.Get(template, sector.Radius, sector.Scale);
                 instance.GetComponent<MeshFilter>().sharedMesh = mesh;
                 var collider = instance.GetComponent<MeshCollider>();
-                if (collider != null) collider.sharedMesh = mesh;
+                if (collider != null) collider.sharedMesh = floorMeshes.Get(walkingTemplate,sector.Radius,sector.Scale);
             }
         }
     }

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5999307519936045708}
   - component: {fileID: 900000000000000003}
   - component: {fileID: 113027353943154607}
+  - component: {fileID: 7649762465848542867}
   m_Layer: 0
   m_Name: Step_Tile
   m_TagString: Untagged
@@ -44,7 +45,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 481190122475769794}
-  m_Mesh: {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  m_Mesh: {fileID: 4225841234729652378, guid: a1d304c05ae4912479046082198da02b, type: 3}
 --- !u!23 &2138501384674733591
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -128,16 +129,16 @@ MonoBehaviour:
   outline: {fileID: 900000000000000003}
   meshFilter: {fileID: 4200043039238331101}
   stageMeshes:
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
-  - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
+  - {fileID: 4225841234729652378, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: -2655600213762798070, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 5261156741530356002, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 275035685453568457, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 8358149304112496889, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 6886856964525145411, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 4983992795013237038, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 4296287541271474421, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: 2200659760832120637, guid: a1d304c05ae4912479046082198da02b, type: 3}
+  - {fileID: -326657626863128026, guid: a1d304c05ae4912479046082198da02b, type: 3}
   - {fileID: -9032052548848561664, guid: 14b00877a3827dc43a76786f5848fee6, type: 3}
 --- !u!114 &900000000000000003
 MonoBehaviour:
@@ -173,3 +174,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 0.19999999, z: 4}
   m_Center: {x: 2, y: -0.099999994, z: -2}
+--- !u!114 &7649762465848542867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 481190122475769794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3fdeec63d05a02447b5ee8a02f273d6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Buildings.PillarConstructionMotion
+  library: {fileID: 11400000, guid: 9ed1d5dfdf7c4754f88f4c3b147437de, type: 2}

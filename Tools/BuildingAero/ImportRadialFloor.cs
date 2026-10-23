@@ -13,8 +13,10 @@ var path="Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab";var root=PrefabUt
 try{
     root.GetComponent<MeshFilter>().sharedMesh=mesh;root.GetComponent<MeshRenderer>().sharedMaterial=material;
     var so=new SerializedObject(root.GetComponent<TowerOfBabel.Buildings.Building>());var stages=so.FindProperty("stageMeshes");
-    for(int i=0;i<stages.arraySize;i++)stages.GetArrayElementAtIndex(i).objectReferenceValue=mesh;
+    var construction=AssetDatabase.LoadAllAssetsAtPath(dir+"/Construction/Floor_TileStages.fbx").OfType<Mesh>().ToArray();
+    for(int i=0;i<stages.arraySize;i++)stages.GetArrayElementAtIndex(i).objectReferenceValue=i<10 ? construction.FirstOrDefault(m=>m.name=="Floor_Tile_Stage_"+i.ToString("00")) ?? mesh : mesh;
     so.ApplyModifiedPropertiesWithoutUndo();
+    if(construction.Length==10) root.GetComponent<MeshFilter>().sharedMesh=construction.Single(m=>m.name=="Floor_Tile_Stage_00");
     var box=root.GetComponent<BoxCollider>();if(box!=null)UnityEngine.Object.DestroyImmediate(box);
     var collider=root.GetComponent<MeshCollider>();if(collider==null)collider=root.AddComponent<MeshCollider>();collider.sharedMesh=mesh;collider.convex=false;
     PrefabUtility.SaveAsPrefabAsset(root,path);

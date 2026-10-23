@@ -1,0 +1,194 @@
+{
+  "prefab": "Assets/_Project/Prefabs/Buildings/Arch.prefab",
+  "guidPreserved": true,
+  "completedMeshPreserved": true,
+  "materialPreserved": true,
+  "positionPreserved": true,
+  "scalePreserved": true,
+  "colliderPreserved": true,
+  "rootChildren": 0,
+  "chunkCount": 80,
+  "chunksPerStage": [
+    {
+      "stage": 1,
+      "count": 8
+    },
+    {
+      "stage": 2,
+      "count": 8
+    },
+    {
+      "stage": 3,
+      "count": 8
+    },
+    {
+      "stage": 4,
+      "count": 8
+    },
+    {
+      "stage": 5,
+      "count": 8
+    },
+    {
+      "stage": 6,
+      "count": 8
+    },
+    {
+      "stage": 7,
+      "count": 8
+    },
+    {
+      "stage": 8,
+      "count": 8
+    },
+    {
+      "stage": 9,
+      "count": 8
+    },
+    {
+      "stage": 10,
+      "count": 8
+    }
+  ],
+  "otherPrefabsUnchanged": [
+    {
+      "path": "Assets/_Project/Prefabs/Buildings/Pillar.prefab",
+      "unchanged": true
+    },
+    {
+      "path": "Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab",
+      "unchanged": true
+    },
+    {
+      "path": "Assets/_Project/Prefabs/Buildings/Step_Tile.prefab",
+      "unchanged": true
+    }
+  ],
+  "stages": [
+    {
+      "stage": 0,
+      "mesh": "Arch_Stage_00",
+      "triangles": 860,
+      "vertexCount": 450,
+      "subMeshCount": 1,
+      "uv0": 450,
+      "uv1": 450,
+      "normals": 450,
+      "tangents": 450
+    },
+    {
+      "stage": 1,
+      "mesh": "Arch_Stage_01",
+      "triangles": 1814,
+      "vertexCount": 1755,
+      "subMeshCount": 1,
+      "uv0": 1755,
+      "uv1": 1755,
+      "normals": 1755,
+      "tangents": 1755
+    },
+    {
+      "stage": 2,
+      "mesh": "Arch_Stage_02",
+      "triangles": 3014,
+      "vertexCount": 3303,
+      "subMeshCount": 1,
+      "uv0": 3303,
+      "uv1": 3303,
+      "normals": 3303,
+      "tangents": 3303
+    },
+    {
+      "stage": 3,
+      "mesh": "Arch_Stage_03",
+      "triangles": 4152,
+      "vertexCount": 4776,
+      "subMeshCount": 1,
+      "uv0": 4776,
+      "uv1": 4776,
+      "normals": 4776,
+      "tangents": 4776
+    },
+    {
+      "stage": 4,
+      "mesh": "Arch_Stage_04",
+      "triangles": 5252,
+      "vertexCount": 6175,
+      "subMeshCount": 1,
+      "uv0": 6175,
+      "uv1": 6175,
+      "normals": 6175,
+      "tangents": 6175
+    },
+    {
+      "stage": 5,
+      "mesh": "Arch_Stage_05",
+      "triangles": 7648,
+      "vertexCount": 8934,
+      "subMeshCount": 1,
+      "uv0": 8934,
+      "uv1": 8934,
+      "normals": 8934,
+      "tangents": 8934
+    },
+    {
+      "stage": 6,
+      "mesh": "Arch_Stage_06",
+      "triangles": 8954,
+      "vertexCount": 10495,
+      "subMeshCount": 1,
+      "uv0": 10495,
+      "uv1": 10495,
+      "normals": 10495,
+      "tangents": 10495
+    },
+    {
+      "stage": 7,
+      "mesh": "Arch_Stage_07",
+      "triangles": 10298,
+      "vertexCount": 12149,
+      "subMeshCount": 1,
+      "uv0": 12149,
+      "uv1": 12149,
+      "normals": 12149,
+      "tangents": 12149
+    },
+    {
+      "stage": 8,
+      "mesh": "Arch_Stage_08",
+      "triangles": 11594,
+      "vertexCount": 13623,
+      "subMeshCount": 1,
+      "uv0": 13623,
+      "uv1": 13623,
+      "normals": 13623,
+      "tangents": 13623
+    },
+    {
+      "stage": 9,
+      "mesh": "Arch_Stage_09",
+      "triangles": 13776,
+      "vertexCount": 15995,
+      "subMeshCount": 1,
+      "uv0": 15995,
+      "uv1": 15995,
+      "normals": 15995,
+      "tangents": 15995
+    },
+    {
+      "stage": 10,
+      "mesh": "Arch",
+      "triangles": 1680,
+      "vertexCount": 1778,
+      "subMeshCount": 1,
+      "uv0": 1778,
+      "uv1": 1778,
+      "normals": 1778,
+      "tangents": 1778
+    }
+  ],
+  "shaderMessages": [],
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "playing": false,
+  "compileFailed": false
+}

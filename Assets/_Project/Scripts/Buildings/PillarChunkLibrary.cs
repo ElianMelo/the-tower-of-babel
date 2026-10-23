@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace TowerOfBabel.Buildings
 {
-    /// <summary>Closed irregular pieces in pillar coordinates, grouped by the stage that adds them.</summary>
+    /// <summary>Closed irregular pieces in building coordinates, grouped by the stage that adds them.</summary>
     public sealed class PillarChunkLibrary : ScriptableObject
     {
         [System.Serializable]

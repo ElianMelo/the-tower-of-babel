@@ -153,7 +153,8 @@ namespace TowerOfBabel.World.Tower
         private static List<StairBox> StairsNearFloor(TowerGenerator g,int floor,float[] radii)
         {
             var result=new List<StairBox>();
-            var mesh=g.stairStepObject.GetComponent<MeshFilter>().sharedMesh;
+            var mesh=g.stairStepObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10)
+                ?? g.stairStepObject.GetComponent<MeshFilter>().sharedMesh;
             int count=Mathf.CeilToInt(g.floorHeight/g.stairHeight);
             int range=Mathf.CeilToInt(g.floorHeight/g.heighIncrease)+1;
             for (int level=Mathf.Max(0,floor-range); level<=Mathf.Min(g.levels-2,floor+1); level++)

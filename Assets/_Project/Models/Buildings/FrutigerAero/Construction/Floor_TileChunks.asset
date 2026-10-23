@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4964314e8794ad746bb8b2504e061df8, type: 3}
+  m_Name: Floor_TileChunks
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Buildings.PillarChunkLibrary
+  Pieces:
+  - Mesh: {fileID: -8427547548873528353, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: 8633989532141655101, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: -7906382631481971463, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: 1960506374072015504, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: 5946557732540864765, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: 2868724985930816052, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: -3066112820818913128, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: 928468528417379551, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 1
+  - Mesh: {fileID: 4608764438185259326, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: -206283607132181743, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: 3527324560727404851, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: -8748987268204535458, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: -7463210162362359645, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: -5396191769105196369, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: 3553222997580508044, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: 4763575176859007037, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 2
+  - Mesh: {fileID: -9080273500648996858, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: 2674564147632431925, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: -4329826209315062652, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: 4948756649751565254, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: 2960387038192834470, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: 3763644440172124599, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: 3198017504001941608, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: -1042507392951374193, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 3
+  - Mesh: {fileID: 4217607557678740753, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: 6884055781382997667, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: -4235177883877527571, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: -4035904214750074649, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: 2633351571958672567, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: 4885866115313230835, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: -4210921416931853888, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: -6160949149953635215, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 4
+  - Mesh: {fileID: -4039529059369818584, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: 3094095731405666042, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: -498799470583490453, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: -8284476525400007133, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: -1442936982555933349, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: 2191756957322878243, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: 8704720949823126921, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: 7324325771697955217, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 5
+  - Mesh: {fileID: -1427473529324705840, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: -8653614835241367819, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: -2398283907375909277, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: -8832256610875777033, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: 7796037238683284546, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: 2594943248681733253, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: -8509678704164356629, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: 322013324854335596, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 6
+  - Mesh: {fileID: 6118810232043926699, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: -5493126757068505105, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: 3612303104030101636, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: 5455211546040080888, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: -6588116742530018584, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: -5288441851822958289, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: -8748000358486203737, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: -1326534597332957661, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 7
+  - Mesh: {fileID: 7659055362895372714, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: -7307828630192448011, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: 4582603841320560816, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: 2220593611785570300, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: 5897001580441331066, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: 2756525963563131855, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: -3929254438705154730, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: 7625619145239117199, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 8
+  - Mesh: {fileID: -5598598066496099560, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: -2842836639689490047, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: 3675404690703702177, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: -7508886227593464668, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: 9111065448254212548, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: -2164850276321523347, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: -1027641776488279344, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: -6828251850626902998, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 9
+  - Mesh: {fileID: 8236960008704398580, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: 8846530435501520441, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: 8280630999687646727, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: -260693288191103800, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: 8674678159571359476, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: 5175362062165365490, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: -7578409568669928589, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10
+  - Mesh: {fileID: 2694381292642789839, guid: 2b921be80597faf4ca3f45d4c010c589, type: 3}
+    Stage: 10

@@ -179,7 +179,7 @@ namespace TowerOfBabel.Buildings
         public void CancelInteraction()
         {
             RestoreVisualPosition();
-            constructionMotion?.ResetImmediately();
+            constructionMotion?.CancelWork();
         }
 
         public void CompleteInteraction(GameObject interactor)

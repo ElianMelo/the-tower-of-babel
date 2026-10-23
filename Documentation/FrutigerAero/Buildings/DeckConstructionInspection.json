@@ -1,0 +1,371 @@
+{
+  "assets": [
+    {
+      "kind": "Floor_Tile",
+      "guidPreserved": true,
+      "completedMeshPreserved": true,
+      "materialPreserved": true,
+      "positionPreserved": true,
+      "scalePreserved": true,
+      "colliderPreserved": true,
+      "rootChildren": 0,
+      "chunkCount": 80,
+      "chunksPerStage": [
+        {
+          "stage": 1,
+          "count": 8
+        },
+        {
+          "stage": 2,
+          "count": 8
+        },
+        {
+          "stage": 3,
+          "count": 8
+        },
+        {
+          "stage": 4,
+          "count": 8
+        },
+        {
+          "stage": 5,
+          "count": 8
+        },
+        {
+          "stage": 6,
+          "count": 8
+        },
+        {
+          "stage": 7,
+          "count": 8
+        },
+        {
+          "stage": 8,
+          "count": 8
+        },
+        {
+          "stage": 9,
+          "count": 8
+        },
+        {
+          "stage": 10,
+          "count": 8
+        }
+      ],
+      "stages": [
+        {
+          "stage": 0,
+          "name": "Floor_Tile_Stage_00",
+          "triangles": 212,
+          "vertexCount": 120,
+          "subMeshCount": 1,
+          "uv0": 120,
+          "uv1": 120,
+          "normals": 120,
+          "tangents": 120
+        },
+        {
+          "stage": 1,
+          "name": "Floor_Tile_Stage_01",
+          "triangles": 568,
+          "vertexCount": 606,
+          "subMeshCount": 1,
+          "uv0": 606,
+          "uv1": 606,
+          "normals": 606,
+          "tangents": 606
+        },
+        {
+          "stage": 2,
+          "name": "Floor_Tile_Stage_02",
+          "triangles": 900,
+          "vertexCount": 1082,
+          "subMeshCount": 1,
+          "uv0": 1082,
+          "uv1": 1082,
+          "normals": 1082,
+          "tangents": 1082
+        },
+        {
+          "stage": 3,
+          "name": "Floor_Tile_Stage_03",
+          "triangles": 1244,
+          "vertexCount": 1566,
+          "subMeshCount": 1,
+          "uv0": 1566,
+          "uv1": 1566,
+          "normals": 1566,
+          "tangents": 1566
+        },
+        {
+          "stage": 4,
+          "name": "Floor_Tile_Stage_04",
+          "triangles": 1614,
+          "vertexCount": 2060,
+          "subMeshCount": 1,
+          "uv0": 2060,
+          "uv1": 2060,
+          "normals": 2060,
+          "tangents": 2060
+        },
+        {
+          "stage": 5,
+          "name": "Floor_Tile_Stage_05",
+          "triangles": 1936,
+          "vertexCount": 2512,
+          "subMeshCount": 1,
+          "uv0": 2512,
+          "uv1": 2512,
+          "normals": 2512,
+          "tangents": 2512
+        },
+        {
+          "stage": 6,
+          "name": "Floor_Tile_Stage_06",
+          "triangles": 2252,
+          "vertexCount": 2927,
+          "subMeshCount": 1,
+          "uv0": 2927,
+          "uv1": 2927,
+          "normals": 2927,
+          "tangents": 2927
+        },
+        {
+          "stage": 7,
+          "name": "Floor_Tile_Stage_07",
+          "triangles": 2616,
+          "vertexCount": 3363,
+          "subMeshCount": 1,
+          "uv0": 3363,
+          "uv1": 3363,
+          "normals": 3363,
+          "tangents": 3363
+        },
+        {
+          "stage": 8,
+          "name": "Floor_Tile_Stage_08",
+          "triangles": 2988,
+          "vertexCount": 3815,
+          "subMeshCount": 1,
+          "uv0": 3815,
+          "uv1": 3815,
+          "normals": 3815,
+          "tangents": 3815
+        },
+        {
+          "stage": 9,
+          "name": "Floor_Tile_Stage_09",
+          "triangles": 3324,
+          "vertexCount": 4202,
+          "subMeshCount": 1,
+          "uv0": 4202,
+          "uv1": 4202,
+          "normals": 4202,
+          "tangents": 4202
+        },
+        {
+          "stage": 10,
+          "name": "Floor_Tile",
+          "triangles": 136,
+          "vertexCount": 172,
+          "subMeshCount": 1,
+          "uv0": 172,
+          "uv1": 172,
+          "normals": 172,
+          "tangents": 172
+        }
+      ],
+      "shaderMessages": []
+    },
+    {
+      "kind": "Step_Tile",
+      "guidPreserved": true,
+      "completedMeshPreserved": true,
+      "materialPreserved": true,
+      "positionPreserved": true,
+      "scalePreserved": true,
+      "colliderPreserved": true,
+      "rootChildren": 0,
+      "chunkCount": 80,
+      "chunksPerStage": [
+        {
+          "stage": 1,
+          "count": 8
+        },
+        {
+          "stage": 2,
+          "count": 8
+        },
+        {
+          "stage": 3,
+          "count": 8
+        },
+        {
+          "stage": 4,
+          "count": 8
+        },
+        {
+          "stage": 5,
+          "count": 8
+        },
+        {
+          "stage": 6,
+          "count": 8
+        },
+        {
+          "stage": 7,
+          "count": 8
+        },
+        {
+          "stage": 8,
+          "count": 8
+        },
+        {
+          "stage": 9,
+          "count": 8
+        },
+        {
+          "stage": 10,
+          "count": 8
+        }
+      ],
+      "stages": [
+        {
+          "stage": 0,
+          "name": "Step_Tile_Stage_00",
+          "triangles": 324,
+          "vertexCount": 174,
+          "subMeshCount": 1,
+          "uv0": 174,
+          "uv1": 174,
+          "normals": 174,
+          "tangents": 174
+        },
+        {
+          "stage": 1,
+          "name": "Step_Tile_Stage_01",
+          "triangles": 610,
+          "vertexCount": 603,
+          "subMeshCount": 1,
+          "uv0": 603,
+          "uv1": 603,
+          "normals": 603,
+          "tangents": 603
+        },
+        {
+          "stage": 2,
+          "name": "Step_Tile_Stage_02",
+          "triangles": 1056,
+          "vertexCount": 1201,
+          "subMeshCount": 1,
+          "uv0": 1201,
+          "uv1": 1201,
+          "normals": 1201,
+          "tangents": 1201
+        },
+        {
+          "stage": 3,
+          "name": "Step_Tile_Stage_03",
+          "triangles": 1380,
+          "vertexCount": 1613,
+          "subMeshCount": 1,
+          "uv0": 1613,
+          "uv1": 1613,
+          "normals": 1613,
+          "tangents": 1613
+        },
+        {
+          "stage": 4,
+          "name": "Step_Tile_Stage_04",
+          "triangles": 1680,
+          "vertexCount": 2038,
+          "subMeshCount": 1,
+          "uv0": 2038,
+          "uv1": 2038,
+          "normals": 2038,
+          "tangents": 2038
+        },
+        {
+          "stage": 5,
+          "name": "Step_Tile_Stage_05",
+          "triangles": 1952,
+          "vertexCount": 2425,
+          "subMeshCount": 1,
+          "uv0": 2425,
+          "uv1": 2425,
+          "normals": 2425,
+          "tangents": 2425
+        },
+        {
+          "stage": 6,
+          "name": "Step_Tile_Stage_06",
+          "triangles": 2204,
+          "vertexCount": 2774,
+          "subMeshCount": 1,
+          "uv0": 2774,
+          "uv1": 2774,
+          "normals": 2774,
+          "tangents": 2774
+        },
+        {
+          "stage": 7,
+          "name": "Step_Tile_Stage_07",
+          "triangles": 2562,
+          "vertexCount": 3239,
+          "subMeshCount": 1,
+          "uv0": 3239,
+          "uv1": 3239,
+          "normals": 3239,
+          "tangents": 3239
+        },
+        {
+          "stage": 8,
+          "name": "Step_Tile_Stage_08",
+          "triangles": 2874,
+          "vertexCount": 3617,
+          "subMeshCount": 1,
+          "uv0": 3617,
+          "uv1": 3617,
+          "normals": 3617,
+          "tangents": 3617
+        },
+        {
+          "stage": 9,
+          "name": "Step_Tile_Stage_09",
+          "triangles": 3254,
+          "vertexCount": 4057,
+          "subMeshCount": 1,
+          "uv0": 4057,
+          "uv1": 4057,
+          "normals": 4057,
+          "tangents": 4057
+        },
+        {
+          "stage": 10,
+          "name": "Step_Tile",
+          "triangles": 284,
+          "vertexCount": 293,
+          "subMeshCount": 1,
+          "uv0": 293,
+          "uv1": 293,
+          "normals": 293,
+          "tangents": 293
+        }
+      ],
+      "shaderMessages": []
+    }
+  ],
+  "otherPrefabsUnchanged": [
+    {
+      "path": "Assets/_Project/Prefabs/Buildings/Pillar.prefab",
+      "unchanged": true
+    },
+    {
+      "path": "Assets/_Project/Prefabs/Buildings/Arch.prefab",
+      "unchanged": true
+    }
+  ],
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "playing": false,
+  "compileFailed": false
+}

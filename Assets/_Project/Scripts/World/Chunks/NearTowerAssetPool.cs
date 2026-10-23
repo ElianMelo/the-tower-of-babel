@@ -140,7 +140,8 @@ namespace TowerOfBabel.World.Chunks
                 lease.Assets[localIndex] = current;
             }
 
-            current.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
+            if (current.ActiveIndex>=0) current.Building?.ApplyStage(asset.Stage);
+            else current.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
             ApplyTransform(current.GameObject.transform, asset);
             ConfigureFloorGeometry(current, asset);
             ActivateInstance(current);
@@ -332,15 +333,19 @@ namespace TowerOfBabel.World.Chunks
 
         private void ConfigureFloorGeometry(PooledInstance instance, ChunkAssetData asset)
         {
-            if (asset.AssetType != TowerAssetType.Floor || chunkManager == null || !chunkManager.RadialFloors) return;
+            if (asset.AssetType != TowerAssetType.Floor || chunkManager == null) return;
+            float radius = Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), chunkManager.FloorCenter);
+            instance.GameObject.GetComponent<PillarConstructionMotion>()?.ConfigureRadialFloor(
+                chunkManager.RadialFloors ? floorMeshes : null,radius,asset.Scale);
+            if (!chunkManager.RadialFloors) return;
             var collider = instance.GameObject.GetComponent<MeshCollider>();
             if (collider == null) return;
             var filter = instance.GameObject.GetComponent<MeshFilter>();
             Mesh source = instance.Building != null ? instance.Building.GetStageMesh(asset.Stage) : filter.sharedMesh;
-            float radius = Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), chunkManager.FloorCenter);
             Mesh mesh = floorMeshes.Get(source, radius, asset.Scale);
             filter.sharedMesh = mesh;
-            collider.sharedMesh = mesh;
+            Mesh walkingSource=instance.Building!=null ? instance.Building.GetStageMesh(ChunkAssetData.CompletedStage) : source;
+            collider.sharedMesh = floorMeshes.Get(walkingSource,radius,asset.Scale);
             instance.GameObject.GetComponent<MeshRenderer>().localBounds = mesh.bounds;
         }
 

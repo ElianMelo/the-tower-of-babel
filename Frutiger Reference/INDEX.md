@@ -70,7 +70,11 @@ These are sampled Edit Mode visual previews, not live gameplay captures. See [fe
 
 - `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Lineup.png` — pillar-only stages 0–10: sparse blue guides and scattered, irregular chunks filling in a seeded random order. Horizontal slices and staggered radial columns are superseded.
 - `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Sequence.gif` — static stage sequence.
-- `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Chunks-Arrival.gif` — separate chunks form with a Unity dissolve, then fly and turn into their exact pillar positions. Existing pieces remain solid. See [pillar construction notes](../Documentation/FrutigerAero/Buildings/PILLAR_CONSTRUCTION.md). Other building prefabs retain their stage setup.
+- `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Chunks-Arrival.gif` — separate chunks form with a Unity dissolve, then fly and turn into their exact pillar positions. Existing pieces remain solid. See [pillar construction notes](../Documentation/FrutigerAero/Buildings/PILLAR_CONSTRUCTION.md).
+- `../Documentation/FrutigerAero/Buildings/Previews/Arch-Construction-Stages.png` — matching arch blueprint and random fill stages, preserving the doorway and recessed aqua panel.
+- `../Documentation/FrutigerAero/Buildings/Previews/Arch-Chunks-Arrival.gif` — arch chunks use the same formation-and-flight sequence. See [arch construction notes](../Documentation/FrutigerAero/Buildings/ARCH_CONSTRUCTION.md).
+- `../Documentation/FrutigerAero/Buildings/Previews/Deck-Chunks-Arrival.gif` — curved floor and stair step assemble from incoming chunks with the same dissolve, flight and placement sequence.
+- `../Documentation/FrutigerAero/Buildings/Previews/Floor_Tile-Construction-Stages.png` and `Step_Tile-Construction-Stages.png` — floor and step blueprint/random-fill stages. Preserve full walking colliders, the radial floor layout and the step scale. See [deck construction notes](../Documentation/FrutigerAero/Buildings/DECK_CONSTRUCTION.md).
 
 The 2026-10-21 building brief explicitly excludes green from building assets. It overrides the older blue/green UI palette for this kit.
 

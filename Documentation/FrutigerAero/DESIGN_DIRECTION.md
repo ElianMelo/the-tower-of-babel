@@ -8,7 +8,7 @@ Primary visual reference: [accepted initial UI](Previews/Fixed-Border-Review.png
 
 The [stone and processor models](Resources/RESOURCE_WORKSHOP.md) use a silvery faceted rock cluster and a rounded pearl-white/azure machine with visible steel rollers and cyan status lights. Generated textures supply the surface detail. The hopper and tray are empty at idle: raw stone enters during use, and processed stone appears only after confirmation. Keep the housing, interaction collider and resource rules fixed.
 
-The [pillar construction sequence](Buildings/PILLAR_CONSTRUCTION.md) fills irregular chunks across the whole shape in a fixed random order. Incoming chunks form outside the pillar through a cyan dissolve, then fly and turn into their correct positions. Existing pieces remain solid. Preserve the sparse blueprint and original completed mesh; horizontal slices and staggered column patterns are superseded.
+The [pillar](Buildings/PILLAR_CONSTRUCTION.md), [arch](Buildings/ARCH_CONSTRUCTION.md), and [floor/step construction sequences](Buildings/DECK_CONSTRUCTION.md) fill irregular chunks across each shape in a fixed random order. Incoming chunks form outside the asset through a cyan dissolve, then fly and turn into their correct positions. Existing pieces remain solid. Preserve sparse blueprints, original completed meshes, the open arch passage, full walking colliders, curved floor layout and step scale. Horizontal slices and staggered column patterns are superseded.
 
 The [tower landscape](TERRAIN_LANDSCAPE.md) uses a flat green circular clearing without grass blades inside the four boundary pillars and smooth green sine/cosine hills around it. Four small lakes outside the clearing reveal the existing ocean surface. Preserve gradual transitions and matte meadow surfaces; keep the playable center and tower placement stable. Green ground supersedes the earlier pearl-colored clearing.
 
@@ -24,7 +24,7 @@ Task completion has a reusable [bubble-to-XP-bar feedback sequence](ACTION_EXPER
 
 ## Color and motion decisions
 
-World gathering and the remaining construction assets use a [slow buoyant weave](INTERACTION_WEAVE.md) instead of fast positional shaking. The pillar now uses the incoming-chunk assembly described above. Animate only the presentation: keep source transforms, colliders and construction placement stable. This is separate from the fixed silhouettes of UI panels.
+World gathering uses a [slow buoyant weave](INTERACTION_WEAVE.md) instead of fast positional shaking. All four building assets use the incoming-chunk assembly described above. Animate only the presentation: keep source transforms, colliders and construction placement stable. This is separate from the fixed silhouettes of UI panels.
 
 | Element | Accepted direction |
 | --- | --- |

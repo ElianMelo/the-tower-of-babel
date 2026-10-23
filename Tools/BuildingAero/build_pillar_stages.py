@@ -46,8 +46,8 @@ def source_pillar(scene):
     return obj
 
 
-def solid_piece(source, index, seeds, scene):
-    obj = bpy.data.objects.new(f'Pillar_Piece_{index:02}',source.data.copy())
+def solid_piece(source, index, seeds, scene, prefix='Pillar', cap_uv=None):
+    obj = bpy.data.objects.new(f'{prefix}_Piece_{index:02}',source.data.copy())
     scene.collection.objects.link(obj)
     bm = bmesh.new()
     bm.from_mesh(obj.data)
@@ -68,7 +68,7 @@ def solid_piece(source, index, seeds, scene):
             face.smooth=False
             for loop in face.loops:
                 p=loop.vert.co
-                if bake_uv: loop[bake_uv].uv=(.5+p.x*.4,.5+(p.y if abs(normal.z)>.5 else p.z*.2)*.4)
+                if bake_uv: loop[bake_uv].uv=cap_uv if cap_uv is not None else (.5+p.x*.4,.5+(p.y if abs(normal.z)>.5 else p.z*.2)*.4)
                 if palette_uv: loop[palette_uv].uv=(.0625,.5)
     bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
     bm.to_mesh(obj.data)
