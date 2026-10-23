@@ -40,7 +40,9 @@ public class MouseRotator : MonoBehaviour, IPlayerControlLock
         //}
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
-        _look = new Vector2(mouseX, mouseY * -1);
+        float sensitivity = TowerOfBabel.Networking.Upgrades.NetworkUpgradeService.Instance != null
+            ? TowerOfBabel.Networking.Upgrades.NetworkUpgradeService.Instance.GetLocalCheatStat(TowerOfBabel.Cheats.CheatStat.MouseSensitivity) : 1;
+        _look = new Vector2(mouseX, mouseY * -1) * sensitivity;
         #region Player Based Rotation
 
         //Move the player based on the X input on the controller

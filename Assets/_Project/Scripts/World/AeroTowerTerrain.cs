@@ -24,6 +24,7 @@ namespace TowerOfBabel.World
         [SerializeField, Min(0)] private float foothillSetback = 16;
         [SerializeField, Min(1)] private float perimeterBlend = 65;
         [SerializeField] private int seed = 17;
+        [SerializeField, Min(0)] private float meadowHeight = 12;
         [Header("Small lakes revealing the existing ocean")]
         [SerializeField] private Transform oceanSurface;
         [SerializeField, Min(.25f)] private float lakeDepth = 3;
@@ -70,10 +71,8 @@ namespace TowerOfBabel.World
             ResolveClearing();
             var data = generatedTerrainData;
             Vector3 size = data.size, origin = targetTerrain.transform.position;
-            if (data.heightmapResolution != sourceTerrainData.heightmapResolution || size != sourceTerrainData.size ||
-                data.detailResolution != sourceTerrainData.detailResolution ||
-                data.detailPrototypes.Length != sourceTerrainData.detailPrototypes.Length)
-                throw new InvalidOperationException("Generated terrain dimensions must match the original source.");
+            if (size != sourceTerrainData.size)
+                throw new InvalidOperationException("Generated terrain bounds must match the original source.");
             if (clearingElevation < origin.y || clearingElevation + mountainHeight > origin.y + size.y)
                 throw new InvalidOperationException("The requested elevations exceed the terrain's vertical range.");
             if (lakes != null && lakes.Length > 0)
@@ -97,7 +96,6 @@ namespace TowerOfBabel.World
                 throw new InvalidOperationException("The full tower clearing must fit inside this terrain.");
 
             int resolution = data.heightmapResolution;
-            float[,] original = sourceTerrainData.GetHeights(0, 0, resolution, resolution);
             var heights = new float[resolution, resolution];
             for (int z = 0; z < resolution; z++)
             {
@@ -108,18 +106,11 @@ namespace TowerOfBabel.World
                     float px = origin.x + localWorldX - ClearingCenter.x;
                     float pz = origin.z + localWorldZ - ClearingCenter.y;
                     float radius = Mathf.Sqrt(px * px + pz * pz);
-                    float foothills = Smooth((radius - ClearingRadius - foothillSetback) / Mathf.Max(1, foothillWidth));
-                    float phase = seed * .61803399f;
-                    // Domain-warped long waves avoid spiky noise and uniform concentric rings.
-                    float wx = px + Mathf.Sin(pz / 180 + phase) * 28;
-                    float wz = pz + Mathf.Cos(px / 210 - phase) * 24;
-                    float wave = .5f + .24f * Mathf.Sin(wx * Mathf.PI * 2 / wavelength + .8f * Mathf.Sin(wz / 65) + phase)
-                        + .18f * Mathf.Cos(wz * Mathf.PI * 2 / (wavelength * 1.27f) + phase * .7f)
-                        + .08f * Mathf.Sin((wx + wz) * Mathf.PI * 2 / (wavelength * .65f) + 1.6f);
-                    float height = clearingElevation + mountainHeight * foothills * (.12f + .88f * Mathf.Clamp01(wave));
+                    float height = SampleLandscapeHeight(new Vector2(px, pz));
                     float edge = Mathf.Min(Mathf.Min(localWorldX, size.x - localWorldX), Mathf.Min(localWorldZ, size.z - localWorldZ));
-                    height = Mathf.Lerp(origin.y + original[z, x] * size.y, height, Smooth(edge / Mathf.Max(1, perimeterBlend)));
-                    height = CarveLakes(new Vector2(px, pz), height);
+                    if (edge < perimeterBlend)
+                        height = Mathf.Lerp(origin.y + sourceTerrainData.GetInterpolatedHeight(localWorldX / size.x, localWorldZ / size.z), height,
+                            Smooth(edge / Mathf.Max(1, perimeterBlend)));
                     heights[z, x] = Mathf.Clamp01((height - origin.y) / size.y);
                 }
             }
@@ -138,6 +129,33 @@ namespace TowerOfBabel.World
             var collider = GetComponent<TerrainCollider>();
             if (collider != null) collider.terrainData = data;
             targetTerrain.Flush();
+        }
+
+        public float SampleLandscapeHeight(Vector2 point)
+        {
+            float radius = point.magnitude;
+            float phase = seed * .61803399f;
+            float wx = point.x + Mathf.Sin(point.y / 145 + phase) * 42;
+            float wz = point.y + Mathf.Cos(point.x / 175 - phase) * 36;
+            float meadow = .5f + .3f * Mathf.Sin(wx / 57 + phase) + .2f * Mathf.Cos(wz / 73 - wx / 130);
+            float envelope = Smooth((radius - ClearingRadius) / 38);
+            float foothills = Smooth((radius - ClearingRadius - foothillSetback) / Mathf.Max(1, foothillWidth));
+            float wave = .5f + .25f * Mathf.Sin(wx * Mathf.PI * 2 / wavelength + .55f * Mathf.Sin(wz / 95) + phase)
+                + .17f * Mathf.Cos(wz * Mathf.PI * 2 / (wavelength * 1.31f) + phase * .7f)
+                + .08f * Mathf.Sin((wx + wz) * Mathf.PI * 2 / (wavelength * .72f) + 1.6f);
+            float ridges = .55f + .45f * Smooth(.5f + .5f * Mathf.Sin(Mathf.Atan2(point.y, point.x) * 2 + phase));
+            float height = clearingElevation + envelope * meadowHeight * Mathf.Clamp01(meadow)
+                + mountainHeight * foothills * ridges * Mathf.Clamp01(wave);
+            if (lakes != null)
+                foreach (var lake in lakes)
+                {
+                    // Broad low meadows keep water visible instead of punching wells into hills.
+                    float fromBank = Vector2.Distance(point, lake.offset) - LakeExtent(lake);
+                    float approach = Smooth(fromBank / 100);
+                    float apron = Mathf.Lerp(clearingElevation + 1.2f, height, approach);
+                    height = Mathf.Lerp(height, Mathf.Min(height, apron), envelope);
+                }
+            return CarveLakes(point, height);
         }
 
         private float CarveLakes(Vector2 point, float height)
@@ -225,7 +243,7 @@ namespace TowerOfBabel.World
             float stepX = size.x / (data.heightmapResolution - 1), stepZ = size.z / (data.heightmapResolution - 1);
             for (int layer = 0; layer < data.detailPrototypes.Length; layer++)
             {
-                int[,] density = sourceTerrainData.GetDetailLayer(0, 0, resolution, resolution, layer);
+                var density = new int[resolution, resolution];
                 for (int z = 0; z < resolution; z++)
                 for (int x = 0; x < resolution; x++)
                 {
@@ -242,9 +260,12 @@ namespace TowerOfBabel.World
                     coverage *= 1 - Smooth((slope - grassSlopeLimit) / 10);
                     float height = origin.y + heights[hz, hx] * size.y;
                     coverage *= Smooth((height - WaterElevation - .3f) / 1.2f);
-                    int previous = density[z, x];
-                    density[z, x] = Mathf.RoundToInt(previous * coverage);
-                    if (previous > 0 && density[z, x] == 0) ClearedDetailCells++;
+                    // Instance counts are authored independently of the source's 0–255 coverage map.
+                    // Inheriting those coverage values as counts creates millions of unnecessary clumps.
+                    float noise = Mathf.PerlinNoise((point.x + seed * 19) * .045f, (point.y - seed * 13) * .045f);
+                    int meadowDensity = Mathf.RoundToInt(Mathf.Lerp(2, 4, noise));
+                    density[z, x] = coverage > .08f ? Mathf.Max(1, Mathf.RoundToInt(meadowDensity * coverage)) : 0;
+                    if (density[z, x] == 0) ClearedDetailCells++;
                 }
                 data.SetDetailLayer(0, 0, layer, density);
             }

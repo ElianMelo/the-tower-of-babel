@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-23",
+  "project": "D:/PersonalProjects/the-tower-of-babel",
+  "editMode": {
+    "failed": 0,
+    "passed": 63
+  },
+  "playMode": {
+    "passed": 16,
+    "failed": 0,
+    "entry": "Unity automated PlayMode test runner only"
+  },
+  "terrain": {
+    "detailResolution": 512,
+    "sourceHash": "7f50bd5cc8a083027aff1610ae1d0561",
+    "assetBytes": 1164428,
+    "runtimeDistance": 95,
+    "maxGrassPerCell": 4,
+    "alphamap": 256,
+    "scatterMode": "InstanceCountMode",
+    "authoredGrassInstances": 708232,
+    "heightmap": 513,
+    "baseMap": 128,
+    "editorDensity": 0.08,
+    "previousAssetBytes": 15293484,
+    "fpsBenchmark": false,
+    "editorDistance": 35,
+    "runtimeDensity": 0.55
+  },
+  "gameplay": {
+    "sandPerGather": 2,
+    "processSeconds": 3.5,
+    "sandRespawnSeconds": 6,
+    "rockMarkerBricks": 4,
+    "kilnSandCost": 2,
+    "sandGatherSeconds": 2.6,
+    "glassOutput": 1
+  },
+  "notes": [
+    "Focused suites only; unrelated full-suite failures were not rerun.",
+    "No manual Play Mode sessions. Scene restored to clean Edit Mode.",
+    "Gameplay checks include local-host RPC flows, cancellation, wallet exchange, cooldown, duplicate visual receipts, F3 new resources, and tower progression."
+  ]
+}

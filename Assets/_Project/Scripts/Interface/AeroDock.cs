@@ -45,6 +45,7 @@ namespace TowerOfBabel.Interface
         {
             if (IsExpanded) { Close(); return; }
             var manager = InterfaceManager.Instance;
+            TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
             manager?.HideInventory(); manager?.HideUpgrade(); manager?.HideEmotes();
             previousCursor = CursorStateConfig.Current;
             CursorStateConfig.UnlockedVisible.Apply();

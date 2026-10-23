@@ -14,7 +14,7 @@ using UnityEngine;
 namespace TowerOfBabel.Networking.Buildings
 {
     [DisallowMultipleComponent]
-    public sealed class NetworkBuildingService : NetworkBehaviour
+    public sealed partial class NetworkBuildingService : NetworkBehaviour
     {
         private sealed class ActiveBuild
         {
@@ -185,6 +185,11 @@ namespace TowerOfBabel.Networking.Buildings
                     build.ChunkKey.Z, build.LocalIndex);
                 yield break;
             }
+
+            int stageProduction = NetworkUpgradeService.Instance != null
+                ? NetworkUpgradeService.Instance.GetServerProduction(connection, UpgradeJob.Build, 1) : 1;
+            for (int step = 1; step < Mathf.Min(stageProduction, ChunkAssetData.CompletedStage) && appliedStage < ChunkAssetData.CompletedStage; step++)
+                if (!chunkManager.TryAdvanceAssetStage(build.ChunkKey, build.LocalIndex, out appliedStage)) break;
 
             ApplyStageObserversRpc(build.ChunkKey.FloorIndex, build.ChunkKey.X, build.ChunkKey.Z,
                 build.LocalIndex, appliedStage);

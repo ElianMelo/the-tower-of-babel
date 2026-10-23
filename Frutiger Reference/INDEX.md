@@ -17,6 +17,8 @@ The six original user-supplied images from this chat are preserved in attachment
 
 Current interactive revision images:
 
+- `../Documentation/FrutigerAero/Previews/Cheat-Menu.png`, `Cheat-Menu-Stats.png`, `Cheat-Menu-1280x960.png` and `Cheat-Menu-2560x1080.png` — F3 developer controls using the shared glass buttons, Frutiger text, search and scrollable action/stat lists. See [menu controls](../Documentation/CHEAT_MENU.md).
+
 - `UI/Project-Inventory-Icon-Review.png` — generated backpack header and compact resource rows.
 - `UI/Project-Upgrade-Interactive-Review.png` — large skill nodes in the draggable viewport.
 - `UI/Project-Upgrade-Hover-Review.png` — full effect, cost, and unlock details.
@@ -30,6 +32,8 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ### Stone and processor workshop
 
+- `../Documentation/FrutigerAero/Resources/Previews/Sand-Glass-Idle.png`, `Sand-Glass-Working.png`, `Sand-Glass-Complete.png` and `Sand-Glass-Working.gif` — new Blender sand pile and round glass kiln, shrinking sand, mesh chips, rock cooldown bricks, dust and confirmed glass output. See [sand and glass notes](../Documentation/FrutigerAero/Resources/SAND_GLASS.md).
+
 - `../Documentation/FrutigerAero/Resources/Previews/Stone-Processor-Idle.png` — textured three-rock resource and rounded white/blue processing machine, modeled in Blender.
 - `../Documentation/FrutigerAero/Resources/Previews/Stone-Processor-World.png` — current prefab instances grounded in the Tower scene.
 - `../Documentation/FrutigerAero/Resources/Previews/Processor-Working.gif` — sampled roller, press, feed stone, status-light and completion motion. See [asset and animation notes](../Documentation/FrutigerAero/Resources/RESOURCE_WORKSHOP.md) and [generated texture prompts](../Documentation/FrutigerAero/Resources/TexturePrompts.md).
@@ -41,6 +45,10 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 - `../Documentation/FrutigerAero/Foliage/Previews/Bush-Terrace.png` — irregular detail clusters on the outer terrace, outside the wall and clear of the stairs. See [placement and rendering notes](../Documentation/FrutigerAero/Foliage/BUSHES.md).
 
 ### Tower terrain landscape
+
+- `../Documentation/FrutigerAero/Previews/Terrain-Overview-Lightweight.png` and `Terrain-Lake-1-Lightweight.png` — reduced terrain and grass cost, with the rolling landscape and lakes preserved. Current settings and validation are in [landscape notes](../Documentation/FrutigerAero/TERRAIN_LANDSCAPE.md).
+
+- `../Documentation/FrutigerAero/Previews/Terrain-Overview-RollingMeadow.png`, `Terrain-Ground-RollingMeadow.png`, `Terrain-Mountains-RollingMeadow.png` and `Terrain-Lake-1-RollingMeadow.png` through `Terrain-Lake-3-RollingMeadow.png` — requested 2026-10-23 revision: a tighter tower footprint, curved meadows, visible lakes with broad approaches, undulating ridges and grass across the outer terrain. These supersede the earlier wide clearing and four small lake placements.
 
 - `../Assets/_Project/UI/FrutigerAero/Art/AeroLandscape.png` — existing nature reference for optimistic green hills, clear blue skies and soft transitions; its historical menu placement is still superseded.
 - `../Documentation/FrutigerAero/Previews/Terrain-Overview.png` — current green circular tower clearing, small lakes and flowing green mountains, based on the four boundary pillars.

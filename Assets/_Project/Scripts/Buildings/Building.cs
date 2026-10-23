@@ -136,6 +136,7 @@ namespace TowerOfBabel.Buildings
         }
 
         public void ApplyStage(byte stage) => ApplyStage(stage,true);
+        public void ApplyStageImmediately(byte stage) => ApplyStage(stage, false);
 
         private void ApplyStage(byte stage,bool animate)
         {

@@ -42,6 +42,12 @@ public static class AeroTowerTerrainAuthoring
             Layer("HighMeadow", new Color(.51f,.75f,.23f), 24)
         };
         generated.terrainLayers = layers;
+        generated.heightmapResolution = 513;
+        generated.alphamapResolution = 256;
+        generated.baseMapResolution = 128;
+        generated.SetDetailResolution(512, 32);
+        generated.SetDetailScatterMode(DetailScatterMode.InstanceCountMode);
+        generated.size = source.size;
         string materialPath = Root + "/AeroTerrain.mat";
         var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
         if (material == null)
@@ -62,12 +68,33 @@ public static class AeroTowerTerrainAuthoring
         var references = data.FindProperty("boundaryMarkers"); references.arraySize = markers.Length;
         for (int i = 0; i < markers.Length; i++) references.GetArrayElementAtIndex(i).objectReferenceValue = markers[i];
         data.FindProperty("minimumTowerRadius").floatValue = generator != null ? generator.radius : 96;
+        data.FindProperty("clearingPadding").floatValue = 2;
+        data.FindProperty("mountainHeight").floatValue = 78;
+        data.FindProperty("wavelength").floatValue = 310;
+        data.FindProperty("foothillWidth").floatValue = 180;
+        data.FindProperty("foothillSetback").floatValue = 32;
+        data.FindProperty("meadowHeight").floatValue = 10;
+        data.FindProperty("grassFeather").floatValue = 3.5f;
+        data.FindProperty("grassSlopeLimit").floatValue = 45;
+        data.FindProperty("lakeShoreWidth").floatValue = 18;
+        var basins = data.FindProperty("lakes"); basins.arraySize = 3;
+        Vector2[] offsets = { new(-50, -190), new(195, 70), new(-190, 140) };
+        Vector2[] radii = { new(52, 34), new(42, 28), new(36, 25) };
+        float[] rotations = { -18, 28, -36 };
+        for (int i = 0; i < basins.arraySize; i++)
+        {
+            var basin = basins.GetArrayElementAtIndex(i);
+            basin.FindPropertyRelative("offset").vector2Value = offsets[i];
+            basin.FindPropertyRelative("radii").vector2Value = radii[i];
+            basin.FindPropertyRelative("rotation").floatValue = rotations[i];
+        }
         data.ApplyModifiedPropertiesWithoutUndo();
         try
         {
             component.Generate();
             terrain.materialTemplate = material;
-            terrain.heightmapPixelError = 3;
+            var quality = terrain.GetComponent<TerrainPresentationQuality>() ?? terrain.gameObject.AddComponent<TerrainPresentationQuality>();
+            quality.ApplyQuality(false);
             EditorUtility.SetDirty(generated); EditorUtility.SetDirty(component); EditorUtility.SetDirty(material);
             PrefabUtility.RecordPrefabInstancePropertyModifications(terrain);
             PrefabUtility.RecordPrefabInstancePropertyModifications(terrain.GetComponent<TerrainCollider>());

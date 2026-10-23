@@ -10,7 +10,7 @@ using UnityEngine;
 namespace TowerOfBabel.Networking.Upgrades
 {
     [DisallowMultipleComponent]
-    public sealed class NetworkUpgradeService : NetworkBehaviour
+    public sealed partial class NetworkUpgradeService : NetworkBehaviour
     {
         public static NetworkUpgradeService Instance { get; private set; }
 
@@ -52,6 +52,7 @@ namespace TowerOfBabel.Networking.Upgrades
         {
             ServerManager.OnRemoteConnectionState -= HandleRemoteConnectionState;
             serverProgress.Clear();
+            serverCheats.Clear();
             base.OnStopServer();
         }
 
@@ -80,17 +81,17 @@ namespace TowerOfBabel.Networking.Upgrades
 
         public float GetLocalActionDuration(UpgradeJob job, float baseDuration)
         {
-            return Mathf.Max(0.1f, baseDuration - GetLocalEffect(job, UpgradeEffectType.Efficiency));
+            return Mathf.Max(0.02f, Mathf.Max(0.1f, baseDuration - GetLocalEffect(job, UpgradeEffectType.Efficiency)) / GetLocalCheatStat(SpeedStat(job)));
         }
 
         public int GetLocalActionCost(UpgradeJob job, int baseCost)
         {
-            return Mathf.Max(1, baseCost + Mathf.RoundToInt(GetLocalEffect(job, UpgradeEffectType.Cost)));
+            return Mathf.Max(1, Mathf.RoundToInt((baseCost + GetLocalEffect(job, UpgradeEffectType.Cost)) * GetLocalCheatStat(CostStat(job))));
         }
 
         public int GetLocalProduction(UpgradeJob job, int baseAmount)
         {
-            return Mathf.Max(1, baseAmount + Mathf.RoundToInt(GetLocalEffect(job, UpgradeEffectType.Production)));
+            return Mathf.Max(1, Mathf.RoundToInt((baseAmount + GetLocalEffect(job, UpgradeEffectType.Production)) * GetLocalCheatStat(ProductionStat(job))));
         }
 
         public void RequestPurchase(UpgradeJob job, string upgradeId)
@@ -175,7 +176,7 @@ namespace TowerOfBabel.Networking.Upgrades
             UpgradeJobProgress progress = GetOrCreateServerProgress(connection).Get(job);
             int previousLevel = progress.Level;
             int previousExperience = progress.Experience;
-            bool changed = progress.GainExperience(amount);
+            bool changed = progress.GainExperience(Mathf.Clamp(Mathf.RoundToInt(amount * GetServerCheatStat(connection, TowerOfBabel.Cheats.CheatStat.Experience)), 1, 10000000));
             // The receipt precedes the snapshot so the HUD can hold its old fill until bubbles arrive.
             // Max-level actions still celebrate, but their receipt contains zero awarded XP.
             ReceiveActionRewardTargetRpc(connection, job, worldPosition, actionLabel ?? job.ToString(),
@@ -206,20 +207,18 @@ namespace TowerOfBabel.Networking.Upgrades
         public float GetServerActionDuration(NetworkConnection connection, UpgradeJob job,
             float baseDuration)
         {
-            return Mathf.Max(0.1f,
-                baseDuration - GetServerEffect(connection, job, UpgradeEffectType.Efficiency));
+            return Mathf.Max(0.02f, Mathf.Max(0.1f,
+                baseDuration - GetServerEffect(connection, job, UpgradeEffectType.Efficiency)) / GetServerCheatStat(connection, SpeedStat(job)));
         }
 
         public int GetServerActionCost(NetworkConnection connection, UpgradeJob job, int baseCost)
         {
-            return Mathf.Max(1,
-                baseCost + Mathf.RoundToInt(GetServerEffect(connection, job, UpgradeEffectType.Cost)));
+            return Mathf.Max(1, Mathf.RoundToInt((baseCost + GetServerEffect(connection, job, UpgradeEffectType.Cost)) * GetServerCheatStat(connection, CostStat(job))));
         }
 
         public int GetServerProduction(NetworkConnection connection, UpgradeJob job, int baseAmount)
         {
-            return Mathf.Max(1,
-                baseAmount + Mathf.RoundToInt(GetServerEffect(connection, job, UpgradeEffectType.Production)));
+            return Mathf.Max(1, Mathf.RoundToInt((baseAmount + GetServerEffect(connection, job, UpgradeEffectType.Production)) * GetServerCheatStat(connection, ProductionStat(job))));
         }
 
         internal PlayerUpgradeProgress GetOrCreateServerProgress(NetworkConnection connection)
@@ -402,6 +401,7 @@ namespace TowerOfBabel.Networking.Upgrades
         private void ReceiveCheatResultTargetRpc(NetworkConnection connection, bool success,
             string message)
         {
+            CheatResult?.Invoke(message);
             if (success)
                 Debug.Log($"[Upgrade Cheat] {message}");
             else
@@ -412,11 +412,15 @@ namespace TowerOfBabel.Networking.Upgrades
             RemoteConnectionStateArgs args)
         {
             if (connection != null && args.ConnectionState == RemoteConnectionState.Stopped)
+            {
                 serverProgress.Remove(connection.ClientId);
+                serverCheats.Remove(connection.ClientId);
+            }
         }
 
         private void ResetLocalProgress()
         {
+            localCheats.Reset();
             foreach (UpgradeJob job in new[] { UpgradeJob.Gather, UpgradeJob.Process, UpgradeJob.Build })
             {
                 UpgradeJobSnapshot snapshot = new(job, 0, 0, 0, Array.Empty<string>());

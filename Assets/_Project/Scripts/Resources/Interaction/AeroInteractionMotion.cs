@@ -21,6 +21,15 @@ namespace TowerOfBabel.Resources.Interaction
         private Transform target;
         private float elapsed, strength, tempo, progress, blend;
         private bool interacting, presenting;
+        private Vector3 gatherScale = Vector3.one;
+        private float gatherImpact;
+        private bool grounded;
+
+        public void SetGatherPose(Vector3 scale, float impact, bool anchored)
+        {
+            gatherScale = scale; gatherImpact = impact; grounded = anchored;
+            if (presenting) ApplyPose();
+        }
 
         public void Begin(Transform visualRoot, float amplitude, float speed)
         {
@@ -60,6 +69,7 @@ namespace TowerOfBabel.Resources.Interaction
                 }
             }
             elapsed = progress = blend = 0;
+            gatherScale = Vector3.one; gatherImpact = 0; grounded = false;
             strength = Mathf.Max(0, amplitude);
             // Preserve existing authored tempo values: 24 now makes one smooth weave in ~2.6 seconds.
             tempo = Mathf.Max(0, speed) * .1f;
@@ -100,6 +110,12 @@ namespace TowerOfBabel.Resources.Interaction
                 Mathf.Sin(phase * 2) * .35f) * (strength * envelope);
             float tilt = Mathf.Min(3, strength * 48) * envelope;
             Quaternion rotation = Quaternion.Euler(Mathf.Sin(phase * 2) * tilt * .3f, 0, -Mathf.Sin(phase) * tilt);
+            if (grounded) { offset = Vector3.zero; rotation = Quaternion.identity; }
+            else
+            {
+                offset += Vector3.up * gatherImpact * .025f;
+                rotation *= Quaternion.Euler(gatherImpact * -2, 0, gatherImpact * 2.5f);
+            }
             foreach (var visual in visuals)
             {
                 if (visual.Source == null || visual.Proxy == null || visual.SourceMesh == null) continue;
@@ -119,7 +135,7 @@ namespace TowerOfBabel.Resources.Interaction
                 // Amplitude stays consistent for scaled stones and radial building pieces.
                 visual.Transform.position = visual.Anchor.position + visual.Anchor.rotation * offset;
                 visual.Transform.localRotation = rotation;
-                visual.Transform.localScale = Vector3.one;
+                visual.Transform.localScale = gatherScale;
             }
         }
 

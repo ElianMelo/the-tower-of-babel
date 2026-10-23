@@ -32,7 +32,7 @@ namespace TowerOfBabel.Networking.Resources
         public bool CanExchangeLocal(ResourceType source, int cost, ResourceType target, int production)
         {
             long targetAfter = (long)GetLocalAmount(target) + production - (source == target ? cost : 0);
-            return cost > 0 && production > 0 && GetLocalAmount(source) >= cost && targetAfter <= capacityPerResource;
+            return cost > 0 && production > 0 && GetLocalAmount(source) >= cost && targetAfter <= LocalCapacity;
         }
 
         public bool RequestProcessStart(ResourceProcessor processor, Vector3 playerPosition)
@@ -57,6 +57,7 @@ namespace TowerOfBabel.Networking.Resources
 
         public override void OnStopClient()
         {
+            localCapacity = 0;
             ResourceProcessor interrupted = localActiveProcessor;
             localActiveProcessor = null;
             interrupted?.RejectByServer();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FishNet.Connection;
 using FishNet.Managing;
@@ -237,6 +238,73 @@ namespace TowerOfBabel.Resources.Tests
             yield return WaitFor(() => service.GetLocalAmount(ResourceType.ProcessedStone) == 1, "Cancelling another player cancelled the host.");
             Assert.That(store.GetAmount(second.ClientId, ResourceType.Stone), Is.EqualTo(5));
             Assert.That(store.GetAmount(second.ClientId, ResourceType.ProcessedStone), Is.Zero);
+        }
+
+        [UnityTest]
+        public IEnumerator HostGlass_CancellationKeepsSandAndConfirmedExchangeRevealsGlassExactlyOnce()
+        {
+            Object.Destroy(processor.gameObject); yield return null;
+            processor = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/GlassFurnace.prefab")).GetComponent<ResourceProcessor>();
+            processor.transform.position = new Vector3(0, 1000, 0); player.transform.position = processor.transform.position;
+            Set(processor, "processorId", "test-glass-kiln"); Set(processor, "interactionDuration", .35f);
+            Invoke(service, "RebuildNodeLookup"); Seed(ResourceType.Sand, 4); Seed(ResourceType.Glass, 0);
+            var motion = processor.GetComponent<GlassFurnaceAnimation>();
+            Begin(); yield return WaitFor(() => ActiveCount == 1, "Glass processing did not start.");
+            raycaster.CancelCurrentInteraction(); yield return WaitFor(() => ActiveCount == 0, "Glass processing did not cancel.");
+            Assert.That(store.GetAmount(connection.ClientId, ResourceType.Sand), Is.EqualTo(4));
+            Assert.That(motion.IsOutputVisible, Is.False); Assert.That(motion.CompletionCount, Is.Zero);
+            int completed = 0; processor.ServerCompleted += () => completed++;
+            Begin(); yield return WaitFor(() => completed == 1, "Glass exchange did not complete through the host RPC flow.");
+            Assert.That(service.GetLocalAmount(ResourceType.Sand), Is.EqualTo(2)); Assert.That(service.GetLocalAmount(ResourceType.Glass), Is.EqualTo(1));
+            Assert.That(store.GetAmount(connection.ClientId, ResourceType.Sand), Is.EqualTo(2));
+            Assert.That(motion.IsOutputVisible, Is.True); Assert.That(motion.CompletionCount, Is.EqualTo(1));
+            processor.CompleteByServer(); Assert.That(motion.CompletionCount, Is.EqualTo(1));
+            yield return new WaitForSeconds(1.4f); Assert.That(motion.IsOutputVisible, Is.False);
+            Seed(ResourceType.Glass, 50); Focus(); Assert.That(processor.CanInteract, Is.False);
+            Seed(ResourceType.Glass, 1); Seed(ResourceType.Sand, 1); Focus(); Assert.That(processor.CanInteract, Is.False);
+        }
+
+        [UnityTest]
+        public IEnumerator HostSand_GatheringCancellationAndCooldownPreserveResourceAuthority()
+        {
+            var sand = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == ResourceType.Sand);
+            var original = sand.Definition; var definition = Object.Instantiate(original);
+            Set(definition, "interactionDuration", .3f); Set(definition, "respawnCooldown", .5f); Set(sand, "definition", definition);
+            try
+            {
+                Seed(ResourceType.Sand, 0); player.transform.position = sand.transform.position;
+                Invoke(raycaster, "SetTarget", sand.GetComponent<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => Get<IDictionary>(service, "activeGathers").Count == 1, "Sand gathering did not start.");
+                raycaster.CancelCurrentInteraction();
+                yield return WaitFor(() => Get<IDictionary>(service, "activeGathers").Count == 0, "Sand gathering did not cancel.");
+                Assert.That(service.GetLocalAmount(ResourceType.Sand), Is.Zero);
+                var feedback = sand.GetComponent<ResourceHarvestFeedback>(); Assert.That(feedback.PresentationScale, Is.EqualTo(1));
+                Invoke(raycaster, "SetTarget", sand.GetComponent<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => service.GetLocalAmount(ResourceType.Sand) == 2, "Sand gather did not reach the wallet.");
+                Assert.That(sand.CanInteract, Is.False); Assert.That(feedback.IsDepleted, Is.True); Assert.That(feedback.CompletionCount, Is.EqualTo(1));
+                yield return WaitFor(() => sand.CanInteract, "Sand did not respawn.");
+                Assert.That(feedback.IsDepleted, Is.False); Assert.That(service.GetLocalAmount(ResourceType.Sand), Is.EqualTo(2));
+            }
+            finally { Set(sand, "definition", original); Object.Destroy(definition); }
+        }
+
+        [UnityTest]
+        public IEnumerator RockCooldown_LeavesBricksEmitsMeshChipsAndRestoresTheNode()
+        {
+            var stone = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == ResourceType.Stone);
+            var feedback = stone.GetComponent<ResourceHarvestFeedback>();
+            Assert.That(feedback.MarkerVisible, Is.False); var collider = stone.GetComponentInChildren<Collider>();
+            var position = collider.transform.position;
+            stone.BeginAuthoritativeCooldown(.25f);
+            Assert.That(feedback.MarkerVisible, Is.True); Assert.That(stone.CanInteract, Is.False);
+            var chips = stone.GetComponentsInChildren<ParticleSystem>().Single(ps => ps.GetComponent<ParticleSystemRenderer>().renderMode == ParticleSystemRenderMode.Mesh);
+            Assert.That(chips.particleCount, Is.GreaterThan(0));
+            stone.BeginAuthoritativeCooldown(.25f); Assert.That(feedback.CompletionCount, Is.EqualTo(1), "Duplicate cooldown notifications must not replay the break.");
+            yield return new WaitForSeconds(.35f);
+            Assert.That(feedback.MarkerVisible, Is.False); Assert.That(stone.CanInteract, Is.True);
+            Assert.That(collider.transform.position, Is.EqualTo(position));
         }
 
         private int ActiveCount => Get<IDictionary>(service, "activeProcesses").Count;

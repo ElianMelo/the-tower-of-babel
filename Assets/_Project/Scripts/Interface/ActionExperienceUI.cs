@@ -444,13 +444,14 @@ namespace TowerOfBabel.Interface
         private void ClearFeedback()
         {
             pending.Clear(); animating = false; impact = hold = 0;
-            barVisibility.alpha = 0;
-            bar.anchoredPosition = barRest; bar.localScale = Vector3.one;
-            experienceText.rectTransform.localScale = Vector3.one;
-            arrivalGlow.color = Color.clear;
-            foreach (Bubble b in bubbles) b.Renderer.gameObject.SetActive(false);
-            foreach (Pop p in pops) { p.Age = 1; p.Image.gameObject.SetActive(false); }
-            foreach (Caption c in captions) { c.Age = 2; c.Text.gameObject.SetActive(false); }
+            // Scene unload can destroy presentation children before this HUD is disabled.
+            if (barVisibility != null) barVisibility.alpha = 0;
+            if (bar != null) { bar.anchoredPosition = barRest; bar.localScale = Vector3.one; }
+            if (experienceText != null) experienceText.rectTransform.localScale = Vector3.one;
+            if (arrivalGlow != null) arrivalGlow.color = Color.clear;
+            foreach (Bubble b in bubbles) if (b.Renderer != null) b.Renderer.gameObject.SetActive(false);
+            foreach (Pop p in pops) { p.Age = 1; if (p.Image != null) p.Image.gameObject.SetActive(false); }
+            foreach (Caption c in captions) { c.Age = 2; if (c.Text != null) c.Text.gameObject.SetActive(false); }
             audioSource?.Stop();
         }
 

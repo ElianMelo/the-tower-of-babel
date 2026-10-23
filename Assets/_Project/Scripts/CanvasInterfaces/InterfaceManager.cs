@@ -69,6 +69,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ShowInventory()
     {
+        TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
         menuLauncher?.Close();
         upgradeUI?.Hide();
         animationEmoteUI?.Hide();
@@ -88,6 +89,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ShowUpgrade()
     {
+        TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
         menuLauncher?.Close();
         inventoryUI?.Hide();
         animationEmoteUI?.Hide();
@@ -101,6 +103,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ToggleEmotes()
     {
+        TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
         menuLauncher?.Close();
         if (animationEmoteUI == null) return;
         if (animationEmoteUI.IsVisible) animationEmoteUI.Hide();

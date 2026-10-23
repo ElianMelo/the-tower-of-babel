@@ -20,6 +20,8 @@ namespace TowerOfBabel.Resources
 
         private AeroInteractionMotion interactionMotion;
         private bool isCoolingDown;
+        private ResourceHarvestFeedback harvestFeedback;
+        private ResourceHarvestFeedback Feedback => harvestFeedback != null ? harvestFeedback : harvestFeedback = GetComponent<ResourceHarvestFeedback>();
 
         public string ObjectName => gameObject.name;
         public bool UsesGatheringAnimation => true;
@@ -44,7 +46,7 @@ namespace TowerOfBabel.Resources
         {
             get
             {
-                var filter=visuals!=null ? visuals.GetComponent<MeshFilter>() : null;
+                var filter=visuals!=null ? visuals.GetComponentInChildren<MeshFilter>() : null;
                 if (filter==null || filter.sharedMesh==null) return transform.position;
                 var bounds=filter.sharedMesh.bounds;
                 return filter.transform.TransformPoint(bounds.center+Vector3.up*bounds.extents.y*.6f);
@@ -68,11 +70,13 @@ namespace TowerOfBabel.Resources
             if (interactionMotion == null)
                 interactionMotion = GetComponent<AeroInteractionMotion>() ?? gameObject.AddComponent<AeroInteractionMotion>();
             interactionMotion.Begin(visuals.transform, definition.ShakeStrength, definition.ShakeSpeed);
+            Feedback?.BeginWork();
         }
 
         public void UpdateInteraction(float normalizedProgress)
         {
             interactionMotion?.SetProgress(normalizedProgress);
+            Feedback?.SetProgress(normalizedProgress);
         }
 
         public void CancelInteraction()
@@ -99,6 +103,7 @@ namespace TowerOfBabel.Resources
 
         public void RejectByServer()
         {
+            RestoreVisualPosition();
             ServerRejected?.Invoke();
         }
 
@@ -108,19 +113,29 @@ namespace TowerOfBabel.Resources
             StartCoroutine(CooldownRoutine(duration));
         }
 
+        public void ResetAuthoritativeCooldown()
+        {
+            StopAllCoroutines(); isCoolingDown = false;
+            Feedback?.ResetFeedback();
+            if (visuals != null) visuals.SetActive(true);
+        }
+
         private IEnumerator CooldownRoutine(float duration)
         {
             interactionMotion?.Stop(true);
             isCoolingDown = true;
+            Feedback?.Deplete();
             visuals.SetActive(false);
             yield return new WaitForSeconds(duration);
             visuals.SetActive(true);
             isCoolingDown = false;
+            Feedback?.Respawn();
         }
 
         private void RestoreVisualPosition()
         {
             interactionMotion?.Stop();
+            Feedback?.StopWork();
         }
 
         private void OnDisable()

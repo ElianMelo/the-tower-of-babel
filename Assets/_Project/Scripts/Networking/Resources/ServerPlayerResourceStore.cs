@@ -6,6 +6,7 @@ namespace TowerOfBabel.Networking.Resources
     public sealed class ServerPlayerResourceStore
     {
         private readonly Dictionary<int, Dictionary<ResourceType, int>> resourcesByPlayer = new();
+        private readonly Dictionary<int, int> capacities = new();
 
         public int CapacityPerResource { get; }
 
@@ -22,16 +23,29 @@ namespace TowerOfBabel.Networking.Resources
                 : 0;
         }
 
+        public int GetCapacity(int playerId) => capacities.TryGetValue(playerId, out int capacity) ? capacity : CapacityPerResource;
+        public void SetCapacity(int playerId, int capacity)
+        {
+            capacities[playerId] = System.Math.Clamp(capacity, 1, 1000000);
+            if (resourcesByPlayer.TryGetValue(playerId, out var amounts))
+                foreach (var type in new List<ResourceType>(amounts.Keys)) amounts[type] = System.Math.Min(amounts[type], GetCapacity(playerId));
+        }
+        public void SetAmount(int playerId, ResourceType type, int amount)
+        {
+            if (!resourcesByPlayer.TryGetValue(playerId, out var amounts)) resourcesByPlayer[playerId] = amounts = new();
+            amounts[type] = System.Math.Clamp(amount, 0, GetCapacity(playerId));
+        }
+
         public bool TryAdd(int playerId, ResourceType resourceType, int amount, out int authoritativeAmount)
         {
             int current = GetAmount(playerId, resourceType);
-            if (amount <= 0 || current >= CapacityPerResource)
+            if (amount <= 0 || current >= GetCapacity(playerId))
             {
                 authoritativeAmount = current;
                 return false;
             }
 
-            authoritativeAmount = System.Math.Min(CapacityPerResource, current + amount);
+            authoritativeAmount = (int)System.Math.Min(GetCapacity(playerId), (long)current + amount);
             if (!resourcesByPlayer.TryGetValue(playerId, out Dictionary<ResourceType, int> resources))
             {
                 resources = new Dictionary<ResourceType, int>();
@@ -58,7 +72,7 @@ namespace TowerOfBabel.Networking.Resources
             return true;
         }
 
-        public void RemovePlayer(int playerId) => resourcesByPlayer.Remove(playerId);
+        public void RemovePlayer(int playerId) { resourcesByPlayer.Remove(playerId); capacities.Remove(playerId); }
 
         public bool CanExchange(int playerId, ResourceType source, int cost, ResourceType target, int production)
         {
@@ -68,7 +82,7 @@ namespace TowerOfBabel.Networking.Resources
             long targetAfter = (long)GetAmount(playerId, target) + production;
             if (source == target)
                 targetAfter -= cost;
-            return targetAfter <= CapacityPerResource;
+            return targetAfter <= GetCapacity(playerId);
         }
 
         // Validate the entire exchange before changing either balance. Never truncate production.

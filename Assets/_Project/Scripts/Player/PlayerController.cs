@@ -1,6 +1,8 @@
 using UnityEngine;
 using TowerOfBabel;
 using TowerOfBabel.Resources.Interaction;
+using TowerOfBabel.Cheats;
+using TowerOfBabel.Networking.Upgrades;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour, IPlayerControlLock
@@ -62,6 +64,8 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
     private float jumpBufferCounter;
     private bool controlsLocked;
     private bool isSprinting;
+    private float Stat(CheatStat stat) => NetworkUpgradeService.Instance != null ? NetworkUpgradeService.Instance.GetLocalCheatStat(stat) : CheatProfile.Default(stat);
+    private int EffectiveExtraJumps => extraJumps + (int)Stat(CheatStat.ExtraJumps);
 
     private void Awake()
     {
@@ -77,7 +81,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
 
         targetHeight = standingHeight;
         controller.height = standingHeight;
-        jumpsRemaining = extraJumps;
+        jumpsRemaining = EffectiveExtraJumps;
     }
 
     private void Start()
@@ -109,7 +113,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         AlignForwardWithCamera();
         UpdatePlayerVisuals();
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && !TowerOfBabel.Cheats.CheatMenuUI.ConsumedEscapeThisFrame)
             ToggleCursorLock();
     }
 
@@ -170,20 +174,20 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         if (inputDirection.sqrMagnitude > 1f)
             inputDirection.Normalize();
 
-        float targetSpeed = walkSpeed;
+        float targetSpeed = walkSpeed * Stat(CheatStat.WalkSpeed);
         isSprinting = false;
         if (isCrouching)
-            targetSpeed = crouchSpeed;
+            targetSpeed = crouchSpeed * Stat(CheatStat.CrouchSpeed);
         else if (Input.GetKey(KeyCode.LeftShift) && inputZ > 0f)
         {
-            targetSpeed = sprintSpeed;
+            targetSpeed = sprintSpeed * Stat(CheatStat.SprintSpeed);
             isSprinting = true;
         }
 
         Vector3 targetHorizontalVelocity = inputDirection * targetSpeed;
 
         // Smooth acceleration; less control while airborne
-        float accel = acceleration * (isGrounded ? 1f : airControlMultiplier);
+        float accel = acceleration * Stat(CheatStat.Acceleration) * (isGrounded ? 1f : airControlMultiplier * Stat(CheatStat.AirControl));
 
         // BUG FIX: Removed erroneous * targetSpeed multiplication
         currentHorizontalVelocity = Vector3.MoveTowards(
@@ -210,16 +214,16 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         // Reset jumps when grounded
         if (isGrounded && velocity.y <= 0f)
         {
-            jumpsRemaining = extraJumps;
+            jumpsRemaining = EffectiveExtraJumps;
             velocity.y = groundedGravity;
         }
 
         // Execute jump if buffered and we have coyote time or extra jumps
-        bool canJump = (coyoteTimeCounter > 0f && jumpsRemaining == extraJumps) || (jumpsRemaining > 0);
+        bool canJump = (coyoteTimeCounter > 0f && jumpsRemaining == EffectiveExtraJumps) || (jumpsRemaining > 0);
 
         if (jumpBufferCounter > 0f && canJump)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            velocity.y = Mathf.Sqrt(jumpHeight * Stat(CheatStat.JumpHeight) * -2f * gravity * Stat(CheatStat.Gravity));
             jumpBufferCounter = 0f; // Consume the buffer
             playerVisuals?.PlayJump();
 
@@ -227,12 +231,12 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
             if (!isGrounded && coyoteTimeCounter <= 0f && jumpsRemaining > 0)
                 jumpsRemaining--;
             else if (isGrounded)
-                jumpsRemaining = extraJumps; // Reset on ground jump
+                jumpsRemaining = EffectiveExtraJumps; // Reset on ground jump
         }
 
         // Apply gravity
         if (!isGrounded)
-            velocity.y += gravity * Time.deltaTime;
+            velocity.y += gravity * Stat(CheatStat.Gravity) * Time.deltaTime;
 
         // Hard cap falling speed to prevent tunneling
         if (velocity.y < -50f)

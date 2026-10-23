@@ -1,5 +1,7 @@
 # Stone and processor assets
 
+The later [sand, glass and gathering feedback pass](SAND_GLASS.md) extends this workshop with a sand resource, glass kiln, capped Unity particles, rock cooldown bricks and spatial audio. Its validation report supersedes the historical validation note below for the updated resource flow.
+
 The stone resource is now a faceted three-rock cluster with a generated silvery gray stone texture. The processor is an open-front machine with a pearl ceramic housing, azure roller hubs, brushed steel drums, a hopper, press, output tray and three cyan status lights. Its rounded white/blue surfaces follow the project's nature-and-technology direction.
 
 ## Assets and textures

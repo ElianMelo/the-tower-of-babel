@@ -1,0 +1,315 @@
+{
+  "project": "D:/PersonalProjects/the-tower-of-babel",
+  "date": "2026-10-23",
+  "unity": "6000.3.11f1",
+  "cli": "1.0.0-beta.14",
+  "editMode": {
+    "failed": 0,
+    "skipped": 0,
+    "passed": 58
+  },
+  "playMode": {
+    "failed": 0,
+    "skipped": 0,
+    "passed": 13
+  },
+  "tests": [
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.BulkConstruction_UpdatesStagesProgressionAndCacheVersionsTogether",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Capacity_IsPerPlayerClampsExistingBalancesAndHandlesOverflow",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.CheatPrefab_ContainsEveryQuickActionAndAScrollableStatsList",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Profiles_ClampValuesCopySnapshotsAndRestoreEveryDefault",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Terrain_GrassCoversDryOuterMeadowAndNeverTheTowerOrWater",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Terrain_RetainsFoundationHasRollingMeadowsAndAccessibleLakeBanks",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.DuplicatedProcessors_HaveDistinctStableSceneIds",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(0,0,1,1,False,0,0)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,1,1,True,0,1)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,4,2,3,True,1,7)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,2,1,False,1,0)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,49,1,2,False,3,49)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,50,1,1,False,3,50)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,0,1,False,3,0)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,1,0,False,3,0)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,1,1,int.MaxValue,False,3,1)",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_RechecksBalancesAndKeepsPlayersIndependent",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_SameResourceUsesNetAmountAtCapacity",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Processor_UsesOnlyProcessUpgradesAndClampsCostAndDuration",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.StoneProcessorPrefab_HasRecipeAndResolvableInteractionCollider",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.AbsoluteLevel_GrantsPointsOnlyForLevelsGainedAndResetsExperience",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.BuyingBottomCenterRevealsLevelFiftyUpgrade",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.CheatPointGrantAndReset_ClearTheExpectedProgression",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Experience_IsIncrementalPerJobAndResetsAfterLevelUp",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Experience_StopsAtLevelFiftyWithFiftyPoints",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InputActions_BindUpgradeToTabAndInventoryToI",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,2.0f,\"Efficiency\\n-0.2s\",False,\"Efficiency\\n-2s\")",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,0.25f,\"Efficiency\\n-0.2s\",False,\"Efficiency\\n-0.25s\")",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Cost,-3.0f,\"Cost\\n-2\",False,\"Cost\\n-3\")",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,4.0f,\"Production\\n+2\",False,\"Production\\n+4\")",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,5.0f,\"Level 50\\nProduction +2\",True,\"Level 50\\nProduction +5\")",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.PlaceholderConfig_HasSevenBySevenGridAndOneCapstonePerJob",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Purchases_StartAtCenterAndRevealOnlyOrthogonalNeighbors",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.CacheChunks_AssignsDeterministicTypeAndPositionOrderedLocalIndices",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.CacheChunks_StoresPureDeterministicDataThatSurvivesAuthoringObjectDestruction",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ChebyshevDistance_CountsDiagonalAdjacentChunkAsOne",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ChunkManager_AdvancesOneStageAndNotifiesListeners",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ConfigureTower_CachesDataThenDestroysTemporaryAuthoringAssets",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.InstancedFarRenderer_CullsSpatialPagesBehindCamera",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.InstancedFarRenderer_LoadsAndRemovesTypedChunkInstances",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.NearPool_ChunkBoundaryOnlyReleasesAndPositionsChangedSlab",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.NearPool_StageChangeDoesNotRecycleUnchangedChunkAssets",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.Neighborhood_WithRadiusOneContainsExactlyTwentySevenUniqueChunks",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayerInstance_RejectsStaleSnapshots",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_PrioritizesFriendsAndUsesTwentyChunkCutoff",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_RemoteRegistrationRequestsSearchAfterInitialLocalSearch",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_ReturnsReleasedVisualToPool",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.SpatialIndex_CutsSearchPastTwentyChunks",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.SpatialIndex_UsesChunkDistanceAndRandomizesNearestTies",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.TowerRenderPrefabs_RetainInstancingVariantsForPlayerBuilds",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.TowerVisibility_ImmediatelySwitchesChunkDataBetweenNearPoolAndFarRenderer",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.WorldToChunk_UsesFloorDivisionForNegativeCoordinates",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.BoundBuildings_RefreshTheirPresentationWhenTheFloorUnlocks",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Bushes_AppearOnlyOnCompletedAndUnlockedFloors",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Floors_UnlockOnlyAfterEveryAssetAcrossAllChunksIsComplete",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.SnapshotAndRollback_RecomputeTheFirstUnfinishedFloor",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_HidesLaterFloorsEvenWhenSnapshotsContainBuiltAssets",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_KeepsLockedChunksOutOfBothNearAndFarRendering",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.MenuActions_UpdateServerProgressCapacityResourcesAndConstruction",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.Cancellation_DisablingAndDisconnecting_DoNotConsumeOrGrantExperience",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.DelayedReply_DoesNotInterruptANewerRequestOnTheSameProcessor",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.HostProcessing_ExchangesOnCompletion_UpdatesWalletAndGrantsProcessExperience",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.MissingMaterialsAndFullOutput_RejectStartAndRecheckAtCompletion",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.ServerProcessing_AppliesProcessUpgradesAndSnapshotsRecipeAtStart",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.SharedProcessor_AcceptsIndependentPlayersAndCancelsOnlyTheRequestedPlayer",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds",
+      "result": "Passed"
+    },
+    {
+      "name": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry",
+      "result": "Passed"
+    }
+  ],
+  "checks": [
+    "F3/Escape, paused input and cursor restoration",
+    "Server-confirmed XP, levels, points and upgrades",
+    "Per-player bag capacity and resource exchanges",
+    "Instant gather, process, asset and floor construction",
+    "Normal processing regression checks",
+    "Construction stages, floor visibility and foliage",
+    "Cinemachine field-of-view override",
+    "Grass coverage, foundation and lake clearance",
+    "Menu visual review at 4:3, 16:10 and ultrawide"
+  ],
+  "editorRestored": "Tower scene, clean Edit Mode",
+  "widerSuite": "Focused checks passed; earlier unrelated full-suite UI/font/collider failures were not rerun."
+}

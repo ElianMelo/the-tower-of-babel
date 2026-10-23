@@ -32,6 +32,8 @@ namespace TowerOfBabel.Networking.Resources
         private readonly Dictionary<int, ActiveGather> activeGathers = new();
         private ServerPlayerResourceStore serverResources;
         private Resource localActiveResource;
+        public int LocalCapacity => localCapacity > 0 ? localCapacity : capacityPerResource;
+        private int localCapacity;
 
         private void Awake()
         {
@@ -126,7 +128,7 @@ namespace TowerOfBabel.Networking.Resources
                 || !nodes.TryGetValue(nodeId, out Resource node)
                 || !node.ServerCanGather
                 || Vector3.Distance(claimedPlayerPosition, node.transform.position) > maximumInteractionDistance
-                || serverResources.GetAmount(sender.ClientId, node.Definition.ResourceType) >= capacityPerResource)
+                || serverResources.GetAmount(sender.ClientId, node.Definition.ResourceType) >= serverResources.GetCapacity(sender.ClientId))
             {
                 RejectGatherTargetRpc(sender, nodeId);
                 return;
@@ -172,8 +174,9 @@ namespace TowerOfBabel.Networking.Resources
                 yield break;
             }
 
-            node.BeginAuthoritativeCooldown(node.Definition.RespawnCooldown);
-            SetNodeCooldownObserversRpc(node.NodeId, node.Definition.RespawnCooldown);
+            float cooldown = node.Definition.RespawnCooldown / (NetworkUpgradeService.Instance != null ? NetworkUpgradeService.Instance.GetServerCheatStat(connection, TowerOfBabel.Cheats.CheatStat.ResourceRespawnSpeed) : 1);
+            node.BeginAuthoritativeCooldown(cooldown);
+            SetNodeCooldownObserversRpc(node.NodeId, cooldown);
             UpdateWalletTargetRpc(connection, node.Definition.ResourceType, amount);
             NetworkUpgradeService.Instance?.ServerGrantActionExperience(connection, UpgradeJob.Gather,
                 worldPosition: node.FeedbackPosition,

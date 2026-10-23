@@ -123,7 +123,7 @@ namespace TowerOfBabel.World.Chunks
             }
         }
 
-        public bool ApplyAssetStage(ChunkSceneCache chunk, int localIndex)
+        public bool ApplyAssetStage(ChunkSceneCache chunk, int localIndex, bool animate = true)
         {
             if (chunk == null || !activeChunks.TryGetValue(chunk.Key, out ChunkLease lease) ||
                 (uint)localIndex >= (uint)lease.Assets.Length ||
@@ -140,7 +140,11 @@ namespace TowerOfBabel.World.Chunks
                 lease.Assets[localIndex] = current;
             }
 
-            if (current.ActiveIndex>=0) current.Building?.ApplyStage(asset.Stage);
+            if (current.ActiveIndex>=0)
+            {
+                if (animate) current.Building?.ApplyStage(asset.Stage);
+                else current.Building?.ApplyStageImmediately(asset.Stage);
+            }
             else current.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
             ApplyTransform(current.GameObject.transform, asset);
             ConfigureFloorGeometry(current, asset);
