@@ -263,7 +263,7 @@ namespace TowerOfBabel.Cheats
             }
             foreach (string section in new[] { "Quick actions", "Construction" })
             {
-                ToggleRow(section, "Instantly build asset", "While enabled, interact with any available asset to finish it for free", () => NetworkUpgradeService.Instance?.GetLocalCheatStat(CheatStat.InstantBuild) > .5f,
+                ToggleRow(section, "Instantly build asset", "Fills your bag with every resource; while enabled, interact with any available asset to finish it for free", () => NetworkUpgradeService.Instance?.GetLocalCheatStat(CheatStat.InstantBuild) > .5f,
                     value => Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(CheatStat.InstantBuild, value ? 1 : 0)));
                 Action(section, "Instantly build floor", "Complete the next unfinished floor, wherever you are standing; repeat to advance", () => Command(CheatCommand.BuildFloor), "Build next floor");
             }

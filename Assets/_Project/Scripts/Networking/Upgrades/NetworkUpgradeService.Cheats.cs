@@ -43,6 +43,12 @@ namespace TowerOfBabel.Networking.Upgrades
             if (!serverCheats.TryGetValue(sender.ClientId, out var profile)) serverCheats[sender.ClientId] = profile = new CheatProfile();
             profile.Set(stat, value);
             if (stat == CheatStat.BagCapacity) NetworkResourceService.Instance?.ServerCheatCapacity(sender, (int)profile.Get(stat));
+            if (stat == CheatStat.InstantBuild && profile.Get(stat) > .5f && NetworkResourceService.Instance != null)
+            {
+                var resources = NetworkResourceService.Instance;
+                foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
+                    resources.ServerCheatSetResource(sender, type, resources.ServerCapacity(sender));
+            }
             CheatStatsTargetRpc(sender, profile.Snapshot());
             SendCheatResult(sender, true, $"{stat}: {profile.Get(stat):0.##}");
         }

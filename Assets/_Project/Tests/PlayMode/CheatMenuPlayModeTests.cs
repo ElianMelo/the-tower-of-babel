@@ -204,6 +204,7 @@ namespace TowerOfBabel.Resources.Tests
             var raycaster = player.GetComponent<TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster>();
             menu.Show(); menu.ToggleControls["Instantly build asset"].isOn = true;
             yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.InstantBuild) == 1, "Instant-build toggle did not reach the server");
+            yield return Wait(() => Enum.GetValues(typeof(ResourceType)).Cast<ResourceType>().All(type => resources.GetLocalAmount(type) == resources.LocalCapacity), "Instant build did not fill every resource to bag capacity");
             Assert.That(chunks.CachedChunks.SelectMany(c => c.Assets).All(a => a.Stage == 0), Is.True, "Enabling the toggle must not build the captured target");
             var candidate = chunks.CachedChunks.Where(c => c.Key.FloorIndex == 0)
                 .SelectMany(c => c.Assets.Select(a => (key: c.Key, asset: a))).Where(p => p.asset.AssetType == TowerOfBabel.World.Tower.TowerAssetType.Pillar)
@@ -222,6 +223,8 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(chunks.CachedChunks.Where(c => c.Key.FloorIndex == 1).SelectMany(c => c.Assets).All(a => a.Stage == 0), Is.True);
             menu.Show(); menu.ToggleControls["Instantly build asset"].isOn = false;
             yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.InstantBuild) == 0, "Toggle did not disable");
+            foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
+                Assert.That(resources.GetLocalAmount(type), Is.EqualTo(resources.LocalCapacity), "Disabling instant build must retain granted resources");
         }
 
         private static IEnumerator Wait(Func<bool> condition, string message)
