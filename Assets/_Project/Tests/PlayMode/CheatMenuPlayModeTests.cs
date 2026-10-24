@@ -140,6 +140,90 @@ namespace TowerOfBabel.Resources.Tests
             yield return Wait(() => upgrades.GetLocalSnapshot(UpgradeJob.Build).Level == 0 && upgrades.GetLocalSnapshot(UpgradeJob.Gather).Level == 0, "Progression reset failed");
         }
 
+        [UnityTest]
+        public IEnumerator GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState()
+        {
+            var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+            var extra = new GameObject("Previously disabled collider"); extra.transform.SetParent(player.transform, false);
+            extra.AddComponent<BoxCollider>().enabled = false;
+            var colliders = player.GetComponentsInChildren<Collider>(true); var previous = colliders.Select(c => c.enabled).ToArray();
+            var start = player.transform.position;
+            menu.Show(); menu.ToggleControls["God mode"].isOn = true;
+            Assert.That(menu.IsGodMode, Is.True); Assert.That(player.enabled, Is.False);
+            Assert.That(colliders.All(c => !c.enabled), Is.True);
+            menu.Hide(); Assert.That(menu.IsGodMode, Is.True);
+            previousKeyboard = Keyboard.current; keyboard = InputSystem.AddDevice<Keyboard>();
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState(Key.Space));
+            yield return null; yield return null; yield return null;
+            InputSystem.QueueStateEvent(keyboard, new KeyboardState()); yield return null;
+            Assert.That(player.transform.position.y, Is.GreaterThan(start.y + .05f));
+            menu.Show(); menu.ToggleControls["God mode"].isOn = false;
+            Assert.That(menu.IsGodMode, Is.False); Assert.That(player.enabled, Is.True);
+            for (int i = 0; i < colliders.Length; i++) Assert.That(colliders[i].enabled, Is.EqualTo(previous[i]));
+            UnityEngine.Object.Destroy(extra);
+        }
+
+        [UnityTest]
+        public IEnumerator BuildFloor_AlwaysAdvancesTheNextUnfinishedFloorRegardlessOfPlayerOrSelection()
+        {
+            var chunks = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
+            var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>(); var start = player.transform.position;
+            menu.Show(); menu.SetFloor(45);
+            menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            yield return Wait(() => chunks.IsFloorComplete(0), "The first unfinished floor did not complete");
+            menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            yield return Wait(() => chunks.IsFloorComplete(1), "Repeated action rebuilt the standing floor instead of advancing");
+            Assert.That(chunks.ActiveConstructionFloor, Is.EqualTo(2)); Assert.That(chunks.IsFloorComplete(44), Is.False);
+            Assert.That(Mathf.Abs(player.transform.position.y - start.y), Is.LessThan(2));
+        }
+
+        [UnityTest]
+        public IEnumerator AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass()
+        {
+            menu.Show(); menu.SelectAllProfessions(); menu.SetAmount(10);
+            menu.ActionButtons["Level up"].onClick.Invoke();
+            yield return Wait(() => Enum.GetValues(typeof(UpgradeJob)).Cast<UpgradeJob>().All(j => upgrades.GetLocalSnapshot(j).Level == 1), "ALL did not level every class");
+            menu.ActionButtons["Gain XP"].onClick.Invoke();
+            yield return Wait(() => Enum.GetValues(typeof(UpgradeJob)).Cast<UpgradeJob>().All(j => upgrades.GetLocalSnapshot(j).Experience > 0 || upgrades.GetLocalSnapshot(j).Level > 1), "ALL did not give XP to every class");
+            menu.SelectCategory("Stats"); menu.Search("Construction speed");
+            menu.GetComponentsInChildren<UnityEngine.UI.Button>().First(b => b.GetComponentInChildren<TMPro.TMP_Text>().text == "5x").onClick.Invoke();
+            yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.GatherSpeed) == 5 && upgrades.GetLocalCheatStat(CheatStat.ProcessSpeed) == 5 && upgrades.GetLocalCheatStat(CheatStat.BuildSpeed) == 5, "ALL did not apply action speed across classes");
+            menu.SelectCategory("Progression"); menu.ActionButtons["Reset selected profession"].onClick.Invoke();
+            yield return Wait(() => Enum.GetValues(typeof(UpgradeJob)).Cast<UpgradeJob>().All(j => upgrades.GetLocalSnapshot(j).Level == 0), "ALL reset did not reset every class");
+            menu.SelectProfession(UpgradeJob.Build); menu.ActionButtons["Level up"].onClick.Invoke();
+            yield return Wait(() => upgrades.GetLocalSnapshot(UpgradeJob.Build).Level == 1, "Single-class selection failed");
+            Assert.That(upgrades.GetLocalSnapshot(UpgradeJob.Gather).Level, Is.Zero); Assert.That(upgrades.GetLocalSnapshot(UpgradeJob.Process).Level, Is.Zero);
+        }
+
+        [UnityTest]
+        public IEnumerator InstantBuildToggle_OnlyBuildsOnInteractionCompletesAllStagesAndChargesNothing()
+        {
+            var chunks = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
+            var pool = UnityEngine.Object.FindFirstObjectByType<TowerOfBabel.World.Chunks.NearTowerAssetPool>();
+            var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+            var raycaster = player.GetComponent<TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster>();
+            menu.Show(); menu.ToggleControls["Instantly build asset"].isOn = true;
+            yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.InstantBuild) == 1, "Instant-build toggle did not reach the server");
+            Assert.That(chunks.CachedChunks.SelectMany(c => c.Assets).All(a => a.Stage == 0), Is.True, "Enabling the toggle must not build the captured target");
+            var candidate = chunks.CachedChunks.Where(c => c.Key.FloorIndex == 0)
+                .SelectMany(c => c.Assets.Select(a => (key: c.Key, asset: a))).Where(p => p.asset.AssetType == TowerOfBabel.World.Tower.TowerAssetType.Pillar)
+                .OrderBy(p => (p.asset.Position - player.transform.position).sqrMagnitude).First();
+            var body = player.GetComponent<CharacterController>(); body.enabled = false;
+            player.transform.position = candidate.asset.Position + Vector3.forward * 2 + Vector3.up; body.enabled = true;
+            chunks.RefreshTowerVisibility();
+            var building = pool.ActiveAssets.Select(a => a.GetComponent<TowerOfBabel.Buildings.Building>()).First(b => b != null && b.ChunkKey == candidate.key && b.LocalIndex == candidate.asset.LocalIndex);
+            Assert.That(building.EffectiveResourceCost, Is.Zero); Assert.That(building.Duration, Is.LessThan(.02f)); Assert.That(building.CanInteract, Is.True);
+            int balance = resources.GetLocalAmount(building.ResourceType);
+            menu.Hide();
+            typeof(TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster).GetMethod("SetTarget", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(raycaster, new object[] { building.gameObject });
+            Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+            yield return Wait(() => chunks.TryGetAsset(candidate.key, candidate.asset.LocalIndex, out var a) && a.Stage == 10, "Interacting did not finish the asset");
+            Assert.That(resources.GetLocalAmount(building.ResourceType), Is.EqualTo(balance));
+            Assert.That(chunks.CachedChunks.Where(c => c.Key.FloorIndex == 1).SelectMany(c => c.Assets).All(a => a.Stage == 0), Is.True);
+            menu.Show(); menu.ToggleControls["Instantly build asset"].isOn = false;
+            yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.InstantBuild) == 0, "Toggle did not disable");
+        }
+
         private static IEnumerator Wait(Func<bool> condition, string message)
         {
             float deadline = Time.realtimeSinceStartup + 12;

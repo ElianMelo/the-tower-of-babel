@@ -9,6 +9,11 @@ namespace TowerOfBabel.Networking.Buildings
         public bool ServerCheatConstruction(CheatCommand command, int floor, ChunkKey key, int index)
         {
             if (!IsServerStarted || chunkManager == null) return false;
+            if (command == CheatCommand.BuildFloor)
+            {
+                if (!chunkManager.ActiveConstructionFloor.HasValue) return false;
+                floor = chunkManager.ActiveConstructionFloor.Value;
+            }
             bool assetOnly = command is CheatCommand.BuildAsset or CheatCommand.ResetAsset or CheatCommand.AdvanceAsset;
             bool all = command is CheatCommand.BuildTower or CheatCommand.ResetTower;
             byte stage = command is CheatCommand.ResetAsset or CheatCommand.ResetFloor or CheatCommand.ResetTower ? (byte)0 : ChunkAssetData.CompletedStage;

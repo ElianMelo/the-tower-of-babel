@@ -1,0 +1,56 @@
+{
+  "project": "D:/PersonalProjects/the-tower-of-babel/Assets",
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "sceneDirty": false,
+  "playing": false,
+  "compilerFailed": false,
+  "editMode": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "xml": "Temp/AeroAtmosphere-EditMode.xml"
+  },
+  "playMode": {
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "xml": "Temp/AeroAtmosphere-PlayMode.xml"
+  },
+  "sun": {
+    "distance": 38.0,
+    "samples": 16,
+    "density": 0.04,
+    "intensity": 0.85,
+    "passes": 2,
+    "halfResolutionTargets": 1,
+    "extraCameras": 0
+  },
+  "lamps": {
+    "instances": 2,
+    "active": 2,
+    "shadowCasters": 1,
+    "maximumActive": 4,
+    "cookieResolution": 128,
+    "cookieInterval": 0.125,
+    "transientCookieAssets": 0
+  },
+  "terrain": {
+    "heightResolution": 513,
+    "editorGrassDensity": 0.08,
+    "editorGrassDistance": 35.0
+  },
+  "shaderMessages": [
+    {
+      "name": "Hidden/TowerOfBabel/Sun Shafts",
+      "messages": []
+    },
+    {
+      "name": "Hidden/TowerOfBabel/Water Projection Cookie",
+      "messages": []
+    },
+    {
+      "name": "TowerOfBabel/Buildings/Aquatic Finish",
+      "messages": []
+    }
+  ]
+}

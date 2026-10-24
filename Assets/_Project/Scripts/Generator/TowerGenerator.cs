@@ -1,5 +1,7 @@
 using NaughtyAttributes;
 using System.Collections.Generic;
+using System.Linq;
+using TowerOfBabel.World.Chunks;
 using TowerOfBabel.World.Tower;
 using UnityEngine;
 
@@ -34,6 +36,19 @@ public class TowerGenerator : MonoBehaviour
 
     public bool IsBusy { get; private set; }
     public Transform TowerParent => parent;
+    public float GetWallRadius(int floor) => radius - decreaseAmount * (floor / 2 + 1);
+    public float PillarSupportRadius
+    {
+        get
+        {
+            var mesh = pillarObject != null ? pillarObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) : null;
+            if (mesh == null) return .65f;
+            var bounds = mesh.bounds; var scale = pillarObject.transform.localScale;
+            return new Vector2(Mathf.Max(Mathf.Abs(bounds.min.x), Mathf.Abs(bounds.max.x)) * scale.x,
+                Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)) * scale.z).magnitude + .05f;
+        }
+    }
+    public float GetFloorOuterRadius(int floor) => Mathf.Max(GetWallRadius(floor), GetWallRadius(Mathf.Max(0, floor - 1))) + PillarSupportRadius;
 
     public void FillCurrentLevelFloor(float floorRadius, float baseLevel)
     {
@@ -184,8 +199,7 @@ public class TowerGenerator : MonoBehaviour
                         new Vector3(point.x, baseHeight + yOffset, point.y),
                         Quaternion.Euler(0, yAngle, 0));
                 }
-                var calculatedFloorRadius = i % 2 == 0 ? currentRadius + decreaseAmount : currentRadius;
-                calculatedFloorRadius = i == 0 ? currentRadius : calculatedFloorRadius;
+                var calculatedFloorRadius = GetFloorOuterRadius(i);
                 FillCurrentLevelFloor(calculatedFloorRadius, baseHeight + 0.2f);
                 if(i < (levels - 1))
                 {
@@ -196,6 +210,7 @@ public class TowerGenerator : MonoBehaviour
             }
             Physics.SyncTransforms();
             RemoveBlockingFloor();
+            EnsurePillarSupports();
             // Decoration data survives ConfigureTower's removal of temporary construction objects.
             GetComponent<TowerBushScatter>()?.Generate(this);
         }
@@ -211,6 +226,42 @@ public class TowerGenerator : MonoBehaviour
             Mathf.Cos(value),
             Mathf.Sin(value)
         ) * radius;
+    }
+
+    private void EnsurePillarSupports()
+    {
+        if (!TowerFloorLayout.SupportsRadialFloor(floorTileObject)) return;
+        var assets = parent.GetComponentsInChildren<TowerAsset>();
+        var pillars = assets.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease)).ToDictionary(g => g.Key, g => g.ToArray());
+        var groups = assets.Where(a => a.AssetType == TowerAssetType.Floor).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease));
+        var completed = floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? floorTileObject.GetComponent<MeshFilter>().sharedMesh;
+        var template = floorTileObject.GetComponent<MeshFilter>().sharedMesh;
+        foreach (var group in groups)
+        {
+            var data = group.Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale)).ToArray();
+            var support = new TowerFloorSupport(data, center, completed.bounds.max.y);
+            if (!pillars.TryGetValue(group.Key, out var levelPillars)) levelPillars = System.Array.Empty<TowerAsset>();
+            foreach (var pillar in levelPillars)
+            {
+                var point = new Vector2(pillar.transform.position.x, pillar.transform.position.z);
+                if (support.SupportsDisk(point, PillarSupportRadius - .05f, out _)) continue;
+                var sector = TowerFloorLayout.SupportPad(center, data[0].Position.y, point, PillarSupportRadius, data[0].Scale.y);
+                if (group.Key > 0 && GetWallRadius(group.Key) < GetWallRadius(group.Key - 1) - .01f)
+                {
+                    if (!support.TryFindInnerConnection(point, PillarSupportRadius, out float connection))
+                        throw new System.InvalidOperationException($"No connected deck behind pillar at {point}.");
+                    sector = TowerFloorLayout.SupportBridge(center, data[0].Position.y, point, PillarSupportRadius, connection, data[0].Scale.y);
+                }
+                var instance = CreateTowerAsset(floorTileObject, TowerAssetType.Floor, sector.Position, sector.Rotation, "Pillar support deck");
+                instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x, sector.Scale.y / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
+                if (TowerFloorLayout.SupportsRadialFloor(floorTileObject))
+                {
+                    instance.GetComponent<MeshFilter>().sharedMesh = floorMeshes.Get(template, sector.Radius, sector.Scale);
+                    var collider = instance.GetComponent<MeshCollider>(); if (collider != null) collider.sharedMesh = floorMeshes.Get(completed, sector.Radius, sector.Scale);
+                }
+                support.Add(new ChunkAssetData(0, TowerAssetType.Floor, sector.Position, sector.Rotation, sector.Scale));
+            }
+        }
     }
 
     private void OnDestroy() => floorMeshes.Dispose();

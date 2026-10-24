@@ -55,11 +55,12 @@ namespace TowerOfBabel.Buildings
             ? "Construction complete"
             : $"Stage {currentStage}/{ChunkAssetData.CompletedStage} - {EffectiveResourceCost} {resourceType}";
         public Color DetailColor => IsComplete ? CompleteColor : HasLocalResources ? AvailableColor : UnavailableColor;
+        public bool InstantBuildEnabled => NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.GetLocalCheatStat(TowerOfBabel.Cheats.CheatStat.InstantBuild) > .5f;
         public string PromptText => IsComplete
             ? "Complete"
-            : HasLocalResources ? "Press 'E'" : $"Need {EffectiveResourceCost} {resourceType}";
+            : InstantBuildEnabled ? "Press 'E' - instant build" : HasLocalResources ? "Press 'E'" : $"Need {EffectiveResourceCost} {resourceType}";
         public float Duration => EffectiveInteractionDuration;
-        public bool CanInteract => IsConstructionAvailable && HasLocalResources;
+        public bool CanInteract => IsConstructionAvailable && (InstantBuildEnabled || HasLocalResources);
         public bool IsConstructionAvailable => isActiveAndEnabled && isBound && !IsComplete &&
             chunkManager != null && chunkManager.CanConstructAsset(chunkKey, localIndex);
         public ResourceType ResourceType => resourceType;
@@ -70,6 +71,7 @@ namespace TowerOfBabel.Buildings
             get
             {
                 NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+                if (InstantBuildEnabled) return 0;
                 return upgrades != null
                     ? upgrades.GetLocalActionCost(UpgradeJob.Build, resourceCostPerStage)
                     : resourceCostPerStage;
@@ -80,6 +82,7 @@ namespace TowerOfBabel.Buildings
             get
             {
                 NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+                if (InstantBuildEnabled) return .01f;
                 return upgrades != null
                     ? upgrades.GetLocalActionDuration(UpgradeJob.Build, interactionDuration)
                     : interactionDuration;

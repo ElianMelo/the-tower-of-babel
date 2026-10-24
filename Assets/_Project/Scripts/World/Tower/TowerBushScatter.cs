@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TowerOfBabel.World.Chunks;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,6 +11,7 @@ namespace TowerOfBabel.World.Tower
     [DisallowMultipleComponent, RequireComponent(typeof(TowerGenerator))]
     public sealed class TowerBushScatter : MonoBehaviour
     {
+        public const float RootEmbedDepth = .04f;
         [SerializeField] private GameObject[] bushPrefabs = new GameObject[3];
         [SerializeField] private int seed = 7319;
         [SerializeField, Range(0,1)] private float terraceCoverage = .78f;
@@ -94,7 +96,7 @@ namespace TowerOfBabel.World.Tower
                 throw new InvalidOperationException("Bush placement expects the tower's unit-scale authoring parent.");
             if (bushPrefabs==null || bushPrefabs.Length!=3 || Array.Exists(bushPrefabs,p=>p==null))
                 throw new InvalidOperationException("Assign small, medium and large bush prefabs.");
-            float[] radii=new float[3], heights=new float[3];
+            float[] radii=new float[3], heights=new float[3], bottoms=new float[3];
             for (int i=0; i<3; i++)
             {
                 var prefab=bushPrefabs[i];
@@ -103,7 +105,16 @@ namespace TowerOfBabel.World.Tower
                 var mesh=prefab.GetComponent<MeshFilter>().sharedMesh;
                 foreach (var v in mesh.vertices) radii[i]=Mathf.Max(radii[i],new Vector2(v.x,v.z).magnitude);
                 heights[i]=mesh.bounds.max.y;
+                bottoms[i]=mesh.bounds.min.y;
             }
+            var temporaryFloors = generator.TowerParent.GetComponentsInChildren<TowerAsset>(true)
+                .Where(a => a.AssetType == TowerAssetType.Floor).Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale)).ToArray();
+            var manager = FindObjectsByType<ChunkManager>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(m => m.gameObject.scene == gameObject.scene);
+            var actualFloors = temporaryFloors.Length > 0 ? temporaryFloors : manager != null
+                ? manager.CachedChunks.SelectMany(c => c.Assets).Where(a => a.AssetType == TowerAssetType.Floor).ToArray() : Array.Empty<ChunkAssetData>();
+            float top = generator.floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10).bounds.max.y ?? 0;
+            var supports = actualFloors.GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / generator.heighIncrease))
+                .ToDictionary(g => g.Key, g => new TowerFloorSupport(g, generator.center, top));
             var result=new List<Placement>();
             var radiusByFloor=new float[Mathf.Max(0,generator.levels)];
             float current=generator.radius;
@@ -115,8 +126,8 @@ namespace TowerOfBabel.World.Tower
             for (int floor=1; floor<radiusByFloor.Length; floor++)
             {
                 float wall=radiusByFloor[floor];
-                float outer=floor%2==0 ? wall+generator.decreaseAmount : wall;
-                if (wall<=0 || outer-wall<.5f) continue;
+                float outer=generator.GetFloorOuterRadius(floor);
+                if (wall<=0 || floor%2!=0 || outer-wall<.5f || !supports.TryGetValue(floor, out var support)) continue;
                 var random=new System.Random(unchecked(seed+floor*104729));
                 if (random.NextDouble()>terraceCoverage) continue;
                 var stairs=StairsNearFloor(generator,floor,radiusByFloor);
@@ -139,6 +150,8 @@ namespace TowerOfBabel.World.Tower
                         var candidate=new Placement { variant=variant,floor=floor,position=new Vector3(generator.center.x+Mathf.Cos(a)*r,
                             floor*generator.heighIncrease+.2f,generator.center.y+Mathf.Sin(a)*r),scale=size,yaw=Range(random,0,360),
                             footprint=footprint,height=heights[variant]*size.y,wallRadius=wall,floorRadius=outer };
+                        if (!support.SupportsDisk(new Vector2(candidate.position.x, candidate.position.z), footprint, out float surface)) continue;
+                        candidate.position.y = surface - bottoms[variant] * size.y - RootEmbedDepth;
                         if (OverlapsStairs(candidate,stairs) || OverlapsPlants(candidate,result)) continue;
                         result.Add(candidate); count++;
                     }

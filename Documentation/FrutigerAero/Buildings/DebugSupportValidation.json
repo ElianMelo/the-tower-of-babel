@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-23",
+  "project": "D:/PersonalProjects/the-tower-of-babel",
+  "editMode": {
+    "failed": 0,
+    "passed": 68
+  },
+  "playMode": {
+    "entry": "Automated Unity PlayMode test runner only",
+    "failed": 0,
+    "passed": 20
+  },
+  "features": [
+    "God mode: flight, every player collider disabled, original states restored",
+    "Instant build: toggle, interaction trigger, stage 10, no material cost, floor gating retained",
+    "Build floor: server resolves next unfinished floor for each press",
+    "ALL: progression and profession-stat actions across Gather, Process and Build"
+  ],
+  "geometry": {
+    "rootEmbedMetres": 0.04,
+    "unsupportedBaseOrCeilingFootprints": 0,
+    "constructionAssets": 89477,
+    "extendedOuterTiles": 3441,
+    "preservedNonFloorAssets": 37560,
+    "addedSupportTiles": 4445,
+    "groundedBushes": 165
+  },
+  "validation": [
+    "Real support MeshCollider raycasts",
+    "Regenerated tower support after stair cuts",
+    "All saved pillar bases and caps, all bushes",
+    "Local-host RPC tests for new controls",
+    "Existing resource and tower progression regressions"
+  ],
+  "finalState": {
+    "scene": "Assets/_Project/Scenes/Tower.unity",
+    "editMode": true,
+    "sceneClean": true
+  },
+  "notes": "Focused suites only; unrelated full-suite failures were not rerun."
+}

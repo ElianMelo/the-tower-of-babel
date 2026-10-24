@@ -84,8 +84,14 @@ namespace TowerOfBabel.Resources.Tests
             try
             {
                 var menu = root.GetComponent<CheatMenuUI>(); menu.BuildView(); menu.ShowPreview();
-                foreach (string action in new[] { "Level up", "Gain XP", "Instantly build asset", "Instantly build floor", "Increase bag capacity" })
+                foreach (string action in new[] { "Level up", "Gain XP", "Instantly build floor", "Increase bag capacity" })
                     Assert.That(menu.ActionButtons.ContainsKey(action), Is.True, action);
+                Assert.That(menu.ToggleControls.ContainsKey("Instantly build asset"), Is.True);
+                Assert.That(menu.ToggleControls.ContainsKey("God mode"), Is.True);
+                Assert.That(menu.ToggleControls["God mode"].graphic.canvasRenderer.GetAlpha(), Is.Zero, "An off toggle must not show the green on mark.");
+                Canvas.ForceUpdateCanvases();
+                Assert.That(menu.ToggleControls["God mode"].graphic.gameObject.activeSelf, Is.False, "Canvas rebuilds must keep the off indicator hidden.");
+                menu.SelectAllProfessions(); Assert.That(menu.AllProfessions, Is.True);
                 menu.SelectCategory("Stats");
                 Assert.That(root.GetComponentsInChildren<TMPro.TMP_InputField>(true).Length, Is.GreaterThan(20));
                 var scroll = root.GetComponentInChildren<UnityEngine.UI.ScrollRect>(true);

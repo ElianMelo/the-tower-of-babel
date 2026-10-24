@@ -1,0 +1,83 @@
+{
+  "date": "2026-10-24T00:57:24.3228499Z",
+  "project": "D:/PersonalProjects/the-tower-of-babel/Assets",
+  "unity": "6000.3.11f1",
+  "graphics": "Direct3D11",
+  "editMode": {
+    "passed": 18,
+    "failed": 0,
+    "skipped": 0,
+    "result": "Temp/LightingRepair-EditMode.xml"
+  },
+  "playMode": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "result": "Temp/LightingRepair-PlayMode.xml"
+  },
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "sceneDirty": false,
+  "playing": false,
+  "camera": "(-6.00, 1.00, -102.70)",
+  "terrainResolution": 513,
+  "editorGrassDensity": 0.08,
+  "editorGrassDistance": 35.0,
+  "screenSpaceAO": false,
+  "regions": [
+    {
+      "name": "Lake 1",
+      "position": "(-50.24, -1.00, -189.99)",
+      "yaw": 18.0000019,
+      "radii": "(55.12, 36.04)",
+      "shoreFade": 4.0,
+      "height": 3.0,
+      "depth": 5.0
+    },
+    {
+      "name": "Lake 2",
+      "position": "(194.76, -1.00, 70.01)",
+      "yaw": 332.0,
+      "radii": "(44.52, 29.68)",
+      "shoreFade": 4.0,
+      "height": 3.0,
+      "depth": 5.0
+    },
+    {
+      "name": "Lake 3",
+      "position": "(-190.24, -1.00, 140.01)",
+      "yaw": 36.0,
+      "radii": "(38.16, 26.50)",
+      "shoreFade": 4.0,
+      "height": 3.0,
+      "depth": 5.0
+    }
+  ],
+  "sun": {
+    "direction": "(10.00, 330.00, 0.00)",
+    "intensity": 2.4
+  },
+  "shaderErrors": [
+    {
+      "name": "Hidden/TowerOfBabel/Nearby Water Light",
+      "errors": []
+    },
+    {
+      "name": "Hidden/TowerOfBabel/Sun Shafts",
+      "errors": []
+    },
+    {
+      "name": "Hidden/TowerOfBabel/Water Projection Cookie",
+      "errors": []
+    },
+    {
+      "name": "TowerOfBabel/Buildings/Aquatic Finish",
+      "errors": []
+    }
+  ],
+  "notes": [
+    "Runtime checks entered Play Mode only through the automated runner.",
+    "Preview bay has a solid roof; tower review uses 1500 cached assets with a completed overhead floor and actual HUD.",
+    "Direct3D12 graphics-device crash during diagnosis; reopened with session-only force-d3d11. Build graphics settings unchanged.",
+    "git diff --check reports Unity-generated trailing spaces on empty serialized scene fields; no scene YAML was edited by hand."
+  ]
+}

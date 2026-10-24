@@ -17,6 +17,8 @@ The six original user-supplied images from this chat are preserved in attachment
 
 Current interactive revision images:
 
+- `../Documentation/FrutigerAero/Previews/Cheat-Menu-Toggles.png` — God mode and instant-interaction-build toggles, sequential floor completion, and the ALL profession selector.
+
 - `../Documentation/FrutigerAero/Previews/Cheat-Menu.png`, `Cheat-Menu-Stats.png`, `Cheat-Menu-1280x960.png` and `Cheat-Menu-2560x1080.png` — F3 developer controls using the shared glass buttons, Frutiger text, search and scrollable action/stat lists. See [menu controls](../Documentation/CHEAT_MENU.md).
 
 - `UI/Project-Inventory-Icon-Review.png` — generated backpack header and compact resource rows.
@@ -30,6 +32,19 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ## Asset
 
+### Nearby water light and reflections
+
+- `Asset/Crystal-Water-Iridescence-User.png` — supplied clear blue liquid/glass close-up: broad flowing distortions, transparent aqua depth, restrained cyan/lilac iridescence, and sparse sharp white glints. Use for future water, glazing and bubble presentation while retaining readable silhouettes and the established white architectural core.
+
+- `Asset/Sun-Beams-Forest-User.png` — supplied golden sun shafts shaped by trees and branches.
+- `Asset/Aquarium-Glow-User.png` — supplied luminous aqua aquarium, bright water and glossy highlights; the caption is reference-image content.
+- `Asset/Water-Projection-Lamp-User.png` — supplied glowing cube lamp projecting moving aqua light across nearby walls.
+- `../Documentation/FrutigerAero/Lighting/Previews/Sun-Rays-After.png`, `Tower-Side-After.png`, `Projection-After.png` and `Projection-Motion.gif` — sunlight entering side openings beneath solid roofs, HDR lamp cores/bloom, and local animated spotlight water cookies. The tower review uses saved cache transforms and a completed overhead floor. See [sun rays and projection lamps](../Documentation/FrutigerAero/Lighting/SUN_RAYS_AND_PROJECTION_LAMPS.md).
+
+- `Asset/Aquatic-Light-Interior-User.png` — supplied bright aquarium interior: moving water light on white walls, ceilings and furnishings, glossy aqua reflections.
+- `Asset/Aquatic-Light-Caustics-User.png` — supplied close-up of the branching cyan-white caustic pattern.
+- `../Documentation/FrutigerAero/Lighting/Previews/Nearby-After.png` and `Lake-After.png` — dry kit exclusion and localized light at the actual lake. The old camera-wide caustic wash and `Nearby-Motion.gif` are superseded: caustics belong near water and artificial sources. [Lighting notes](../Documentation/FrutigerAero/Lighting/AQUATIC_LIGHT.md) describe source footprints, reflections and the distance budget.
+
 ### Stone and processor workshop
 
 - `../Documentation/FrutigerAero/Resources/Previews/Sand-Glass-Idle.png`, `Sand-Glass-Working.png`, `Sand-Glass-Complete.png` and `Sand-Glass-Working.gif` — new Blender sand pile and round glass kiln, shrinking sand, mesh chips, rock cooldown bricks, dust and confirmed glass output. See [sand and glass notes](../Documentation/FrutigerAero/Resources/SAND_GLASS.md).
@@ -39,6 +54,10 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 - `../Documentation/FrutigerAero/Resources/Previews/Processor-Working.gif` — sampled roller, press, feed stone, status-light and completion motion. See [asset and animation notes](../Documentation/FrutigerAero/Resources/RESOURCE_WORKSHOP.md) and [generated texture prompts](../Documentation/FrutigerAero/Resources/TexturePrompts.md).
 
 ### Exterior tower foliage
+
+- `Asset/Tower-Setback-And-Water-Bugs-User.png` — user's annotated screenshot showing the near water boundary, disconnected pillar supports and unnecessary outer floor islands. These defects are superseded by the current repair.
+- `../Documentation/FrutigerAero/Buildings/Previews/Setback-Connected.png` and `Ocean-Horizon-14m.png` / `Ocean-Horizon-270m.png` — connected shrinking-floor supports, the cleared outer stair side, and continuous water coverage. See [repair notes](../Documentation/FrutigerAero/Buildings/OCEAN_AND_SETBACK_REPAIR.md).
+- `Bush-Terrace.png` and the overhead capture document earlier foliage grounding. [Current floor-support notes](../Documentation/FrutigerAero/Buildings/TOWER_SUPPORTS.md) supersede their isolated cap-pad geometry; the current scene has 164 supported shrubs.
 
 - `../Documentation/FrutigerAero/Foliage/Previews/Bush-Sizes.png` — three green broadleaf shrub shapes in small, medium and large sizes.
 - `../Documentation/FrutigerAero/Foliage/Previews/Bush-Wind.gif` — sampled slow wind bending and leaf flutter, with anchored bases.

@@ -35,6 +35,12 @@ namespace TowerOfBabel.Cheats
         private readonly Dictionary<string, UnityEngine.UI.Button> actionButtons = new();
         private readonly Dictionary<string, UnityEngine.UI.Outline> tabOutlines = new();
         private readonly List<GameObject> rows = new();
+        private readonly Dictionary<string, UnityEngine.UI.Toggle> toggleControls = new();
+        private readonly List<(UnityEngine.UI.Toggle toggle, Func<bool> read, TMP_Text caption)> toggleValues = new();
+        private readonly Dictionary<string, UnityEngine.UI.Outline> professionOutlines = new();
+        private bool allProfessions;
+        private Collider[] flightColliders = Array.Empty<Collider>();
+        private bool[] flightColliderStates = Array.Empty<bool>();
         private NetworkUpgradeService boundService;
         private PlayerControlStateMachine controls;
         private PlayerController player;
@@ -50,12 +56,15 @@ namespace TowerOfBabel.Cheats
         private bool flying;
         private Vector3 spawn;
         private bool hasSpawn;
-        private bool controllerWasEnabled, playerWasEnabled;
+        private bool playerWasEnabled;
         private static int consumedEscapeFrame = -1;
         public static bool ConsumedEscapeThisFrame => consumedEscapeFrame == Time.frameCount;
         private static readonly Color Ink = new(.055f, .20f, .29f, 1);
         private static readonly string[] Categories = { "Quick actions", "Progression", "Construction", "Inventory", "Stats", "World", "Animations" };
         public bool IsVisible => visuals != null && visuals.activeSelf;
+        public bool IsGodMode => flying;
+        public bool AllProfessions => allProfessions;
+        public IReadOnlyDictionary<string, UnityEngine.UI.Toggle> ToggleControls => toggleControls;
         public IReadOnlyDictionary<string, UnityEngine.UI.Button> ActionButtons => actionButtons;
         public int SelectedFloor => Mathf.Max(0, Number(floorInput, 1) - 1);
         public int Amount => Mathf.Clamp(Number(amountInput, 1000), 1, 1000000);
@@ -89,6 +98,13 @@ namespace TowerOfBabel.Cheats
         public void Search(string term) { search.text = term ?? ""; }
         public void SetAmount(int amount) { amountInput.text = Mathf.Clamp(amount, 1, 1000000).ToString(); }
         public void SetFloor(int floor) { floorInput.text = Mathf.Max(1, floor).ToString(); }
+        public void SelectAllProfessions() { allProfessions = true; RebuildRows(); RefreshValues(); }
+        public void SelectProfession(UpgradeJob value) { job = value; allProfessions = false; RebuildRows(); RefreshValues(); }
+        private void ForSelectedProfessions(Action<UpgradeJob> action)
+        {
+            if (allProfessions) foreach (UpgradeJob value in Enum.GetValues(typeof(UpgradeJob))) action(value);
+            else action(job);
+        }
         public void Show()
         {
             if (IsVisible) return;
@@ -153,6 +169,9 @@ namespace TowerOfBabel.Cheats
             var service = NetworkUpgradeService.Instance;
             var snapshot = service != null ? service.GetLocalSnapshot(job) : new UpgradeJobSnapshot(job, 0, 0, 0, null);
             if (jobLabel != null) jobLabel.text = $"{job}   Level {snapshot.Level}/50   XP {snapshot.Experience}/{UpgradeJobProgress.GetExperienceRequired(snapshot.Level)}   Points {snapshot.AvailablePoints}";
+            if (jobLabel != null && allProfessions) jobLabel.text = "ALL classes  |  " + string.Join("   ", Enum.GetValues(typeof(UpgradeJob)).Cast<UpgradeJob>().Select(j => $"{j}: Lv {service?.GetLocalSnapshot(j).Level ?? 0}"));
+            foreach (var item in professionOutlines) item.Value.enabled = item.Key == (allProfessions ? "ALL" : job.ToString());
+            foreach (var item in toggleValues) if (item.toggle != null) { bool value = item.read(); item.toggle.SetIsOnWithoutNotify(value); item.toggle.graphic.gameObject.SetActive(value); item.caption.text = value ? "On" : "Off"; }
             if (context != null) context.text = $"Target: {targetDescription}     |     Bag: {NetworkResourceService.Instance?.LocalCapacity ?? 50} per resource";
             foreach (var pair in statFields) if (pair.field != null && !pair.field.isFocused)
                 pair.field.SetTextWithoutNotify((service != null ? service.GetLocalCheatStat(pair.stat) : CheatProfile.Default(pair.stat)).ToString("0.##", CultureInfo.InvariantCulture));
@@ -183,10 +202,16 @@ namespace TowerOfBabel.Cheats
             Button(toolbar, "-", () => floorInput.text = Mathf.Max(1, SelectedFloor).ToString(), 36);
             Button(toolbar, "+", () => floorInput.text = (SelectedFloor + 2).ToString(), 36);
             jobLabel = Text("", panel, 19, true); Place(jobLabel.rectTransform, 28, 204, 950, 30);
-            var jobs = Rect("Professions", panel); Place(jobs, 995, 202, 390, 32); Horizontal(jobs, 6);
+            var jobs = Rect("Professions", panel); Place(jobs, 905, 202, 480, 32); Horizontal(jobs, 6);
             jobs.anchorMin = jobs.anchorMax = new Vector2(1, 1); jobs.pivot = new Vector2(1, 1); jobs.anchoredPosition = new Vector2(-28, -202);
-            jobLabel.rectTransform.anchorMax = Vector2.one; jobLabel.rectTransform.offsetMin = new Vector2(28, -234); jobLabel.rectTransform.offsetMax = new Vector2(-440, -204); jobLabel.rectTransform.anchorMin = new Vector2(0, 1);
-            foreach (UpgradeJob option in Enum.GetValues(typeof(UpgradeJob))) { var captured = option; Button(jobs, option.ToString(), () => { job = captured; RefreshValues(); RebuildRows(); }, 120); }
+            jobLabel.rectTransform.anchorMax = Vector2.one; jobLabel.rectTransform.offsetMin = new Vector2(28, -234); jobLabel.rectTransform.offsetMax = new Vector2(-530, -204); jobLabel.rectTransform.anchorMin = new Vector2(0, 1);
+            void ProfessionButton(string label, UnityAction action, float width)
+            {
+                var button = Button(jobs, label, action, width); var outline = button.gameObject.AddComponent<UnityEngine.UI.Outline>();
+                outline.effectColor = new Color(.5f, 1, .65f); outline.effectDistance = new Vector2(2, -2); professionOutlines[label] = outline;
+            }
+            foreach (UpgradeJob option in Enum.GetValues(typeof(UpgradeJob))) { var captured = option; ProfessionButton(option.ToString(), () => SelectProfession(captured), 120); }
+            ProfessionButton("ALL", SelectAllProfessions, 90);
             context = Text("Target captured when F3 opens", panel, 16); Place(context.rectTransform, 28, 242, 1330, 28);
             var scrollRoot = Rect("Action list", panel); Stretch(scrollRoot, 24, 24, 282, 70);
             scroll = scrollRoot.gameObject.AddComponent<UnityEngine.UI.ScrollRect>(); scroll.horizontal = false; scroll.scrollSensitivity = 38;
@@ -206,15 +231,30 @@ namespace TowerOfBabel.Cheats
             if (!Matches(section, label) || actionButtons.ContainsKey(label)) return;
             var row = Row(label, detail); var b = Button(row, button, action, 180); actionButtons[label] = b;
         }
+        private void ToggleRow(string section, string label, string detail, Func<bool> read, UnityAction<bool> changed)
+        {
+            if (!Matches(section, label) || toggleControls.ContainsKey(label)) return;
+            var row = Row(label, detail); var control = Panel(label + " toggle", row);
+            var layout = control.gameObject.AddComponent<UnityEngine.UI.LayoutElement>(); layout.preferredWidth = layout.minWidth = 180; layout.preferredHeight = 40;
+            var toggle = control.gameObject.AddComponent<UnityEngine.UI.Toggle>(); toggle.targetGraphic = control.GetComponent<UnityEngine.UI.Image>();
+            toggle.toggleTransition = UnityEngine.UI.Toggle.ToggleTransition.None;
+            var mark = Rect("Enabled", control); mark.anchorMin = mark.anchorMax = new Vector2(0, .5f); mark.anchoredPosition = new Vector2(28, 0); mark.sizeDelta = new Vector2(20, 20);
+            var check = mark.gameObject.AddComponent<UnityEngine.UI.Image>(); check.color = new Color(.25f, .9f, .4f); toggle.graphic = check;
+            var caption = Text(read() ? "On" : "Off", control, 17, true); Stretch(caption.rectTransform, 52, 8, 4, 4);
+            toggle.SetIsOnWithoutNotify(read());
+            mark.gameObject.SetActive(read());
+            toggle.onValueChanged.AddListener(value => { if (value != read()) changed(value); bool state = read(); mark.gameObject.SetActive(state); caption.text = state ? "On" : "Off"; });
+            toggleValues.Add((toggle, read, caption)); toggleControls[label] = toggle;
+        }
         public void RebuildRows()
         {
             if (content == null) return;
             foreach (var row in rows) { row.SetActive(false); if (Application.isPlaying) Destroy(row); else DestroyImmediate(row); }
-            rows.Clear(); statFields.Clear(); actionButtons.Clear();
+            rows.Clear(); statFields.Clear(); actionButtons.Clear(); toggleControls.Clear(); toggleValues.Clear();
             foreach (var tab in tabOutlines) tab.Value.enabled = tab.Key == category;
             var service = NetworkUpgradeService.Instance;
-            UnityAction level = () => Sent(service != null && service.RequestCheatLevel(job, Mathf.Min(50, service.GetLocalSnapshot(job).Level + 1)));
-            UnityAction xp = () => Sent(service != null && service.RequestCheatExperience(job, Amount));
+            UnityAction level = () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, Mathf.Min(50, service.GetLocalSnapshot(j).Level + 1))));
+            UnityAction xp = () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatExperience(j, Amount)));
             foreach (string section in new[] { "Quick actions", "Progression" })
             {
                 Action(section, "Level up", "Selected profession - gain one level and its upgrade point", level, "+1 level");
@@ -222,20 +262,22 @@ namespace TowerOfBabel.Cheats
             }
             foreach (string section in new[] { "Quick actions", "Construction" })
             {
-                Action(section, "Instantly build asset", "Finish the captured target at stage 10", () => Command(CheatCommand.BuildAsset), "Build asset");
-                Action(section, "Instantly build floor", "Complete every asset on the selected floor and reveal the next", () => Command(CheatCommand.BuildFloor), "Build floor");
+                ToggleRow(section, "Instantly build asset", "While enabled, interact with any available asset to finish it for free", () => NetworkUpgradeService.Instance?.GetLocalCheatStat(CheatStat.InstantBuild) > .5f,
+                    value => Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(CheatStat.InstantBuild, value ? 1 : 0)));
+                Action(section, "Instantly build floor", "Complete the next unfinished floor, wherever you are standing; repeat to advance", () => Command(CheatCommand.BuildFloor), "Build next floor");
             }
+            foreach (string section in new[] { "Quick actions", "World" }) ToggleRow(section, "God mode", "Fly through walls with WASD, Space up, Ctrl down and Shift to accelerate", () => flying, SetGodMode);
             foreach (string section in new[] { "Quick actions", "Inventory" })
                 Action(section, "Increase bag capacity", "Add the amount to the capacity of each resource", () => Sent(service != null && service.RequestCheatStat(CheatStat.BagCapacity, (NetworkResourceService.Instance?.LocalCapacity ?? 50) + Amount)), "+ capacity");
             Action("Quick actions", "Start local host", "Start a session here, then use all gameplay actions", () => { var bootstrap = FindFirstObjectByType<NetworkBootstrap>(); SetStatus(bootstrap != null && bootstrap.StartHost() ? "Starting host..." : "A session is already running or the network service is unavailable."); }, "Start host");
-            Action("Progression", "Gain 10 levels", "Selected profession, clamped to level 50", () => Sent(service != null && service.RequestCheatLevel(job, Mathf.Min(50, service.GetLocalSnapshot(job).Level + 10))), "+10 levels");
-            Action("Progression", "Max level", "Set the selected profession to level 50", () => Sent(service != null && service.RequestCheatLevel(job, 50)), "Level 50");
-            Action("Progression", "Grant upgrade points", "Add the selected amount of spendable points", () => Sent(service != null && service.RequestCheatPoints(job, Amount)), "Grant points");
+            Action("Progression", "Gain 10 levels", "Selected classes, clamped to level 50", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, Mathf.Min(50, service.GetLocalSnapshot(j).Level + 10)))), "+10 levels");
+            Action("Progression", "Max level", "Set the selected classes to level 50", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, 50))), "Level 50");
+            Action("Progression", "Grant upgrade points", "Add the selected amount of spendable points", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatPoints(j, Amount))), "Grant points");
             Action("Progression", "Unlock all upgrades", "Max every profession and purchase every node", () => Command(CheatCommand.UnlockAllUpgrades), "Unlock all");
-            Action("Progression", "Reset selected profession", "Reset its level, XP, points and purchased nodes", () => Sent(service != null && service.RequestCheatReset(job)), "Reset job");
+            Action("Progression", "Reset selected profession", "Reset the selected classes' level, XP, points and purchased nodes", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatReset(j))), "Reset selected");
             Action("Progression", "Reset all progression", "Reset all three professions", () => Sent(service != null && service.RequestCheatResetAll()), "Reset all jobs");
             if (service != null && service.Config != null && category == "Progression")
-                foreach (var upgrade in service.Config.GetUpgrades(job)) { string id = upgrade.Id; Action("Progression", "Purchase " + upgrade.DisplayName + " [" + upgrade.Row + "," + upgrade.Column + "]", id, () => Sent(service.RequestCheatPurchase(job, id)), "Purchase"); }
+                foreach (var upgrade in service.Config.GetUpgrades(job)) { string id = upgrade.Id; int row = upgrade.Row, column = upgrade.Column; Action("Progression", "Purchase " + upgrade.DisplayName + " [" + row + "," + column + "]", allProfessions ? "Matching node position in every class" : id, () => ForSelectedProfessions(j => Sent(service.RequestCheatPurchase(j, row, column))), "Purchase"); }
             foreach (var entry in new[] {
                 ("Advance asset one stage", "Add one stage to the captured asset", CheatCommand.AdvanceAsset),
                 ("Reset asset", "Return the captured asset to its blueprint", CheatCommand.ResetAsset),
@@ -258,7 +300,6 @@ namespace TowerOfBabel.Cheats
             Action("Stats", "Reset every stat", "Restore movement, actions, capacity and experience multipliers", () => Command(CheatCommand.ResetModifiers), "Restore defaults");
             Action("World", "Teleport to selected floor", "Move to a safe floor tile on an unlocked floor", TeleportFloor, "Teleport");
             Action("World", "Return to spawn", "Move back to the saved starting position", () => { ResolvePlayer(); if (hasSpawn) Teleport(spawn); }, "Return");
-            Action("World", "Fly / noclip", "Move with WASD, Space up and Ctrl down; F3 opens controls", ToggleFlight, "Toggle flight");
             foreach (float scale in new[] { 0f, .25f, 1f, 2f, 5f }) { float value = scale; Action("World", "Time scale " + scale.ToString("0.##", CultureInfo.InvariantCulture), "Local simulation speed; menu remains responsive while paused", () => { Time.timeScale = value; SetStatus("Time scale: " + value); }, "Apply"); }
             Action("World", "Scan construction", "Close this menu and highlight nearby unfinished work", () => { Hide(); FindFirstObjectByType<PlayerInteractionRaycaster>()?.ScanNearbyConstruction(); }, "Scan");
             Action("World", "Cancel current action", "Stop gathering, processing or construction", () => { ResolvePlayer(); player?.GetComponent<PlayerInteractionRaycaster>()?.CancelCurrentInteraction(); SetStatus("Action cancelled."); }, "Cancel");
@@ -272,7 +313,7 @@ namespace TowerOfBabel.Cheats
         }
         private void StatRow(CheatStat stat)
         {
-            if (stat == CheatStat.GatherCost) return; // Gathering has no input cost in this game.
+            if (stat is CheatStat.GatherCost or CheatStat.InstantBuild) return; // Dedicated toggle; gathering has no input cost.
             string label = System.Text.RegularExpressions.Regex.Replace(stat.ToString(), "([a-z])([A-Z])", "$1 $2");
             label = stat switch {
                 CheatStat.BuildSpeed => "Construction speed",
@@ -286,7 +327,7 @@ namespace TowerOfBabel.Cheats
             var row = Row(label, absolute ? "Absolute value" : "Multiplier - 1 restores normal gameplay");
             float current = NetworkUpgradeService.Instance != null ? NetworkUpgradeService.Instance.GetLocalCheatStat(stat) : CheatProfile.Default(stat);
             var input = Input(row, label, current.ToString(CultureInfo.InvariantCulture), 100, true); statFields.Add((input, stat));
-            UnityAction<float> set = value => Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(stat, value));
+            UnityAction<float> set = value => SetSelectedStat(stat, value);
             Button(row, "Apply", () => { if (float.TryParse(input.text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value)) set(value); }, 80);
             foreach (float factor in absolute ? new[] { 1f, 2f } : new[] { 2f, 5f, 10f, 100f }) { float value = factor; Button(row, absolute ? "+" + (stat == CheatStat.BagCapacity ? (factor * 1000).ToString() : factor.ToString()) : factor + "x", () => set(absolute ? (NetworkUpgradeService.Instance?.GetLocalCheatStat(stat) ?? current) + (stat == CheatStat.BagCapacity ? value * 1000 : value) : value), 62); }
             Button(row, "Reset", () => set(CheatProfile.Default(stat)), 74);
@@ -306,14 +347,29 @@ namespace TowerOfBabel.Cheats
         private void ToggleFlight()
         {
             ResolvePlayer(); if (player == null) return;
-            if (flying) { RestoreFlight(); SetStatus("Flight disabled."); return; }
-            playerWasEnabled = player.enabled; var body = player.GetComponent<CharacterController>(); controllerWasEnabled = body != null && body.enabled;
-            player.enabled = false; if (body != null) body.enabled = false; flying = true; SetStatus("Flight enabled. Close F3 to move; Space rises, Ctrl descends.");
+            if (flying) { RestoreFlight(); SetStatus("God mode disabled."); return; }
+            playerWasEnabled = player.enabled;
+            player.GetComponent<PlayerInteractionRaycaster>()?.CancelCurrentInteraction();
+            flightColliders = player.GetComponentsInChildren<Collider>(true); flightColliderStates = flightColliders.Select(c => c.enabled).ToArray();
+            player.enabled = false; foreach (var collider in flightColliders) collider.enabled = false;
+            flying = true; SetStatus("God mode enabled. Close F3 to fly; Space rises, Ctrl descends.");
         }
         private void RestoreFlight()
         {
             if (!flying) return; flying = false; if (player == null) return; player.enabled = playerWasEnabled;
-            var body = player.GetComponent<CharacterController>(); if (body != null) body.enabled = controllerWasEnabled;
+            for (int i = 0; i < flightColliders.Length; i++) if (flightColliders[i] != null) flightColliders[i].enabled = flightColliderStates[i];
+            flightColliders = Array.Empty<Collider>(); flightColliderStates = Array.Empty<bool>();
+        }
+        public void SetGodMode(bool enabled) { if (enabled != flying) ToggleFlight(); }
+        private void SetSelectedStat(CheatStat stat, float value)
+        {
+            int index = (int)stat, first = (int)CheatStat.GatherSpeed, last = (int)CheatStat.BuildCost;
+            if (allProfessions && index >= first && index <= last)
+            {
+                int start = first + (index - first) / 3 * 3;
+                ForSelectedProfessions(j => { var target = (CheatStat)(start + (int)j); if (target != CheatStat.GatherCost) Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(target, value)); });
+            }
+            else Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(stat, value));
         }
         private void UpdateFlight()
         {

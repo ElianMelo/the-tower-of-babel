@@ -1,0 +1,13 @@
+# Floor support and grounded terrace foliage
+
+The current repair preserves pillar, arch and stair transforms and construction stages. Main deck rings still reach the required wall footprint. On shrinking floors, **1,435 support sectors extend inward into the existing deck**, with positive overlap and continuous walking collision. They replace the disconnected short pads visible in the user's screenshot. **1,505 unnecessary outer cap pads were removed** from the opposite side of the stairs. The scene now has 87,972 construction assets, including 2,940 pillar supports in total. The original 3,441 main-ring extensions remain.
+
+`TowerFloorSupport` queries actual radial sectors, including stair holes. `TryFindInnerConnection` finds an existing inward landing wide enough for the complete support; `TowerFloorLayout.SupportBridge` overlaps that landing. Shrinking-floor bridges stay inward of the incoming outer stair route. Same-radius floors retain their narrower support footprints to preserve stair headroom. The generator no longer creates an extra support row for the preceding floor's cap line. `TowerGenerator` applies this after stair cutting so regeneration retains the correction. Non-radial custom fixtures retain their existing behavior.
+
+`TowerSupportAuthoring.Apply()` recognizes and replaces old support sectors through Unity APIs, preserving ordinary deck sectors, support construction stages and all 37,560 non-floor assets. It regenerates foliage against the real corrected deck and saves only in this project's saved Tower scene in Edit Mode. Repeated runs replace the same support geometry rather than accumulating duplicates.
+
+Bush placement checks the canopy and reserved wind footprint at the centre and 16 perimeter points against real floor sectors. It rejects holes and unsupported ledge edges, keeps wall/stair clearances, and embeds roots by 4 cm. All 164 current shrubs pass the support check and retain the completed-floor visibility gate. One previous placement depended on removed geometry and was omitted by regeneration.
+
+Regression checks include MeshCollider raycasts along the whole bridge, overlap across every shrinking-floor bridge's inward edge, absence of outer cap islands, a regenerated three-floor tower, and every saved pillar and bush across all 45 floors. These run in Edit Mode. Final runtime checks cover tower progression and ocean camera following.
+
+See [current repair and water coverage](OCEAN_AND_SETBACK_REPAIR.md), [support inspection](TowerSupportInspection.json), [connected setback preview](Previews/Setback-Connected.png), and [F3 controls](../../CHEAT_MENU.md). Earlier support validation and terrace images are historical; the isolated cap pads in that implementation are superseded.

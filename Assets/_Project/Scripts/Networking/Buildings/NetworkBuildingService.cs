@@ -110,19 +110,29 @@ namespace TowerOfBabel.Networking.Buildings
         {
             ChunkKey key = new(floor, x, z);
             NetworkUpgradeService upgrades = NetworkUpgradeService.Instance;
+            bool instant = upgrades != null && upgrades.GetServerCheatStat(sender, TowerOfBabel.Cheats.CheatStat.InstantBuild) > .5f;
             if (sender == null || activeBuilds.ContainsKey(sender.ClientId) ||
                 !TryGetBuildDefinition(key, localIndex, out ChunkAssetData asset, out Building definition) ||
                 !chunkManager.CanConstructAsset(key, localIndex) ||
                 asset.Stage >= ChunkAssetData.CompletedStage ||
                 Vector3.Distance(claimedPlayerPosition, asset.Position) > maximumInteractionDistance ||
-                NetworkResourceService.Instance == null ||
+                !instant && (NetworkResourceService.Instance == null ||
                 !NetworkResourceService.Instance.ServerHasAtLeast(sender, definition.ResourceType,
                     upgrades != null
                         ? upgrades.GetServerActionCost(sender, UpgradeJob.Build,
                             definition.ResourceCostPerStage)
-                        : definition.ResourceCostPerStage))
+                        : definition.ResourceCostPerStage)))
             {
                 RejectBuildTargetRpc(sender, floor, x, z, localIndex);
+                return;
+            }
+
+            if (instant)
+            {
+                chunkManager.SetAssetStage(key, localIndex, ChunkAssetData.CompletedStage);
+                ApplyStageObserversRpc(floor, x, z, localIndex, ChunkAssetData.CompletedStage);
+                upgrades.ServerGrantActionExperience(sender, UpgradeJob.Build, worldPosition: asset.Position + Vector3.up * .75f,
+                    actionLabel: $"Built {asset.AssetType} · stage 10/10");
                 return;
             }
 

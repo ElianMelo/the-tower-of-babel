@@ -9,6 +9,21 @@ namespace TowerOfBabel.World.Tower
     {
         public const float TemplateSize = 4f;
 
+        public static Sector SupportPad(Vector2 center, float height, Vector2 pillar, float margin, float thicknessScale)
+        {
+            Vector2 delta = pillar - center; float radius = delta.magnitude;
+            float sweep = 2 * Mathf.Asin(Mathf.Clamp01(margin / radius));
+            return new Sector(center, height, radius + margin, Mathf.Atan2(delta.y, delta.x) - sweep * .5f,
+                sweep, margin * 2, thicknessScale);
+        }
+
+        public static Sector SupportBridge(Vector2 center, float height, Vector2 pillar, float margin, float innerRadius, float thicknessScale)
+        {
+            var pad = SupportPad(center, height, pillar, margin, thicknessScale);
+            return new Sector(center, height, pad.Radius, pad.Angle, pad.Sweep,
+                pad.Radius - Mathf.Max(0, Mathf.Min(innerRadius, pad.Radius - margin * 2)), thicknessScale);
+        }
+
         public static bool SupportsRadialFloor(GameObject prefab)
         {
             if (prefab == null) return false;

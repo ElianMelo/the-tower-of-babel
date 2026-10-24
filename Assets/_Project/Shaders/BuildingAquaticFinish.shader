@@ -33,6 +33,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
         _InnerDepth("Apparent water depth", Range(0,.2)) = .055
         _InteriorStrength("Water color within glass", Range(0,1)) = .3
         _InnerCausticStrength("Caustics within glass", Range(0,2)) = .55
+        _GlazeGlow("Aquatic inlay glow", Range(0,4)) = 1
         _GlassBorderWidth("Glass border width in metres", Range(0,.4)) = .11
         _GlassBorderStrength("Glass border strength", Range(0,1)) = .7
         _GlassEdgeStrength("Frosted Fresnel edge", Range(0,1)) = .12
@@ -82,6 +83,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             float _WaterScale,_FlowSpeed,_FlowDistortion,_InnerDepth,_WaterDetailDistance,_MotionTime,_ModelKind;
             half _WaterNormalStrength,_InteriorStrength,_InnerCausticStrength,_GlassBorderWidth,_GlassBorderStrength,_GlassEdgeStrength,_InstanceVariation;
             half _GlazeReflection;
+            half _GlazeGlow;
             float _GlassThickness,_GlassRefraction,_GlassIOR;
             half _BorderGlass,_GlassTransmission;
             half4 _GlassTint;
@@ -243,6 +245,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+            #pragma multi_compile_fragment _ _LIGHT_COOKIES
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
@@ -283,9 +286,9 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 data.positionWS=input.positionWS;data.positionCS=input.positionCS;
                 data.normalWS=n;data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(input.positionWS);
                 half rim=pow(1-saturate(dot(n,view)),3);
-                surface.emission=half3(.42,.78,1)*water.x*_WaterLightStrength*(1-glass*.7);
-                surface.emission+=_WaterLightColor.rgb*glass*(water.x*_InnerCausticStrength+rim*_GlassEdgeStrength);
-                surface.emission+=half3(.08,.65,1)*buildEdge*.65;
+                surface.emission=half3(.42,.78,1)*water.x*_WaterLightStrength*glass*.3;
+                surface.emission+=_WaterLightColor.rgb*glass*(water.x*_InnerCausticStrength+rim*_GlassEdgeStrength)*_GlazeGlow;
+                surface.emission+=half3(.08,.65,1)*buildEdge*2.2;
                 data.shadowCoord=TransformWorldToShadowCoord(input.positionWS);
                 data.bakedGI=SampleSH(n);data.shadowMask=half4(1,1,1,1);
                 data.vertexLighting=VertexLighting(input.positionWS,n);
@@ -322,6 +325,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+            #pragma multi_compile_fragment _ _LIGHT_COOKIES
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION

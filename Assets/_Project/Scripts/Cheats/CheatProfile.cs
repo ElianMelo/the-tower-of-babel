@@ -8,7 +8,7 @@ namespace TowerOfBabel.Cheats
         WalkSpeed, SprintSpeed, CrouchSpeed, Acceleration, AirControl, JumpHeight, Gravity,
         ExtraJumps, MouseSensitivity, CameraFov, GatherSpeed, ProcessSpeed, BuildSpeed,
         GatherProduction, ProcessProduction, BuildProduction, GatherCost, ProcessCost, BuildCost,
-        BagCapacity, Experience, ResourceRespawnSpeed
+        BagCapacity, Experience, ResourceRespawnSpeed, InstantBuild
     }
 
     public enum CheatCommand
@@ -23,13 +23,14 @@ namespace TowerOfBabel.Cheats
     {
         private readonly float[] values = new float[Enum.GetValues(typeof(CheatStat)).Length];
         public CheatProfile() { Reset(); }
-        public static float Default(CheatStat stat) => stat == CheatStat.BagCapacity ? 50 : stat == CheatStat.CameraFov ? 60 : stat == CheatStat.ExtraJumps ? 0 : 1;
+        public static float Default(CheatStat stat) => stat == CheatStat.BagCapacity ? 50 : stat == CheatStat.CameraFov ? 60 : stat is CheatStat.ExtraJumps or CheatStat.InstantBuild ? 0 : 1;
         public static float Sanitize(CheatStat stat, float value)
         {
             if (float.IsNaN(value) || float.IsInfinity(value)) return Default(stat);
             return stat switch {
                 CheatStat.BagCapacity => Mathf.Round(Mathf.Clamp(value, 1, 1000000)),
                 CheatStat.ExtraJumps => Mathf.Round(Mathf.Clamp(value, 0, 100)),
+                CheatStat.InstantBuild => value >= .5f ? 1 : 0,
                 CheatStat.CameraFov => Mathf.Clamp(value, 30, 110),
                 _ => Mathf.Clamp(value, .01f, 1000)
             };

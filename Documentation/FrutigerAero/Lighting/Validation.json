@@ -1,0 +1,35 @@
+{
+  "project": "D:/PersonalProjects/the-tower-of-babel/Assets",
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "dirty": false,
+  "playing": false,
+  "compilerFailed": false,
+  "editorTests": {
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0,
+    "report": "Temp/AeroLight-EditMode.xml"
+  },
+  "playTests": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "report": "Temp/AeroLight-PlayMode.xml"
+  },
+  "light": {
+    "distance": 42.0,
+    "fadeStart": 24.0,
+    "caustics": 0.7,
+    "reflections": 0.18,
+    "renderPasses": 1,
+    "extraTargets": 0,
+    "extraCameras": 0
+  },
+  "post": {
+    "hdr": true,
+    "enabled": true,
+    "mask": 1,
+    "profile": "Assets/_Project/UI/FrutigerAero/AeroAtmosphere.asset"
+  },
+  "shaderMessages": []
+}

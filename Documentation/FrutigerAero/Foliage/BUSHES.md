@@ -14,7 +14,7 @@ The existing white/blue building palette is preserved: these are separate green 
 - Stair rejection uses the actual step mesh bounds and the generator's four-flight placement math. It includes incoming stairs just below the terrace, outgoing steps and a 0.70 m walking margin beyond the canopy. The inspection helper separately checks the saved results against the scene's cached stair transforms.
 - Plants also maintain space from one another. They are visual details without collision or construction stages.
 
-The default saved layout contains **158 bushes across 17 terraces**: 76 small, 58 medium and 24 large. Several eligible terraces are left empty. Tuning seed, terrace coverage or average cluster spacing regenerates a different arrangement through the component's **Regenerate exterior bushes** context command. Save the scene after using that command.
+The latest support repair regenerates **165 bushes**, retaining deterministic irregular clusters and empty terraces. Every full canopy/wind footprint is now checked against actual cached floor sectors, including missing stair sectors and support pads. Unsupported candidates are rejected. Each root uses its mesh's lowest point and is seated 4 cm into the real floor surface, so a single low leaf tip cannot leave the rest of the shrub visibly suspended. Tuning seed, terrace coverage or average cluster spacing regenerates the arrangement through **Regenerate exterior bushes**. Save the scene afterward.
 
 ## Wind and rendering
 
@@ -22,7 +22,7 @@ During gameplay, each terrace's bushes stay hidden until every cached constructi
 
 The opaque URP shader bends upper foliage in two slow sine/cosine waves and adds smaller leaf flutter. Vertex alpha increases the response with height, keeping the base effectively anchored. World position changes each plant's phase and green tone, avoiding synchronized motion. Forward lighting, shadow casting, depth and depth normals all use the same displaced geometry.
 
-The scene stores placement data on the generator, outside the temporary construction hierarchy. It therefore survives `ConfigureTower` clearing its generated objects after caching. Runtime rendering batches by terrace and size, with frustum and 150 m distance culling. The current layout uses 46 possible batches before culling. No per-bush GameObject, collider, Update loop, network identity or persistent building ID is created at runtime. The construction cache remains at 85,032 assets.
+The scene stores placement data on the generator, outside the temporary construction hierarchy. It survives `ConfigureTower` clearing its generated objects after caching. Runtime rendering batches by terrace and size, with frustum and 150 m distance culling. No per-bush GameObject, collider, Update loop, network identity or persistent building ID is created at runtime. The tower now has 89,477 construction assets after adding base and ceiling supports; foliage support checks run during authoring, with no per-frame physics queries.
 
 ## Review and authoring
 
