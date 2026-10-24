@@ -37,12 +37,17 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ### Transparent river glass pools — 2026-10-24
 
+- `Asset/River-Glass-Refraction-User.png` — curved glass distorts the background while retaining a clear enclosure.
+- `Asset/River-Suspended-Glass-Pool-User.png` — separate transparent shell and moving water interior, visible from below.
+- `Asset/River-Water-Distortion-User.png` — aqua water, broad liquid distortion and bright caustic branches.
+- `Asset/River-White-Caustics-User.png` — white projected light against blue water and restrained structural frames.
+
 - `Asset/River-Projection-Motion-User.gif` — animated aqua light projected onto pillars and walls; match the existing AquaProjectionLamp's local illumination.
 - `Asset/River-Glass-Aqua-Interior-User.png` and `Asset/River-Glass-Caustic-Detail-User.png` — clear cyan glass, white architecture, and branching moving caustics.
 - `Asset/River-Glass-Sky-Pool-User.png` and `Asset/River-Glass-Stacked-Pools-User.png` — visible objects through water-filled glazing, including views from below and through stacked floors.
 - `Asset/River-Glass-Pool-Wall-User.png` — transparent pool walls, restrained depth tint, reflected highlights and a clear water volume.
 
-The requested implementation is a sealed, flush, walkable glass channel with light above and below. Preserve the two-ring/spoke/pool layout. See [river glass implementation](../Documentation/FrutigerAero/Lighting/RIVER_GLASS.md).
+The current revision separates the recessed water interior from the smooth glass enclosure, adds thin channel rims and approximately 12-metre panel joints, and projects white moving water light above and below. These occasional pool-section joints supersede the earlier completely seamless river finish. Preserve the two-ring/spoke/pool layout and walkable slab. See [river glass implementation and performance measurements](../Documentation/FrutigerAero/Lighting/RIVER_GLASS.md).
 
 ### Continuous tower floors
 

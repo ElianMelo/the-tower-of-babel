@@ -1,0 +1,114 @@
+{
+  "mode": "PlayMode",
+  "PassCount": 15,
+  "FailCount": 0,
+  "SkipCount": 0,
+  "Duration": 17.8583811,
+  "cases": [
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 3.4098481
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildFirstFloor_NextFloorCanBeTargetedAndBuiltThroughInteraction",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 1.2909728
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildFloor_AlwaysAdvancesTheNextUnfinishedFloorRegardlessOfPlayerOrSelection",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.9867705
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildWholeTower_KeepsSharedWaterGeometryAndRespondsToTheNextCommand",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 1.3463958
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.8008325
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.6611468
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.InstantBuildToggle_OnlyBuildsOnInteractionCompletesAllStagesAndChargesNothing",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.8343346
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.MenuActions_UpdateServerProgressCapacityResourcesAndConstruction",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 2.3444604
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests.ChunkProjection_AdvancesCookiesAndReleasesAfterRollbackAndDisable",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.6203554
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests.WaterGlass_OnlyDrawsAfterCompletionAndStopsOnRollbackOrPoolRelease",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.018676
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0183949
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0209981
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0128137
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 2.165416
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 3.2636901
+    }
+  ]
+}

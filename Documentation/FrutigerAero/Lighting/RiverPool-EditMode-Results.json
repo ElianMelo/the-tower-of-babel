@@ -1,0 +1,247 @@
+{
+  "mode": "EditMode",
+  "PassCount": 30,
+  "FailCount": 4,
+  "SkipCount": 0,
+  "Duration": 2.4802253,
+  "cases": [
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.CompletedChannelBank_HidesBuriedVerticalTileWalls",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0286118
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.CompletedTower_RendersUnreadableSharedMeshesWithoutCpuExpansion",
+      "ResultState": "Failed",
+      "Message": "  Expected: 90\r\n  But was:  47\r\n",
+      "StackTrace": "at TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.CompletedTower_RendersUnreadableSharedMeshesWithoutCpuExpansion () [0x0020c] in D:\\PersonalProjects\\the-tower-of-babel\\Assets\\_Project\\Tests\\Rendering\\EditMode\\RiverGlassGpuEditModeTests.cs:39\r\n",
+      "Duration": 0.5468298
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.ContainedWater_MotionRemainsVisibleAtGameplayDistance(20)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0583731
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.ContainedWater_MotionRemainsVisibleAtGameplayDistance(40)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0291312
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,1)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0193213
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(True,1)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0117395
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,3)",
+      "ResultState": "Failed",
+      "Message": "  Expected: 6\r\n  But was:  5\r\n",
+      "StackTrace": "at TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors (System.Boolean underside, System.Int32 layers) [0x003bf] in D:\\PersonalProjects\\the-tower-of-babel\\Assets\\_Project\\Tests\\Rendering\\EditMode\\RiverGlassGpuEditModeTests.cs:136\r\n",
+      "Duration": 0.016295
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(True,3)",
+      "ResultState": "Failed",
+      "Message": "  Expected: 6\r\n  But was:  5\r\n",
+      "StackTrace": "at TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors (System.Boolean underside, System.Int32 layers) [0x003bf] in D:\\PersonalProjects\\the-tower-of-babel\\Assets\\_Project\\Tests\\Rendering\\EditMode\\RiverGlassGpuEditModeTests.cs:136\r\n",
+      "Duration": 0.0138263
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,5)",
+      "ResultState": "Failed",
+      "Message": "  Expected: 10\r\n  But was:  7\r\n",
+      "StackTrace": "at TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors (System.Boolean underside, System.Int32 layers) [0x003bf] in D:\\PersonalProjects\\the-tower-of-babel\\Assets\\_Project\\Tests\\Rendering\\EditMode\\RiverGlassGpuEditModeTests.cs:136\r\n",
+      "Duration": 0.0155174
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverPoolGeometryTests.AdjacentCompletedTiles_DoNotCreateInternalWaterOrGlassWalls",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0392789
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverPoolGeometryTests.Enclosure_HasSeparateContainedWaterAndActualBoundaryWalls(0)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.17279
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverPoolGeometryTests.Enclosure_HasSeparateContainedWaterAndActualBoundaryWalls(20)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.034919
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverPoolGeometryTests.Enclosure_HasSeparateContainedWaterAndActualBoundaryWalls(42)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0295946
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.FarRenderer_KeepsGlassBuiltStagesAndCullsItsEmptyBlueprint",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0454613
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.GlassLayout_HasTwoRingsCardinalSpokesAndCenterPool",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0007141
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.GlassPrefab_UsesGlassHasEveryStageAndSameWalkingDatum",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0028971
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.SavedIsland_IsSubmergedOnAllEdgesAndRetainsConstructionAssets",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.4092137
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.DestroyedDrawProvider_IsPrunedBeforeTheNextCamera",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0011018
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(0)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.001414
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(1)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.000481
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(20)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0004676
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(42)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0004846
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.FarSubmissions_KeepFloorIdentityBatchLimitAndCompletionState",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0108437
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.OpticalPath_DependsOnWaterThicknessAndAngleAndRemainsFiniteAtGrazingAngles",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0006687
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(False)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0748151
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(True)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.037612
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionPool_IsBoundedAnimatedAndRemovedOnRollbackAndDisable",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0109822
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionShadows_OnlyIncludeLocalFloorsAndStopWhenTheLightIsDisabled",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0015488
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.ExplicitLegacyModels_FillMissingGlassTypeWithoutReplacingOverrides",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0070563
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.FinishedFloorFaces_AreFlushSharedAndCloseTheCentre",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0430195
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(False)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.028308
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(True)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0227262
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(Floor)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0605152
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(GlassWaterFloor)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0648572
+    }
+  ]
+}

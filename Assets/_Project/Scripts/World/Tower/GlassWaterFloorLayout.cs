@@ -7,12 +7,7 @@ namespace TowerOfBabel.World.Tower
     {
         public static float ChannelDistance(Vector2 point, int floorIndex, Vector4 layout)
         {
-            float wall = Mathf.Max(3, layout.x - layout.y * (Mathf.Floor(floorIndex * .5f) + 1));
-            float radius = point.magnitude;
-            float width = Mathf.Min(layout.w, Mathf.Max(.55f, wall * .014f));
-            float ring = Mathf.Min(Mathf.Abs(radius - wall * .5f), Mathf.Abs(radius - wall * .88f));
-            float spoke = Mathf.Min(Mathf.Abs(point.x), Mathf.Abs(point.y));
-            return Mathf.Max(Mathf.Min(Mathf.Min(ring, spoke) - width, radius - wall * .16f), radius - wall * .96f);
+            return Rendering.RiverPoolGeometry.ChannelDistance(point,floorIndex,layout);
         }
 
         public static bool IsChannel(Vector2 point, float wallRadius, float tileDepth)

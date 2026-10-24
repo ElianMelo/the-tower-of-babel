@@ -478,7 +478,9 @@ namespace TowerOfBabel.World.Chunks
                 {
                     layer = layer,
                     camera = camera,
-                    shadowCastingMode = floor ? ShadowCastingMode.On : ShadowCastingMode.Off,
+                    // TowerAtmosphereBridge owns bounded sun occlusion. River lights only
+                    // need native floor casters inside their small local projection volumes.
+                    shadowCastingMode = ShadowCastingMode.Off,
                     receiveShadows = false,
                     reflectionProbeUsage = ReflectionProbeUsage.Off,
                     motionVectorMode = MotionVectorGenerationMode.ForceNoMotion
@@ -504,6 +506,8 @@ namespace TowerOfBabel.World.Chunks
                         }
 
                         RenderParams renderParams = baseParams;
+                        if (floor && RiverGlassRenderRegistry.NeedsProjectionShadows(page.Bounds,camera,layer))
+                            renderParams.shadowCastingMode=ShadowCastingMode.On;
                         renderParams.worldBounds = page.Bounds;
                         renderParams.matProps = page.LightProbeProperties;
                         if (river)

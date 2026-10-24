@@ -27,6 +27,15 @@ public static class RiverGlassAuthoring
         profile.ripples = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Stylized Water 3/Materials/Textures/Normals/SmoothWaves.png");
         profile.environment = glass.GetTexture("_Environment") as Cubemap;
         profile.layout = glass.GetVector("_RiverLayout");
+        if(profile.presentationVersion<2)
+        {
+            profile.opticalThickness=.14f; profile.waterTop=.04f; profile.waterBottom=.18f; profile.glassThickness=.02f;
+            profile.rippleStrength=.28f; profile.flowSpeed=.065f; profile.refraction=.008f; profile.reflections=.5f;
+            profile.waterTint=new Color(.08f,.5f,.65f); profile.glassTint=new Color(.55f,.86f,.94f);
+            profile.projectionTint=new Color(.88f,.96f,1); profile.daylightIntensity=48; profile.nightIntensity=36;
+            profile.projectionRange=8; profile.selectionDistance=24; profile.projectionAngle=120;
+            profile.presentationVersion=2;
+        }
         glass.SetFloat("_RiverStage", 10); glass.SetFloat("_RiverFloorIndex", -1); glass.enableInstancing = true;
         EditorUtility.SetDirty(glass); EditorUtility.SetDirty(profile);
         foreach (var name in new[] { "PC_Renderer", "Mobile_Renderer" })

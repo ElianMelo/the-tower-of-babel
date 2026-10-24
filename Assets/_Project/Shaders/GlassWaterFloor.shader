@@ -106,6 +106,24 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             half4 Frag(Varyings i):SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i); Aperture(i); half build=Reveal(i);
+                // Completed tiles contribute opaque marble only. Water and glass have their own
+                // cached geometry; do not evaluate the retired painted-water path on every marble pixel.
+                if(_RiverStage>9.5)
+                {
+                    half3 normal=normalize(i.normal);float3 marblePosition=i.ws*_MarbleScale;
+                    half stone=lerp(1,Marble(marblePosition,normal),_VeinStrength);
+                    normal=MarbleNormal(marblePosition,normal);
+                    SurfaceData surface=(SurfaceData)0;
+                    surface.albedo=stone*_BaseColor.rgb;surface.alpha=1;surface.specular=half3(.04,.04,.04);
+                    surface.smoothness=_MarbleSmoothness;surface.normalTS=half3(0,0,1);surface.occlusion=1;
+                    surface.clearCoatMask=_PearlCoat;surface.clearCoatSmoothness=.95;
+                    surface.emission=build*half3(.1,2,3);
+                    InputData data=(InputData)0;
+                    data.positionWS=i.ws;data.positionCS=i.positionCS;data.normalWS=normal;data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(i.ws);
+                    data.shadowCoord=TransformWorldToShadowCoord(i.ws);data.bakedGI=SampleSH(normal);data.shadowMask=half4(1,1,1,1);
+                    data.vertexLighting=VertexLighting(i.ws,normal);data.normalizedScreenSpaceUV=GetNormalizedScreenSpaceUV(i.positionCS);
+                    return half4(MixFog(UniversalFragmentPBR(data,surface).rgb,i.fog),1);
+                }
                 float2 p=i.ws.xz; float t=_Time.y*_FlowSpeed;
                 // A continuous world-space field crosses tile boundaries without per-tile resets.
                 float2 warp=float2(sin(p.y*.64+t*3)+sin(p.x*.4-t*2),cos(p.x*.55+t*2.5))*.035;

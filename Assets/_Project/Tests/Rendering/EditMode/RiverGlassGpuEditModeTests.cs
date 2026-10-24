@@ -13,6 +13,77 @@ namespace TowerOfBabel.Rendering.Tests
 {
     public sealed class RiverGlassGpuEditModeTests
     {
+        [Test]
+        public void CompletedTower_RendersUnreadableSharedMeshesWithoutCpuExpansion()
+        {
+            var original=SceneManager.GetActiveScene();var scene=EditorSceneManager.NewPreviewScene();
+            var target=new RenderTexture(64,64,24);var oldTarget=RenderTexture.active;
+            var source=new Source();
+            var mesh=Object.Instantiate(AssetDatabase.LoadAssetAtPath<Mesh>("Assets/_Project/Models/Buildings/FrutigerAero/FloorTileComplete.asset"));
+            mesh.name="GPU-only shared tower river slab";mesh.UploadMeshData(true);
+            var feature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
+            try
+            {
+                var go=new GameObject("Complete tower rendering regression camera");SceneManager.MoveGameObjectToScene(go,scene);
+                var camera=go.AddComponent<Camera>();camera.enabled=false;camera.scene=scene;camera.targetTexture=target;camera.cullingMask=1<<31;
+                camera.transform.position=new Vector3(0,275,0);camera.transform.rotation=Quaternion.Euler(90,0,0);camera.farClipPlane=400;
+                for(int floor=0;floor<45;floor++)
+                {
+                    var matrices=new Matrix4x4[425];
+                    for(int i=0;i<matrices.Length;i++)matrices[i]=Matrix4x4.Translate(new Vector3((i%20-10)*4,floor*6,(i/20-10)*4));
+                    var draw=new RiverGlassDraw {mesh=mesh,matrices=matrices,count=matrices.Length,floor=floor,height=floor*6};draw.Configure();source.draws.Add(draw);
+                }
+                RiverGlassRenderRegistry.Register(source);
+                Assert.DoesNotThrow(()=>{camera.Render();camera.Render();},"Rendering must not read/duplicate mesh vertices or build per-instance geometry.");
+                Assert.That(feature.LastSubmittedInstances,Is.EqualTo(19125));
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(47),"Only two floors receive the additional detail pass.");
+                Assert.That(feature.LastDetailedFloors,Is.EqualTo(2));
+                Assert.That(feature.CachedGeometryCount,Is.Zero);
+                Assert.That(Resources.FindObjectsOfTypeAll<Mesh>().Any(m=>m.name.StartsWith("River glass shell — cached")),Is.False);
+            }
+            finally
+            {
+                RiverGlassRenderRegistry.Unregister(source);RenderTexture.active=oldTarget;
+                EditorSceneManager.ClosePreviewScene(scene);SceneManager.SetActiveScene(original);target.Release();Object.DestroyImmediate(target);Object.DestroyImmediate(mesh);
+            }
+        }
+
+        [TestCase(20)] [TestCase(40)]
+        public void ContainedWater_MotionRemainsVisibleAtGameplayDistance(int distance)
+        {
+            var original=SceneManager.GetActiveScene();var scene=EditorSceneManager.NewPreviewScene();
+            var oldTarget=RenderTexture.active;var target=new RenderTexture(256,256,24,RenderTextureFormat.ARGBHalf);
+            var pixels=new Texture2D(256,256,TextureFormat.RGBAFloat,false);
+            var feature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
+            float oldTime=feature.previewTime,oldDay=Shader.GetGlobalFloat("_AeroDaylight");var source=new Source();
+            try
+            {
+                var root=new GameObject("Distant liquid motion camera");SceneManager.MoveGameObjectToScene(root,scene);
+                var camera=root.AddComponent<Camera>();camera.enabled=false;camera.scene=scene;camera.targetTexture=target;
+                camera.cullingMask=1<<31;camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.2f,.25f,.3f);
+                camera.transform.position=new Vector3(0,distance*.4f,-distance*.92f);camera.transform.LookAt(Vector3.zero);
+                var mesh=AssetDatabase.LoadAssetAtPath<Mesh>("Assets/_Project/Models/Buildings/FrutigerAero/FloorTileComplete.asset");
+                var matrices=new List<Matrix4x4>();for(int x=-2;x<=1;x++)for(int z=-1;z<=2;z++)matrices.Add(Matrix4x4.Translate(new Vector3(x*4,0,z*4)));
+                var draw=new RiverGlassDraw {mesh=mesh,count=matrices.Count,matrices=matrices.ToArray()};draw.Configure();source.draws.Add(draw);
+                RiverGlassRenderRegistry.Register(source);Shader.SetGlobalFloat("_AeroDaylight",1);
+                Color[] Sample(float time)
+                {
+                    feature.previewTime=time;camera.Render();camera.Render();RenderTexture.active=target;
+                    pixels.ReadPixels(new Rect(0,0,256,256),0,0);pixels.Apply();return pixels.GetPixels();
+                }
+                var before=Sample(2);var after=Sample(6);
+                Assert.That(before.Where((c,i)=>Mathf.Abs(c.grayscale-after[i].grayscale)>.008f).Count(),Is.GreaterThan(100),
+                    "The actual water pixels must visibly move, including in the reduced distant-refraction path.");
+                Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(1));
+            }
+            finally
+            {
+                RiverGlassRenderRegistry.Unregister(source);feature.previewTime=oldTime;Shader.SetGlobalFloat("_AeroDaylight",oldDay);
+                RenderTexture.active=oldTarget;EditorSceneManager.ClosePreviewScene(scene);SceneManager.SetActiveScene(original);
+                target.Release();Object.DestroyImmediate(target);Object.DestroyImmediate(pixels);
+            }
+        }
+
         private sealed class Source : IRiverGlassDrawSource
         {
             public readonly List<RiverGlassDraw> draws = new();
@@ -63,9 +134,11 @@ namespace TowerOfBabel.Rendering.Tests
                 Color color=pixels.GetPixel(64,64);
                 Assert.That(color.r,Is.GreaterThan(.2f),"The red marker must remain visible through actual color/depth apertures.");
                 Assert.That(color.r,Is.GreaterThan(color.g*1.5f),"A painted blue bed must not replace the marker.");
-                Assert.That(feature.LastDrawCalls,Is.EqualTo(layers));
-                Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(3));
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(layers+Mathf.Min(layers,feature.profile.detailedFloorLimit)));
+                Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(1));
                 Assert.That(feature.LastRefractedLayers,Is.GreaterThan(0));
+                Assert.That(feature.LastBackgroundWidth,Is.EqualTo(64));
+                Assert.That(feature.LastBackgroundHeight,Is.EqualTo(64));
                 Assert.That(ShaderUtil.GetShaderMessages(feature.surfaceShader).Where(m=>m.severity==UnityEditor.Rendering.ShaderCompilerMessageSeverity.Error),Is.Empty);
             }
             finally

@@ -17,6 +17,24 @@ namespace TowerOfBabel.World.Tests
 {
     public sealed class RiverGlassEditModeTests
     {
+        [Test]
+        public void ProjectionShadows_OnlyIncludeLocalFloorsAndStopWhenTheLightIsDisabled()
+        {
+            var root=new GameObject("Local river shadow budget");var view=new GameObject("River shadow camera");
+            var light=root.AddComponent<Light>();light.type=LightType.Spot;light.range=8;light.shadows=LightShadows.Hard;
+            var camera=view.AddComponent<Camera>();camera.enabled=false;
+            try
+            {
+                RiverGlassRenderRegistry.RegisterProjection(light);
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.up*6,Vector3.one),camera,0),Is.True);
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.up*120,Vector3.one*4),camera,0),Is.False,
+                    "Completing distant floors must not add them to a local river light's shadow workload.");
+                light.enabled=false;
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.zero,Vector3.one),camera,0),Is.False);
+            }
+            finally {RiverGlassRenderRegistry.UnregisterProjection(light);Object.DestroyImmediate(root);Object.DestroyImmediate(view);}
+        }
+
         private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
         private static RiverGlassProfile Profile => AssetDatabase.LoadAssetAtPath<RiverGlassProfile>("Assets/_Project/Environment/Lighting/RiverGlass.asset");
         private static GameObject Prefab => AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Buildings/GlassWaterFloor.prefab");
@@ -110,9 +128,10 @@ namespace TowerOfBabel.World.Tests
                 lighting=root.AddComponent<RiverGlassLighting>(); lighting.profile=Profile;
                 lighting.cookieShader=Shader.Find("Hidden/TowerOfBabel/River caustic cookie"); root.SetActive(true);
                 lighting.Sample(camera,0,1); lighting.Sample(camera,.3f,1);
-                Assert.That(lighting.ActiveLightCount,Is.EqualTo(4)); Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(2));
+                Assert.That(lighting.ActiveLightCount,Is.EqualTo(2)); Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(1));
                 var lights=root.GetComponentsInChildren<Light>();
                 Assert.That(lights.All(l=>l.shadows==LightShadows.Hard&&l.shadowCustomResolution==256),Is.True);
+                Assert.That(lights.All(l=>l.spotAngle==120&&l.range==8),Is.True);
                 var cookie=lights[0].cookie as RenderTexture; var before=CookiePixels(cookie);
                 lighting.Sample(camera,4,1); var after=CookiePixels(cookie);
                 Assert.That(before.Where((v,i)=>!v.Equals(after[i])).Count(),Is.GreaterThan(50),"The cookie must advance, not just the CPU clock.");
@@ -153,7 +172,12 @@ namespace TowerOfBabel.World.Tests
                     return pixels.GetPixels(120,120,16,16).Average(c=>c.grayscale);
                 }
                 float dark=Brightness();lighting.Sample(camera,1,1);lighting.Sample(camera,1.3f,1);float lit=Brightness();
+                var review=new Texture2D(256,256,TextureFormat.RGB24,false);review.SetPixels(pixels.GetPixels());review.Apply();
+                System.IO.File.WriteAllBytes($"Documentation/FrutigerAero/Lighting/Previews/River-Receiver-{(below?"Below":"Above")}.png",review.EncodeToPNG());Object.DestroyImmediate(review);
                 Assert.That(lit-dark,Is.GreaterThan(.01f),"The pooled cookie must actually illuminate a native URP receiver.");
+                var before=pixels.GetPixels();lighting.Sample(camera,5,1);Brightness();var after=pixels.GetPixels();
+                Assert.That(before.Where((v,i)=>Mathf.Abs(v.grayscale-after[i].grayscale)>.005f).Count(),Is.GreaterThan(20),
+                    "Moving light must reach rendered receiver pixels, not merely update a cookie texture.");
                 var blocker=GameObject.CreatePrimitive(PrimitiveType.Cube);SceneManager.MoveGameObjectToScene(blocker,scene);blocker.layer=31;
                 blocker.transform.position=new Vector3(0,below?-1:1,1.5f);blocker.transform.localScale=new Vector3(1.3f,4,.3f);blocker.GetComponent<Renderer>().sharedMaterial=material;
                 float blocked=Brightness();

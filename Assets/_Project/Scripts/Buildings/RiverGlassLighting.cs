@@ -6,18 +6,18 @@ using UnityEngine.Rendering;
 
 namespace TowerOfBabel.Rendering
 {
-    /// <summary>Gameplay-side bridge: two water patches, two shadowed lights each.</summary>
+    /// <summary>One local water patch and two occluded projections share an animated cookie.</summary>
     [ExecuteAlways, DisallowMultipleComponent, RequireComponent(typeof(ChunkManager))]
     public sealed class RiverGlassLighting : MonoBehaviour
     {
-        public const int MaximumLights = 4;
+        public const int MaximumLights = 2;
         public const int CookieResolution = 128;
         public const float CookieInterval = .125f;
         public RiverGlassProfile profile;
         public Shader cookieShader;
         private ChunkManager manager;
         private readonly Dictionary<ChunkKey, List<Candidate>> candidates = new();
-        private readonly Patch[] patches = new Patch[2];
+        private readonly Patch[] patches = new Patch[1];
         private float nextSelection;
         public int ActiveLightCount { get; private set; }
         public int AllocatedCookieCount { get; private set; }
@@ -88,7 +88,7 @@ namespace TowerOfBabel.Rendering
 
         private void Select(Vector3 view)
         {
-            for (int slot = 0; slot < 2; slot++)
+            for (int slot = 0; slot < patches.Length; slot++)
             {
                 var patch = patches[slot]; patch.hasDesired = false;
                 float best = profile.selectionDistance * profile.selectionDistance;
@@ -99,8 +99,6 @@ namespace TowerOfBabel.Rendering
                     foreach (var source in Candidates(chunk))
                     {
                         float distance = (source.point - view).sqrMagnitude;
-                        if (slot == 1 && patches[0].hasDesired &&
-                            (source.point - patches[0].desired.point).sqrMagnitude < profile.patchSeparation * profile.patchSeparation) continue;
                         // Prefer an existing patch slightly to avoid hopping between neighbouring tiles.
                         float score = patch.hasSource && patch.source.Same(source) ? distance * .8f : distance;
                         if (distance > profile.selectionDistance * profile.selectionDistance || score >= best) continue;
@@ -117,7 +115,7 @@ namespace TowerOfBabel.Rendering
             if (!isActiveAndEnabled || !manager.isActiveAndEnabled || profile == null || cookieShader == null ||
                 !RiverGlassProfile.SupportsProjection ||
                 (camera.scene.IsValid() && camera.scene != gameObject.scene)) { Release(); return; }
-            for (int i = 0; i < 2; i++) patches[i] ??= new Patch();
+            for (int i = 0; i < patches.Length; i++) patches[i] ??= new Patch();
             if (seconds >= nextSelection)
             {
                 Select(camera.transform.position); nextSelection = seconds + .25f;
@@ -147,13 +145,14 @@ namespace TowerOfBabel.Rendering
                     patch.nextCookie = seconds + CookieInterval;
                 }
                 float distance = Vector3.Distance(camera.transform.position, patch.source.point);
-                float fade = 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(24, profile.selectionDistance, distance));
+                float fade = 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(profile.selectionDistance*.7f, profile.selectionDistance, distance));
                 float daylight = Mathf.Clamp01(Shader.GetGlobalFloat("_AeroDaylight"));
                 float intensity = Mathf.Lerp(profile.nightIntensity, profile.daylightIntensity, daylight) * patch.strength * fade;
                 ApplyLight(patch.up); ApplyLight(patch.down);
                 void ApplyLight(Light light)
                 {
                     light.color = profile.projectionTint; light.intensity = intensity; light.range = profile.projectionRange;
+                    light.spotAngle=profile.projectionAngle; light.innerSpotAngle=profile.projectionAngle*.95f;
                     light.cullingMask = camera.cullingMask; light.enabled = intensity > .001f;
                     if (light.enabled) ActiveLightCount++;
                 }
@@ -170,8 +169,8 @@ namespace TowerOfBabel.Rendering
                 var go = new GameObject(name) { hideFlags = HideFlags.HideAndDontSave, layer = gameObject.layer };
                 go.transform.SetParent(patch.root.transform, false); go.transform.localPosition = Vector3.up * offset;
                 go.transform.rotation = Quaternion.LookRotation(direction);
-                var light = go.AddComponent<Light>(); light.type = LightType.Spot; light.spotAngle = 170;
-                light.innerSpotAngle = 160; light.shadows = LightShadows.Hard;
+                var light = go.AddComponent<Light>(); light.type = LightType.Spot; light.spotAngle = profile.projectionAngle;
+                light.innerSpotAngle = profile.projectionAngle*.95f; light.shadows = LightShadows.Hard;
                 light.shadowCustomResolution = 256; light.shadowBias = .02f; light.shadowNormalBias = .02f;
                 RiverGlassProfile.ConfigureProjectionLight(light);
                 light.renderMode = LightRenderMode.ForcePixel;

@@ -21,7 +21,7 @@ public static class RiverGlassVisualReview
 {
     public const string Folder = "Documentation/FrutigerAero/Lighting/Previews";
     private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
-    public static object Capture()
+    public static object Capture(string revision = "Enhanced")
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Review in Edit Mode.");
         var original = SceneManager.GetActiveScene();
@@ -33,11 +33,12 @@ public static class RiverGlassVisualReview
         var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset");
         var feature = renderer.rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
         float oldClock = feature.previewTime;
+        bool oldActive = feature.isActive;
         bool oldAsync = ShaderUtil.allowAsyncCompilation; ShaderUtil.allowAsyncCompilation = false;
         foreach (var light in originalLights) light.enabled = false;
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive); SceneManager.SetActiveScene(scene);
-        var target = new RenderTexture(1280, 800, 24, RenderTextureFormat.ARGBHalf);
-        var pixels = new Texture2D(1280, 800, TextureFormat.RGB24, false);
+        var target = new RenderTexture(1920, 1080, 24, RenderTextureFormat.ARGBHalf);
+        var pixels = new Texture2D(1920, 1080, TextureFormat.RGB24, false);
         var ownedMaterials = new List<Material>();
         RiverGlassLighting lighting = null;
         try
@@ -93,39 +94,76 @@ public static class RiverGlassVisualReview
                 Box("Underwater visibility marker", new Vector3(i*3,-5.7f,0), new Vector3(1,.2f,18), i%2==0?new Color(.12f,.43f,.24f):new Color(.9f,.38f,.12f));
             Box("White receiver wall", new Vector3(-9,2,-4), new Vector3(.3f,4,16), Color.white);
             Box("White receiver pillar", new Vector3(5,2,-4), new Vector3(.8f,4,.8f), Color.white);
+            Box("Upper white receiver wall", new Vector3(-3,14,-4), new Vector3(.3f,4,12), Color.white);
+            Box("Upper white receiver pillar", new Vector3(3,14,-4), new Vector3(.8f,4,.8f), Color.white);
             var results = new List<object>();
             void Save(string name, Vector3 position, Vector3 look, float time, bool night = false)
             {
                 camera.transform.position = position; camera.transform.LookAt(look);
+                lighting.Release();
                 Shader.SetGlobalFloat("_AeroDaylight", night ? 0 : 1); sun.intensity = night ? .035f : 1.2f;
                 feature.previewTime = time; lighting.Sample(camera, time, 1);
                 lighting.Sample(camera, time + .01f, 1);
-                var watch = Stopwatch.StartNew();
-                for (int i = 0; i < 2; i++)
-                { typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate", Private).Invoke(far, null); camera.Render(); }
-                watch.Stop(); RenderTexture.active = target;
+                var tick = (Action)Delegate.CreateDelegate(typeof(Action), far, typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate", Private));
+                foreach (string mode in new[] { "Disabled", "Surface", "Projection", "Combined" })
+                {
+                    feature.SetActive(mode == "Surface" || mode == "Combined");
+                    foreach (var light in root.GetComponentsInChildren<Light>()) light.enabled = mode == "Projection" || mode == "Combined";
+                    for (int i = 0; i < 8; i++) { tick(); camera.Render(); }
+                    long allocated = GC.GetAllocatedBytesForCurrentThread();
+                    var watch = Stopwatch.StartNew();
+                    for (int i = 0; i < 12; i++) { tick(); camera.Render(); }
+                    watch.Stop();
+                    allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+                    results.Add(new { name, mode, width = target.width, height = target.height,
+                        waterDrawCalls = feature.isActive ? feature.LastDrawCalls : 0,
+                        refractedLayers = feature.isActive ? feature.LastRefractedLayers : 0,
+                        riverLights = mode == "Projection" || mode == "Combined" ? lighting.ActiveLightCount : 0,
+                        cookies = lighting.AllocatedCookieCount, farDrawCalls = far.DrawCallCount,
+                        backgroundWidth=feature.isActive?feature.LastBackgroundWidth:0,
+                        backgroundHeight=feature.isActive?feature.LastBackgroundHeight:0,
+                        shadowLights=root.GetComponentsInChildren<Light>().Count(l=>l.enabled&&l.shadows!=LightShadows.None),
+                        shadowResolution=256,
+                        cpuRenderMilliseconds = watch.Elapsed.TotalMilliseconds / 12,
+                        managedBytesPerRender = allocated / 12, gpuMilliseconds = (double?)null,
+                        timingNote = "Synchronous Edit Mode Camera.Render includes editor and submission overhead; GPU frame timing unavailable. Not gameplay FPS." });
+                }
+                RenderTexture.active = target;
                 pixels.ReadPixels(new Rect(0,0,target.width,target.height),0,0); pixels.Apply();
-                Directory.CreateDirectory(Folder); File.WriteAllBytes($"{Folder}/River-Glass-{name}.png", pixels.EncodeToPNG());
-                results.Add(new { name, waterDrawCalls = feature.LastDrawCalls, refractedLayers = feature.LastRefractedLayers,
-                    status = feature.LastStatus,
-                    riverLights = lighting.ActiveLightCount, cookies = lighting.AllocatedCookieCount,
-                    farDrawCalls = far.DrawCallCount, cpuRenderMilliseconds = watch.Elapsed.TotalMilliseconds / 2,
-                    gpuMilliseconds = (double?)null });
+                Directory.CreateDirectory(Folder); File.WriteAllBytes($"{Folder}/River-{revision}-{name}.png", pixels.EncodeToPNG());
             }
-            Save("Above", new Vector3(11,3.8f,-18), new Vector3(2,-.2f,-3), 2);
-            Save("Below", new Vector3(11,-3,-18), new Vector3(1,.3f,-2), 2.5f);
-            Save("Stacked", new Vector3(5,18,-9), new Vector3(0,-5,0), 3);
-            Save("Ring-Join", new Vector3(39,3,-23), new Vector3(43,0,-15), 4);
-            Save("Night-A", new Vector3(11,3.8f,-18), new Vector3(2,1,-3), 5, true);
-            Save("Night-B", new Vector3(11,3.8f,-18), new Vector3(2,1,-3), 8, true);
+            Save("Above", new Vector3(11,15.8f,-18), new Vector3(2,11.8f,-3), 2);
+            Save("Below", new Vector3(11,9,-18), new Vector3(1,12.3f,-2), 2.5f);
+            Save("Stacked", new Vector3(5,24,-9), new Vector3(0,-5,0), 3);
+            Save("Ring-Join", new Vector3(39,15,-23), new Vector3(43,12,-15), 4);
+            Save("Night-A", new Vector3(11,15.8f,-18), new Vector3(2,13,-3), 5, true);
+            Save("Night-B", new Vector3(11,15.8f,-18), new Vector3(2,13,-3), 8, true);
+            Save("Distance-40-A",new Vector3(24,17,-35),new Vector3(0,12,-3),2);
+            Save("Distance-40-B",new Vector3(24,17,-35),new Vector3(0,12,-3),6);
+            // The original comparison fixture puts an entire floor in one artificial chunk.
+            // Local projection review uses real spatial chunks so distance pruning cannot
+            // reject nearby negative-Z receivers using that artificial chunk's distant bounds.
+            lighting.enabled=false;
+            var spatialChunks=matricesByFloor.SelectMany(tiles=>tiles)
+                .GroupBy(a=>ChunkGrid.WorldToChunk(a.Position,manager.ChunkSizeMeters,manager.FloorHeight))
+                .Select(group=>(ChunkSceneCache)Activator.CreateInstance(typeof(ChunkSceneCache),Private,null,
+                    new object[]{group.Key,group.Select((a,i)=>new ChunkAssetData(i,a.AssetType,a.Position,a.Rotation,a.Scale,a.Stage)).ToList()},null)).ToList();
+            typeof(ChunkManager).GetField("cachedChunks",Private).SetValue(manager,spatialChunks);
+            typeof(ChunkManager).GetMethod("RebuildChunkLookup",Private).Invoke(manager,null);
+            lighting.enabled=true;
+            GameObject.Find("Upper white receiver wall").transform.position=new Vector3(5,14,-12);
+            GameObject.Find("Upper white receiver pillar").transform.position=new Vector3(10,14,-7);
+            Save("Local-Caustics-Day",new Vector3(12,15,-16),new Vector3(4,13,-10),5);
+            Save("Local-Caustics-Night-A",new Vector3(12,15,-16),new Vector3(4,13,-10),5,true);
+            Save("Local-Caustics-Night-B",new Vector3(12,15,-16),new Vector3(4,13,-10),8,true);
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(results, Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText("Documentation/FrutigerAero/Lighting/RIVER_GLASS_PREVIEW.json", json);
+            File.WriteAllText($"Documentation/FrutigerAero/Lighting/RIVER_{revision.ToUpperInvariant()}_PREVIEW.json", json);
             return results;
         }
         finally
         {
             if (lighting != null) lighting.Release();
-            feature.previewTime = oldClock; RenderTexture.active = oldTarget;
+            feature.previewTime = oldClock; feature.SetActive(oldActive); RenderTexture.active = oldTarget;
             EditorSceneManager.CloseScene(scene, true); SceneManager.SetActiveScene(original);
             foreach (var mat in ownedMaterials) Object.DestroyImmediate(mat);
             target.Release(); Object.DestroyImmediate(target); Object.DestroyImmediate(pixels);

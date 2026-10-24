@@ -33,7 +33,7 @@ namespace TowerOfBabel.World.Tests
             try
             {
                 owner.SetActive(true);yield return new WaitForSeconds(.4f);
-                Assert.That(lighting.ActiveLightCount,Is.EqualTo(4));Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(2));
+                Assert.That(lighting.ActiveLightCount,Is.EqualTo(2));Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(1));
                 var cookie=owner.GetComponentInChildren<Light>().cookie;uint before=cookie.updateCount;
                 yield return new WaitForSeconds(.2f);
                 Assert.That(cookie.updateCount,Is.GreaterThan(before),"Runtime, not just a sampled preview, must refresh the cookie.");

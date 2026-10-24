@@ -68,6 +68,60 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [UnityTest]
+        public IEnumerator BuildWholeTower_KeepsSharedWaterGeometryAndRespondsToTheNextCommand()
+        {
+            var chunks=UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
+            Assert.That(chunks.CachedChunks.Sum(c=>c.Assets.Count),Is.GreaterThan(80000),"Exercise the saved tower, not a small synthetic fixture.");
+            menu.Show();menu.SelectCategory("Construction");
+            long before=UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
+            menu.ActionButtons["Instantly build tower"].onClick.Invoke();
+            yield return Wait(()=>chunks.CachedChunks.All(c=>c.Assets.All(a=>a.Stage==10)),"The full-tower cheat did not complete");
+            for(int i=0;i<10;i++)yield return null; // Real Game cameras render the completed tower.
+            Assert.That(chunks.ActiveConstructionFloor,Is.Null);
+            Assert.That(UnityEngine.Resources.FindObjectsOfTypeAll<Mesh>().Any(m=>m.name.StartsWith("River glass shell — cached")),Is.False,
+                "The full cheat must never allocate expanded water meshes for 19,000 completed tiles.");
+            long growth=UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong()-before;
+            Assert.That(growth,Is.LessThan(256L*1024*1024),"Completing the tower must not duplicate gigabytes of river geometry.");
+            menu.ActionButtons["Reset tower"].onClick.Invoke();
+            yield return Wait(()=>chunks.ActiveConstructionFloor==0&&chunks.CachedChunks.All(c=>c.Assets.All(a=>a.Stage==0)),"The game stopped responding after building the tower");
+            TestContext.WriteLine($"Full tower: {chunks.CachedChunks.Sum(c=>c.Assets.Count)} assets; native memory growth {growth/1048576d:F1} MiB.");
+        }
+
+        [UnityTest]
+        public IEnumerator BuildFirstFloor_NextFloorCanBeTargetedAndBuiltThroughInteraction()
+        {
+            var chunks=UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
+            var player=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
+            var pool=UnityEngine.Object.FindFirstObjectByType<NearTowerAssetPool>();
+            var raycaster=player.GetComponent<TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster>();
+            menu.Show();menu.SelectCategory("Construction");menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            yield return Wait(()=>chunks.IsFloorComplete(0),"The first-floor cheat did not complete");
+            for(int i=0;i<5;i++)yield return null;
+            Assert.That(chunks.ActiveConstructionFloor,Is.EqualTo(1));
+            upgrades.RequestCheatStat(CheatStat.InstantBuild,1);
+            yield return Wait(()=>upgrades.GetLocalCheatStat(CheatStat.InstantBuild)==1,"Instant-build interaction setup failed");
+            var candidate=chunks.CachedChunks.Where(c=>c.Key.FloorIndex==1)
+                .SelectMany(c=>c.Assets.Select(a=>(key:c.Key,asset:a)))
+                .Where(p=>p.asset.AssetType==TowerOfBabel.World.Tower.TowerAssetType.Pillar)
+                .OrderBy(p=>(p.asset.Position-player.transform.position).sqrMagnitude).First();
+            var inward=new Vector3(chunks.FloorCenter.x-candidate.asset.Position.x,0,chunks.FloorCenter.y-candidate.asset.Position.z).normalized;
+            var body=player.GetComponent<CharacterController>();body.enabled=false;
+            player.transform.position=candidate.asset.Position+inward*2+Vector3.up*.1f;body.enabled=true;
+            chunks.RefreshTowerVisibility();menu.Hide();yield return null;
+            var building=pool.ActiveAssets.Select(a=>a.GetComponent<TowerOfBabel.Buildings.Building>())
+                .First(b=>b!=null&&b.ChunkKey==candidate.key&&b.LocalIndex==candidate.asset.LocalIndex);
+            Assert.That(building.IsConstructionAvailable,Is.True);Assert.That(building.CanInteract,Is.True);
+            var collider=building.GetComponent<Collider>();Assert.That(collider,Is.Not.Null);
+            var origin=player.transform.position+Vector3.up*1.6f;Physics.SyncTransforms();
+            Assert.That(Physics.Raycast(origin,(collider.bounds.center-origin).normalized,out var hit,5,~0,QueryTriggerInteraction.Ignore),Is.True);
+            Assert.That(hit.collider.GetComponentInParent<TowerOfBabel.Buildings.Building>(),Is.SameAs(building),"Actual tower colliders must allow targeting the unlocked floor.");
+            typeof(TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster).GetMethod("SetTarget",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)
+                .Invoke(raycaster,new object[]{hit.collider.gameObject});
+            Assert.That(raycaster.TryBeginCurrentInteraction(),Is.True,"The interaction state must be usable after the floor cheat.");
+            yield return Wait(()=>chunks.TryGetAsset(candidate.key,candidate.asset.LocalIndex,out var asset)&&asset.Stage==10,"The next-floor interaction never completed");
+        }
+
+        [UnityTest]
         public IEnumerator F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls()
         {
             previousKeyboard = Keyboard.current; keyboard = InputSystem.AddDevice<Keyboard>();

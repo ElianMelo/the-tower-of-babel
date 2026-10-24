@@ -18,13 +18,19 @@ Shader "Hidden/TowerOfBabel/River caustic cookie"
             V Vert(A i){V o;o.position=TransformObjectToHClip(i.position.xyz);o.uv=i.uv;return o;}
             half4 Frag(V i):SV_Target
             {
-                float2 p=(i.uv-.5)*8+_CookieOrigin.xz;
+                // At a typical 3m receiver distance this spans about ten world metres.
+                float2 p=(i.uv-.5)*10+_CookieOrigin.xz;
                 float clock=_RiverClock*_FlowSpeed;
-                half caustic=SampleCaustics(p,float2(clock,clock*.73),.42,.25).r;
+                half3 first=SAMPLE_TEXTURE2D(_CausticsTex,sampler_CausticsTex,p*.18+float2(clock,clock*.73)).rgb;
+                half3 second=SAMPLE_TEXTURE2D(_CausticsTex,sampler_CausticsTex,p*.12-float2(clock*.61,clock)).rgb;
+                // Preserve complete branching ridges. Intersecting two RGB patterns and taking
+                // only red reduced the projection to isolated pinpricks instead of water light.
+                half caustic=max(max(first.r,max(first.g,first.b)),max(second.r,max(second.g,second.b))*.65);
                 half swell=pow(saturate(.5+.5*sin(dot(p,float2(.7,.9))-clock*2)),4);
-                half aperture=1-smoothstep(.3,.5,length(i.uv-.5));
-                half value=(.025+caustic*.8+swell*.08)*aperture;
-                return half4(value,value,value,1);
+                half aperture=1-smoothstep(.42,.5,length(i.uv-.5));
+                half core=smoothstep(.025,.4,caustic);
+                half value=(.025+core*1.5+swell*.025)*aperture;
+                return half4(value*(.92+.08*core),value*(.98+.02*core),value,1);
             }
             ENDHLSL
         }
