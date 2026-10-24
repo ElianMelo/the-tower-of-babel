@@ -108,10 +108,10 @@ namespace TowerOfBabel.World.Tower
                 bottoms[i]=mesh.bounds.min.y;
             }
             var temporaryFloors = generator.TowerParent.GetComponentsInChildren<TowerAsset>(true)
-                .Where(a => a.AssetType == TowerAssetType.Floor).Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale)).ToArray();
+                .Where(a => a.AssetType.IsFloor()).Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale)).ToArray();
             var manager = FindObjectsByType<ChunkManager>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(m => m.gameObject.scene == gameObject.scene);
             var actualFloors = temporaryFloors.Length > 0 ? temporaryFloors : manager != null
-                ? manager.CachedChunks.SelectMany(c => c.Assets).Where(a => a.AssetType == TowerAssetType.Floor).ToArray() : Array.Empty<ChunkAssetData>();
+                ? manager.CachedChunks.SelectMany(c => c.Assets).Where(a => a.AssetType.IsFloor()).ToArray() : Array.Empty<ChunkAssetData>();
             float top = generator.floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10).bounds.max.y ?? 0;
             var supports = actualFloors.GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / generator.heighIncrease))
                 .ToDictionary(g => g.Key, g => new TowerFloorSupport(g, generator.center, top));

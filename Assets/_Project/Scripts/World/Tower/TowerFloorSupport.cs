@@ -23,7 +23,7 @@ namespace TowerOfBabel.World.Tower
         }
         public void Add(ChunkAssetData asset)
         {
-            if (asset.AssetType != TowerAssetType.Floor) return;
+            if (!asset.AssetType.IsFloor()) return;
             float radius = Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), center);
             if (radius < .0001f) return;
             float depth = asset.Scale.x * TowerFloorLayout.TemplateSize, sweep = asset.Scale.z * TowerFloorLayout.TemplateSize / radius;
@@ -78,7 +78,7 @@ namespace TowerOfBabel.World.Tower
         /// <summary>Recognizes old pads and connected replacements without treating ordinary deck tiles as supports.</summary>
         public static bool IsPillarSupport(ChunkAssetData asset, Vector2 center, float margin, params float[] wallRadii)
         {
-            if (asset.AssetType != TowerAssetType.Floor) return false;
+            if (!asset.AssetType.IsFloor()) return false;
             float outerRadius = Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), center);
             float sweep = asset.Scale.z * TowerFloorLayout.TemplateSize / Mathf.Max(.001f, outerRadius);
             foreach (float wall in wallRadii)

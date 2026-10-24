@@ -17,9 +17,10 @@ MonoBehaviour:
   settings:
     intensity: 0.85
     density: 0.035
-    distance: 42
-    samples: 24
+    distance: 32
+    samples: 16
     tint: {r: 1, g: 0.96, b: 0.86, a: 1}
+  raySettings: {fileID: 11400000, guid: ba67772f126c84f468271f4c49a330b6, type: 2}
 --- !u!114 &-3277050205778725576
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,15 +62,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroLightRendererFeature
   m_Active: 1
   lightShader: {fileID: 4800000, guid: cd79db823d2101a41bc83fd3d40a71ec, type: 3}
-  caustics: {fileID: 2800000, guid: 553a5cb7f0b7e2141b85a9f589e2203e, type: 3}
+  caustics: {fileID: 2800000, guid: 6a6111d7c04a2aa41a70e3595cc26c9c, type: 3}
   environment: {fileID: 8900000, guid: bfa6913d4cb6e96459e49363b9af071e, type: 3}
   settings:
     distance: 42
     fadeStart: 24
-    causticIntensity: 0.7
+    causticIntensity: 1.2
     reflectedLight: 0.18
-    scale: 0.2
-    speed: 0.055
+    scale: 0.42
+    speed: 0.045
     tint: {r: 0.38, g: 0.85, b: 1, a: 1}
 --- !u!114 &11400000
 MonoBehaviour:

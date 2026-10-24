@@ -77,9 +77,9 @@ public static class TowerLightingRepairPreview
                     material=neutralMaterial ? new Material(Shader.Find("Universal Render Pipeline/Unlit")) : new Material(prefab.GetComponent<Renderer>().sharedMaterial);
                     if(neutralMaterial) material.SetColor("_BaseColor",new Color(.5f,.5f,.5f));
                     materials.Add(asset.AssetType,material);
-                    if(asset.AssetType==TowerAssetType.Floor) TowerFloorLayout.ConfigureMaterial(material,true,manager.FloorCenter,true);
+                    if(asset.AssetType.IsFloor()) TowerFloorLayout.ConfigureMaterial(material,true,manager.FloorCenter,true);
                 }
-                if(asset.AssetType==TowerAssetType.Floor)
+                if(asset.AssetType.IsFloor())
                     mesh=meshes.Get(mesh,Vector2.Distance(new Vector2(asset.Position.x,asset.Position.z),manager.FloorCenter),asset.Scale);
                 var go=Create(asset.AssetType.ToString(),typeof(MeshFilter),typeof(MeshRenderer));
                 go.transform.SetPositionAndRotation(asset.Position,asset.Rotation); go.transform.localScale=asset.Scale;

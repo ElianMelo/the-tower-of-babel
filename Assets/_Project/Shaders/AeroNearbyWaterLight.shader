@@ -17,7 +17,9 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #define USE_FULL_PRECISION_BLIT_TEXTURE
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
-            TEXTURE2D(_AeroCaustics); SAMPLER(sampler_AeroCaustics);
+            #define _CausticsTex _AeroCaustics
+            #define sampler_CausticsTex sampler_AeroCaustics
+            #include "Assets/Stylized Water 3/Shaders/Libraries/Caustics.hlsl"
             TEXTURECUBE(_AeroEnvironment); SAMPLER(sampler_AeroEnvironment);
             float4 _AeroRange, _AeroMotion;
             half4 _AeroTint;
@@ -51,13 +53,7 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
 
             half WaterLight(float2 uv, float clock)
             {
-                float2 drift = float2(clock, clock * .73);
-                float2 warp = sin(uv.yx * 2.1 + drift * 2.4) * .09;
-                half a = SAMPLE_TEXTURE2D(_AeroCaustics, sampler_AeroCaustics, uv + drift + warp).r;
-                // Two differently oriented layers make the bright network stretch and converge.
-                float2 rotated = float2(uv.x * .8 + uv.y * .6, -uv.x * .6 + uv.y * .8);
-                half b = SAMPLE_TEXTURE2D(_AeroCaustics, sampler_AeroCaustics, rotated * 1.17 - drift * .61 - warp).r;
-                return pow(saturate(min(a,b) * 2.4), 1.35);
+                return SampleCaustics(uv, float2(clock, clock * .73), 1, .35).r;
             }
 
             half4 Frag(Varyings input) : SV_Target

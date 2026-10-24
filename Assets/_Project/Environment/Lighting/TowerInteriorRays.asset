@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d292faace32a53a4296ac32f595b5c3f, type: 3}
+  m_Name: TowerInteriorRays
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroRaySettings
+  quality: 0
+  intensity: 1.65
+  density: 0.035
+  distance: 32
+  softness: 0.4
+  noiseScale: 0.23
+  noiseVelocity: {x: 0.035, y: 0.016, z: -0.025}
+  noiseContrast: 0.65
+  fillStrength: 2.2
+  fillRange: 24
+  fillAngle: 38
+  fillDownAngle: 12
+  transitionSeconds: 0.85
+  selectionHysteresis: 0.25
+  interiorHaze: 0.12

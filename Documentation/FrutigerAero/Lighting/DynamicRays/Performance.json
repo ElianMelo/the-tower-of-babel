@@ -1,0 +1,53 @@
+{
+    "gpu": "NVIDIA GeForce RTX 4060",
+    "api": "Direct3D11",
+    "unity": "6000.3.11f1",
+    "scope": "Automated PlayMode isolated 1920x1080 Review camera: completed floor + covered ceiling, production bounded shadow cache, fixed view, three alternating blocks per mode. GPU-collecting CustomSampler commands bracket begin/endCameraRendering; Recorder.gpuElapsedNanoseconds reads that envelope and GPU pass scopes. CPU frame time is separate.",
+    "measurements": [
+        {
+            "preset": "Disabled",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianCameraGpuMs": 1.85344,
+            "medianScatterGpuMs": 0.0,
+            "medianCompositeGpuMs": 0.0,
+            "medianMainShadowGpuMs": 0.0,
+            "medianFillShadowGpuMs": 0.0,
+            "medianCpuFrameMs": 3.4222009126096966,
+            "gpuCameraAvailable": true,
+            "gpuPassesAvailable": false
+        },
+        {
+            "preset": "Balanced PC",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianCameraGpuMs": 3.544064,
+            "medianScatterGpuMs": 0.941056,
+            "medianCompositeGpuMs": 0.090112,
+            "medianMainShadowGpuMs": 0.123904,
+            "medianFillShadowGpuMs": 0.022528,
+            "medianCpuFrameMs": 4.994600545614958,
+            "gpuCameraAvailable": true,
+            "gpuPassesAvailable": true
+        },
+        {
+            "preset": "Low",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianCameraGpuMs": 2.756608,
+            "medianScatterGpuMs": 0.19968,
+            "medianCompositeGpuMs": 0.060416,
+            "medianMainShadowGpuMs": 0.123904,
+            "medianFillShadowGpuMs": 0.01024,
+            "medianCpuFrameMs": 3.9657028391957285,
+            "gpuCameraAvailable": true,
+            "gpuPassesAvailable": true
+        }
+    ],
+    "balancedIncrementMs": 1.6906240000000002,
+    "lowIncrementMs": 0.903168,
+    "gpuBudgetVerdict": "Within approximately 2 ms in this fixture; full gameplay profiling still depends on scene load."
+}

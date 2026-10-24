@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-24",
+  "unity": "6000.3.11f1",
+  "gpu": "NVIDIA GeForce RTX 4060",
+  "api": "Direct3D11",
+  "editMode": {
+    "passed": 72,
+    "failed": 0,
+    "skipped": 0,
+    "results": "Temp/TileFix-EditMode.xml"
+  },
+  "playMode": {
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "results": "Temp/TileFix-PlayMode.xml",
+    "enteredThroughAutomatedRunner": true
+  },
+  "coverage": {
+    "instancesPerTileType": 1024,
+    "tileTypes": [
+      "Floor",
+      "GlassWaterFloor"
+    ],
+    "safePageSize": 511,
+    "pagesPer1024": 3,
+    "allInstanceCentrePixelsVisible": true
+  },
+  "finishedMesh": {
+    "asset": "Assets/_Project/Models/Buildings/FrutigerAero/FloorTileComplete.asset",
+    "vertices": 296,
+    "triangles": 268,
+    "bounds": "Center: (2.00, -0.10, -2.00), Extents: (2.00, 0.10, 2.00)",
+    "angularSegments": 16,
+    "sharedStoneAndGlass": true
+  },
+  "visualReview": {
+    "floors": [
+      0,
+      20,
+      42
+    ],
+    "usesProductionNearPoolAndFarRenderer": true,
+    "restoredOriginalLightingContext": true,
+    "timeOfDay": 0.29,
+    "lightingMatchedToLiveBefore": false
+  },
+  "cachedAssets": 87972,
+  "shaderMessages": [],
+  "performance": "No new GPU benchmark or timing claim for this repair.",
+  "editor": {
+    "scene": "Assets/_Project/Scenes/Tower.unity",
+    "dirty": false,
+    "playing": false
+  }
+}

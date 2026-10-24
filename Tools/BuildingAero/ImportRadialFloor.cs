@@ -22,4 +22,5 @@ try{
     PrefabUtility.SaveAsPrefabAsset(root,path);
 }finally{PrefabUtility.UnloadPrefabContents(root);}
 AssetDatabase.SaveAssets();
+TowerTileRepairAuthoring.Apply(); // Retain the shared flush marble/glass stage-10 template.
 return new{mesh.name,triangles=mesh.triangles.Length/3,mesh.subMeshCount,bounds=mesh.bounds.ToString(),normals=mesh.normals.Length,tangents=mesh.tangents.Length,uv=mesh.uv.Length,uv1=mesh.uv2.Length};

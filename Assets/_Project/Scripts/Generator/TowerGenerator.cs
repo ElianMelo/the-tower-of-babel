@@ -11,6 +11,7 @@ public class TowerGenerator : MonoBehaviour
     public GameObject pillarObject;
     public GameObject archObject;
     public GameObject floorTileObject;
+    public GameObject glassWaterFloorObject;
     public GameObject stairStepObject;
 
     public float radius;
@@ -59,12 +60,16 @@ public class TowerGenerator : MonoBehaviour
         foreach (var sector in TowerFloorLayout.Build(center, baseLevel, floorRadius,
                      tileDecreaseRate, arcLength, floorTileObject.transform.localScale.y))
         {
-            GameObject instance = CreateTowerAsset(floorTileObject, TowerAssetType.Floor, sector.Position, sector.Rotation);
+            int floor = Mathf.Max(0, Mathf.RoundToInt((baseLevel - .2f) / heighIncrease));
+            bool glass = glassWaterFloorObject != null && GlassWaterFloorLayout.IsChannel(
+                GlassWaterFloorLayout.TileCenter(sector.Position, sector.Rotation, sector.Scale, center), GetWallRadius(floor), tileDecreaseRate);
+            var prefab = glass ? glassWaterFloorObject : floorTileObject;
+            GameObject instance = CreateTowerAsset(prefab, glass ? TowerAssetType.GlassWaterFloor : TowerAssetType.Floor, sector.Position, sector.Rotation);
             instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x,
                 sector.Scale.y / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
             if (template != null)
             {
-                Mesh mesh = floorMeshes.Get(template, sector.Radius, sector.Scale);
+                Mesh mesh = floorMeshes.Get(prefab.GetComponent<MeshFilter>().sharedMesh, sector.Radius, sector.Scale);
                 instance.GetComponent<MeshFilter>().sharedMesh = mesh;
                 var collider = instance.GetComponent<MeshCollider>();
                 if (collider != null) collider.sharedMesh = floorMeshes.Get(walkingTemplate,sector.Radius,sector.Scale);
@@ -233,7 +238,7 @@ public class TowerGenerator : MonoBehaviour
         if (!TowerFloorLayout.SupportsRadialFloor(floorTileObject)) return;
         var assets = parent.GetComponentsInChildren<TowerAsset>();
         var pillars = assets.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease)).ToDictionary(g => g.Key, g => g.ToArray());
-        var groups = assets.Where(a => a.AssetType == TowerAssetType.Floor).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease));
+        var groups = assets.Where(a => a.AssetType.IsFloor()).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease));
         var completed = floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? floorTileObject.GetComponent<MeshFilter>().sharedMesh;
         var template = floorTileObject.GetComponent<MeshFilter>().sharedMesh;
         foreach (var group in groups)
@@ -271,6 +276,7 @@ public class TowerGenerator : MonoBehaviour
         return assetType switch
         {
             TowerAssetType.Floor => floorTileObject,
+            TowerAssetType.GlassWaterFloor => glassWaterFloorObject,
             TowerAssetType.Stair => stairStepObject,
             TowerAssetType.Pillar => pillarObject,
             TowerAssetType.Arch => archObject,

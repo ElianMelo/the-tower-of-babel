@@ -25,13 +25,15 @@ namespace TowerOfBabel.World.Chunks
     [DisallowMultipleComponent]
     public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer
     {
-        private const int MaximumInstancesPerDraw = 1023;
+        // Both object-to-world and world-to-object are required by our non-uniform
+        // radial transforms. Unity's default instancing layout fits 511, not 1023.
+        public const int MaximumInstancesPerDraw = 511;
         private static readonly ProfilerMarker RenderMarker = new("Tower.FarRenderer.Render");
         private static readonly ProfilerMarker RebuildMarker = new("Tower.FarRenderer.RebuildPages");
 
         [Tooltip("One configured building prefab for every tower asset type.")]
         [SerializeField] private List<TowerAssetRenderModel> models = new();
-        [Tooltip("Fallback data source for the four model prefabs when Models is empty.")]
+        [Tooltip("Supplies asset types missing from the explicit model overrides.")]
         [SerializeField] private ChunkManager chunkManager;
 
         [Header("Spatial batching")]
@@ -184,32 +186,33 @@ namespace TowerOfBabel.World.Chunks
         {
             DisposeBatches();
             if (chunkManager == null) chunkManager = GetComponent<ChunkManager>();
-            if (models.Count > 0)
+            var configuredTypes = new HashSet<TowerAssetType>();
+            for (int i = 0; i < models.Count; i++)
             {
-                for (int i = 0; i < models.Count; i++)
+                TowerAssetRenderModel model = models[i];
+                if (model != null && model.Prefab != null)
                 {
-                    TowerAssetRenderModel model = models[i];
-                    if (model != null)
-                        AddModelBatches(model.AssetType, model.Prefab);
+                    AddModelBatches(model.AssetType, model.Prefab);
+                    configuredTypes.Add(model.AssetType);
                 }
-                return;
             }
 
-            if (chunkManager == null)
-                chunkManager = GetComponent<ChunkManager>();
-            if (chunkManager == null)
+            if (chunkManager == null && models.Count == 0)
                 chunkManager = FindFirstObjectByType<ChunkManager>();
             if (chunkManager == null)
             {
-                Debug.LogError("Far chunk rendering needs explicit Models or a ChunkManager prefab data source.", this);
+                if (configuredTypes.Count == 0)
+                    Debug.LogError("Far chunk rendering needs explicit Models or a ChunkManager prefab data source.", this);
                 return;
             }
 
             TowerAssetPrefabSet prefabs = chunkManager.AssetPrefabs;
-            AddModelBatches(TowerAssetType.Floor, prefabs.GetPrefab(TowerAssetType.Floor));
-            AddModelBatches(TowerAssetType.Stair, prefabs.GetPrefab(TowerAssetType.Stair));
-            AddModelBatches(TowerAssetType.Pillar, prefabs.GetPrefab(TowerAssetType.Pillar));
-            AddModelBatches(TowerAssetType.Arch, prefabs.GetPrefab(TowerAssetType.Arch));
+            foreach (TowerAssetType type in Enum.GetValues(typeof(TowerAssetType)))
+            {
+                GameObject prefab = prefabs.GetPrefab(type);
+                if (!configuredTypes.Contains(type) && prefab != null)
+                    AddModelBatches(type, prefab);
+            }
         }
 
         private void EnsureModelBatches()
@@ -255,7 +258,7 @@ namespace TowerOfBabel.World.Chunks
 
                 Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
                 if (mesh != null)
-                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType == TowerAssetType.Floor ? chunkManager : null));
+                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType.IsFloor() ? chunkManager : null));
             }
         }
 

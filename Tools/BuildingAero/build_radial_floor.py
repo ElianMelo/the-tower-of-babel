@@ -23,7 +23,7 @@ def build_floor():
     low=collect('LP_Radial_Floor_Tile',[low],True)
     high=low.copy();high.data=low.data.copy();scene.collection.objects.link(high);high.name='HP_Radial_Floor_Tile'
     mat=prepare_low('Floor_Tile',low);PAIRS['Floor_Tile']=(low,high,mat)
-    low['layout']='4 m inward X / 4 m negative-Z arc parameter; 6 angular spans; Unity bends by instance radius and scale'
+    low['layout']='4 m inward X / 4 m negative-Z arc parameter; 16 angular spans, flush faces; Unity bends by instance radius and scale'
     print('RADIAL_FLOOR_BUILT',len(low.data.polygons),'triangles',len(low.data.vertices),'vertices')
 
 def save_floor():

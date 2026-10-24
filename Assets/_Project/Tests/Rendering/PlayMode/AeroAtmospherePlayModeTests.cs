@@ -21,6 +21,7 @@ namespace TowerOfBabel.Rendering.Tests
         private AeroSunShaftRendererFeature shafts;
         private AeroLightRendererFeature water;
         private bool shaftActive,waterActive;
+        private AeroDayNightProfile contextProfile;
 
         [UnitySetUp]
         public IEnumerator SetUp()
@@ -35,6 +36,11 @@ namespace TowerOfBabel.Rendering.Tests
             var renderer=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset");
             shafts=renderer.rendererFeatures.OfType<AeroSunShaftRendererFeature>().Single(); shaftActive=shafts.isActive;
             water=renderer.rendererFeatures.OfType<AeroLightRendererFeature>().Single(); waterActive=water.isActive; water.SetActive(false);
+            var root=Move(new GameObject("Runtime bounded shaft context"));
+            var cycle=root.AddComponent<AeroDayNightCycle>(); contextProfile=ScriptableObject.CreateInstance<AeroDayNightProfile>(); cycle.profile=contextProfile;
+            var context=root.AddComponent<AeroTowerAtmosphere>(); context.cycle=cycle; context.raySettings=shafts.raySettings; context.baseRadius=100;context.decrease=0;context.floorHeight=40;
+            context.SetConstructionContext(true,System.Array.Empty<AeroArchOpening>());
+            for(int i=0;i<20;i++) context.Sample(Vector3.up,i*.1f);
             yield return null;
         }
         private GameObject Move(GameObject go) {SceneManager.MoveGameObjectToScene(go,scene); return go;}
@@ -90,6 +96,7 @@ namespace TowerOfBabel.Rendering.Tests
         {
             shafts.SetActive(shaftActive); water.SetActive(waterActive); camera.enabled=false; camera.targetTexture=null;
             Object.Destroy(dark); Object.Destroy(caster); Object.Destroy(target);
+            Object.Destroy(contextProfile);
             yield return SceneManager.UnloadSceneAsync(scene);
         }
     }

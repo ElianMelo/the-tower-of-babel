@@ -8,7 +8,8 @@ namespace TowerOfBabel.World.Tower
         Floor = 0,
         Stair = 1,
         Pillar = 2,
-        Arch = 3
+        Arch = 3,
+        GlassWaterFloor = 4
     }
 
     [Serializable]
@@ -18,6 +19,7 @@ namespace TowerOfBabel.World.Tower
         [SerializeField] private GameObject stair;
         [SerializeField] private GameObject pillar;
         [SerializeField] private GameObject arch;
+        [SerializeField] private GameObject glassWaterFloor;
 
         public bool IsComplete => floor != null && stair != null && pillar != null && arch != null;
 
@@ -29,6 +31,7 @@ namespace TowerOfBabel.World.Tower
                 TowerAssetType.Stair => stair,
                 TowerAssetType.Pillar => pillar,
                 TowerAssetType.Arch => arch,
+                TowerAssetType.GlassWaterFloor => glassWaterFloor,
                 _ => null
             };
         }
@@ -49,10 +52,18 @@ namespace TowerOfBabel.World.Tower
                 case TowerAssetType.Arch:
                     arch = prefab;
                     break;
+                case TowerAssetType.GlassWaterFloor:
+                    glassWaterFloor = prefab;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetType), assetType, null);
             }
         }
+    }
+
+    public static class TowerAssetTypeExtensions
+    {
+        public static bool IsFloor(this TowerAssetType type) => type == TowerAssetType.Floor || type == TowerAssetType.GlassWaterFloor;
     }
 
     /// <summary>Marks one generated tower asset root with its structural model type.</summary>

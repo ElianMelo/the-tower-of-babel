@@ -141,42 +141,20 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             o.originSeed=float4(origin,frac((q.x+q.y)*q.z));
             return o;
         }
-        half Marble(float3 p,half3 n)
-        {
-            half3 w=pow(abs(n),4);w/=max(dot(w,half3(1,1,1)),.001);
-            float aspect=max(_TextureAspect,.01);
-            half a=SAMPLE_TEXTURE2D(_MarbleMap,sampler_MarbleMap,float2(p.y/aspect,p.z)).r;
-            half b=SAMPLE_TEXTURE2D(_MarbleMap,sampler_MarbleMap,float2(p.x/aspect,p.z)).r;
-            half c=SAMPLE_TEXTURE2D(_MarbleMap,sampler_MarbleMap,float2(p.x/aspect,p.y)).r;
-            return dot(half3(a,b,c),w);
-        }
+        #include "BuildingMarbleSurface.hlsl"
         float3 MarblePosition(Varyings input)
         {
+            // One continuous floor finish across tiles, rings and near/far transitions.
+            if(_ModelKind>.5 && _ModelKind<1.5)return input.positionWS*_MarbleScale;
             float seed=input.originSeed.w;
             return (input.positionWS-input.originSeed.xyz)*_MarbleScale
                  +float3(seed,frac(seed*3.71),frac(seed*7.13))*3;
         }
-        half2 ReliefGradient(float2 uv)
-        {
-            half3 normal=UnpackNormal(SAMPLE_TEXTURE2D(_NormalMap,sampler_NormalMap,uv));
-            // Mirrored image repeats also mirror the relief's tangent directions.
-            half2 mirror=1-4*frac(floor(uv)*.5);
-            return normal.xy/max(normal.z,.1)*mirror;
-        }
-        half3 MarbleNormal(float3 p,half3 n)
-        {
-            half3 w=pow(abs(n),4);w/=max(dot(w,half3(1,1,1)),.001);
-            float aspect=max(_TextureAspect,.01);
-            half2 x=ReliefGradient(float2(p.y/aspect,p.z));
-            half2 y=ReliefGradient(float2(p.x/aspect,p.z));
-            half2 z=ReliefGradient(float2(p.x/aspect,p.y));
-            half3 gradient=half3(0,x.x,x.y)*w.x+half3(y.x,0,y.y)*w.y+half3(z.x,z.y,0)*w.z;
-            gradient-=n*dot(n,gradient);
-            // A flat normal texture leaves the actual rounded mesh normal intact.
-            return normalize(n+gradient*_NormalStrength);
-        }
         half3 OrnamentNormal(Varyings input,half3 n)
         {
+            // The old floor bake contains a separate bevel around every tile.
+            // Finished deck faces join flush; keep their real geometric normal.
+            if(_ModelKind>.5 && _ModelKind<1.5 && abs(n.y)>.99)return n;
             half3 detail=UnpackNormal(SAMPLE_TEXTURE2D(_BakedNormal,sampler_BakedNormal,input.uv));
             detail.xy*=_BakedStrength;detail=normalize(detail);
             half3 tangent=SafeNormalize(input.tangentWS.xyz-n*dot(n,input.tangentWS.xyz));
@@ -281,7 +259,8 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 half enamel=saturate((bakedColor.b-bakedColor.r)*2);
                 surface.smoothness=lerp(_Smoothness,.96,glass);surface.normalTS=half3(0,0,1);
                 surface.clearCoatMask=_PearlCoat;surface.clearCoatSmoothness=.95;
-                surface.occlusion=lerp(1,SAMPLE_TEXTURE2D(_BakedAO,sampler_BakedAO,input.uv).r,_AOStrength);
+                half floorFace=step(.5,_ModelKind)*step(_ModelKind,1.5)*step(.99,abs(input.normalWS.y));
+                surface.occlusion=lerp(1,SAMPLE_TEXTURE2D(_BakedAO,sampler_BakedAO,input.uv).r,_AOStrength*(1-floorFace));
                 InputData data=(InputData)0;
                 data.positionWS=input.positionWS;data.positionCS=input.positionCS;
                 data.normalWS=n;data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(input.positionWS);

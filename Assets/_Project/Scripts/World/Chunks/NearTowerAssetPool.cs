@@ -42,6 +42,24 @@ namespace TowerOfBabel.World.Chunks
         public int LastRemovedChunkCount { get; private set; }
         public int LastPositionedAssetCount { get; private set; }
         public IReadOnlyList<GameObject> ActiveAssets => activeAssets;
+        private int shadowFloorMin = int.MaxValue, shadowFloorMax = int.MinValue;
+        public bool HasActiveChunk(ChunkKey key) => activeChunks.ContainsKey(key);
+        public void SetShadowFloors(int minimum, int maximum)
+        {
+            if (minimum == shadowFloorMin && maximum == shadowFloorMax) return;
+            shadowFloorMin = minimum; shadowFloorMax = maximum;
+            foreach (var instance in activeByObject.Values) ConfigureShadows(instance);
+        }
+        private void ConfigureShadows(PooledInstance instance)
+        {
+            var building = instance.Building;
+            bool solid = building != null && building.CurrentStage > 0 && building.ChunkKey.FloorIndex >= shadowFloorMin && building.ChunkKey.FloorIndex <= shadowFloorMax;
+            foreach (var renderer in instance.Renderers)
+            {
+                renderer.shadowCastingMode = solid ? ShadowCastingMode.On : ShadowCastingMode.Off;
+                renderer.receiveShadows = solid;
+            }
+        }
 
         private void Awake()
         {
@@ -70,6 +88,7 @@ namespace TowerOfBabel.World.Chunks
             CreateTypePool(TowerAssetType.Stair);
             CreateTypePool(TowerAssetType.Pillar);
             CreateTypePool(TowerAssetType.Arch);
+            if (prefabs.GetPrefab(TowerAssetType.GlassWaterFloor) != null) CreateTypePool(TowerAssetType.GlassWaterFloor);
         }
 
         public void BeginUpdate()
@@ -148,6 +167,7 @@ namespace TowerOfBabel.World.Chunks
             else current.Building?.Bind(chunkManager, chunk.Key, asset.LocalIndex, asset.Stage);
             ApplyTransform(current.GameObject.transform, asset);
             ConfigureFloorGeometry(current, asset);
+            ConfigureShadows(current);
             ActivateInstance(current);
             return true;
         }
@@ -275,6 +295,7 @@ namespace TowerOfBabel.World.Chunks
 
         private void ActivateInstance(PooledInstance instance)
         {
+            ConfigureShadows(instance);
             if (instance.ActiveIndex >= 0)
                 return;
 
@@ -337,7 +358,7 @@ namespace TowerOfBabel.World.Chunks
 
         private void ConfigureFloorGeometry(PooledInstance instance, ChunkAssetData asset)
         {
-            if (asset.AssetType != TowerAssetType.Floor || chunkManager == null) return;
+            if (!asset.AssetType.IsFloor() || chunkManager == null) return;
             float radius = Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), chunkManager.FloorCenter);
             instance.GameObject.GetComponent<PillarConstructionMotion>()?.ConfigureRadialFloor(
                 chunkManager.RadialFloors ? floorMeshes : null,radius,asset.Scale);
@@ -408,6 +429,7 @@ namespace TowerOfBabel.World.Chunks
             public GameObject GameObject { get; }
             public TypePool Owner { get; }
             public Building Building { get; }
+            public MeshRenderer[] Renderers { get; }
             public int ActiveIndex { get; set; } = -1;
             public bool HasDeferredReturn { get; set; }
 
@@ -416,6 +438,7 @@ namespace TowerOfBabel.World.Chunks
                 GameObject = gameObject;
                 Owner = owner;
                 Building = gameObject.GetComponent<Building>();
+                Renderers = gameObject.GetComponentsInChildren<MeshRenderer>(true);
             }
         }
 
@@ -515,8 +538,9 @@ namespace TowerOfBabel.World.Chunks
                                 hideFlags = HideFlags.DontSave
                             };
                             if (runtime.HasProperty("_ReceiveShadows"))
-                                runtime.SetFloat("_ReceiveShadows", 0f);
-                            if (assetType == TowerAssetType.Floor && chunkManager != null)
+                                runtime.SetFloat("_ReceiveShadows", 1f);
+                            runtime.DisableKeyword("_RECEIVE_SHADOWS_OFF");
+                            if (assetType.IsFloor() && chunkManager != null)
                                 TowerFloorLayout.ConfigureMaterial(runtime, chunkManager.RadialFloors, chunkManager.FloorCenter, true);
                             runtimeMaterials.Add(source, runtime);
                         }

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="15" result="Passed" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:36:05Z" duration="26,5716491">
+  <test-suite type="TestSuite" id="1084" name="the-tower-of-babel" fullname="the-tower-of-babel" runstate="Runnable" testcasecount="57" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:36:05Z" duration="26.571649" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1015" name="TowerOfBabel.Rendering.Tests.PlayMode.dll" fullname="D:/PersonalProjects/the-tower-of-babel/Library/ScriptAssemblies/TowerOfBabel.Rendering.Tests.PlayMode.dll" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:36:00Z" duration="21.031379" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16032" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1016" name="TowerOfBabel" fullname="TowerOfBabel" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:36:00Z" duration="21.027676" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1017" name="Rendering" fullname="TowerOfBabel.Rendering" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:36:00Z" duration="21.024628" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1018" name="Tests" fullname="TowerOfBabel.Rendering.Tests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:36:00Z" duration="21.021398" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="AeroAtmospherePlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:35:40Z" duration="1.130950" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1003" name="Projection_UpdatesItsExistingCookieAndReleasesItWhenDisabled" fullname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests.Projection_UpdatesItsExistingCookieAndReleasesItWhenDisabled" methodname="Projection_UpdatesItsExistingCookieAndReleasesItWhenDisabled" classname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" runstate="Runnable" seed="688618062" result="Passed" start-time="2026-10-24 11:35:39Z" end-time="2026-10-24 11:35:40Z" duration="1.017675" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="SunShafts_ReactToMovingShadowOnlyOccludersDuringGameplay" fullname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests.SunShafts_ReactToMovingShadowOnlyOccludersDuringGameplay" methodname="SunShafts_ReactToMovingShadowOnlyOccludersDuringGameplay" classname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" runstate="Runnable" seed="1983194601" result="Passed" start-time="2026-10-24 11:35:40Z" end-time="2026-10-24 11:35:40Z" duration="0.074211" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1004" name="AeroDayNightPlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-24 11:35:40Z" end-time="2026-10-24 11:35:40Z" duration="0.297175" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1005" name="Cycle_AdvancesAndSwitchesSunMoonAndFlareWithoutAllocatingNewSkyMaterials" fullname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests.Cycle_AdvancesAndSwitchesSunMoonAndFlareWithoutAllocatingNewSkyMaterials" methodname="Cycle_AdvancesAndSwitchesSunMoonAndFlareWithoutAllocatingNewSkyMaterials" classname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" runstate="Runnable" seed="211258240" result="Passed" start-time="2026-10-24 11:35:40Z" end-time="2026-10-24 11:35:40Z" duration="0.279050" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="Fireflies_HaveBoundedPopulationAndContinuousMotion" fullname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests.Fireflies_HaveBoundedPopulationAndContinuousMotion" methodname="Fireflies_HaveBoundedPopulationAndContinuousMotion" classname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" runstate="Runnable" seed="2132224097" result="Passed" start-time="2026-10-24 11:35:40Z" end-time="2026-10-24 11:35:40Z" duration="0.013437" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1007" name="AeroLightPlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-24 11:35:40Z" end-time="2026-10-24 11:35:41Z" duration="0.541462" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="Light_AnimatesWithGameTimeAndTogglesWithoutExtraCameras" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests.Light_AnimatesWithGameTimeAndTogglesWithoutExtraCameras" methodname="Light_AnimatesWithGameTimeAndTogglesWithoutExtraCameras" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" seed="929444198" result="Passed" start-time="2026-10-24 11:35:40Z" end-time="2026-10-24 11:35:41Z" duration="0.512872" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="Light_DisablingTheSourceRemovesProjectionWithoutMovingTheCamera" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests.Light_DisablingTheSourceRemovesProjectionWithoutMovingTheCamera" methodname="Light_DisablingTheSourceRemovesProjectionWithoutMovingTheCamera" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" seed="1097007965" result="Passed" start-time="2026-10-24 11:35:41Z" end-time="2026-10-24 11:35:41Z" duration="0.013754" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="Light_FadesWhenThePlayerViewMovesAway" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests.Light_FadesWhenThePlayerViewMovesAway" methodname="Light_FadesWhenThePlayerViewMovesAway" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" seed="1529283005" result="Passed" start-time="2026-10-24 11:35:41Z" end-time="2026-10-24 11:35:41Z" duration="0.012386" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="AeroOceanPlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:35:41Z" end-time="2026-10-24 11:35:41Z" duration="0.028452" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1012" name="Ocean_FollowsTheViewWithoutAllocatingNewMeshesOrChangingWaterHeight" fullname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests.Ocean_FollowsTheViewWithoutAllocatingNewMeshesOrChangingWaterHeight" methodname="Ocean_FollowsTheViewWithoutAllocatingNewMeshesOrChangingWaterHeight" classname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests" runstate="Runnable" seed="567938744" result="Passed" start-time="2026-10-24 11:35:41Z" end-time="2026-10-24 11:35:41Z" duration="0.026626" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1013" name="TowerRayRuntimeReviewTests" fullname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests" classname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:35:41Z" end-time="2026-10-24 11:36:00Z" duration="19.016581" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1014" name="CompletedInterior_RecordsMatched1080pDisabledBalancedAndLowGpuCost" fullname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests.CompletedInterior_RecordsMatched1080pDisabledBalancedAndLowGpuCost" methodname="CompletedInterior_RecordsMatched1080pDisabledBalancedAndLowGpuCost" classname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests" runstate="Runnable" seed="133550892" result="Passed" start-time="2026-10-24 11:35:41Z" end-time="2026-10-24 11:36:00Z" duration="19.014575" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="Timeout" value="180000" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{
+    "gpu": "NVIDIA GeForce RTX 4060",
+    "api": "Direct3D11",
+    "unity": "6000.3.11f1",
+    "scope": "Automated PlayMode isolated 1920x1080 Review camera: completed floor + covered ceiling, production bounded shadow cache, fixed view, three alternating blocks per mode. GPU-collecting CustomSampler commands bracket begin/endCameraRendering; Recorder.gpuElapsedNanoseconds reads that envelope and GPU pass scopes. CPU frame time is separate.",
+    "measurements": [
+        {
+            "preset": "Disabled",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianCameraGpuMs": 1.85344,
+            "medianScatterGpuMs": 0.0,
+            "medianCompositeGpuMs": 0.0,
+            "medianMainShadowGpuMs": 0.0,
+            "medianFillShadowGpuMs": 0.0,
+            "medianCpuFrameMs": 3.4222009126096966,
+            "gpuCameraAvailable": true,
+            "gpuPassesAvailable": false
+        },
+        {
+            "preset": "Balanced PC",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianCameraGpuMs": 3.544064,
+            "medianScatterGpuMs": 0.941056,
+            "medianCompositeGpuMs": 0.090112,
+            "medianMainShadowGpuMs": 0.123904,
+            "medianFillShadowGpuMs": 0.022528,
+            "medianCpuFrameMs": 4.994600545614958,
+            "gpuCameraAvailable": true,
+            "gpuPassesAvailable": true
+        },
+        {
+            "preset": "Low",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianCameraGpuMs": 2.756608,
+            "medianScatterGpuMs": 0.19968,
+            "medianCompositeGpuMs": 0.060416,
+            "medianMainShadowGpuMs": 0.123904,
+            "medianFillShadowGpuMs": 0.01024,
+            "medianCpuFrameMs": 3.9657028391957285,
+            "gpuCameraAvailable": true,
+            "gpuPassesAvailable": true
+        }
+    ],
+    "balancedIncrementMs": 1.6906240000000002,
+    "lowIncrementMs": 0.903168,
+    "gpuBudgetVerdict": "Within approximately 2 ms in this fixture; full gameplay profiling still depends on scene load."
+}
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1075" name="TowerOfBabel.Resources.Tests.PlayMode.dll" fullname="D:/PersonalProjects/the-tower-of-babel/Library/ScriptAssemblies/TowerOfBabel.Resources.Tests.PlayMode.dll" runstate="Runnable" testcasecount="48" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:05Z" duration="5.503340" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16032" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1076" name="TowerOfBabel" fullname="TowerOfBabel" runstate="Runnable" testcasecount="48" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:05Z" duration="5.500460" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1077" name="World" fullname="TowerOfBabel.World" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:05Z" duration="5.498142" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1078" name="Tests" fullname="TowerOfBabel.World.Tests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:05Z" duration="5.496817" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1019" name="GlassWaterFloorPlayModeTests" fullname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests" classname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:00Z" duration="0.014495" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1020" name="WaterProjection_OnlyEmitsAfterCompletionAndStopsOnRollbackOrPoolRelease" fullname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests.WaterProjection_OnlyEmitsAfterCompletionAndStopsOnRollbackOrPoolRelease" methodname="WaterProjection_OnlyEmitsAfterCompletionAndStopsOnRollbackOrPoolRelease" classname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests" runstate="Runnable" seed="548189169" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:00Z" duration="0.012711" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1021" name="TowerProgressionPlayModeTests" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:05Z" duration="5.480838" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1022" name="BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback" methodname="BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="2020207913" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:00Z" duration="0.035556" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete" methodname="Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="1533658604" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:00Z" duration="0.011991" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus" methodname="Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="1948684977" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:00Z" duration="0.008240" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds" methodname="Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="1568073482" result="Passed" start-time="2026-10-24 11:36:00Z" end-time="2026-10-24 11:36:02Z" duration="2.161215" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry" methodname="Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="479753776" result="Passed" start-time="2026-10-24 11:36:02Z" end-time="2026-10-24 11:36:05Z" duration="3.260856" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: Temp/TowerRays-PlayMode.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

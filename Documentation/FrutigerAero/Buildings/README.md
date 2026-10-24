@@ -1,5 +1,7 @@
 # Frutiger Aero building kit
 
+Current floor correction: [distant tile visibility and continuous marble/glass joins](TILE_VISIBILITY_AND_JOINS.md), including validation and tower previews.
+
 Opaque aquatic finish restored, 2026-10-21. The subsequent see-through border experiment was rejected by the user.
 
 The primary target is now `frutiger-building-sample-2.jpg`, explicitly selected by the user. The kit also follows the ten images in `Assets/_Project/References/Buildings/` and the supplied red arch annotation, preserved at `Frutiger Reference/Asset/Building-Arch-Full-Spandrel-User.png`. The building palette is white with blue details. No green colors occur in its eight-color palette. Older UI references using green do not override this building brief.

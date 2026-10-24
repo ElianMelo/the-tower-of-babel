@@ -13,6 +13,10 @@ float2 AquaticProjection(float3 p)
 }
 half GlassRegion(Varyings input,half3 color)
 {
+    // Radial deck faces are continuous marble; a synthetic border around every
+    // patch reads as an open joint, especially when looking up at the ceiling.
+    // Actual aqua side bands and the separate enclosed river retain their glaze.
+    if(_RadialFloor>.5 && _ModelKind>.5 && _ModelKind<1.5 && abs(input.normalWS.y)>.99)return 0;
     half region=saturate((color.b-color.r)*3);
     if(_ModelKind> .5 && _ModelKind<1.5 || _ModelKind>2.5)
     {

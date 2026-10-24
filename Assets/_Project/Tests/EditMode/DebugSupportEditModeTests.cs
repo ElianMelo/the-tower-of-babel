@@ -78,7 +78,7 @@ namespace TowerOfBabel.World.Tests
             {
                 generator.GenerateTower();
                 var assets = parent.GetComponentsInChildren<TowerAsset>();
-                var supports = assets.Where(a => a.AssetType == TowerAssetType.Floor).Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale))
+                var supports = assets.Where(a => a.AssetType.IsFloor()).Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale))
                     .GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / 6)).ToDictionary(g => g.Key, g => new TowerFloorSupport(g, generator.center));
                 foreach (var pillar in assets.Where(a => a.AssetType == TowerAssetType.Pillar))
                 {
@@ -102,7 +102,7 @@ namespace TowerOfBabel.World.Tests
                 var manager = roots.SelectMany(r => r.GetComponentsInChildren<ChunkManager>(true)).Single();
                 var scatter = g.GetComponent<TowerBushScatter>();
                 var all = manager.CachedChunks.SelectMany(c => c.Assets).ToArray();
-                var supports = all.Where(a => a.AssetType == TowerAssetType.Floor).GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / g.heighIncrease))
+                var supports = all.Where(a => a.AssetType.IsFloor()).GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / g.heighIncrease))
                     .ToDictionary(group => group.Key, group => new TowerFloorSupport(group, g.center));
                 int checkedPillars = 0;
                 foreach (var pillar in all.Where(a => a.AssetType == TowerAssetType.Pillar))
@@ -127,7 +127,7 @@ namespace TowerOfBabel.World.Tests
                 for (int floor = 2; floor < g.levels; floor += 2)
                     Assert.That(g.GetFloorOuterRadius(floor), Is.GreaterThan(g.GetWallRadius(floor - 1) + .5f));
                 int connected=0;
-                foreach(var group in all.Where(a=>a.AssetType==TowerAssetType.Floor).GroupBy(a=>Mathf.FloorToInt(a.Position.y/g.heighIncrease)))
+                foreach(var group in all.Where(a=>a.AssetType.IsFloor()).GroupBy(a=>Mathf.FloorToInt(a.Position.y/g.heighIncrease)))
                 {
                     float wall=g.GetWallRadius(group.Key),previous=g.GetWallRadius(Mathf.Max(0,group.Key-1));
                     if(wall>=previous-.01f) continue;

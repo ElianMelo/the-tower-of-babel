@@ -1,0 +1,921 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="57" result="Failed(Child)" total="57" passed="50" failed="7" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:14:25Z" duration="50,4914333">
+  <test-suite type="TestSuite" id="1084" name="the-tower-of-babel" fullname="the-tower-of-babel" runstate="Runnable" testcasecount="57" result="Failed" site="Child" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:14:25Z" duration="50.491433" total="57" passed="50" failed="7" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1015" name="TowerOfBabel.Rendering.Tests.PlayMode.dll" fullname="D:/PersonalProjects/the-tower-of-babel/Library/ScriptAssemblies/TowerOfBabel.Rendering.Tests.PlayMode.dll" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:13:56Z" duration="21.000548" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16032" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1016" name="TowerOfBabel" fullname="TowerOfBabel" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:13:56Z" duration="20.998342" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1017" name="Rendering" fullname="TowerOfBabel.Rendering" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:13:56Z" duration="20.996655" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1018" name="Tests" fullname="TowerOfBabel.Rendering.Tests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:13:56Z" duration="20.995178" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="AeroAtmospherePlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:13:36Z" duration="0.848367" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1003" name="Projection_UpdatesItsExistingCookieAndReleasesItWhenDisabled" fullname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests.Projection_UpdatesItsExistingCookieAndReleasesItWhenDisabled" methodname="Projection_UpdatesItsExistingCookieAndReleasesItWhenDisabled" classname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" runstate="Runnable" seed="1421200507" result="Passed" start-time="2026-10-24 11:13:35Z" end-time="2026-10-24 11:13:36Z" duration="0.785668" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1002" name="SunShafts_ReactToMovingShadowOnlyOccludersDuringGameplay" fullname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests.SunShafts_ReactToMovingShadowOnlyOccludersDuringGameplay" methodname="SunShafts_ReactToMovingShadowOnlyOccludersDuringGameplay" classname="TowerOfBabel.Rendering.Tests.AeroAtmospherePlayModeTests" runstate="Runnable" seed="617196101" result="Passed" start-time="2026-10-24 11:13:36Z" end-time="2026-10-24 11:13:36Z" duration="0.040573" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1004" name="AeroDayNightPlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-24 11:13:36Z" end-time="2026-10-24 11:13:36Z" duration="0.286087" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1005" name="Cycle_AdvancesAndSwitchesSunMoonAndFlareWithoutAllocatingNewSkyMaterials" fullname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests.Cycle_AdvancesAndSwitchesSunMoonAndFlareWithoutAllocatingNewSkyMaterials" methodname="Cycle_AdvancesAndSwitchesSunMoonAndFlareWithoutAllocatingNewSkyMaterials" classname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" runstate="Runnable" seed="385175775" result="Passed" start-time="2026-10-24 11:13:36Z" end-time="2026-10-24 11:13:36Z" duration="0.269100" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="Fireflies_HaveBoundedPopulationAndContinuousMotion" fullname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests.Fireflies_HaveBoundedPopulationAndContinuousMotion" methodname="Fireflies_HaveBoundedPopulationAndContinuousMotion" classname="TowerOfBabel.Rendering.Tests.AeroDayNightPlayModeTests" runstate="Runnable" seed="512350023" result="Passed" start-time="2026-10-24 11:13:36Z" end-time="2026-10-24 11:13:36Z" duration="0.014759" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1007" name="AeroLightPlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-24 11:13:36Z" end-time="2026-10-24 11:13:37Z" duration="0.543297" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="Light_AnimatesWithGameTimeAndTogglesWithoutExtraCameras" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests.Light_AnimatesWithGameTimeAndTogglesWithoutExtraCameras" methodname="Light_AnimatesWithGameTimeAndTogglesWithoutExtraCameras" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" seed="1851636916" result="Passed" start-time="2026-10-24 11:13:36Z" end-time="2026-10-24 11:13:37Z" duration="0.512978" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="Light_DisablingTheSourceRemovesProjectionWithoutMovingTheCamera" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests.Light_DisablingTheSourceRemovesProjectionWithoutMovingTheCamera" methodname="Light_DisablingTheSourceRemovesProjectionWithoutMovingTheCamera" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" seed="653143832" result="Passed" start-time="2026-10-24 11:13:37Z" end-time="2026-10-24 11:13:37Z" duration="0.013359" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="Light_FadesWhenThePlayerViewMovesAway" fullname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests.Light_FadesWhenThePlayerViewMovesAway" methodname="Light_FadesWhenThePlayerViewMovesAway" classname="TowerOfBabel.Rendering.Tests.AeroLightPlayModeTests" runstate="Runnable" seed="1589774961" result="Passed" start-time="2026-10-24 11:13:37Z" end-time="2026-10-24 11:13:37Z" duration="0.014558" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1011" name="AeroOceanPlayModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests" classname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:13:37Z" end-time="2026-10-24 11:13:37Z" duration="0.025801" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1012" name="Ocean_FollowsTheViewWithoutAllocatingNewMeshesOrChangingWaterHeight" fullname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests.Ocean_FollowsTheViewWithoutAllocatingNewMeshesOrChangingWaterHeight" methodname="Ocean_FollowsTheViewWithoutAllocatingNewMeshesOrChangingWaterHeight" classname="TowerOfBabel.Rendering.Tests.AeroOceanPlayModeTests" runstate="Runnable" seed="1981964481" result="Passed" start-time="2026-10-24 11:13:37Z" end-time="2026-10-24 11:13:37Z" duration="0.023300" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1013" name="TowerRayRuntimeReviewTests" fullname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests" classname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:13:37Z" end-time="2026-10-24 11:13:56Z" duration="19.288587" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1014" name="CompletedInterior_RecordsMatched1080pDisabledBalancedAndLowGpuCost" fullname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests.CompletedInterior_RecordsMatched1080pDisabledBalancedAndLowGpuCost" methodname="CompletedInterior_RecordsMatched1080pDisabledBalancedAndLowGpuCost" classname="TowerOfBabel.Rendering.Tests.TowerRayRuntimeReviewTests" runstate="Runnable" seed="324491703" result="Passed" start-time="2026-10-24 11:13:37Z" end-time="2026-10-24 11:13:56Z" duration="19.286574" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="Timeout" value="180000" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[{
+    "gpu": "NVIDIA GeForce RTX 4060",
+    "api": "Direct3D11",
+    "unity": "6000.3.11f1",
+    "scope": "Automated PlayMode completed floor + covered ceiling fixture with the production bounded shadow cache, fixed camera, three alternating blocks per mode. GPU frame includes Editor overhead. Timings use RawFrameDataView.frameGpuTimeMs and Recorder.gpuElapsedNanoseconds, never CPU marker durations.",
+    "measurements": [
+        {
+            "preset": "Disabled",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianGpuFrameMs": 0.0,
+            "medianScatterGpuMs": 0.0,
+            "medianCompositeGpuMs": 0.0,
+            "medianCpuFrameMs": 3.4850977826863529,
+            "gpuFrameAvailable": false,
+            "gpuPassesAvailable": false
+        },
+        {
+            "preset": "Balanced PC",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianGpuFrameMs": 0.0,
+            "medianScatterGpuMs": 2.113536,
+            "medianCompositeGpuMs": 0.062464,
+            "medianCpuFrameMs": 6.090993527323008,
+            "gpuFrameAvailable": false,
+            "gpuPassesAvailable": true
+        },
+        {
+            "preset": "Low",
+            "width": 1920,
+            "height": 1080,
+            "samples": 180,
+            "medianGpuFrameMs": 0.0,
+            "medianScatterGpuMs": 0.275456,
+            "medianCompositeGpuMs": 0.05632,
+            "medianCpuFrameMs": 4.068700596690178,
+            "gpuFrameAvailable": false,
+            "gpuPassesAvailable": true
+        }
+    ],
+    "balancedIncrementMs": 0.0,
+    "lowIncrementMs": 0.0,
+    "gpuBudgetVerdict": "GPU frame timestamps unavailable: the 2 ms target is unverified. CPU frame timing is not GPU timing."
+}
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1075" name="TowerOfBabel.Resources.Tests.PlayMode.dll" fullname="D:/PersonalProjects/the-tower-of-babel/Library/ScriptAssemblies/TowerOfBabel.Resources.Tests.PlayMode.dll" runstate="Runnable" testcasecount="48" result="Failed" site="Child" start-time="2026-10-24 11:13:56Z" end-time="2026-10-24 11:14:25Z" duration="29.470076" total="48" passed="41" failed="7" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16032" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1076" name="TowerOfBabel" fullname="TowerOfBabel" runstate="Runnable" testcasecount="48" result="Failed" site="Child" start-time="2026-10-24 11:13:56Z" end-time="2026-10-24 11:14:25Z" duration="29.467765" total="48" passed="41" failed="7" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1079" name="Resources" fullname="TowerOfBabel.Resources" runstate="Runnable" testcasecount="42" result="Failed" site="Child" start-time="2026-10-24 11:13:56Z" end-time="2026-10-24 11:14:20Z" duration="23.966792" total="42" passed="35" failed="7" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1080" name="Tests" fullname="TowerOfBabel.Resources.Tests" runstate="Runnable" testcasecount="42" result="Failed" site="Child" start-time="2026-10-24 11:13:56Z" end-time="2026-10-24 11:14:20Z" duration="23.964555" total="42" passed="35" failed="7" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1027" name="CheatMenuPlayModeTests" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" testcasecount="6" result="Failed" site="Child" start-time="2026-10-24 11:13:56Z" end-time="2026-10-24 11:14:04Z" duration="7.831865" total="6" passed="4" failed="2" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1032" name="AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass" methodname="AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" seed="284210972" result="Passed" start-time="2026-10-24 11:13:56Z" end-time="2026-10-24 11:13:58Z" duration="2.334137" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+[Upgrade Cheat] Gather: level set from 0 to 1; points 1.
+[Upgrade Cheat] Process: level set from 0 to 1; points 1.
+[Upgrade Cheat] Build: level set from 0 to 1; points 1.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+[Upgrade Cheat] Gather: gained 10 XP.
+[Upgrade Cheat] Process: gained 10 XP.
+[Upgrade Cheat] Build: gained 10 XP.
+[Upgrade Cheat] GatherSpeed: 5
+[Upgrade Cheat] ProcessSpeed: 5
+[Upgrade Cheat] BuildSpeed: 5
+[Upgrade Cheat] Gather: progression reset.
+[Upgrade Cheat] Process: progression reset.
+[Upgrade Cheat] Build: progression reset.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+[Upgrade Cheat] Build: level set from 0 to 1; points 1.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1031" name="BuildFloor_AlwaysAdvancesTheNextUnfinishedFloorRegardlessOfPlayerOrSelection" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildFloor_AlwaysAdvancesTheNextUnfinishedFloorRegardlessOfPlayerOrSelection" methodname="BuildFloor_AlwaysAdvancesTheNextUnfinishedFloorRegardlessOfPlayerOrSelection" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" seed="1665656784" result="Passed" start-time="2026-10-24 11:13:58Z" end-time="2026-10-24 11:13:59Z" duration="0.860946" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+[Upgrade Cheat] BuildFloor completed.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1028" name="F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls" methodname="F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" seed="1012304302" result="Failed" start-time="2026-10-24 11:13:59Z" end-time="2026-10-24 11:14:00Z" duration="0.640396" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests+<F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls>d__9.MoveNext () [0x000cb] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\CheatMenuPlayModeTests.cs:77
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1030" name="GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState" methodname="GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" seed="1231660215" result="Failed" start-time="2026-10-24 11:14:00Z" end-time="2026-10-24 11:14:00Z" duration="0.660713" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: greater than 1.18843019f
+  But was:  1.13843024f
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests+<GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState>d__11.MoveNext () [0x0022d] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\CheatMenuPlayModeTests.cs:159
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1033" name="InstantBuildToggle_OnlyBuildsOnInteractionCompletesAllStagesAndChargesNothing" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.InstantBuildToggle_OnlyBuildsOnInteractionCompletesAllStagesAndChargesNothing" methodname="InstantBuildToggle_OnlyBuildsOnInteractionCompletesAllStagesAndChargesNothing" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" seed="1904699924" result="Passed" start-time="2026-10-24 11:14:00Z" end-time="2026-10-24 11:14:01Z" duration="0.961471" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+[Upgrade Cheat] InstantBuild: 1
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Action].
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+The character with Unicode value \u00B7 was not found in the [Frutiger Bold SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [ExperienceFloatingText(Clone)].
+[Upgrade Cheat] InstantBuild: 0
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1029" name="MenuActions_UpdateServerProgressCapacityResourcesAndConstruction" fullname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.MenuActions_UpdateServerProgressCapacityResourcesAndConstruction" methodname="MenuActions_UpdateServerProgressCapacityResourcesAndConstruction" classname="TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests" runstate="Runnable" seed="1767953686" result="Passed" start-time="2026-10-24 11:14:01Z" end-time="2026-10-24 11:14:04Z" duration="2.369548" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+[Upgrade Cheat] Gather: level set from 0 to 1; points 1.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+[Upgrade Cheat] Gather: gained 1000 XP.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+[Upgrade Cheat] BagCapacity: 1050
+[Upgrade Cheat] FillBag completed.
+[Upgrade Cheat] ClearBag completed.
+[Upgrade Cheat] AddSand completed.
+[Upgrade Cheat] AddGlass completed.
+[Upgrade Cheat] BuildSpeed: 10
+[Upgrade Cheat] GatherProduction: 5
+[Upgrade Cheat] WalkSpeed: 3
+[Upgrade Cheat] CameraFov: 90
+[Upgrade Cheat] InstantGather completed.
+[Upgrade Cheat] InstantProcess completed.
+[Upgrade Cheat] BuildAsset completed.
+[Upgrade Cheat] BuildFloor completed.
+[Upgrade Cheat] ResetFloor completed.
+[Upgrade Cheat] UnlockAllUpgrades completed.
+[Upgrade Cheat] ResetModifiers completed.
+[Upgrade Cheat] All upgrade progression reset.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1034" name="FrutigerAeroPlayModeTests" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" testcasecount="14" result="Failed" site="Child" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:06Z" duration="2.308167" total="14" passed="9" failed="5" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1048" name="BackgroundHoverTracksTheMouseWithoutFillOrRaycastChanges" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.BackgroundHoverTracksTheMouseWithoutFillOrRaycastChanges" methodname="BackgroundHoverTracksTheMouseWithoutFillOrRaycastChanges" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1680915718" result="Failed" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:04Z" duration="0.261349" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: greater than 0.949999988f
+  But was:  0.0f
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests+<BackgroundHoverTracksTheMouseWithoutFillOrRaycastChanges>d__19.MoveNext () [0x00135] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\FrutigerAeroPlayModeTests.cs:360
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+              <test-case id="1042" name="ClickFeedbackShakesAndSettlesEvenWhileGameTimeIsPaused" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.ClickFeedbackShakesAndSettlesEvenWhileGameTimeIsPaused" methodname="ClickFeedbackShakesAndSettlesEvenWhileGameTimeIsPaused" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="484204614" result="Failed" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:04Z" duration="0.089054" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests+<ClickFeedbackShakesAndSettlesEvenWhileGameTimeIsPaused>d__13.MoveNext () [0x000b5] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\FrutigerAeroPlayModeTests.cs:225
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1041" name="EmoteCenterTracksScreenCenterAndClosesWithoutATitlebar" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.EmoteCenterTracksScreenCenterAndClosesWithoutATitlebar" methodname="EmoteCenterTracksScreenCenterAndClosesWithoutATitlebar" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="520584893" result="Passed" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:04Z" duration="0.107364" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+              <test-case id="1039" name="GeneratedMenuEntriesKeepFrutigerRegularAndBold" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.GeneratedMenuEntriesKeepFrutigerRegularAndBold" methodname="GeneratedMenuEntriesKeepFrutigerRegularAndBold" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="340724725" result="Failed" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:04Z" duration="0.190376" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  ExperienceFloatingText(Clone)
+  Expected: <Frutiger SDF (TMPro.TMP_FontAsset)>
+  But was:  <Frutiger Bold SDF (TMPro.TMP_FontAsset)>
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests+<GeneratedMenuEntriesKeepFrutigerRegularAndBold>d__10.MoveNext () [0x000de] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\FrutigerAeroPlayModeTests.cs:167
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+              <test-case id="1040" name="HoverDetailsClampInsideWindowAndDraggingMovesTheLargeTree" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.HoverDetailsClampInsideWindowAndDraggingMovesTheLargeTree" methodname="HoverDetailsClampInsideWindowAndDraggingMovesTheLargeTree" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1029666415" result="Passed" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:04Z" duration="0.103505" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+              <test-case id="1043" name="HoverLightFadesAndRespectsDisabledControlsWhilePaused" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.HoverLightFadesAndRespectsDisabledControlsWhilePaused" methodname="HoverLightFadesAndRespectsDisabledControlsWhilePaused" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="472683070" result="Failed" start-time="2026-10-24 11:14:04Z" end-time="2026-10-24 11:14:05Z" duration="0.241551" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: greater than 0.949999988f
+  But was:  0.0f
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests+<HoverLightFadesAndRespectsDisabledControlsWhilePaused>d__14.MoveNext () [0x000fc] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\FrutigerAeroPlayModeTests.cs:254
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1047" name="LiquidClockAndPromptFloatContinueWhileGameTimeIsPaused" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.LiquidClockAndPromptFloatContinueWhileGameTimeIsPaused" methodname="LiquidClockAndPromptFloatContinueWhileGameTimeIsPaused" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="122098277" result="Passed" start-time="2026-10-24 11:14:05Z" end-time="2026-10-24 11:14:05Z" duration="0.352514" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1038" name="MKeyTogglesListAndMenuSelectionTransfersInputLock" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.MKeyTogglesListAndMenuSelectionTransfersInputLock" methodname="MKeyTogglesListAndMenuSelectionTransfersInputLock" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1330732305" result="Failed" start-time="2026-10-24 11:14:05Z" end-time="2026-10-24 11:14:05Z" duration="0.077278" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests+<MKeyTogglesListAndMenuSelectionTransfersInputLock>d__9.MoveNext () [0x0009e] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\PlayMode\FrutigerAeroPlayModeTests.cs:140
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+                </failure>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1035" name="PanelsSwitchExclusivelyAndCloseRestoresControls" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.PanelsSwitchExclusivelyAndCloseRestoresControls" methodname="PanelsSwitchExclusivelyAndCloseRestoresControls" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1720661012" result="Passed" start-time="2026-10-24 11:14:05Z" end-time="2026-10-24 11:14:05Z" duration="0.108965" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+              <test-case id="1046" name="PromptFloatsGentlyWithoutDriftingWhenRepeatedlyRefreshed" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.PromptFloatsGentlyWithoutDriftingWhenRepeatedlyRefreshed" methodname="PromptFloatsGentlyWithoutDriftingWhenRepeatedlyRefreshed" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1136902471" result="Passed" start-time="2026-10-24 11:14:05Z" end-time="2026-10-24 11:14:06Z" duration="0.396240" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1045" name="PromptUsesActionOnLeftAndGatherRecipeOrConsumptionOnRight" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.PromptUsesActionOnLeftAndGatherRecipeOrConsumptionOnRight" methodname="PromptUsesActionOnLeftAndGatherRecipeOrConsumptionOnRight" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1457819582" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.075272" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1044" name="ResourcePromptsUseGeneratedStoneAndThePillarsActualConstructionResource" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.ResourcePromptsUseGeneratedStoneAndThePillarsActualConstructionResource" methodname="ResourcePromptsUseGeneratedStoneAndThePillarsActualConstructionResource" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1953550902" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.075100" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1036" name="RuntimeBoardsKeepAllFiftyNodesInsideBoundsAndTabsSelectTheCorrectJob" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.RuntimeBoardsKeepAllFiftyNodesInsideBoundsAndTabsSelectTheCorrectJob" methodname="RuntimeBoardsKeepAllFiftyNodesInsideBoundsAndTabsSelectTheCorrectJob" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="920405327" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.101566" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+              <test-case id="1037" name="SelectingEachProfessionKeepsTheOriginalBrightBlueGlass" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests.SelectingEachProfessionKeepsTheOriginalBrightBlueGlass" methodname="SelectingEachProfessionKeepsTheOriginalBrightBlueGlass" classname="TowerOfBabel.Resources.Tests.FrutigerAeroPlayModeTests" runstate="Runnable" seed="1568461890" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.121097" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+There are no audio listeners in the scene. Please ensure there is always one audio listener in the scene
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1049" name="FrutigirGirlPlayModeTests" fullname="TowerOfBabel.Resources.Tests.FrutigirGirlPlayModeTests" classname="TowerOfBabel.Resources.Tests.FrutigirGirlPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.022174" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1050" name="EmoteAndNetworkAnimationUseJumpAndReturnToLocomotion" fullname="TowerOfBabel.Resources.Tests.FrutigirGirlPlayModeTests.EmoteAndNetworkAnimationUseJumpAndReturnToLocomotion" methodname="EmoteAndNetworkAnimationUseJumpAndReturnToLocomotion" classname="TowerOfBabel.Resources.Tests.FrutigirGirlPlayModeTests" runstate="Runnable" seed="671044243" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.019723" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1051" name="ResourceInteractionPlayModeTests" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.171152" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1057" name="AuthoritativeCooldown_DisablesAndRestoresResource" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.AuthoritativeCooldown_DisablesAndRestoresResource" methodname="AuthoritativeCooldown_DisablesAndRestoresResource" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="85803912" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.061034" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="ClientCancel_SendsServerCancelRequest" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.ClientCancel_SendsServerCancelRequest" methodname="ClientCancel_SendsServerCancelRequest" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1204434847" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.007388" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="DisabledResource_CancelsActiveInteraction" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.DisabledResource_CancelsActiveInteraction" methodname="DisabledResource_CancelsActiveInteraction" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1765800837" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.005492" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1060" name="GatherRejection_ReleasesLocalGatherWithOrWithoutListener" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.GatherRejection_ReleasesLocalGatherWithOrWithoutListener" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.006309" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1058" name="GatherRejection_ReleasesLocalGatherWithOrWithoutListener(True)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.GatherRejection_ReleasesLocalGatherWithOrWithoutListener(True)" methodname="GatherRejection_ReleasesLocalGatherWithOrWithoutListener" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1160846515" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.003290" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1059" name="GatherRejection_ReleasesLocalGatherWithOrWithoutListener(False)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.GatherRejection_ReleasesLocalGatherWithOrWithoutListener(False)" methodname="GatherRejection_ReleasesLocalGatherWithOrWithoutListener" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1433215590" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.000355" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1063" name="Inventory_BuildsZeroAmountRow_AndUpdatesFromWalletEvent" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.Inventory_BuildsZeroAmountRow_AndUpdatesFromWalletEvent" methodname="Inventory_BuildsZeroAmountRow_AndUpdatesFromWalletEvent" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1046509073" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.007969" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1062" name="InventoryToggle_DoesNotCancelActiveGathering" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.InventoryToggle_DoesNotCancelActiveGathering" methodname="InventoryToggle_DoesNotCancelActiveGathering" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1287623064" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.006437" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1064" name="NetworkBootstrap_StartHost_StartsServerAndClient_AndSecondCallDoesNothing" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.NetworkBootstrap_StartHost_StartsServerAndClient_AndSecondCallDoesNothing" methodname="NetworkBootstrap_StartHost_StartsServerAndClient_AndSecondCallDoesNothing" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="34195212" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.044869" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[SpawnablePrefabs is null on NetworkSystem. Select the NetworkManager in scene InitTestScene5c2181a4-8a79-45ba-bd95-36bcf1ee4d36 and choose a prefabs file. Choosing DefaultPrefabObjects will automatically populate prefabs for you.
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1061" name="PlayerControlStateMachine_DisconnectInterruptsGatheringAndRelock" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.PlayerControlStateMachine_DisconnectInterruptsGatheringAndRelock" methodname="PlayerControlStateMachine_DisconnectInterruptsGatheringAndRelock" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1322698080" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.005243" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="Raycaster_StartAndSecondActionCancel_LocksAndUnlocksControls" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.Raycaster_StartAndSecondActionCancel_LocksAndUnlocksControls" methodname="Raycaster_StartAndSecondActionCancel_LocksAndUnlocksControls" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1975310067" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.005970" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="ResourceCompletion_DoesNotPredictWalletOrCooldown" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.ResourceCompletion_DoesNotPredictWalletOrCooldown" methodname="ResourceCompletion_DoesNotPredictWalletOrCooldown" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="1932908599" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.010176" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="ServerRejection_CancelsLocallyWithoutCancelEcho" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests.ServerRejection_CancelsLocallyWithoutCancelEcho" methodname="ServerRejection_CancelsLocallyWithoutCancelEcho" classname="TowerOfBabel.Resources.Tests.ResourceInteractionPlayModeTests" runstate="Runnable" seed="415013273" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:06Z" duration="0.005822" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Local server is stopping for Tugboat.
+Local server is stopped for Tugboat.
+Local client is stopped for Tugboat.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1065" name="ResourceProcessorPlayModeTests" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:20Z" duration="13.627986" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1067" name="Cancellation_DisablingAndDisconnecting_DoNotConsumeOrGrantExperience" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.Cancellation_DisablingAndDisconnecting_DoNotConsumeOrGrantExperience" methodname="Cancellation_DisablingAndDisconnecting_DoNotConsumeOrGrantExperience" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="520774422" result="Passed" start-time="2026-10-24 11:14:06Z" end-time="2026-10-24 11:14:07Z" duration="0.888929" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[NetworkManager on object NetworkSystem is being destroyed due to persistence type DestroyNewest. A NetworkManager instance already exist on NetworkSystem.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1070" name="DelayedReply_DoesNotInterruptANewerRequestOnTheSameProcessor" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.DelayedReply_DoesNotInterruptANewerRequestOnTheSameProcessor" methodname="DelayedReply_DoesNotInterruptANewerRequestOnTheSameProcessor" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="1322564882" result="Passed" start-time="2026-10-24 11:14:07Z" end-time="2026-10-24 11:14:10Z" duration="2.999304" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1072" name="HostGlass_CancellationKeepsSandAndConfirmedExchangeRevealsGlassExactlyOnce" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.HostGlass_CancellationKeepsSandAndConfirmedExchangeRevealsGlassExactlyOnce" methodname="HostGlass_CancellationKeepsSandAndConfirmedExchangeRevealsGlassExactlyOnce" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="2127481569" result="Passed" start-time="2026-10-24 11:14:10Z" end-time="2026-10-24 11:14:13Z" duration="2.563904" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1066" name="HostProcessing_ExchangesOnCompletion_UpdatesWalletAndGrantsProcessExperience" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.HostProcessing_ExchangesOnCompletion_UpdatesWalletAndGrantsProcessExperience" methodname="HostProcessing_ExchangesOnCompletion_UpdatesWalletAndGrantsProcessExperience" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="1939818235" result="Passed" start-time="2026-10-24 11:14:13Z" end-time="2026-10-24 11:14:14Z" duration="1.074746" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1073" name="HostSand_GatheringCancellationAndCooldownPreserveResourceAuthority" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.HostSand_GatheringCancellationAndCooldownPreserveResourceAuthority" methodname="HostSand_GatheringCancellationAndCooldownPreserveResourceAuthority" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="1277774166" result="Passed" start-time="2026-10-24 11:14:14Z" end-time="2026-10-24 11:14:15Z" duration="1.546184" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1068" name="MissingMaterialsAndFullOutput_RejectStartAndRecheckAtCompletion" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.MissingMaterialsAndFullOutput_RejectStartAndRecheckAtCompletion" methodname="MissingMaterialsAndFullOutput_RejectStartAndRecheckAtCompletion" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="1240495689" result="Passed" start-time="2026-10-24 11:14:15Z" end-time="2026-10-24 11:14:17Z" duration="1.503398" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1074" name="RockCooldown_LeavesBricksEmitsMeshChipsAndRestoresTheNode" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.RockCooldown_LeavesBricksEmitsMeshChipsAndRestoresTheNode" methodname="RockCooldown_LeavesBricksEmitsMeshChipsAndRestoresTheNode" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="1002399622" result="Passed" start-time="2026-10-24 11:14:17Z" end-time="2026-10-24 11:14:18Z" duration="0.909917" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+]]></output>
+              </test-case>
+              <test-case id="1069" name="ServerProcessing_AppliesProcessUpgradesAndSnapshotsRecipeAtStart" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.ServerProcessing_AppliesProcessUpgradesAndSnapshotsRecipeAtStart" methodname="ServerProcessing_AppliesProcessUpgradesAndSnapshotsRecipeAtStart" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="546460332" result="Passed" start-time="2026-10-24 11:14:18Z" end-time="2026-10-24 11:14:19Z" duration="0.965265" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+              <test-case id="1071" name="SharedProcessor_AcceptsIndependentPlayersAndCancelsOnlyTheRequestedPlayer" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests.SharedProcessor_AcceptsIndependentPlayersAndCancelsOnlyTheRequestedPlayer" methodname="SharedProcessor_AcceptsIndependentPlayersAndCancelsOnlyTheRequestedPlayer" classname="TowerOfBabel.Resources.Tests.ResourceProcessorPlayModeTests" runstate="Runnable" seed="639625257" result="Passed" start-time="2026-10-24 11:14:19Z" end-time="2026-10-24 11:14:20Z" duration="1.171419" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+Local server is starting for Tugboat. Listening on port 7770.
+Local client is starting for Tugboat. Server IP is localhost, port is 7770.
+Local server is started for Tugboat.
+Remote connection started for Id 0.
+Local client is started for Tugboat.
+Local client is stopping for Tugboat.
+The character with Unicode value \u00B7 was not found in the [Frutiger SDF] font asset or any potential fallbacks. It was replaced by Unicode character \u0020 in text object [Profession].
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+        <test-suite type="TestSuite" id="1077" name="World" fullname="TowerOfBabel.World" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:25Z" duration="5.498639" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1078" name="Tests" fullname="TowerOfBabel.World.Tests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:25Z" duration="5.496249" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1019" name="GlassWaterFloorPlayModeTests" fullname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests" classname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:20Z" duration="0.020829" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1020" name="WaterProjection_OnlyEmitsAfterCompletionAndStopsOnRollbackOrPoolRelease" fullname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests.WaterProjection_OnlyEmitsAfterCompletionAndStopsOnRollbackOrPoolRelease" methodname="WaterProjection_OnlyEmitsAfterCompletionAndStopsOnRollbackOrPoolRelease" classname="TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests" runstate="Runnable" seed="616290921" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:20Z" duration="0.018837" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1021" name="TowerProgressionPlayModeTests" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:25Z" duration="5.473496" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1022" name="BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback" methodname="BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="326835218" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:20Z" duration="0.016738" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete" methodname="Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="1789807416" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:20Z" duration="0.015585" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus" methodname="Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="693216720" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:20Z" duration="0.011623" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds" methodname="Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="1582962083" result="Passed" start-time="2026-10-24 11:14:20Z" end-time="2026-10-24 11:14:22Z" duration="2.163356" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry" fullname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry" methodname="Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry" classname="TowerOfBabel.World.Tests.TowerProgressionPlayModeTests" runstate="Runnable" seed="1975500394" result="Passed" start-time="2026-10-24 11:14:22Z" end-time="2026-10-24 11:14:25Z" duration="3.262073" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Saving results to: Temp/TowerRays-PlayMode.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

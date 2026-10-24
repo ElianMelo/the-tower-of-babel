@@ -20,6 +20,7 @@ namespace TowerOfBabel.Rendering
         }
         public Shader shaftShader;
         public ShaftSettings settings = new();
+        public AeroRaySettings raySettings;
         [NonSerialized] public float previewTime = -1;
         private Material material;
         private ShaftPass pass;
@@ -51,10 +52,11 @@ namespace TowerOfBabel.Rendering
             private sealed class ScatterData
             {
                 public Material material;
-                public TextureHandle depth, shadow;
+                public TextureHandle depth, shadow, additionalShadow;
                 public Vector4 parameters;
+                public Vector4 volume0, volume1, blend, noise, velocity, fills;
                 public Color tint;
-                public float clock;
+                public float clock, sunHasCasters;
             }
             private sealed class CompositeData
             {
@@ -67,29 +69,61 @@ namespace TowerOfBabel.Rendering
             {
                 var resources = frameData.Get<UniversalResourceData>();
                 var lights = frameData.Get<UniversalLightData>();
+                var camera = frameData.Get<UniversalCameraData>().camera;
+                var context = AeroTowerLightContext.ForCamera(camera);
+                if (context == null || !context.HasGeometry || context.InteriorWeight <= .0001f) return;
                 if (!resources.cameraDepthTexture.IsValid() || !resources.mainShadowsTexture.IsValid() || lights.mainLightIndex < 0) return;
+                var profile = context.raySettings != null ? context.raySettings : owner.raySettings;
+                if (profile == null || profile.intensity <= 0) return;
                 var descriptor = resources.activeColorTexture.GetDescriptor(graph);
                 descriptor.name = "Aero half-resolution sun shafts";
-                descriptor.width = Mathf.Max(1, (descriptor.width + 1) / 2);
-                descriptor.height = Mathf.Max(1, (descriptor.height + 1) / 2);
+                descriptor.width = Mathf.Max(1, (descriptor.width + profile.Downsample - 1) / profile.Downsample);
+                descriptor.height = Mathf.Max(1, (descriptor.height + profile.Downsample - 1) / profile.Downsample);
                 descriptor.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
                 descriptor.depthBufferBits = DepthBits.None;
                 descriptor.msaaSamples = MSAASamples.None;
                 descriptor.clearBuffer = false;
                 var rays = graph.CreateTexture(descriptor);
                 var s = owner.settings;
+                var volume = VolumeManager.instance.stack.GetComponent<AeroShaftVolume>();
+                float intensity = volume != null && volume.active ? volume.intensity.value : 1;
+                float density = volume != null && volume.active ? volume.density.value : 1;
                 using (var builder = graph.AddRasterRenderPass<ScatterData>("Aero sun shadow scattering", out var d, scatter))
                 {
                     d.material = owner.material; d.depth = resources.cameraDepthTexture; d.shadow = resources.mainShadowsTexture;
-                    d.parameters = new Vector4(Mathf.Clamp(s.distance, 8, 48), Mathf.Clamp(s.density, .001f, .1f), s.intensity, Mathf.Clamp(s.samples, 8, 24));
+                    d.additionalShadow = resources.additionalShadowsTexture;
+                    d.parameters = new Vector4(Mathf.Clamp(profile.distance, 8, 32), Mathf.Clamp(profile.density * density, .001f, .1f), profile.intensity * s.intensity * intensity, profile.Steps);
+                    d.volume0 = context.Volume0; d.volume1 = context.Volume1; d.blend = context.VolumeBlend;
+                    d.noise = new Vector4(profile.noiseScale, profile.noiseContrast, profile.interiorHaze, profile.softness);
+                    d.velocity = profile.noiseVelocity;
+                    // ForwardLights packs visible lights in order, omitting the main light.
+                    // Call GetAdditionalPerObjectLight with these indices, never the screen tile/per-object iterator.
+                    d.fills = new Vector4(-1, -1, 0, 0);
+                    int additionalIndex = 0;
+                    for (int i = 0; i < lights.visibleLights.Length; i++)
+                    {
+                        if (i == lights.mainLightIndex) continue;
+                        for (int slot = 0; slot < Mathf.Min(2, context.bounceLights?.Length ?? 0); slot++)
+                            if (context.bounceLights[slot] != null && lights.visibleLights[i].light == context.bounceLights[slot] && context.bounceLights[slot].enabled)
+                                d.fills[slot] = additionalIndex;
+                        additionalIndex++;
+                    }
                     d.tint = s.tint; d.clock = owner.previewTime;
+                    d.sunHasCasters = frameData.Get<UniversalRenderingData>().cullResults.GetShadowCasterBounds(lights.mainLightIndex, out _) ? 1 : 0;
                     builder.UseTexture(d.depth, AccessFlags.Read); builder.UseTexture(d.shadow, AccessFlags.Read);
+                    if (d.additionalShadow.IsValid()) builder.UseTexture(d.additionalShadow, AccessFlags.Read);
+                    else d.fills = new Vector4(-1, -1, 0, 0);
                     builder.SetRenderAttachment(rays, 0, AccessFlags.WriteAll);
                     builder.SetRenderFunc(static (ScatterData data, RasterGraphContext ctx) =>
                     {
                         data.material.SetVector(Params, data.parameters); data.material.SetColor(Tint, data.tint);
                         data.material.SetFloat("_AeroShaftClock", data.clock);
+                        data.material.SetFloat("_AeroSunHasCasters", data.sunHasCasters);
                         data.material.SetTexture(Shadow, data.shadow);
+                        if (data.additionalShadow.IsValid()) data.material.SetTexture("_AdditionalLightsShadowmapTexture", data.additionalShadow);
+                        data.material.SetVector("_AeroTowerVolume0", data.volume0); data.material.SetVector("_AeroTowerVolume1", data.volume1);
+                        data.material.SetVector("_AeroTowerBlend", data.blend); data.material.SetVector("_AeroNoise", data.noise);
+                        data.material.SetVector("_AeroNoiseVelocity", data.velocity); data.material.SetVector("_AeroFillIndices", data.fills);
                         Blitter.BlitTexture(ctx.cmd, data.depth, new Vector4(1, 1, 0, 0), data.material, 0);
                     });
                 }

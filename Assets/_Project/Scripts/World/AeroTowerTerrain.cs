@@ -25,6 +25,10 @@ namespace TowerOfBabel.World
         [SerializeField, Min(1)] private float perimeterBlend = 65;
         [SerializeField] private int seed = 17;
         [SerializeField, Min(0)] private float meadowHeight = 12;
+        [Header("Island coastline")]
+        [SerializeField, Min(180)] private float islandRadius = 350;
+        [SerializeField, Min(20)] private float coastWidth = 90;
+        [SerializeField, Min(2)] private float seaBedDepth = 14;
         [Header("Small lakes revealing the existing ocean")]
         [SerializeField] private Transform oceanSurface;
         [SerializeField, Min(.25f)] private float lakeDepth = 3;
@@ -56,6 +60,7 @@ namespace TowerOfBabel.World
         public float ClearingRadius => clearingRadius;
         public int ClearedDetailCells { get; private set; }
         public float WaterElevation => oceanSurface != null ? oceanSurface.position.y : clearingElevation - 1;
+        public float CoastRadius(float angle) => islandRadius * (1 + .1f * Mathf.Sin(angle * 3 + seed) + .055f * Mathf.Cos(angle * 5 - seed * .3f));
         public LakeBasin[] Lakes => lakes == null ? Array.Empty<LakeBasin>() : (LakeBasin[])lakes.Clone();
 
         [ContextMenu("Generate Frutiger Aero Landscape")]
@@ -66,7 +71,7 @@ namespace TowerOfBabel.World
                 throw new InvalidOperationException("Assign a separate source and generated TerrainData; the source is never modified.");
             if (targetTerrain.transform.rotation != Quaternion.identity || targetTerrain.transform.lossyScale != Vector3.one)
                 throw new InvalidOperationException("The terrain must have an unrotated, unit-scale transform.");
-            if (generatedTerrainData.terrainLayers.Length != 3)
+            if (generatedTerrainData.terrainLayers.Length < 3)
                 throw new InvalidOperationException("Assign the green clearing, meadow and high meadow layers in that order.");
             ResolveClearing();
             var data = generatedTerrainData;
@@ -108,13 +113,24 @@ namespace TowerOfBabel.World
                     float radius = Mathf.Sqrt(px * px + pz * pz);
                     float height = SampleLandscapeHeight(new Vector2(px, pz));
                     float edge = Mathf.Min(Mathf.Min(localWorldX, size.x - localWorldX), Mathf.Min(localWorldZ, size.z - localWorldZ));
+                    // The entire perimeter is seabed; never blend the island back into the old mainland.
                     if (edge < perimeterBlend)
-                        height = Mathf.Lerp(origin.y + sourceTerrainData.GetInterpolatedHeight(localWorldX / size.x, localWorldZ / size.z), height,
-                            Smooth(edge / Mathf.Max(1, perimeterBlend)));
+                        height = Mathf.Lerp(WaterElevation - seaBedDepth, height, Smooth(edge / Mathf.Max(1, perimeterBlend)));
                     heights[z, x] = Mathf.Clamp01((height - origin.y) / size.y);
                 }
             }
             data.SetHeights(0, 0, heights);
+            // Do not draw a square seabed through the distant ocean. Retain the shallow
+            // shelf and lake bottoms, then let the ocean cover the deep perimeter.
+            int holesResolution = data.holesResolution;
+            var solid = new bool[holesResolution, holesResolution];
+            for (int z = 0; z < holesResolution; z++)
+            for (int x = 0; x < holesResolution; x++)
+            {
+                float h = origin.y + data.GetInterpolatedHeight((x + .5f) / holesResolution, (z + .5f) / holesResolution);
+                solid[z, x] = h > WaterElevation - 11;
+            }
+            data.SetHoles(0, 0, solid);
             PaintGround(data, heights, origin, size);
             ClearGrass(data, heights, origin, size);
             var trees = new List<TreeInstance>();
@@ -155,7 +171,11 @@ namespace TowerOfBabel.World
                     float apron = Mathf.Lerp(clearingElevation + 1.2f, height, approach);
                     height = Mathf.Lerp(height, Mathf.Min(height, apron), envelope);
                 }
-            return CarveLakes(point, height);
+            height = CarveLakes(point, height);
+            float shore = CoastRadius(Mathf.Atan2(point.y, point.x));
+            float coastal = Smooth((radius - (shore - coastWidth)) / coastWidth);
+            float beach = Mathf.Lerp(clearingElevation + .4f, WaterElevation - seaBedDepth, Smooth((radius - shore + 18) / 65));
+            return Mathf.Lerp(height, beach, coastal);
         }
 
         private float CarveLakes(Vector2 point, float height)
@@ -217,7 +237,8 @@ namespace TowerOfBabel.World
         private void PaintGround(TerrainData data, float[,] heights, Vector3 origin, Vector3 size)
         {
             int resolution = data.alphamapResolution;
-            var weights = new float[resolution, resolution, 3];
+            int layers = data.terrainLayers.Length;
+            var weights = new float[resolution, resolution, layers];
             int lastHeight = data.heightmapResolution - 1;
             for (int z = 0; z < resolution; z++)
             for (int x = 0; x < resolution; x++)
@@ -230,6 +251,12 @@ namespace TowerOfBabel.World
                 weights[z, x, 0] = 1 - meadow;
                 weights[z, x, 1] = meadow * (1 - highland);
                 weights[z, x, 2] = meadow * highland;
+                if (layers > 3)
+                {
+                    float sand = (1 - Smooth((height - WaterElevation - .5f) / 3)) * meadow;
+                    for (int i = 0; i < 3; i++) weights[z, x, i] *= 1 - sand;
+                    weights[z, x, 3] = sand;
+                }
             }
             data.SetAlphamaps(0, 0, weights);
         }
@@ -258,7 +285,7 @@ namespace TowerOfBabel.World
                     float dz = (heights[up, hx] - heights[down, hx]) * size.y / (Mathf.Max(1, up - down) * stepZ);
                     float slope = Mathf.Atan(Mathf.Sqrt(dx * dx + dz * dz)) * Mathf.Rad2Deg;
                     coverage *= 1 - Smooth((slope - grassSlopeLimit) / 10);
-                    float height = origin.y + heights[hz, hx] * size.y;
+                    float height = origin.y + data.GetInterpolatedHeight((x + .5f) / resolution, (z + .5f) / resolution);
                     coverage *= Smooth((height - WaterElevation - .3f) / 1.2f);
                     // Instance counts are authored independently of the source's 0–255 coverage map.
                     // Inheriting those coverage values as counts creates millions of unnecessary clumps.

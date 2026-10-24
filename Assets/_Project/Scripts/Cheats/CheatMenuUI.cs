@@ -13,6 +13,7 @@ using TowerOfBabel.Resources;
 using TowerOfBabel.Resources.Interaction;
 using TowerOfBabel.Upgrades;
 using TowerOfBabel.World.Chunks;
+using TowerOfBabel.World.Tower;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -335,7 +336,7 @@ namespace TowerOfBabel.Cheats
         private void TeleportFloor()
         {
             ResolvePlayer(); if (chunks == null || player == null || !chunks.IsFloorVisible(SelectedFloor)) { SetStatus("Complete the lower floors first, or build this floor using Construction."); return; }
-            var tiles = chunks.CachedChunks.Where(c => c.Key.FloorIndex == SelectedFloor).SelectMany(c => c.Assets).Where(a => a.AssetType == TowerOfBabel.World.Tower.TowerAssetType.Floor).OrderBy(a => (a.Position - player.transform.position).sqrMagnitude).ToArray();
+            var tiles = chunks.CachedChunks.Where(c => c.Key.FloorIndex == SelectedFloor).SelectMany(c => c.Assets).Where(a => a.AssetType.IsFloor()).OrderBy(a => (a.Position - player.transform.position).sqrMagnitude).ToArray();
             if (tiles.Length == 0) { SetStatus("No floor tiles at that level."); return; } Teleport(tiles[0].Position + Vector3.up * 2);
         }
         private void Teleport(Vector3 position)

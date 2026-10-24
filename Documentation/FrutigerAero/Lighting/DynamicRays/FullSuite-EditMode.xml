@@ -1,0 +1,1110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="150" result="Failed(Child)" total="150" passed="147" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-24 11:27:01Z" end-time="2026-10-24 11:27:07Z" duration="6,12526">
+  <test-suite type="TestSuite" id="1000" name="the-tower-of-babel" fullname="the-tower-of-babel" runstate="Runnable" testcasecount="150" result="Failed" site="Child" start-time="2026-10-24 11:27:01Z" end-time="2026-10-24 11:27:07Z" duration="6.125260" total="150" passed="147" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1038" name="TowerOfBabel.Rendering.Tests.EditMode.dll" fullname="D:/PersonalProjects/the-tower-of-babel/Library/ScriptAssemblies/TowerOfBabel.Rendering.Tests.EditMode.dll" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-10-24 11:27:01Z" end-time="2026-10-24 11:27:03Z" duration="1.400724" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16032" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1039" name="TowerOfBabel" fullname="TowerOfBabel" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-10-24 11:27:01Z" end-time="2026-10-24 11:27:03Z" duration="1.399887" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1040" name="Rendering" fullname="TowerOfBabel.Rendering" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:03Z" duration="1.300270" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1041" name="Tests" fullname="TowerOfBabel.Rendering.Tests" runstate="Runnable" testcasecount="30" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:03Z" duration="1.299549" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1004" name="AeroAtmosphereEditModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.225830" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1011" name="FillShafts_ShareNativeSpotShadowsAndRejectExteriorViews" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.FillShafts_ShareNativeSpotShadowsAndRejectExteriorViews" methodname="FillShafts_ShareNativeSpotShadowsAndRejectExteriorViews" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="185931317" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.064325" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1006" name="Lamp_HasRealSpotProjectionAndAnimatedCookieAndReleasesItsTexture" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.Lamp_HasRealSpotProjectionAndAnimatedCookieAndReleasesItsTexture" methodname="Lamp_HasRealSpotProjectionAndAnimatedCookieAndReleasesItsTexture" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="1230649061" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.026812" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1007" name="Lamps_SelectOnlyFourNearestWithOneShadowAndReleaseDistantCookies" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.Lamps_SelectOnlyFourNearestWithOneShadowAndReleaseDistantCookies" methodname="Lamps_SelectOnlyFourNearestWithOneShadowAndReleaseDistantCookies" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="967870543" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.005359" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1013" name="ProjectorCookie_ActuallyLightsStockSurfacesAndChangesTheRenderedPattern" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.ProjectorCookie_ActuallyLightsStockSurfacesAndChangesTheRenderedPattern" methodname="ProjectorCookie_ActuallyLightsStockSurfacesAndChangesTheRenderedPattern" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="1954078605" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.025960" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="SavedAtmosphere_HasBoundedQualityAndHDRGlow" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SavedAtmosphere_HasBoundedQualityAndHDRGlow" methodname="SavedAtmosphere_HasBoundedQualityAndHDRGlow" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="1978682888" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.013459" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1010" name="SunRays_CoveredNoonBlocksOverheadAndWorldNoiseIsRepeatable" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_CoveredNoonBlocksOverheadAndWorldNoiseIsRepeatable" methodname="SunRays_CoveredNoonBlocksOverheadAndWorldNoiseIsRepeatable" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="156569096" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.034513" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1009" name="SunRays_EnterOpenSidesBeneathASolidCoveredRoof" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_EnterOpenSidesBeneathASolidCoveredRoof" methodname="SunRays_EnterOpenSidesBeneathASolidCoveredRoof" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="274575351" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.012051" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1008" name="SunRays_RenderVisibleScatteringAndRespondToOccluders" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_RenderVisibleScatteringAndRespondToOccluders" methodname="SunRays_RenderVisibleScatteringAndRespondToOccluders" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="296454576" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.014345" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1012" name="SunRays_ZeroIntensityAndMissingSunAreNoOps" fullname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_ZeroIntensityAndMissingSunAreNoOps" methodname="SunRays_ZeroIntensityAndMissingSunAreNoOps" classname="TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests" runstate="Runnable" seed="1743596209" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.011784" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1014" name="AeroIslandAtmosphereEditModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.011584" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1017" name="Cycle_HasSmoothPeriodicSunriseAndNight" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.Cycle_HasSmoothPeriodicSunriseAndNight" methodname="Cycle_HasSmoothPeriodicSunriseAndNight" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="2005806338" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.001029" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1019" name="ExitAtmosphere_FadesTowardEverySideAndRejectsOtherHeights" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.ExitAtmosphere_FadesTowardEverySideAndRejectsOtherHeights" methodname="ExitAtmosphere_FadesTowardEverySideAndRejectsOtherHeights" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="494406934" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.000767" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1020" name="Fireflies_DoNotRequireLegacyBeamsAndFillStaysAnchoredUntilDark" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.Fireflies_DoNotRequireLegacyBeamsAndFillStaysAnchoredUntilDark" methodname="Fireflies_DoNotRequireLegacyBeamsAndFillStaysAnchoredUntilDark" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="1883405453" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.003961" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1016" name="FloorTransitions_BlendFixedVolumesWithoutResettingInteriorDensity" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.FloorTransitions_BlendFixedVolumesWithoutResettingInteriorDensity" methodname="FloorTransitions_BlendFixedVolumesWithoutResettingInteriorDensity" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="549249356" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.000824" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1018" name="Profile_AndMaterialsHaveSavedDependenciesAndNoShaderErrors" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.Profile_AndMaterialsHaveSavedDependenciesAndNoShaderErrors" methodname="Profile_AndMaterialsHaveSavedDependenciesAndNoShaderErrors" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="574181365" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.001718" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1015" name="QualityPresetsAndOrdinaryCameraSceneAreResolved" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.QualityPresetsAndOrdinaryCameraSceneAreResolved" methodname="QualityPresetsAndOrdinaryCameraSceneAreResolved" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="259850719" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.000533" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1021" name="SunFlare_UsesOcclusionAndRendererSupportsBothFlarePaths" fullname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.SunFlare_UsesOcclusionAndRendererSupportsBothFlarePaths" methodname="SunFlare_UsesOcclusionAndRendererSupportsBothFlarePaths" classname="TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests" runstate="Runnable" seed="351491468" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.000910" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1022" name="AeroLightEditModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.622669" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1024" name="CameraFilter_ExcludesReflectionAndPreviewCameras" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.CameraFilter_ExcludesReflectionAndPreviewCameras" methodname="CameraFilter_ExcludesReflectionAndPreviewCameras" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="2019515160" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.000837" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="Lake_UsesItsOwnReflectiveMaterialInTheSavedScene" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.Lake_UsesItsOwnReflectiveMaterialInTheSavedScene" methodname="Lake_UsesItsOwnReflectiveMaterialInTheSavedScene" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="1900032446" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.437844" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="NearbyEnvironment_ActuallyChangesOrdinaryLitSurfaceReflections" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.NearbyEnvironment_ActuallyChangesOrdinaryLitSurfaceReflections" methodname="NearbyEnvironment_ActuallyChangesOrdinaryLitSurfaceReflections" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="1643926406" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.013684" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1023" name="Range_HasFullNearLightAndASmoothFiniteFade" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.Range_HasFullNearLightAndASmoothFiniteFade" methodname="Range_HasFullNearLightAndASmoothFiniteFade" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="2052982181" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.000658" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="RenderGraph_DoesNotLightDistantGeometryOrTheSky" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_DoesNotLightDistantGeometryOrTheSky" methodname="RenderGraph_DoesNotLightDistantGeometryOrTheSky" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="1610695980" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.011804" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1029" name="RenderGraph_LeavesScreenSpaceInterfacePixelsUnchanged" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_LeavesScreenSpaceInterfacePixelsUnchanged" methodname="RenderGraph_LeavesScreenSpaceInterfacePixelsUnchanged" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="156527192" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.028834" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="RenderGraph_OnlyLightsWaterFootprintsAndNeverDarkensEdges" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_OnlyLightsWaterFootprintsAndNeverDarkensEdges" methodname="RenderGraph_OnlyLightsWaterFootprintsAndNeverDarkensEdges" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="130047510" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.097216" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1027" name="RenderGraph_ProjectsOnOrdinaryNearbyObjectsAndAnimates" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_ProjectsOnOrdinaryNearbyObjectsAndAnimates" methodname="RenderGraph_ProjectsOnOrdinaryNearbyObjectsAndAnimates" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="1890513495" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.011155" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="RenderGraph_WaterPatternStaysAttachedWhenTheCameraMoves" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_WaterPatternStaysAttachedWhenTheCameraMoves" methodname="RenderGraph_WaterPatternStaysAttachedWhenTheCameraMoves" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="540669119" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.008339" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="RenderGraph_ZeroStrengthIsAVisibleNoOp" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_ZeroStrengthIsAVisibleNoOp" methodname="RenderGraph_ZeroStrengthIsAVisibleNoOp" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="1845908649" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.007012" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="SavedFeature_HasBuildReferencesAndACompiledShader" fullname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.SavedFeature_HasBuildReferencesAndACompiledShader" methodname="SavedFeature_HasBuildReferencesAndACompiledShader" classname="TowerOfBabel.Rendering.Tests.AeroLightEditModeTests" runstate="Runnable" seed="1343205782" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:02Z" duration="0.001901" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1034" name="AeroOceanEditModeTests" fullname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests" classname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:03Z" duration="0.337620" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1035" name="Mesh_IsSeamlessUpwardFacingAndLighterThanTheOldPlane" fullname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests.Mesh_IsSeamlessUpwardFacingAndLighterThanTheOldPlane" methodname="Mesh_IsSeamlessUpwardFacingAndLighterThanTheOldPlane" classname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests" runstate="Runnable" seed="1576009812" result="Passed" start-time="2026-10-24 11:27:02Z" end-time="2026-10-24 11:27:03Z" duration="0.034825" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1037" name="RenderCoverage_HasNoSeamsOrExposedEdgeAtTowerHeightAndAfterMoving" fullname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests.RenderCoverage_HasNoSeamsOrExposedEdgeAtTowerHeightAndAfterMoving" methodname="RenderCoverage_HasNoSeamsOrExposedEdgeAtTowerHeightAndAfterMoving" classname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests" runstate="Runnable" seed="864100472" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.078837" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="SavedWater_UsesTheSeamlessMeshAndWorldSpaceMaterial" fullname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests.SavedWater_UsesTheSeamlessMeshAndWorldSpaceMaterial" methodname="SavedWater_UsesTheSeamlessMeshAndWorldSpaceMaterial" classname="TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests" runstate="Runnable" seed="2024908781" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.221341" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1182" name="TowerOfBabel.Resources.Tests.EditMode.dll" fullname="D:/PersonalProjects/the-tower-of-babel/Library/ScriptAssemblies/TowerOfBabel.Resources.Tests.EditMode.dll" runstate="Runnable" testcasecount="120" result="Failed" site="Child" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:07Z" duration="4.619871" total="120" passed="117" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16032" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1183" name="TowerOfBabel" fullname="TowerOfBabel" runstate="Runnable" testcasecount="120" result="Failed" site="Child" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:07Z" duration="4.616746" total="120" passed="117" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1186" name="Resources" fullname="TowerOfBabel.Resources" runstate="Runnable" testcasecount="84" result="Failed" site="Child" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:05Z" duration="2.348016" total="84" passed="81" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestSuite" id="1187" name="Tests" fullname="TowerOfBabel.Resources.Tests" runstate="Runnable" testcasecount="84" result="Failed" site="Child" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:05Z" duration="2.247773" total="84" passed="81" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-suite type="TestFixture" id="1083" name="AeroInteractionEditModeTests" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.131288" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1090" name="ButtonFeedbackTravelsThroughVertexDataWithoutCloningMaterials" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.ButtonFeedbackTravelsThroughVertexDataWithoutCloningMaterials" methodname="ButtonFeedbackTravelsThroughVertexDataWithoutCloningMaterials" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" seed="1313249652" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.006160" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="ConnectionsAreDrawnOnlyBetweenRevealedAdjacentSkills" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.ConnectionsAreDrawnOnlyBetweenRevealedAdjacentSkills" methodname="ConnectionsAreDrawnOnlyBetweenRevealedAdjacentSkills" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" seed="399229263" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.008456" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="RevisedArtworkWheelAndScrollableTreeAreBoundToReusablePrefabs" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.RevisedArtworkWheelAndScrollableTreeAreBoundToReusablePrefabs" methodname="RevisedArtworkWheelAndScrollableTreeAreBoundToReusablePrefabs" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" seed="635772500" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.012245" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1089" name="TooltipExplainsActualGameplayValuesAndRequirements" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.TooltipExplainsActualGameplayValuesAndRequirements" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.002397" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1086" name="TooltipExplainsActualGameplayValuesAndRequirements(Efficiency,0.25f,&quot;Reduces action time by 0.25 seconds.&quot;)" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.TooltipExplainsActualGameplayValuesAndRequirements(Efficiency,0.25f,&quot;Reduces action time by 0.25 seconds.&quot;)" methodname="TooltipExplainsActualGameplayValuesAndRequirements" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" seed="1811428644" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.000788" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1087" name="TooltipExplainsActualGameplayValuesAndRequirements(Cost,-3.0f,&quot;Reduces resource cost by 3.&quot;)" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.TooltipExplainsActualGameplayValuesAndRequirements(Cost,-3.0f,&quot;Reduces resource cost by 3.&quot;)" methodname="TooltipExplainsActualGameplayValuesAndRequirements" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" seed="410460735" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.000090" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1088" name="TooltipExplainsActualGameplayValuesAndRequirements(Production,4.0f,&quot;Increases production by 4 per action.&quot;)" fullname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests.TooltipExplainsActualGameplayValuesAndRequirements(Production,4.0f,&quot;Increases production by 4 per action.&quot;)" methodname="TooltipExplainsActualGameplayValuesAndRequirements" classname="TowerOfBabel.Resources.Tests.AeroInteractionEditModeTests" runstate="Runnable" seed="726040169" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.000085" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+            </test-suite>
+            <test-suite type="TestFixture" id="1091" name="AeroSurfaceEditModeTests" fullname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests" classname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.197863" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1094" name="BackgroundHoverDoesNotChangeRenderedInteriorColorOrAlpha" fullname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests.BackgroundHoverDoesNotChangeRenderedInteriorColorOrAlpha" methodname="BackgroundHoverDoesNotChangeRenderedInteriorColorOrAlpha" classname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests" runstate="Runnable" seed="1943270920" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.006386" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1092" name="BackgroundsUseBorderOnlyHoverAndSmallIconsUse64PixelTextures" fullname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests.BackgroundsUseBorderOnlyHoverAndSmallIconsUse64PixelTextures" methodname="BackgroundsUseBorderOnlyHoverAndSmallIconsUse64PixelTextures" classname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests" runstate="Runnable" seed="1530689729" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.012035" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1095" name="BorderLightTravelsWhileEveryRenderedEdgeAndInteriorOpacityStaysFixed" fullname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests.BorderLightTravelsWhileEveryRenderedEdgeAndInteriorOpacityStaysFixed" methodname="BorderLightTravelsWhileEveryRenderedEdgeAndInteriorOpacityStaysFixed" classname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests" runstate="Runnable" seed="1573534894" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.176203" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1093" name="GameplayMetadataKeepsGatherRecipeAndConstructionDistinct" fullname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests.GameplayMetadataKeepsGatherRecipeAndConstructionDistinct" methodname="GameplayMetadataKeepsGatherRecipeAndConstructionDistinct" classname="TowerOfBabel.Resources.Tests.AeroSurfaceEditModeTests" runstate="Runnable" seed="2022391101" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.001728" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1096" name="CheatAndTerrainEditModeTests" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:04Z" duration="0.877153" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1099" name="BulkConstruction_UpdatesStagesProgressionAndCacheVersionsTogether" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.BulkConstruction_UpdatesStagesProgressionAndCacheVersionsTogether" methodname="BulkConstruction_UpdatesStagesProgressionAndCacheVersionsTogether" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" seed="2086130383" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.005765" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1098" name="Capacity_IsPerPlayerClampsExistingBalancesAndHandlesOverflow" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Capacity_IsPerPlayerClampsExistingBalancesAndHandlesOverflow" methodname="Capacity_IsPerPlayerClampsExistingBalancesAndHandlesOverflow" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" seed="1090097837" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:03Z" duration="0.004582" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1100" name="CheatPrefab_ContainsEveryQuickActionAndAScrollableStatsList" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.CheatPrefab_ContainsEveryQuickActionAndAScrollableStatsList" methodname="CheatPrefab_ContainsEveryQuickActionAndAScrollableStatsList" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" seed="1743248315" result="Passed" start-time="2026-10-24 11:27:03Z" end-time="2026-10-24 11:27:04Z" duration="0.427370" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1097" name="Profiles_ClampValuesCopySnapshotsAndRestoreEveryDefault" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Profiles_ClampValuesCopySnapshotsAndRestoreEveryDefault" methodname="Profiles_ClampValuesCopySnapshotsAndRestoreEveryDefault" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" seed="663202229" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.001077" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1102" name="Terrain_GrassCoversDryOuterMeadowAndNeverTheTowerOrWater" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Terrain_GrassCoversDryOuterMeadowAndNeverTheTowerOrWater" methodname="Terrain_GrassCoversDryOuterMeadowAndNeverTheTowerOrWater" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" seed="1722894949" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.223343" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1101" name="Terrain_RetainsFoundationHasRollingMeadowsAndAccessibleLakeBanks" fullname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests.Terrain_RetainsFoundationHasRollingMeadowsAndAccessibleLakeBanks" methodname="Terrain_RetainsFoundationHasRollingMeadowsAndAccessibleLakeBanks" classname="TowerOfBabel.Resources.Tests.CheatAndTerrainEditModeTests" runstate="Runnable" seed="409305313" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.212927" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1103" name="FrutigerAeroEditModeTests" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" testcasecount="12" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.093744" total="12" passed="12" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1116" name="CameraFollowerRecognizesFrutigirGirlHead" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.CameraFollowerRecognizesFrutigirGirlHead" methodname="CameraFollowerRecognizesFrutigirGirlHead" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="122556040" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.004179" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1115" name="CharacterUsesNewRigForLocalAndRemoteAndEveryDanceUsesJump" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.CharacterUsesNewRigForLocalAndRemoteAndEveryDanceUsesJump" methodname="CharacterUsesNewRigForLocalAndRemoteAndEveryDanceUsesJump" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="84549735" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.064171" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1114" name="CompactScreensHaveDifferentLayoutsAndNearbyResourceAmounts" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.CompactScreensHaveDifferentLayoutsAndNearbyResourceAmounts" methodname="CompactScreensHaveDifferentLayoutsAndNearbyResourceAmounts" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1250434786" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000789" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1108" name="EveryUpgradeIncludingCapstoneFitsInsideBoard" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.006506" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1104" name="EveryUpgradeIncludingCapstoneFitsInsideBoard(1348,545)" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1348,545)" methodname="EveryUpgradeIncludingCapstoneFitsInsideBoard" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="45523177" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.002325" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1105" name="EveryUpgradeIncludingCapstoneFitsInsideBoard(1120,600)" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1120,600)" methodname="EveryUpgradeIncludingCapstoneFitsInsideBoard" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1864376815" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.001062" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1106" name="EveryUpgradeIncludingCapstoneFitsInsideBoard(1348,905)" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1348,905)" methodname="EveryUpgradeIncludingCapstoneFitsInsideBoard" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="212737212" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.001055" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1107" name="EveryUpgradeIncludingCapstoneFitsInsideBoard(1980,545)" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.EveryUpgradeIncludingCapstoneFitsInsideBoard(1980,545)" methodname="EveryUpgradeIncludingCapstoneFitsInsideBoard" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1403534249" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.001005" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1111" name="InventoryScrollIsClippedAndDataBindingsAreIntact" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.InventoryScrollIsClippedAndDataBindingsAreIntact" methodname="InventoryScrollIsClippedAndDataBindingsAreIntact" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1424286254" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.002731" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1113" name="LauncherReplacesBrandAndDockAndUsesM" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.LauncherReplacesBrandAndDockAndUsesM" methodname="LauncherReplacesBrandAndDockAndUsesM" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1081219054" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.003622" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1109" name="MainPrefabHasAllScreensAndFunctionalWindowCloseButtons" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.MainPrefabHasAllScreensAndFunctionalWindowCloseButtons" methodname="MainPrefabHasAllScreensAndFunctionalWindowCloseButtons" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1848823925" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000882" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1112" name="NodeStatesRemainReadableAndOnlyAvailableNodesCanBeClicked" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.NodeStatesRemainReadableAndOnlyAvailableNodesCanBeClicked" methodname="NodeStatesRemainReadableAndOnlyAvailableNodesCanBeClicked" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1307915750" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.002480" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1110" name="VisualsReusePrefabSourcesAndDoNotBlockButtons" fullname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests.VisualsReusePrefabSourcesAndDoNotBlockButtons" methodname="VisualsReusePrefabSourcesAndDoNotBlockButtons" classname="TowerOfBabel.Resources.Tests.FrutigerAeroEditModeTests" runstate="Runnable" seed="1332220042" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.005376" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1117" name="FrutigerFontEditModeTests" fullname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests" classname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.242627" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1119" name="AllAuthoredGameplayAndConsoleTextUsesFrutiger" fullname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.AllAuthoredGameplayAndConsoleTextUsesFrutiger" methodname="AllAuthoredGameplayAndConsoleTextUsesFrutiger" classname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests" runstate="Runnable" seed="1652728867" result="Failed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.018798" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Assets/_Project/UI/FrutigerAero/Prefabs/ExperienceBar.prefab: ·
+  Expected: True
+  But was:  False
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.AllAuthoredGameplayAndConsoleTextUsesFrutiger () [0x00109] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\EditMode\FrutigerFontEditModeTests.cs:55
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1118" name="RegularAndBoldUseSuppliedFacesWithMatchingAtlasSettings" fullname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.RegularAndBoldUseSuppliedFacesWithMatchingAtlasSettings" methodname="RegularAndBoldUseSuppliedFacesWithMatchingAtlasSettings" classname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests" runstate="Runnable" seed="1005399535" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.003630" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1120" name="TowerSceneHasNoOldFontOverrides" fullname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests.TowerSceneHasNoOldFontOverrides" methodname="TowerSceneHasNoOldFontOverrides" classname="TowerOfBabel.Resources.Tests.FrutigerFontEditModeTests" runstate="Runnable" seed="563752009" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.218868" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1121" name="ResourceInteractionEditModeTests" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" testcasecount="21" result="Failed" site="Child" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:05Z" duration="0.055959" total="21" passed="19" failed="2" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <failure>
+                <message><![CDATA[One or more child tests had errors]]></message>
+              </failure>
+              <test-case id="1124" name="Building_ExposesElevenStagesAndAppliesConfiguredMesh" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Building_ExposesElevenStagesAndAppliesConfiguredMesh" methodname="Building_ExposesElevenStagesAndAppliesConfiguredMesh" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1614648450" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.002577" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1143" name="InteractionUI_ShowsAndHidesAuthoredFields" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.InteractionUI_ShowsAndHidesAuthoredFields" methodname="InteractionUI_ShowsAndHidesAuthoredFields" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="837343929" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.004181" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1123" name="PlayerResourceWallet_AccumulatesStone" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.PlayerResourceWallet_AccumulatesStone" methodname="PlayerResourceWallet_AccumulatesStone" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1152852214" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000510" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1137" name="PlayerResourceWallet_RaisesChangedAmount" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.PlayerResourceWallet_RaisesChangedAmount" methodname="PlayerResourceWallet_RaisesChangedAmount" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1980322659" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000704" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1135" name="Raycaster_RefreshesFocusedPresentationWithoutChangingTarget" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Raycaster_RefreshesFocusedPresentationWithoutChangingTarget" methodname="Raycaster_RefreshesFocusedPresentationWithoutChangingTarget" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="649661721" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.003504" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1142" name="Resource_CancelRestoresVisualPosition" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Resource_CancelRestoresVisualPosition" methodname="Resource_CancelRestoresVisualPosition" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1150630027" result="Failed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.004906" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <failure>
+                  <message><![CDATA[  Expected: (0.00, 0.00, 0.00)
+  But was:  (1.00, 1.00, 1.00)
+]]></message>
+                  <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.Resource_CancelRestoresVisualPosition () [0x0008e] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\EditMode\ResourceInteractionEditModeTests.cs:308
+]]></stack-trace>
+                </failure>
+              </test-case>
+              <test-case id="1122" name="ResourceDefinition_CanUseShortTestDurations" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ResourceDefinition_CanUseShortTestDurations" methodname="ResourceDefinition_CanUseShortTestDurations" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="708095953" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000454" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1136" name="ResourceDefinitionCollection_ExposesConfiguredDefinitions" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ResourceDefinitionCollection_ExposesConfiguredDefinitions" methodname="ResourceDefinitionCollection_ExposesConfiguredDefinitions" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1910318009" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.002261" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1139" name="ServerPlayerResourceStore_CanGatherAfterSpendingAtCapacity" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_CanGatherAfterSpendingAtCapacity" methodname="ServerPlayerResourceStore_CanGatherAfterSpendingAtCapacity" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="375623131" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000422" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1140" name="ServerPlayerResourceStore_ConsumesOnlyWhenFullCostIsAvailable" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_ConsumesOnlyWhenFullCostIsAvailable" methodname="ServerPlayerResourceStore_ConsumesOnlyWhenFullCostIsAvailable" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1884668171" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000348" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1138" name="ServerPlayerResourceStore_EnforcesPerResourceCapacity" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_EnforcesPerResourceCapacity" methodname="ServerPlayerResourceStore_EnforcesPerResourceCapacity" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="962915540" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000276" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1141" name="ServerPlayerResourceStore_SeparatesPlayers" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerPlayerResourceStore_SeparatesPlayers" methodname="ServerPlayerResourceStore_SeparatesPlayers" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1428520047" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.000192" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1144" name="ServerStatusUI_ShowsConnectionStatesAndHidesWhenConnected" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.ServerStatusUI_ShowsConnectionStatesAndHidesWhenConnected" methodname="ServerStatusUI_ShowsConnectionStatesAndHidesWhenConnected" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1426179593" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.001481" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1125" name="TowerOutline_UsesSharedLineworkSettingsAndRestoresRenderingLayer" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerOutline_UsesSharedLineworkSettingsAndRestoresRenderingLayer" methodname="TowerOutline_UsesSharedLineworkSettingsAndRestoresRenderingLayer" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="32893440" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:04Z" duration="0.002332" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1134" name="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:05Z" duration="0.019723" total="3" passed="2" failed="1" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <failure>
+                  <message><![CDATA[One or more child tests had errors]]></message>
+                </failure>
+                <test-case id="1131" name="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(&quot;Assets/_Project/Prefabs/Buildings/Arch.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(&quot;Assets/_Project/Prefabs/Buildings/Arch.prefab&quot;)" methodname="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="951852747" result="Passed" start-time="2026-10-24 11:27:04Z" end-time="2026-10-24 11:27:05Z" duration="0.014170" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Cached 1 typed tower assets into 1 chunks.
+]]></output>
+                </test-case>
+                <test-case id="1132" name="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(&quot;Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(&quot;Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab&quot;)" methodname="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="654229459" result="Failed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.002569" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <failure>
+                    <message><![CDATA[  The interaction collider must sit above coplanar ground so the player raycast can focus the building.
+  Expected: same as <Floor_Tile(Clone) (UnityEngine.MeshCollider)>
+  But was:  <Test Ground (UnityEngine.BoxCollider)>
+]]></message>
+                    <stack-trace><![CDATA[at TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround (System.String prefabPath) [0x00193] in D:\PersonalProjects\the-tower-of-babel\Assets\_Project\Tests\EditMode\ResourceInteractionEditModeTests.cs:165
+]]></stack-trace>
+                  </failure>
+                  <output><![CDATA[Cached 1 typed tower assets into 1 chunks.
+]]></output>
+                </test-case>
+                <test-case id="1133" name="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(&quot;Assets/_Project/Prefabs/Buildings/Step_Tile.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround(&quot;Assets/_Project/Prefabs/Buildings/Step_Tile.prefab&quot;)" methodname="TowerPrefab_ColliderResolvesBuildingAndWinsAgainstGround" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="549342715" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001618" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[Cached 1 typed tower assets into 1 chunks.
+]]></output>
+                </test-case>
+              </test-suite>
+              <test-suite type="ParameterizedMethod" id="1130" name="TowerPrefab_HasWorkingSharedOutline" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.007523" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1126" name="TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Arch.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Arch.prefab&quot;)" methodname="TowerPrefab_HasWorkingSharedOutline" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1286080329" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001069" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1127" name="TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Floor_Tile.prefab&quot;)" methodname="TowerPrefab_HasWorkingSharedOutline" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="1520853203" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000244" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1128" name="TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Pillar.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Pillar.prefab&quot;)" methodname="TowerPrefab_HasWorkingSharedOutline" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="70166318" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000212" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1129" name="TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Step_Tile.prefab&quot;)" fullname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests.TowerPrefab_HasWorkingSharedOutline(&quot;Assets/_Project/Prefabs/Buildings/Step_Tile.prefab&quot;)" methodname="TowerPrefab_HasWorkingSharedOutline" classname="TowerOfBabel.Resources.Tests.ResourceInteractionEditModeTests" runstate="Runnable" seed="953580124" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000280" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+            </test-suite>
+            <test-suite type="TestFixture" id="1145" name="ResourceProcessorEditModeTests" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" testcasecount="14" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.124875" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1160" name="DuplicatedProcessors_HaveDistinctStableSceneIds" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.DuplicatedProcessors_HaveDistinctStableSceneIds" methodname="DuplicatedProcessors_HaveDistinctStableSceneIds" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1097388688" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001092" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1156" name="Exchange_IsAtomicAndRequiresFullOutputCapacity" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.100010" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1147" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(0,0,1,1,False,0,0)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(0,0,1,1,False,0,0)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="2000192972" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000712" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1148" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,1,1,True,0,1)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,1,1,True,0,1)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1138674146" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000071" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1149" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(3,4,2,3,True,1,7)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,4,2,3,True,1,7)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1882760335" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000060" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1150" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,2,1,False,1,0)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(1,0,2,1,False,1,0)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="183821178" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000058" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1151" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(3,49,1,2,False,3,49)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,49,1,2,False,3,49)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1609078069" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000121" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1152" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(3,50,1,1,False,3,50)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,50,1,1,False,3,50)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1594661764" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000064" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1153" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,0,1,False,3,0)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,0,1,False,3,0)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1590086249" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000060" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1154" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,1,0,False,3,0)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,0,1,0,False,3,0)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="44057993" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000057" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1155" name="Exchange_IsAtomicAndRequiresFullOutputCapacity(3,1,1,int.MaxValue,False,3,1)" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_IsAtomicAndRequiresFullOutputCapacity(3,1,1,int.MaxValue,False,3,1)" methodname="Exchange_IsAtomicAndRequiresFullOutputCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1952371972" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000059" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1157" name="Exchange_RechecksBalancesAndKeepsPlayersIndependent" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_RechecksBalancesAndKeepsPlayersIndependent" methodname="Exchange_RechecksBalancesAndKeepsPlayersIndependent" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="470606668" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000391" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1158" name="Exchange_SameResourceUsesNetAmountAtCapacity" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Exchange_SameResourceUsesNetAmountAtCapacity" methodname="Exchange_SameResourceUsesNetAmountAtCapacity" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1174730604" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000164" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1159" name="Processor_UsesOnlyProcessUpgradesAndClampsCostAndDuration" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.Processor_UsesOnlyProcessUpgradesAndClampsCostAndDuration" methodname="Processor_UsesOnlyProcessUpgradesAndClampsCostAndDuration" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1213052905" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.014737" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Script NetworkUpgradeService on object Upgrade test service added a NetworkObject component to Upgrade test service.
+]]></output>
+              </test-case>
+              <test-case id="1146" name="StoneProcessorPrefab_HasRecipeAndResolvableInteractionCollider" fullname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests.StoneProcessorPrefab_HasRecipeAndResolvableInteractionCollider" methodname="StoneProcessorPrefab_HasRecipeAndResolvableInteractionCollider" classname="TowerOfBabel.Resources.Tests.ResourceProcessorEditModeTests" runstate="Runnable" seed="1928109903" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.006530" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1161" name="SandGlassTerrainEditModeTests" fullname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" classname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.490294" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1165" name="KilnPresentation_ConsumesFeedBeforeOutputAndPreservesCollider" fullname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests.KilnPresentation_ConsumesFeedBeforeOutputAndPreservesCollider" methodname="KilnPresentation_ConsumesFeedBeforeOutputAndPreservesCollider" classname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" runstate="Runnable" seed="614588060" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.005543" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1166" name="Landscape_UsesLightweightDataAndDistinctEditorRuntimeBudgets" fullname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests.Landscape_UsesLightweightDataAndDistinctEditorRuntimeBudgets" methodname="Landscape_UsesLightweightDataAndDistinctEditorRuntimeBudgets" classname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" runstate="Runnable" seed="8453141" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.461427" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1162" name="ResourceDefinitions_PreserveExistingIdsAndExposeEveryResourceWithAnIcon" fullname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests.ResourceDefinitions_PreserveExistingIdsAndExposeEveryResourceWithAnIcon" methodname="ResourceDefinitions_PreserveExistingIdsAndExposeEveryResourceWithAnIcon" classname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" runstate="Runnable" seed="1051929859" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001655" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1163" name="ResourcePrefabs_HaveFixedCollidersCappedParticleSystemsAndCorrectKilnRecipe" fullname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests.ResourcePrefabs_HaveFixedCollidersCappedParticleSystemsAndCorrectKilnRecipe" methodname="ResourcePrefabs_HaveFixedCollidersCappedParticleSystemsAndCorrectKilnRecipe" classname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" runstate="Runnable" seed="1652830083" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.003169" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1164" name="SandGathering_ShrinksPresentationAndCancellationRestoresWithoutMovingCollider" fullname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests.SandGathering_ShrinksPresentationAndCancellationRestoresWithoutMovingCollider" methodname="SandGathering_ShrinksPresentationAndCancellationRestoresWithoutMovingCollider" classname="TowerOfBabel.Resources.Tests.SandGlassTerrainEditModeTests" runstate="Runnable" seed="513617871" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.016357" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1167" name="UpgradeSystemEditModeTests" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.029069" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1176" name="AbsoluteLevel_GrantsPointsOnlyForLevelsGainedAndResetsExperience" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.AbsoluteLevel_GrantsPointsOnlyForLevelsGainedAndResetsExperience" methodname="AbsoluteLevel_GrantsPointsOnlyForLevelsGainedAndResetsExperience" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="2102327451" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001024" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1180" name="BuyingBottomCenterRevealsLevelFiftyUpgrade" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.BuyingBottomCenterRevealsLevelFiftyUpgrade" methodname="BuyingBottomCenterRevealsLevelFiftyUpgrade" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="562822891" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001961" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1177" name="CheatPointGrantAndReset_ClearTheExpectedProgression" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.CheatPointGrantAndReset_ClearTheExpectedProgression" methodname="CheatPointGrantAndReset_ClearTheExpectedProgression" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="2141842931" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001165" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1174" name="Experience_IsIncrementalPerJobAndResetsAfterLevelUp" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Experience_IsIncrementalPerJobAndResetsAfterLevelUp" methodname="Experience_IsIncrementalPerJobAndResetsAfterLevelUp" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="426396533" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000973" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1175" name="Experience_StopsAtLevelFiftyWithFiftyPoints" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Experience_StopsAtLevelFiftyWithFiftyPoints" methodname="Experience_StopsAtLevelFiftyWithFiftyPoints" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1600881004" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001515" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1181" name="InputActions_BindUpgradeToTabAndInventoryToI" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InputActions_BindUpgradeToTabAndInventoryToI" methodname="InputActions_BindUpgradeToTabAndInventoryToI" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1518225963" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001414" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-suite type="ParameterizedMethod" id="1173" name="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.007992" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1168" name="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,2.0f,&quot;Efficiency\n-0.2s&quot;,False,&quot;Efficiency\n-2s&quot;)" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,2.0f,&quot;Efficiency\n-0.2s&quot;,False,&quot;Efficiency\n-2s&quot;)" methodname="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1249793755" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.002004" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1169" name="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,0.25f,&quot;Efficiency\n-0.2s&quot;,False,&quot;Efficiency\n-0.25s&quot;)" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Efficiency,0.25f,&quot;Efficiency\n-0.2s&quot;,False,&quot;Efficiency\n-0.25s&quot;)" methodname="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1723079268" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001040" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1170" name="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Cost,-3.0f,&quot;Cost\n-2&quot;,False,&quot;Cost\n-3&quot;)" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Cost,-3.0f,&quot;Cost\n-2&quot;,False,&quot;Cost\n-3&quot;)" methodname="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="722610719" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000730" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1171" name="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,4.0f,&quot;Production\n+2&quot;,False,&quot;Production\n+4&quot;)" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,4.0f,&quot;Production\n+2&quot;,False,&quot;Production\n+4&quot;)" methodname="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1581568687" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000708" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+                <test-case id="1172" name="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,5.0f,&quot;Level 50\nProduction +2&quot;,True,&quot;Level 50\nProduction +5&quot;)" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.InstantiatedUpgradeButton_DisplaysConfiguredEffectValue(Production,5.0f,&quot;Level 50\nProduction +2&quot;,True,&quot;Level 50\nProduction +5&quot;)" methodname="InstantiatedUpgradeButton_DisplaysConfiguredEffectValue" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1154769378" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000850" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                </test-case>
+              </test-suite>
+              <test-case id="1178" name="PlaceholderConfig_HasSevenBySevenGridAndOneCapstonePerJob" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.PlaceholderConfig_HasSevenBySevenGridAndOneCapstonePerJob" methodname="PlaceholderConfig_HasSevenBySevenGridAndOneCapstonePerJob" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="161189899" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000993" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1179" name="Purchases_StartAtCenterAndRevealOnlyOrthogonalNeighbors" fullname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests.Purchases_StartAtCenterAndRevealOnlyOrthogonalNeighbors" methodname="Purchases_StartAtCenterAndRevealOnlyOrthogonalNeighbors" classname="TowerOfBabel.Resources.Tests.UpgradeSystemEditModeTests" runstate="Runnable" seed="1180954132" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000322" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+        <test-suite type="TestSuite" id="1184" name="World" fullname="TowerOfBabel.World" runstate="Runnable" testcasecount="36" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:07Z" duration="2.265698" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1185" name="Tests" fullname="TowerOfBabel.World.Tests" runstate="Runnable" testcasecount="36" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:07Z" duration="2.177994" total="36" passed="36" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1042" name="ChunkManagerEditModeTests" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" testcasecount="19" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.196502" total="19" passed="19" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1047" name="CacheChunks_AssignsDeterministicTypeAndPositionOrderedLocalIndices" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.CacheChunks_AssignsDeterministicTypeAndPositionOrderedLocalIndices" methodname="CacheChunks_AssignsDeterministicTypeAndPositionOrderedLocalIndices" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1299044536" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.003636" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 3 typed tower assets into 1 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1046" name="CacheChunks_StoresPureDeterministicDataThatSurvivesAuthoringObjectDestruction" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.CacheChunks_StoresPureDeterministicDataThatSurvivesAuthoringObjectDestruction" methodname="CacheChunks_StoresPureDeterministicDataThatSurvivesAuthoringObjectDestruction" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="282527270" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.003605" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 2 typed tower assets into 2 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1044" name="ChebyshevDistance_CountsDiagonalAdjacentChunkAsOne" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ChebyshevDistance_CountsDiagonalAdjacentChunkAsOne" methodname="ChebyshevDistance_CountsDiagonalAdjacentChunkAsOne" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="252467340" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000344" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="ChunkManager_AdvancesOneStageAndNotifiesListeners" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ChunkManager_AdvancesOneStageAndNotifiesListeners" methodname="ChunkManager_AdvancesOneStageAndNotifiesListeners" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1516495214" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001869" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 1 typed tower assets into 1 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1048" name="ConfigureTower_CachesDataThenDestroysTemporaryAuthoringAssets" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ConfigureTower_CachesDataThenDestroysTemporaryAuthoringAssets" methodname="ConfigureTower_CachesDataThenDestroysTemporaryAuthoringAssets" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="2095761811" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.012498" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Tower configuration started.
+Cached 44 typed tower assets into 4 chunks.
+Tower configuration completed. Cached 44 assets in 4 chunks as data and removed temporary assets.
+]]></output>
+              </test-case>
+              <test-case id="1054" name="InstancedFarRenderer_CullsSpatialPagesBehindCamera" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.InstancedFarRenderer_CullsSpatialPagesBehindCamera" methodname="InstancedFarRenderer_CullsSpatialPagesBehindCamera" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1390088518" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.022458" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="InstancedFarRenderer_LoadsAndRemovesTypedChunkInstances" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.InstancedFarRenderer_LoadsAndRemovesTypedChunkInstances" methodname="InstancedFarRenderer_LoadsAndRemovesTypedChunkInstances" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1190592125" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.007897" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="NearPool_ChunkBoundaryOnlyReleasesAndPositionsChangedSlab" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.NearPool_ChunkBoundaryOnlyReleasesAndPositionsChangedSlab" methodname="NearPool_ChunkBoundaryOnlyReleasesAndPositionsChangedSlab" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="271171232" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.015290" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1051" name="NearPool_StageChangeDoesNotRecycleUnchangedChunkAssets" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.NearPool_StageChangeDoesNotRecycleUnchangedChunkAssets" methodname="NearPool_StageChangeDoesNotRecycleUnchangedChunkAssets" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1982250241" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001740" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 2 typed tower assets into 1 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1045" name="Neighborhood_WithRadiusOneContainsExactlyTwentySevenUniqueChunks" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.Neighborhood_WithRadiusOneContainsExactlyTwentySevenUniqueChunks" methodname="Neighborhood_WithRadiusOneContainsExactlyTwentySevenUniqueChunks" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="344777869" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001148" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="PlayerInstance_RejectsStaleSnapshots" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayerInstance_RejectsStaleSnapshots" methodname="PlayerInstance_RejectsStaleSnapshots" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1573055255" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000999" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1059" name="PlayersManager_PrioritizesFriendsAndUsesTwentyChunkCutoff" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_PrioritizesFriendsAndUsesTwentyChunkCutoff" methodname="PlayersManager_PrioritizesFriendsAndUsesTwentyChunkCutoff" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="461938257" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.008253" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[PlayersManager has no Remote Player Prefab; priority data will work without visuals.
+]]></output>
+              </test-case>
+              <test-case id="1061" name="PlayersManager_RemoteRegistrationRequestsSearchAfterInitialLocalSearch" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_RemoteRegistrationRequestsSearchAfterInitialLocalSearch" methodname="PlayersManager_RemoteRegistrationRequestsSearchAfterInitialLocalSearch" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1468624899" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.002598" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[PlayersManager has no Remote Player Prefab; priority data will work without visuals.
+]]></output>
+              </test-case>
+              <test-case id="1060" name="PlayersManager_ReturnsReleasedVisualToPool" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_ReturnsReleasedVisualToPool" methodname="PlayersManager_ReturnsReleasedVisualToPool" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="254183764" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.003706" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="SpatialIndex_CutsSearchPastTwentyChunks" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.SpatialIndex_CutsSearchPastTwentyChunks" methodname="SpatialIndex_CutsSearchPastTwentyChunks" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1909170511" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000519" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="SpatialIndex_UsesChunkDistanceAndRandomizesNearestTies" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.SpatialIndex_UsesChunkDistanceAndRandomizesNearestTies" methodname="SpatialIndex_UsesChunkDistanceAndRandomizesNearestTies" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="754254835" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000893" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="TowerRenderPrefabs_RetainInstancingVariantsForPlayerBuilds" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.TowerRenderPrefabs_RetainInstancingVariantsForPlayerBuilds" methodname="TowerRenderPrefabs_RetainInstancingVariantsForPlayerBuilds" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1317454396" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.001724" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1049" name="TowerVisibility_ImmediatelySwitchesChunkDataBetweenNearPoolAndFarRenderer" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.TowerVisibility_ImmediatelySwitchesChunkDataBetweenNearPoolAndFarRenderer" methodname="TowerVisibility_ImmediatelySwitchesChunkDataBetweenNearPoolAndFarRenderer" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="528478781" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.003469" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 2 typed tower assets into 2 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1043" name="WorldToChunk_UsesFloorDivisionForNegativeCoordinates" fullname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests.WorldToChunk_UsesFloorDivisionForNegativeCoordinates" methodname="WorldToChunk_UsesFloorDivisionForNegativeCoordinates" classname="TowerOfBabel.World.Tests.ChunkManagerEditModeTests" runstate="Runnable" seed="1830603545" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000254" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1062" name="DebugSupportEditModeTests" fullname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" classname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:07Z" duration="1.389633" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1064" name="FloorSupport_BridgeConnectsToTheDeckWithoutAddingAnOuterIsland" fullname="TowerOfBabel.World.Tests.DebugSupportEditModeTests.FloorSupport_BridgeConnectsToTheDeckWithoutAddingAnOuterIsland" methodname="FloorSupport_BridgeConnectsToTheDeckWithoutAddingAnOuterIsland" classname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" runstate="Runnable" seed="366812592" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.006212" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1063" name="InstantBuild_ProfileIsAnOffByDefaultBooleanAndResets" fullname="TowerOfBabel.World.Tests.DebugSupportEditModeTests.InstantBuild_ProfileIsAnOffByDefaultBooleanAndResets" methodname="InstantBuild_ProfileIsAnOffByDefaultBooleanAndResets" classname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" runstate="Runnable" seed="1882927610" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.000308" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1065" name="PillarSupportPad_HasRealWalkingCollisionAcrossItsBase" fullname="TowerOfBabel.World.Tests.DebugSupportEditModeTests.PillarSupportPad_HasRealWalkingCollisionAcrossItsBase" methodname="PillarSupportPad_HasRealWalkingCollisionAcrossItsBase" classname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" runstate="Runnable" seed="1805679189" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:05Z" duration="0.005872" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1066" name="RegeneratedTower_RetainsPillarSupportsAfterCuttingStairOpenings" fullname="TowerOfBabel.World.Tests.DebugSupportEditModeTests.RegeneratedTower_RetainsPillarSupportsAfterCuttingStairOpenings" methodname="RegeneratedTower_RetainsPillarSupportsAfterCuttingStairOpenings" classname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" runstate="Runnable" seed="1135947873" result="Passed" start-time="2026-10-24 11:27:05Z" end-time="2026-10-24 11:27:06Z" duration="0.056247" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1067" name="SavedTower_EveryPillarAndBushHasSupportIncludingShrinkingFloors" fullname="TowerOfBabel.World.Tests.DebugSupportEditModeTests.SavedTower_EveryPillarAndBushHasSupportIncludingShrinkingFloors" methodname="SavedTower_EveryPillarAndBushHasSupportIncludingShrinkingFloors" classname="TowerOfBabel.World.Tests.DebugSupportEditModeTests" runstate="Runnable" seed="1112534274" result="Passed" start-time="2026-10-24 11:27:06Z" end-time="2026-10-24 11:27:07Z" duration="1.312078" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1068" name="GlassIslandEditModeTests" fullname="TowerOfBabel.World.Tests.GlassIslandEditModeTests" classname="TowerOfBabel.World.Tests.GlassIslandEditModeTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.245444" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1072" name="FarRenderer_KeepsGlassBuiltStagesAndCullsItsEmptyBlueprint" fullname="TowerOfBabel.World.Tests.GlassIslandEditModeTests.FarRenderer_KeepsGlassBuiltStagesAndCullsItsEmptyBlueprint" methodname="FarRenderer_KeepsGlassBuiltStagesAndCullsItsEmptyBlueprint" classname="TowerOfBabel.World.Tests.GlassIslandEditModeTests" runstate="Runnable" seed="1601988117" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.006154" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1069" name="GlassLayout_HasTwoRingsCardinalSpokesAndCenterPool" fullname="TowerOfBabel.World.Tests.GlassIslandEditModeTests.GlassLayout_HasTwoRingsCardinalSpokesAndCenterPool" methodname="GlassLayout_HasTwoRingsCardinalSpokesAndCenterPool" classname="TowerOfBabel.World.Tests.GlassIslandEditModeTests" runstate="Runnable" seed="1972420379" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.000903" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1070" name="GlassPrefab_UsesGlassHasEveryStageAndSameWalkingDatum" fullname="TowerOfBabel.World.Tests.GlassIslandEditModeTests.GlassPrefab_UsesGlassHasEveryStageAndSameWalkingDatum" methodname="GlassPrefab_UsesGlassHasEveryStageAndSameWalkingDatum" classname="TowerOfBabel.World.Tests.GlassIslandEditModeTests" runstate="Runnable" seed="744309067" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.001367" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1071" name="SavedIsland_IsSubmergedOnAllEdgesAndRetainsConstructionAssets" fullname="TowerOfBabel.World.Tests.GlassIslandEditModeTests.SavedIsland_IsSubmergedOnAllEdgesAndRetainsConstructionAssets" methodname="SavedIsland_IsSubmergedOnAllEdgesAndRetainsConstructionAssets" classname="TowerOfBabel.World.Tests.GlassIslandEditModeTests" runstate="Runnable" seed="1223844955" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.234505" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1073" name="TowerProgressionEditModeTests" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.027371" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1079" name="BoundBuildings_RefreshTheirPresentationWhenTheFloorUnlocks" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests.BoundBuildings_RefreshTheirPresentationWhenTheFloorUnlocks" methodname="BoundBuildings_RefreshTheirPresentationWhenTheFloorUnlocks" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" seed="388602037" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.005401" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1078" name="Bushes_AppearOnlyOnCompletedAndUnlockedFloors" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Bushes_AppearOnlyOnCompletedAndUnlockedFloors" methodname="Bushes_AppearOnlyOnCompletedAndUnlockedFloors" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" seed="967878952" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.002308" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1074" name="Floors_UnlockOnlyAfterEveryAssetAcrossAllChunksIsComplete" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Floors_UnlockOnlyAfterEveryAssetAcrossAllChunksIsComplete" methodname="Floors_UnlockOnlyAfterEveryAssetAcrossAllChunksIsComplete" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" seed="988433539" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.001814" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1075" name="SnapshotAndRollback_RecomputeTheFirstUnfinishedFloor" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests.SnapshotAndRollback_RecomputeTheFirstUnfinishedFloor" methodname="SnapshotAndRollback_RecomputeTheFirstUnfinishedFloor" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" seed="604817742" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.001885" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1076" name="Visibility_HidesLaterFloorsEvenWhenSnapshotsContainBuiltAssets" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_HidesLaterFloorsEvenWhenSnapshotsContainBuiltAssets" methodname="Visibility_HidesLaterFloorsEvenWhenSnapshotsContainBuiltAssets" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" seed="1611271696" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.001776" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+              <test-case id="1077" name="Visibility_KeepsLockedChunksOutOfBothNearAndFarRendering" fullname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_KeepsLockedChunksOutOfBothNearAndFarRendering" methodname="Visibility_KeepsLockedChunksOutOfBothNearAndFarRendering" classname="TowerOfBabel.World.Tests.TowerProgressionEditModeTests" runstate="Runnable" seed="649405395" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.003299" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 4 typed tower assets into 4 chunks.
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-suite type="TestFixture" id="1080" name="TowerRayOcclusionEditModeTests" fullname="TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests" classname="TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.316344" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1081" name="ActualTower_ArchSourceIdentitiesAreUniqueAndSurviveConstructionChanges" fullname="TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests.ActualTower_ArchSourceIdentitiesAreUniqueAndSurviveConstructionChanges" methodname="ActualTower_ArchSourceIdentitiesAreUniqueAndSurviveConstructionChanges" classname="TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests" runstate="Runnable" seed="1959217157" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.310080" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="ShadowCache_RejectsBlueprintsAndHiddenFloorsAndUpdatesOnlyChangedChunks" fullname="TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests.ShadowCache_RejectsBlueprintsAndHiddenFloorsAndUpdatesOnlyChangedChunks" methodname="ShadowCache_RejectsBlueprintsAndHiddenFloorsAndUpdatesOnlyChangedChunks" classname="TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests" runstate="Runnable" seed="161449270" result="Passed" start-time="2026-10-24 11:27:07Z" end-time="2026-10-24 11:27:07Z" duration="0.004923" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Cached 3 typed tower assets into 3 chunks.
+Saving results to: Temp/TowerRays-EditMode.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

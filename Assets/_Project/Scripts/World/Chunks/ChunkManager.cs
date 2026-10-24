@@ -229,6 +229,7 @@ namespace TowerOfBabel.World.Chunks
             assetPrefabs.SetPrefab(TowerAssetType.Stair, generator.GetModelPrefab(TowerAssetType.Stair));
             assetPrefabs.SetPrefab(TowerAssetType.Pillar, generator.GetModelPrefab(TowerAssetType.Pillar));
             assetPrefabs.SetPrefab(TowerAssetType.Arch, generator.GetModelPrefab(TowerAssetType.Arch));
+            assetPrefabs.SetPrefab(TowerAssetType.GlassWaterFloor, generator.GetModelPrefab(TowerAssetType.GlassWaterFloor));
             radialFloors = TowerFloorLayout.SupportsRadialFloor(generator.GetModelPrefab(TowerAssetType.Floor));
             floorCenter = generator.center;
             floorRadialDepth = generator.tileDecreaseRate;
@@ -249,7 +250,7 @@ namespace TowerOfBabel.World.Chunks
             }
             foreach (var chunk in cachedChunks)
                 foreach (var asset in chunk.Assets)
-                    if (asset.AssetType != TowerAssetType.Floor) Add(asset);
+                    if (!asset.AssetType.IsFloor()) Add(asset);
             foreach (var asset in floors) Add(asset);
             var keys = new List<ChunkKey>(grouped.Keys); keys.Sort(); cachedChunks.Clear();
             foreach (var key in keys)

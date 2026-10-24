@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e26142425e324f49a20bd16f15882db, type: 3}
+  m_Name: AeroDayNight
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroDayNightProfile
+  cycleSeconds: 1200
+  startTime: 0.32
+  advanceTime: 1
+  sunAzimuth: 330
+  sunIntensity: 2.4
+  moonIntensity: 0.32
+  daySun: {r: 1, g: 0.97, b: 0.88, a: 1}
+  sunsetSun: {r: 1, g: 0.52, b: 0.24, a: 1}
+  moonColor: {r: 0.4, g: 0.63, b: 1, a: 1}
+  daySky: {r: 0.55, g: 0.67, b: 0.82, a: 1}
+  nightSky: {r: 0.19, g: 0.29, b: 0.45, a: 1}
+  dayExposure: 1
+  nightExposure: 0.22
+  beamIntensity: 1
+  beamDownAngle: 14
+  beamLength: 22
+  exitVolumeStrength: 0.5
+  fireflyDensity: 0.65
+  sunFlareIntensity: 0.4

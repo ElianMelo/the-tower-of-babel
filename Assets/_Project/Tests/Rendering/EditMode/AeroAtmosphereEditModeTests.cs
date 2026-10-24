@@ -111,6 +111,53 @@ namespace TowerOfBabel.Rendering.Tests
         }
 
         [Test]
+        public void SunRays_CoveredNoonBlocksOverheadAndWorldNoiseIsRepeatable()
+        {
+            WithShaftScene((camera,light,roof,capture)=>
+            {
+                Shafts.SetActive(true);light.transform.rotation=Quaternion.Euler(90,0,0);
+                roof.transform.position=new Vector3(0,5,0);roof.transform.localScale=new Vector3(100,.4f,100);
+                roof.GetComponent<Renderer>().shadowCastingMode=ShadowCastingMode.On;
+                roof.GetComponent<Renderer>().sharedMaterial.SetColor("_BaseColor",Color.black);
+                Shafts.previewTime=0;var clear=capture();roof.SetActive(true);var blocked=capture();
+                Shafts.SetActive(false);var opaqueRoof=capture();Shafts.SetActive(true);
+                Assert.That(Mean(blocked)-Mean(opaqueRoof),Is.LessThan(Mean(clear)*.15f),"Measure scattering separately from the visible ceiling material.");
+                roof.SetActive(false);Shafts.previewTime=10;var moved=capture();
+                Assert.That(Difference(clear,moved),Is.GreaterThan(.0001));
+                Shafts.previewTime=0;camera.transform.Rotate(0,10,0);capture();camera.transform.rotation=Quaternion.identity;
+                Assert.That(Difference(clear,capture()),Is.LessThan(.0001),"Returning to the same world view must reproduce the same shafts.");
+                Assert.That(moved.All(c=>!float.IsNaN(c.r)&&!float.IsInfinity(c.r)&&c.r>=0&&c.g>=0&&c.b>=0),Is.True);
+            });
+            Shafts.previewTime=-1;
+        }
+
+        [Test]
+        public void FillShafts_ShareNativeSpotShadowsAndRejectExteriorViews()
+        {
+            WithShaftScene((camera,sun,blocker,capture)=>
+            {
+                var fx=camera.scene.GetRootGameObjects().SelectMany(x=>x.GetComponentsInChildren<AeroTowerAtmosphere>()).Single();
+                var profile=UnityEngine.Object.Instantiate(fx.raySettings);fx.raySettings=profile;profile.fillStrength=20;
+                var fill=new GameObject("Native shadowed side fill",typeof(Light));SceneManager.MoveGameObjectToScene(fill,camera.scene);
+                fx.bounceLights=new[]{fill.GetComponent<Light>()};
+                fx.SetConstructionContext(true,new[]{new AeroArchOpening(1,0,new Vector3(0,2,13),Vector3.back)});
+                sun.intensity=.001f;
+                try
+                {
+                    for(int i=20;i<50;i++)fx.Sample(Vector3.up,i*.1f);
+                    Shafts.SetActive(false);var baseline=capture();Shafts.SetActive(true);var open=capture();
+                    Assert.That(Difference(baseline,open),Is.GreaterThan(.0005));
+                    blocker.transform.position=new Vector3(0,2,10);blocker.transform.localScale=new Vector3(60,60,.5f);blocker.SetActive(true);
+                    Assert.That(Mean(capture()),Is.LessThan(Mean(open)-.0003f),"The same native spotlight atlas must shadow the scattering.");
+                    for(int i=50;i<80;i++)fx.Sample(new Vector3(150,2,0),i*.1f);
+                    camera.transform.position=new Vector3(150,2,0);Shafts.SetActive(false);var exterior=capture();Shafts.SetActive(true);
+                    Assert.That(Difference(exterior,capture()),Is.LessThan(.0001));
+                }
+                finally{fx.raySettings=Shafts.raySettings;UnityEngine.Object.DestroyImmediate(profile);}
+            });
+        }
+
+        [Test]
         public void SunRays_ZeroIntensityAndMissingSunAreNoOps()
         {
             float intensity=Shafts.settings.intensity;
@@ -161,6 +208,8 @@ namespace TowerOfBabel.Rendering.Tests
 
         private void WithShaftScene(Action<Camera,Light,GameObject,Func<Color[]>> check)
         {
+            var oldSun=RenderSettings.sun;float oldClock=Shafts.previewTime;
+            var sceneLights=UnityEngine.Object.FindObjectsByType<Light>(FindObjectsSortMode.None).Where(l=>l.enabled).ToArray();foreach(var l in sceneLights)l.enabled=false;
             var scene=EditorSceneManager.NewPreviewScene();
             var oldTarget=RenderTexture.active; var rt=new RenderTexture(160,160,24); bool active=Shafts.isActive;
             var water=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<AeroLightRendererFeature>().Single(); bool oldWater=water.isActive;
@@ -176,6 +225,13 @@ namespace TowerOfBabel.Rendering.Tests
                 camera.clearFlags=CameraClearFlags.SolidColor; camera.backgroundColor=Color.black;
                 var sun=Move(new GameObject("Shaft fixture sun")).AddComponent<Light>(); sun.type=LightType.Directional; sun.intensity=2;
                 sun.shadows=LightShadows.Hard; sun.transform.rotation=Quaternion.Euler(20,180,0);
+                RenderSettings.sun=sun;
+                var contextRoot=Move(new GameObject("Bounded shaft fixture"));
+                var cycle=contextRoot.AddComponent<AeroDayNightCycle>(); cycle.profile=ScriptableObject.CreateInstance<AeroDayNightProfile>();
+                var context=contextRoot.AddComponent<AeroTowerAtmosphere>(); context.cycle=cycle; context.raySettings=Shafts.raySettings;
+                context.baseRadius=100; context.decrease=0; context.floorHeight=40;
+                context.SetConstructionContext(true,System.Array.Empty<AeroArchOpening>());
+                for(int i=0;i<20;i++) context.Sample(Vector3.up,i*.1f);
                 // A dark wall supplies opaque depth. The occluder sits above/outside the view, toward the sun.
                 var wall=Move(GameObject.CreatePrimitive(PrimitiveType.Cube)); wall.transform.position=new Vector3(0,0,16);
                 wall.transform.localScale=new Vector3(30,30,.2f); wall.GetComponent<Renderer>().sharedMaterial=mat; wall.GetComponent<Renderer>().shadowCastingMode=ShadowCastingMode.Off;
@@ -188,8 +244,10 @@ namespace TowerOfBabel.Rendering.Tests
             }
             finally
             {
+                foreach(var cycle in scene.GetRootGameObjects().SelectMany(x=>x.GetComponentsInChildren<AeroDayNightCycle>())) UnityEngine.Object.DestroyImmediate(cycle.profile);
                 Shafts.SetActive(active); water.SetActive(oldWater); RenderTexture.active=oldTarget; ShaderUtil.allowAsyncCompilation=async;
                 EditorSceneManager.ClosePreviewScene(scene); UnityEngine.Object.DestroyImmediate(mat); UnityEngine.Object.DestroyImmediate(shadowMaterial); UnityEngine.Object.DestroyImmediate(rt);
+                foreach(var l in sceneLights)if(l!=null)l.enabled=true;RenderSettings.sun=oldSun;Shafts.previewTime=oldClock;
             }
         }
         private static Color[] Read(RenderTexture rt)

@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-24",
+  "project": "D:/PersonalProjects/the-tower-of-babel/Assets",
+  "unity": "6000.3.11f1",
+  "graphics": "Direct3D11",
+  "editMode": {
+    "passed": 47,
+    "failed": 0,
+    "skipped": 0
+  },
+  "playMode": {
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "sceneDirty": false,
+  "playing": false,
+  "compilationFailed": false,
+  "totalAssets": 87972,
+  "glassCompositeTiles": 19114,
+  "cycleSeconds": 1200.0,
+  "startTime": 0.32,
+  "beamBudget": 48,
+  "fireflyBudget": 96,
+  "waterRegionBudget": 8,
+  "shaderErrors": [
+    {
+      "shader": "TowerOfBabel/Buildings/Glass water floor",
+      "errors": []
+    },
+    {
+      "shader": "TowerOfBabel/Atmosphere/Soft light VFX",
+      "errors": []
+    },
+    {
+      "shader": "Hidden/TowerOfBabel/Water Projection Cookie",
+      "errors": []
+    },
+    {
+      "shader": "Hidden/TowerOfBabel/Nearby Water Light",
+      "errors": []
+    },
+    {
+      "shader": "Hidden/TowerOfBabel/Sun Shafts",
+      "errors": []
+    }
+  ]
+}

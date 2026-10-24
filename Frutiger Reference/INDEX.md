@@ -1,5 +1,8 @@
 # Frutiger reference library
 
+- `Asset/Sun-Shafts-Cloud-User.png` — separated sunlight shafts and drifting atmospheric density, supplied with the dynamic interior ray plan.
+- `Asset/Forest-Haze-User.png` — restrained haze and soft occluded shafts, supplied with the dynamic interior ray plan.
+
 The user accepted the initial UI version on 2026-10-21. Read [Design direction and future priorities](../Documentation/FrutigerAero/DESIGN_DIRECTION.md) for the consolidated brief. `UI/Project-Fixed-Border-Review.png` is the accepted initial review; earlier images preserve iteration history.
 
 Consult this folder before creating a visual guide or changing this project's visual design. The palette is white, blue, and green, with glossy glass, soft highlights, nature imagery, and readable Frutiger typography. Start with the **Fixed borders and bright blue tabs** section below; earlier images are retained as history.
@@ -31,6 +34,10 @@ Current interactive revision images:
 Other `UI/Project-*` images document earlier UI revisions. They are dated context, rather than a requirement to preserve superseded layouts. New review images belong here as the design evolves.
 
 ## Asset
+
+### Continuous tower floors
+
+- `Asset/Tile-Gaps-And-Distance-Culling-User.png` — reported missing distant river/floor assets and visible grid joints in the covered tower interior. See [the repair and verification](../Documentation/FrutigerAero/Buildings/TILE_VISIBILITY_AND_JOINS.md) and its floor 0, 20 and 42 previews. Tile frames should not interrupt the continuous marble or enclosed river.
 
 ### Nearby water light and reflections
 
@@ -146,6 +153,10 @@ See [building kit notes](../Documentation/FrutigerAero/Buildings/README.md) for 
 - `UpgradesGrowth.png` — earlier detailed glass steps and growth arrow, retained as history; superseded by UpgradesSmall.png.
 
 The game consumes the originals in `Assets/_Project/UI/FrutigerAero/Art/`. Generation prompts are recorded in `Documentation/FrutigerAero/ArtPrompts.md`. The reusable UpgradesIcon prefab now uses the generated growth-arrow image; the earlier tower-and-leaf emblem is superseded.
+
+## Inner glass river blueprint — 2026-10-24
+
+- `Asset/Inner-Glass-Water-Blueprint-User.png` — current floor plan: two concentric blue glass/water channels, four cardinal spokes and a central pool within the white circular deck. This replaces the provisional outer-ring-only interpretation. Composite tiles keep the ordinary floor footprint and stages, consume glass, and use a reflective glass-covered water finish. See [implementation and previews](../Documentation/FrutigerAero/Lighting/ISLAND_GLASS_AND_DAY_NIGHT.md).
 
 ## Character
 

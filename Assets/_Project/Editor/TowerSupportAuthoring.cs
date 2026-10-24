@@ -19,7 +19,7 @@ public static class TowerSupportAuthoring
         var generator = UnityEngine.Object.FindFirstObjectByType<TowerGenerator>();
         var manager = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
         var all = manager.CachedChunks.SelectMany(c => c.Assets).ToArray();
-        var floors = all.Where(a => a.AssetType == TowerAssetType.Floor).GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / generator.heighIncrease));
+        var floors = all.Where(a => a.AssetType.IsFloor()).GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / generator.heighIncrease));
         var pillars = all.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / generator.heighIncrease)).ToDictionary(g => g.Key, g => g.ToArray());
         float meshTop = generator.floorTileObject.GetComponent<Building>().GetStageMesh(10).bounds.max.y;
         float footprint = generator.PillarSupportRadius - .05f;
@@ -75,7 +75,7 @@ public static class TowerSupportAuthoring
         var prior = System.IO.File.Exists(reportPath) ? Newtonsoft.Json.Linq.JObject.Parse(System.IO.File.ReadAllText(reportPath)) : new Newtonsoft.Json.Linq.JObject();
         int priorExtended = (int?)(prior["totalExtended"] ?? prior["extended"]) ?? 0;
         var report = new { extended, pads, bridges, removedSupports, removedOuterSupports=removedSupports-pads, totalExtended = priorExtended + extended, totalPads = pads, unsupportedBefore, unsupportedAfter, bushes = scatter.Placements.Count, constructionAssets = manager.CachedAssetCount,
-            nonFloorAssetsPreserved = all.Count(a => a.AssetType != TowerAssetType.Floor), playing = EditorApplication.isPlaying, sceneDirty = scene.isDirty };
+            nonFloorAssetsPreserved = all.Count(a => !a.AssetType.IsFloor()), playing = EditorApplication.isPlaying, sceneDirty = scene.isDirty };
         System.IO.File.WriteAllText(reportPath, Newtonsoft.Json.JsonConvert.SerializeObject(report, Newtonsoft.Json.Formatting.Indented));
         return report;
     }

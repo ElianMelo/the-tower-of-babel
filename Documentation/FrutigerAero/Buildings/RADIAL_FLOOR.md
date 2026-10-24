@@ -1,5 +1,7 @@
 # Fitted radial tower floors
 
+**2026-10-24 update:** the original inset six-span finished slab and per-tile glazing borders described below are superseded by the shared flush 16-span marble/glass slab and continuous floor shading. Distant pages also supplement missing glass models and use the safe 511-instance limit. See [current tile visibility and joins](TILE_VISIBILITY_AND_JOINS.md). The layout and construction data remain intact; the following records the original radial conversion.
+
 2026-10-21. Current floor geometry/layout revision, retaining the restored [opaque aquatic finish](AERO_FLOW_SHADER.md). The user requested better tiling because the previous square floor pieces overlapped heavily in the circular generator. Arch, pillar and step geometry are unchanged. The building palette remains white and blue; see-through glass remains disabled.
 
 ![Before and after joining edges](Previews/RadialFloor-Comparison.png)
