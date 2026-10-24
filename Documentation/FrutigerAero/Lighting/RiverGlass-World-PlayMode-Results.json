@@ -1,0 +1,62 @@
+{
+  "status": "completed",
+  "duration": 6.89,
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests.ChunkProjection_AdvancesCookiesAndReleasesAfterRollbackAndDisable",
+      "Status": "Passed",
+      "Duration": 1.134295,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassWaterFloorPlayModeTests.WaterGlass_OnlyDrawsAfterCompletionAndStopsOnRollbackOrPoolRelease",
+      "Status": "Passed",
+      "Duration": 0.0472832,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback",
+      "Status": "Passed",
+      "Duration": 0.0856384,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete",
+      "Status": "Passed",
+      "Duration": 0.0307539,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus",
+      "Status": "Passed",
+      "Duration": 0.0178813,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds",
+      "Status": "Passed",
+      "Duration": 2.1693864,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry",
+      "Status": "Passed",
+      "Duration": 3.2715157,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

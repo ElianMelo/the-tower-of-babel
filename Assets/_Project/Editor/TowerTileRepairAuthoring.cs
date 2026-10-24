@@ -87,6 +87,8 @@ public static class TowerTileRepairAuthoring
         glass.SetColor("_BaseColor",stone.GetColor("_BaseColor")); glass.SetFloat("_MarbleSmoothness",stone.GetFloat("_Smoothness"));
         EditorUtility.SetDirty(glass);
         AssetDatabase.SaveAssets();
+        RiverGlassAuthoring.ConfigureAssets();
+        RiverGlassAuthoring.ConfigureScene();
         return $"Shared flush slab: {mesh.vertexCount} vertices, {mesh.triangles.Length / 3} triangles; stage 0–9 unchanged.";
     }
 }

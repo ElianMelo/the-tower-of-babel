@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TowerOfBabel.Buildings;
 using TowerOfBabel.World.Tower;
+using TowerOfBabel.Rendering;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -23,7 +24,7 @@ namespace TowerOfBabel.World.Chunks
     /// Pages are rebuilt only when their member chunks change.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer
+    public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer, IRiverGlassDrawSource
     {
         // Both object-to-world and world-to-object are required by our non-uniform
         // radial transforms. Unity's default instancing layout fits 511, not 1023.
@@ -76,6 +77,7 @@ namespace TowerOfBabel.World.Chunks
             enabled = false;
             return;
 #else
+            RiverGlassRenderRegistry.Register(this);
             EnsureModelBatches();
 #endif
         }
@@ -118,6 +120,7 @@ namespace TowerOfBabel.World.Chunks
 
         public void LoadChunk(in FarChunkSnapshot snapshot)
         {
+            RiverGlassRenderRegistry.Register(this);
             EnsureModelBatches();
             RemoveChunk(snapshot.Key);
             loadedChunks.Add(snapshot.Key);
@@ -133,7 +136,7 @@ namespace TowerOfBabel.World.Chunks
             {
                 if (prepared.MatricesByModel.TryGetValue(pair.Key, out List<Matrix4x4> matrices) &&
                     matrices.Count > 0)
-                    pair.Value.SetChunk(snapshot.Key, prepared.CellKey, matrices);
+                    pair.Value.SetChunk(snapshot.Key, pair.Key.IsRiver ? RenderCellKey.From(snapshot.Key, 1, cellHorizontalSpan) : prepared.CellKey, matrices);
             }
         }
 
@@ -258,7 +261,8 @@ namespace TowerOfBabel.World.Chunks
 
                 Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
                 if (mesh != null)
-                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType.IsFloor() ? chunkManager : null));
+                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType.IsFloor() ? chunkManager : null,
+                        assetType == TowerAssetType.GlassWaterFloor, stage));
             }
         }
 
@@ -273,12 +277,22 @@ namespace TowerOfBabel.World.Chunks
 
         private void OnDisable()
         {
+            RiverGlassRenderRegistry.Unregister(this);
             DisposeBatches();
         }
 
         private void OnDestroy()
         {
+            RiverGlassRenderRegistry.Unregister(this);
             DisposeBatches();
+        }
+
+        public void CollectRiverGlass(Camera camera, Plane[] planes, List<RiverGlassDraw> draws)
+        {
+            if (!isVisible || (camera.scene.IsValid() && camera.scene != gameObject.scene) ||
+                (camera.cullingMask & (1 << gameObject.layer)) == 0) return;
+            foreach (var pair in batches)
+                if (pair.Key.IsCompletedRiver) pair.Value.CollectRiverGlass(camera, planes, draws, maximumDrawDistance);
         }
 
         private void OnValidate()
@@ -321,6 +335,8 @@ namespace TowerOfBabel.World.Chunks
         {
             private readonly TowerAssetType assetType;
             private readonly byte stage;
+            public bool IsRiver => assetType == TowerAssetType.GlassWaterFloor;
+            public bool IsCompletedRiver => IsRiver && stage == ChunkAssetData.CompletedStage;
 
             public RenderBatchKey(TowerAssetType assetType, byte stage)
             {
@@ -392,12 +408,21 @@ namespace TowerOfBabel.World.Chunks
             private readonly Bounds meshBounds;
             private readonly Dictionary<RenderCellKey, RenderCell> cells = new();
             private readonly Dictionary<ChunkKey, RenderCellKey> cellByChunk = new();
+            private readonly bool river;
+            private readonly bool floor;
+            private readonly Vector2 floorCenter;
+            private readonly float floorHeight;
+            private readonly float radial;
 
             public int Count { get; private set; }
 
-            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, ChunkManager floorOwner)
+            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, ChunkManager floorOwner, bool river, byte stage)
             {
                 this.mesh = mesh;
+                this.river = river; floor = floorOwner != null;
+                floorCenter = floorOwner != null ? floorOwner.FloorCenter : Vector2.zero;
+                floorHeight = floorOwner != null ? floorOwner.FloorHeight : 6;
+                radial = floorOwner != null && floorOwner.RadialFloors ? 1 : 0;
                 Material sourceMaterial = sourceRenderer.sharedMaterial;
                 material = new Material(sourceMaterial)
                 {
@@ -407,6 +432,7 @@ namespace TowerOfBabel.World.Chunks
                 };
                 if (material.HasProperty("_ReceiveShadows"))
                     material.SetFloat("_ReceiveShadows", 0f);
+                if (river) material.SetFloat("_RiverStage", stage);
                 meshBounds = mesh.bounds;
                 if (floorOwner != null)
                 {
@@ -421,7 +447,7 @@ namespace TowerOfBabel.World.Chunks
                 RemoveChunk(owner);
                 if (!cells.TryGetValue(cellKey, out RenderCell cell))
                 {
-                    cell = new RenderCell();
+                    cell = new RenderCell { Floor = owner.FloorIndex };
                     cells.Add(cellKey, cell);
                 }
 
@@ -452,7 +478,7 @@ namespace TowerOfBabel.World.Chunks
                 {
                     layer = layer,
                     camera = camera,
-                    shadowCastingMode = ShadowCastingMode.Off,
+                    shadowCastingMode = floor ? ShadowCastingMode.On : ShadowCastingMode.Off,
                     receiveShadows = false,
                     reflectionProbeUsage = ReflectionProbeUsage.Off,
                     motionVectorMode = MotionVectorGenerationMode.ForceNoMotion
@@ -480,6 +506,15 @@ namespace TowerOfBabel.World.Chunks
                         RenderParams renderParams = baseParams;
                         renderParams.worldBounds = page.Bounds;
                         renderParams.matProps = page.LightProbeProperties;
+                        if (river)
+                        {
+                            page.RiverProperties ??= new MaterialPropertyBlock();
+                            if (page.LightProbeProperties != null) page.RiverProperties = page.LightProbeProperties;
+                            page.FloorIdentities ??= new float[page.Count];
+                            System.Array.Fill(page.FloorIdentities, cell.Floor);
+                            page.RiverProperties.SetFloatArray("_RiverFloorIndex", page.FloorIdentities);
+                            renderParams.matProps = page.RiverProperties;
+                        }
                         renderParams.lightProbeUsage = page.LightProbeProperties != null
                             ? LightProbeUsage.CustomProvided
                             : LightProbeUsage.Off;
@@ -491,6 +526,29 @@ namespace TowerOfBabel.World.Chunks
                 }
 
                 return new BatchRenderStats(visiblePages, culledPages, drawCalls);
+            }
+
+            public void CollectRiverGlass(Camera camera, Plane[] planes, List<RiverGlassDraw> draws, float maxDistance)
+            {
+                foreach (var cell in cells.Values)
+                {
+                    cell.RebuildIfDirty(meshBounds, false);
+                    foreach (var page in cell.Pages)
+                    {
+                        if (planes != null && !GeometryUtility.TestPlanesAABB(planes, page.Bounds)) continue;
+                        if (maxDistance > 0 && page.Bounds.SqrDistance(camera.transform.position) > maxDistance * maxDistance) continue;
+                        if (page.RiverDraw == null)
+                        {
+                            var matrices = new Matrix4x4[page.Count];
+                            cell.Matrices.CopyTo(page.StartIndex, matrices, 0, page.Count);
+                            page.RiverDraw = new RiverGlassDraw { mesh = mesh, matrices = matrices, count = page.Count,
+                                floor = cell.Floor, height = cell.Floor * floorHeight, center = floorCenter,
+                                radial = radial, bounds = page.Bounds };
+                            page.RiverDraw.Configure();
+                        }
+                        draws.Add(page.RiverDraw);
+                    }
+                }
             }
 
             public void Dispose()
@@ -508,6 +566,7 @@ namespace TowerOfBabel.World.Chunks
 
         private sealed class RenderCell
         {
+            public int Floor;
             private readonly Dictionary<ChunkKey, List<Matrix4x4>> matricesByChunk = new();
             private readonly List<Matrix4x4> matrices = new();
             private readonly List<RenderPage> pages = new();
@@ -595,6 +654,9 @@ namespace TowerOfBabel.World.Chunks
 
         private sealed class RenderPage
         {
+            public RiverGlassDraw RiverDraw;
+            public MaterialPropertyBlock RiverProperties;
+            public float[] FloorIdentities;
             public int StartIndex { get; }
             public int Count { get; }
             public Bounds Bounds { get; }

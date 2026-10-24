@@ -18,7 +18,7 @@ public static class TowerTileVisualReview
 {
     private const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
     public const string Folder = "Documentation/FrutigerAero/Buildings/Previews";
-    public static string Capture(int floor = 0)
+    public static string Capture(int floor = 0, string prefix = "Tile-Fix")
     {
         if (EditorApplication.isPlaying) throw new InvalidOperationException("Review in Edit Mode.");
         var original = SceneManager.GetActiveScene(); if(original.isDirty) throw new InvalidOperationException("Review needs a clean saved scene.");
@@ -36,6 +36,9 @@ public static class TowerTileVisualReview
         var target = new RenderTexture(1488,887,24,RenderTextureFormat.ARGBHalf); var oldTarget = RenderTexture.active;
         var feature = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<AeroSunShaftRendererFeature>().Single();
         float preview = feature.previewTime;
+        var riverFeature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
+        float riverPreview=riverFeature.previewTime;
+        int viewIndex=0;
         GameObject root = null;
         try
         {
@@ -59,6 +62,10 @@ public static class TowerTileVisualReview
             var chunks = manager.CachedChunks.Where(c=>c.Key.FloorIndex==floor||c.Key.FloorIndex==floor+1).Select(c=>
                 (ChunkSceneCache)Activator.CreateInstance(typeof(ChunkSceneCache),Private,null,new object[]{c.Key,c.Assets
                     .Where(a=>c.Key.FloorIndex==floor||a.AssetType.IsFloor()).Select((a,i)=>new ChunkAssetData(i,a.AssetType,a.Position,a.Rotation,a.Scale,10)).ToList()},null)).ToArray();
+            typeof(ChunkManager).GetField("cachedChunks",Private).SetValue(owner,chunks.ToList());owner.enabled=true;
+            var riverLights=data.AddComponent<RiverGlassLighting>();
+            riverLights.profile=AssetDatabase.LoadAssetAtPath<RiverGlassProfile>(RiverGlassAuthoring.ProfilePath);
+            riverLights.cookieShader=Shader.Find("Hidden/TowerOfBabel/River caustic cookie");
             data.SetActive(true); // manager/far stay disabled; drawing is explicit, without entering Play Mode.
             void Save(string name,Vector3 position,Vector3 look)
             {
@@ -73,6 +80,8 @@ public static class TowerTileVisualReview
                 }
                 near.EndUpdate(); foreach(var go in near.ActiveAssets) foreach(var t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = 31;
                 for(int i=0;i<30;i++) fx.Sample(position,i*.1f); feature.previewTime = 3;
+                float waterClock=3+viewIndex++;riverFeature.previewTime=waterClock;
+                riverLights.Sample(camera,waterClock,1);riverLights.Sample(camera,waterClock+.01f,1);
                 for(int i=0;i<2;i++) {typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate",Private).Invoke(far,null); camera.Render();}
                 RenderTexture.active=target; var image=new Texture2D(target.width,target.height,TextureFormat.RGB24,false);
                 image.ReadPixels(new Rect(0,0,target.width,target.height),0,0); image.Apply();
@@ -82,15 +91,15 @@ public static class TowerTileVisualReview
             if(floor==0)
             {
                 var position=new Vector3(8.84f,2.17f,-90.58f);
-                Save("Tile-Fix-Interior",position,position+Quaternion.Euler(2.45f,12.33f,0)*Vector3.forward*30);
+                Save(prefix+"-Interior",position,position+Quaternion.Euler(2.45f,12.33f,0)*Vector3.forward*30);
             }
-            Save($"Tile-Fix-Floor{floor}-Joins",new Vector3(8,height+4,-radius*.52f),new Vector3(0,height+.2f,-radius*.42f));
-            Save($"Tile-Fix-Floor{floor}-Underside",new Vector3(8,height+2,-radius*.52f),new Vector3(0,height+6,-radius*.42f));
+            Save($"{prefix}-Floor{floor}-Joins",new Vector3(8,height+4,-radius*.52f),new Vector3(0,height+.2f,-radius*.42f));
+            Save($"{prefix}-Floor{floor}-Underside",new Vector3(8,height+2,-radius*.52f),new Vector3(0,height+6,-radius*.42f));
             return Folder;
         }
         finally
         {
-            feature.previewTime=preview; RenderTexture.active=oldTarget; ShaderUtil.allowAsyncCompilation=async;
+            feature.previewTime=preview; riverFeature.previewTime=riverPreview; RenderTexture.active=oldTarget; ShaderUtil.allowAsyncCompilation=async;
             if(root!=null)foreach(var filter in root.GetComponentsInChildren<MeshFilter>())
             {if(filter.sharedMesh!=null&&!AssetDatabase.Contains(filter.sharedMesh)&&filter.sharedMesh.hideFlags==HideFlags.None) UnityEngine.Object.DestroyImmediate(filter.sharedMesh);}
             EditorSceneManager.CloseScene(scene,true); target.Release(); UnityEngine.Object.DestroyImmediate(target); SceneManager.SetActiveScene(original);

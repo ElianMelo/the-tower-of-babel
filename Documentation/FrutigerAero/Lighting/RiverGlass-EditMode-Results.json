@@ -1,0 +1,118 @@
+{
+  "status": "completed",
+  "duration": 1.49,
+  "summary": {
+    "total": 15,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,1)",
+      "Status": "Passed",
+      "Duration": 0.175007,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(True,1)",
+      "Status": "Passed",
+      "Duration": 0.0247813,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,3)",
+      "Status": "Passed",
+      "Duration": 0.0278421,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(True,3)",
+      "Status": "Passed",
+      "Duration": 0.0290847,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,5)",
+      "Status": "Passed",
+      "Duration": 0.0304861,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.DestroyedDrawProvider_IsPrunedBeforeTheNextCamera",
+      "Status": "Passed",
+      "Duration": 0.015281,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(0)",
+      "Status": "Passed",
+      "Duration": 0.0065082,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(1)",
+      "Status": "Passed",
+      "Duration": 0.0021163,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(20)",
+      "Status": "Passed",
+      "Duration": 0.0025591,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(42)",
+      "Status": "Passed",
+      "Duration": 0.0015576,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.FarSubmissions_KeepFloorIdentityBatchLimitAndCompletionState",
+      "Status": "Passed",
+      "Duration": 0.0979127,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.OpticalPath_DependsOnWaterThicknessAndAngleAndRemainsFiniteAtGrazingAngles",
+      "Status": "Passed",
+      "Duration": 0.0060931,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(False)",
+      "Status": "Passed",
+      "Duration": 0.2393368,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(True)",
+      "Status": "Passed",
+      "Duration": 0.0804732,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionPool_IsBoundedAnimatedAndRemovedOnRollbackAndDisable",
+      "Status": "Passed",
+      "Duration": 0.0804128,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

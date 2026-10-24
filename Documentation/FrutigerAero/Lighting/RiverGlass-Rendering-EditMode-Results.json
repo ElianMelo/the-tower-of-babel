@@ -1,0 +1,265 @@
+{
+  "status": "completed",
+  "duration": 15.6,
+  "summary": {
+    "total": 36,
+    "passed": 36,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.FillShafts_ShareNativeSpotShadowsAndRejectExteriorViews",
+      "Status": "Passed",
+      "Duration": 0.1862445,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.Lamp_HasRealSpotProjectionAndAnimatedCookieAndReleasesItsTexture",
+      "Status": "Passed",
+      "Duration": 0.0945581,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.Lamps_SelectOnlyFourNearestWithOneShadowAndReleaseDistantCookies",
+      "Status": "Passed",
+      "Duration": 0.0151875,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.ProjectorCookie_ActuallyLightsStockSurfacesAndChangesTheRenderedPattern",
+      "Status": "Passed",
+      "Duration": 0.0852999,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SavedAtmosphere_HasBoundedQualityAndHDRGlow",
+      "Status": "Passed",
+      "Duration": 0.0404547,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_CoveredNoonBlocksOverheadAndWorldNoiseIsRepeatable",
+      "Status": "Passed",
+      "Duration": 0.1019936,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_EnterOpenSidesBeneathASolidCoveredRoof",
+      "Status": "Passed",
+      "Duration": 0.0514581,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_RenderVisibleScatteringAndRespondToOccluders",
+      "Status": "Passed",
+      "Duration": 0.0384075,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroAtmosphereEditModeTests.SunRays_ZeroIntensityAndMissingSunAreNoOps",
+      "Status": "Passed",
+      "Duration": 0.0575023,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.Cycle_HasSmoothPeriodicSunriseAndNight",
+      "Status": "Passed",
+      "Duration": 0.0026826,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.ExitAtmosphere_FadesTowardEverySideAndRejectsOtherHeights",
+      "Status": "Passed",
+      "Duration": 0.0039699,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.Fireflies_DoNotRequireLegacyBeamsAndFillStaysAnchoredUntilDark",
+      "Status": "Passed",
+      "Duration": 0.013861,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.FloorTransitions_BlendFixedVolumesWithoutResettingInteriorDensity",
+      "Status": "Passed",
+      "Duration": 0.0039382,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.Profile_AndMaterialsHaveSavedDependenciesAndNoShaderErrors",
+      "Status": "Passed",
+      "Duration": 0.0067488,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.QualityPresetsAndOrdinaryCameraSceneAreResolved",
+      "Status": "Passed",
+      "Duration": 0.0019079,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroIslandAtmosphereEditModeTests.SunFlare_UsesOcclusionAndRendererSupportsBothFlarePaths",
+      "Status": "Passed",
+      "Duration": 0.003111,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.CameraFilter_ExcludesReflectionAndPreviewCameras",
+      "Status": "Passed",
+      "Duration": 0.0052669,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.Lake_UsesItsOwnReflectiveMaterialInTheSavedScene",
+      "Status": "Passed",
+      "Duration": 1.2026268,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.NearbyEnvironment_ActuallyChangesOrdinaryLitSurfaceReflections",
+      "Status": "Passed",
+      "Duration": 0.0496,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.Range_HasFullNearLightAndASmoothFiniteFade",
+      "Status": "Passed",
+      "Duration": 0.0015566,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_DoesNotLightDistantGeometryOrTheSky",
+      "Status": "Passed",
+      "Duration": 0.0573206,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_LeavesScreenSpaceInterfacePixelsUnchanged",
+      "Status": "Passed",
+      "Duration": 0.1212984,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_OnlyLightsWaterFootprintsAndNeverDarkensEdges",
+      "Status": "Passed",
+      "Duration": 0.3736585,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_ProjectsOnOrdinaryNearbyObjectsAndAnimates",
+      "Status": "Passed",
+      "Duration": 0.0553403,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_WaterPatternStaysAttachedWhenTheCameraMoves",
+      "Status": "Passed",
+      "Duration": 0.0404609,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.RenderGraph_ZeroStrengthIsAVisibleNoOp",
+      "Status": "Passed",
+      "Duration": 0.0367229,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroLightEditModeTests.SavedFeature_HasBuildReferencesAndACompiledShader",
+      "Status": "Passed",
+      "Duration": 0.0037042,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests.Mesh_IsSeamlessUpwardFacingAndLighterThanTheOldPlane",
+      "Status": "Passed",
+      "Duration": 0.5531393,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests.RenderCoverage_HasNoSeamsOrExposedEdgeAtTowerHeightAndAfterMoving",
+      "Status": "Passed",
+      "Duration": 0.8263787,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.AeroOceanEditModeTests.SavedWater_UsesTheSeamlessMeshAndWorldSpaceMaterial",
+      "Status": "Passed",
+      "Duration": 0.7186513,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.CompletedChannelBank_HidesBuriedVerticalTileWalls",
+      "Status": "Passed",
+      "Duration": 9.7692502,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,1)",
+      "Status": "Passed",
+      "Duration": 0.5622404,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(True,1)",
+      "Status": "Passed",
+      "Duration": 0.0105885,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,3)",
+      "Status": "Passed",
+      "Duration": 0.0146985,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(True,3)",
+      "Status": "Passed",
+      "Duration": 0.0146527,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.Rendering.Tests.RiverGlassGpuEditModeTests.GlassAperture_TransmitsObjectsFromEitherSideAndCompositesStackedFloors(False,5)",
+      "Status": "Passed",
+      "Duration": 0.0112273,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

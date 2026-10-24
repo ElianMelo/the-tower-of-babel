@@ -1,5 +1,7 @@
 # Island, glass rivers and the tower atmosphere
 
+The [transparent river glass rework](RIVER_GLASS.md) supersedes this page's original opaque water-bed and per-panel elliptical projection implementation. The floor layout, dimensions and construction rules below remain current.
+
 The 2026-10-24 blueprint is the current glass-floor layout: two concentric water channels at 50% and 88% of the floor's wall radius, four straight cardinal spokes, and a central pool at 16%. This supersedes the provisional outer-ring-only interpretation. Ordinary architecture remains opaque white with blue glazing.
 
 ## Glass construction

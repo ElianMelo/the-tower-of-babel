@@ -35,6 +35,15 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ## Asset
 
+### Transparent river glass pools — 2026-10-24
+
+- `Asset/River-Projection-Motion-User.gif` — animated aqua light projected onto pillars and walls; match the existing AquaProjectionLamp's local illumination.
+- `Asset/River-Glass-Aqua-Interior-User.png` and `Asset/River-Glass-Caustic-Detail-User.png` — clear cyan glass, white architecture, and branching moving caustics.
+- `Asset/River-Glass-Sky-Pool-User.png` and `Asset/River-Glass-Stacked-Pools-User.png` — visible objects through water-filled glazing, including views from below and through stacked floors.
+- `Asset/River-Glass-Pool-Wall-User.png` — transparent pool walls, restrained depth tint, reflected highlights and a clear water volume.
+
+The requested implementation is a sealed, flush, walkable glass channel with light above and below. Preserve the two-ring/spoke/pool layout. See [river glass implementation](../Documentation/FrutigerAero/Lighting/RIVER_GLASS.md).
+
 ### Continuous tower floors
 
 - `Asset/Tile-Gaps-And-Distance-Culling-User.png` — reported missing distant river/floor assets and visible grid joints in the covered tower interior. See [the repair and verification](../Documentation/FrutigerAero/Buildings/TILE_VISIBILITY_AND_JOINS.md) and its floor 0, 20 and 42 previews. Tile frames should not interrupt the continuous marble or enclosed river.

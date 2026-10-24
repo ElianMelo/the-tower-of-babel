@@ -1,0 +1,55 @@
+{
+  "status": "completed",
+  "duration": 1.01,
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.ExplicitLegacyModels_FillMissingGlassTypeWithoutReplacingOverrides",
+      "Status": "Passed",
+      "Duration": 0.0959036,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.FinishedFloorFaces_AreFlushSharedAndCloseTheCentre",
+      "Status": "Passed",
+      "Duration": 0.1425805,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(False)",
+      "Status": "Passed",
+      "Duration": 0.0785134,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(True)",
+      "Status": "Passed",
+      "Duration": 0.0648473,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(Floor)",
+      "Status": "Passed",
+      "Duration": 0.1589656,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(GlassWaterFloor)",
+      "Status": "Passed",
+      "Duration": 0.1389869,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

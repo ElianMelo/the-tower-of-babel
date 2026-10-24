@@ -96,7 +96,14 @@ namespace TowerOfBabel.World.Tests
                 }
                 Directory.CreateDirectory("Documentation/FrutigerAero/Buildings/Previews");
                 File.WriteAllBytes($"Documentation/FrutigerAero/Buildings/Previews/FarCoverage-{type}.png",image.EncodeToPNG());
-                Assert.That(missing,Is.Empty,"Native GPU coverage failed at instance indices: "+string.Join(",",missing.Take(25)));
+                if(type==TowerAssetType.Floor)
+                    Assert.That(missing,Is.Empty,"Native GPU coverage failed at instance indices: "+string.Join(",",missing.Take(25)));
+                else
+                {
+                    var transparentDraws=new List<TowerOfBabel.Rendering.RiverGlassDraw>();
+                    far.CollectRiverGlass(view,null,transparentDraws);
+                    Assert.That(transparentDraws.Sum(d=>d.count),Is.EqualTo(1024),"Transparent panels must submit every instance even over a black background.");
+                }
                 Assert.That(far.VisiblePageCount,Is.EqualTo(3),"1024 non-uniform transforms require three safe draw pages.");
             }
             finally

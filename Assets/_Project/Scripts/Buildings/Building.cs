@@ -242,6 +242,7 @@ namespace TowerOfBabel.Buildings
             Mesh mesh = GetStageMesh(stage);
             if (meshFilter != null && mesh != null)
                 meshFilter.sharedMesh = mesh;
+            if (TryGetComponent<GlassWaterFloorLight>(out var river)) river.RefreshPresentation();
         }
 
         private void ResolveReferences()

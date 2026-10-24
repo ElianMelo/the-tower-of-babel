@@ -1,0 +1,377 @@
+{
+  "status": "completed",
+  "duration": 5.79,
+  "summary": {
+    "total": 52,
+    "passed": 52,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0
+  },
+  "results": [
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.CacheChunks_AssignsDeterministicTypeAndPositionOrderedLocalIndices",
+      "Status": "Passed",
+      "Duration": 0.0957396,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.CacheChunks_StoresPureDeterministicDataThatSurvivesAuthoringObjectDestruction",
+      "Status": "Passed",
+      "Duration": 0.0091577,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ChebyshevDistance_CountsDiagonalAdjacentChunkAsOne",
+      "Status": "Passed",
+      "Duration": 0.0007064,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ChunkManager_AdvancesOneStageAndNotifiesListeners",
+      "Status": "Passed",
+      "Duration": 0.0098614,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.ConfigureTower_CachesDataThenDestroysTemporaryAuthoringAssets",
+      "Status": "Passed",
+      "Duration": 0.050791,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.InstancedFarRenderer_CullsSpatialPagesBehindCamera",
+      "Status": "Passed",
+      "Duration": 0.0689313,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.InstancedFarRenderer_LoadsAndRemovesTypedChunkInstances",
+      "Status": "Passed",
+      "Duration": 0.0101174,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.NearPool_ChunkBoundaryOnlyReleasesAndPositionsChangedSlab",
+      "Status": "Passed",
+      "Duration": 0.0498978,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.NearPool_StageChangeDoesNotRecycleUnchangedChunkAssets",
+      "Status": "Passed",
+      "Duration": 0.0067897,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.Neighborhood_WithRadiusOneContainsExactlyTwentySevenUniqueChunks",
+      "Status": "Passed",
+      "Duration": 0.0048911,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayerInstance_RejectsStaleSnapshots",
+      "Status": "Passed",
+      "Duration": 0.0042339,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_PrioritizesFriendsAndUsesTwentyChunkCutoff",
+      "Status": "Passed",
+      "Duration": 0.0319936,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_RemoteRegistrationRequestsSearchAfterInitialLocalSearch",
+      "Status": "Passed",
+      "Duration": 0.008382,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.PlayersManager_ReturnsReleasedVisualToPool",
+      "Status": "Passed",
+      "Duration": 0.0127788,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.SpatialIndex_CutsSearchPastTwentyChunks",
+      "Status": "Passed",
+      "Duration": 0.002849,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.SpatialIndex_UsesChunkDistanceAndRandomizesNearestTies",
+      "Status": "Passed",
+      "Duration": 0.0041174,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.TowerRenderPrefabs_RetainInstancingVariantsForPlayerBuilds",
+      "Status": "Passed",
+      "Duration": 0.0466152,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.TowerVisibility_ImmediatelySwitchesChunkDataBetweenNearPoolAndFarRenderer",
+      "Status": "Passed",
+      "Duration": 0.0115312,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.ChunkManagerEditModeTests.WorldToChunk_UsesFloorDivisionForNegativeCoordinates",
+      "Status": "Passed",
+      "Duration": 0.0004942,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.FloorSupport_BridgeConnectsToTheDeckWithoutAddingAnOuterIsland",
+      "Status": "Passed",
+      "Duration": 0.0256596,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.InstantBuild_ProfileIsAnOffByDefaultBooleanAndResets",
+      "Status": "Passed",
+      "Duration": 0.0014016,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.PillarSupportPad_HasRealWalkingCollisionAcrossItsBase",
+      "Status": "Passed",
+      "Duration": 0.0242538,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.RegeneratedTower_RetainsPillarSupportsAfterCuttingStairOpenings",
+      "Status": "Passed",
+      "Duration": 0.2176945,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.SavedTower_EveryPillarAndBushHasSupportIncludingShrinkingFloors",
+      "Status": "Passed",
+      "Duration": 2.7998053,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.FarRenderer_KeepsGlassBuiltStagesAndCullsItsEmptyBlueprint",
+      "Status": "Passed",
+      "Duration": 0.0192211,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.GlassLayout_HasTwoRingsCardinalSpokesAndCenterPool",
+      "Status": "Passed",
+      "Duration": 0.0008676,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.GlassPrefab_UsesGlassHasEveryStageAndSameWalkingDatum",
+      "Status": "Passed",
+      "Duration": 0.0022069,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.GlassIslandEditModeTests.SavedIsland_IsSubmergedOnAllEdgesAndRetainsConstructionAssets",
+      "Status": "Passed",
+      "Duration": 0.4146649,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.DestroyedDrawProvider_IsPrunedBeforeTheNextCamera",
+      "Status": "Passed",
+      "Duration": 0.0019046,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(0)",
+      "Status": "Passed",
+      "Duration": 0.0027887,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(1)",
+      "Status": "Passed",
+      "Duration": 0.0008384,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(20)",
+      "Status": "Passed",
+      "Duration": 0.0007267,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ExactChannelMask_FollowsBothRingsSpokesAndPoolAtEveryFloor(42)",
+      "Status": "Passed",
+      "Duration": 0.00078,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.FarSubmissions_KeepFloorIdentityBatchLimitAndCompletionState",
+      "Status": "Passed",
+      "Duration": 0.0217098,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.OpticalPath_DependsOnWaterThicknessAndAngleAndRemainsFiniteAtGrazingAngles",
+      "Status": "Passed",
+      "Duration": 0.0004842,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(False)",
+      "Status": "Passed",
+      "Duration": 0.078252,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(True)",
+      "Status": "Passed",
+      "Duration": 0.0451147,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.RiverGlassEditModeTests.ProjectionPool_IsBoundedAnimatedAndRemovedOnRollbackAndDisable",
+      "Status": "Passed",
+      "Duration": 0.0210176,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.BoundBuildings_RefreshTheirPresentationWhenTheFloorUnlocks",
+      "Status": "Passed",
+      "Duration": 0.0139725,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Bushes_AppearOnlyOnCompletedAndUnlockedFloors",
+      "Status": "Passed",
+      "Duration": 0.0035099,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Floors_UnlockOnlyAfterEveryAssetAcrossAllChunksIsComplete",
+      "Status": "Passed",
+      "Duration": 0.0032393,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.SnapshotAndRollback_RecomputeTheFirstUnfinishedFloor",
+      "Status": "Passed",
+      "Duration": 0.0030938,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_HidesLaterFloorsEvenWhenSnapshotsContainBuiltAssets",
+      "Status": "Passed",
+      "Duration": 0.004049,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_KeepsLockedChunksOutOfBothNearAndFarRendering",
+      "Status": "Passed",
+      "Duration": 0.0077237,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests.ActualTower_ArchSourceIdentitiesAreUniqueAndSurviveConstructionChanges",
+      "Status": "Passed",
+      "Duration": 0.6527257,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerRayOcclusionEditModeTests.ShadowCache_RejectsBlueprintsAndHiddenFloorsAndUpdatesOnlyChangedChunks",
+      "Status": "Passed",
+      "Duration": 0.0148116,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.ExplicitLegacyModels_FillMissingGlassTypeWithoutReplacingOverrides",
+      "Status": "Passed",
+      "Duration": 0.0209814,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.FinishedFloorFaces_AreFlushSharedAndCloseTheCentre",
+      "Status": "Passed",
+      "Duration": 0.1385146,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(False)",
+      "Status": "Passed",
+      "Duration": 0.0660162,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(True)",
+      "Status": "Passed",
+      "Duration": 0.0378372,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(Floor)",
+      "Status": "Passed",
+      "Duration": 0.0791507,
+      "Message": null,
+      "StackTrace": null
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(GlassWaterFloor)",
+      "Status": "Passed",
+      "Duration": 0.0784199,
+      "Message": null,
+      "StackTrace": null
+    }
+  ]
+}

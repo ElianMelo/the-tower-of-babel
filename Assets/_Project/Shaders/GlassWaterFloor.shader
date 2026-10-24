@@ -21,14 +21,15 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         _RiverLayout("Base radius, setback, floor height, channel half width",Vector)=(96,3,6,1.3)
         _RadialFloor("Radial floor",Float)=0
         _RadialFloorCenter("Floor center",Vector)=(0,0,0,0)
+        _RiverStage("Construction stage",Float)=10
+        _RiverFloorIndex("Explicit floor identity",Float)=-1
         [PerRendererData] _BuildMode("Build mode",Float)=0
         [PerRendererData] _BuildReveal("Build reveal",Float)=1
         [PerRendererData] _BuildClock("Build clock",Float)=0
     }
     SubShader
     {
-        // The sealed water bed is opaque, so stacked floors occlude correctly. The glass top
-        // optically blends the lit water with the environment through Fresnel reflection.
+        // Completed apertures are drawn separately by RiverGlassRendererFeature.
         Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" "Queue"="Geometry" }
         HLSLINCLUDE
         #define _CLEARCOAT 1
@@ -40,7 +41,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         TEXTURE2D(_NormalMap); SAMPLER(sampler_NormalMap);
         float _AeroDaylight;
         CBUFFER_START(UnityPerMaterial)
-        half4 _WaterColor,_GlassTint; float _Smoothness,_FlowSpeed,_Refraction,_RadialFloor; float4 _RadialFloorCenter,_RiverLayout;
+        half4 _WaterColor,_GlassTint; float _Smoothness,_FlowSpeed,_Refraction,_RadialFloor,_RiverStage; float4 _RadialFloorCenter,_RiverLayout;
         half4 _BaseColor; half _VeinStrength,_NormalStrength,_MarbleSmoothness,_PearlCoat;
         float _MarbleScale,_TextureAspect;
         CBUFFER_END
@@ -49,15 +50,29 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         UNITY_DEFINE_INSTANCED_PROP(float,_BuildMode)
         UNITY_DEFINE_INSTANCED_PROP(float,_BuildReveal)
         UNITY_DEFINE_INSTANCED_PROP(float,_BuildClock)
+        UNITY_DEFINE_INSTANCED_PROP(float,_RiverFloorIndex)
         UNITY_INSTANCING_BUFFER_END(Construction)
         struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float4 tangentOS:TANGENT; float2 uv:TEXCOORD0; float3 floorPatch:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
-        struct Varyings { float4 positionCS:SV_POSITION; float3 ws:TEXCOORD0; float3 normal:TEXCOORD1; float3 local:TEXCOORD2; float fog:TEXCOORD3; UNITY_VERTEX_INPUT_INSTANCE_ID UNITY_VERTEX_OUTPUT_STEREO };
+        struct Varyings { float4 positionCS:SV_POSITION; float3 ws:TEXCOORD0; float3 normal:TEXCOORD1; float3 local:TEXCOORD2; float fog:TEXCOORD3; nointerpolation float floorIndex:TEXCOORD4; UNITY_VERTEX_INPUT_INSTANCE_ID UNITY_VERTEX_OUTPUT_STEREO };
         #include "BuildingRadialFloor.hlsl"
+        #include "RiverChannel.hlsl"
         Varyings Vert(Attributes i)
         {
             Varyings o=(Varyings)0; UNITY_SETUP_INSTANCE_ID(i); UNITY_TRANSFER_INSTANCE_ID(i,o); UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
             o.local=_RadialFloor>1.5?i.floorPatch:i.positionOS.xyz; BendRadialFloor(i);
+            float floorIdentity=UNITY_ACCESS_INSTANCED_PROP(Construction,_RiverFloorIndex);
+            o.floorIndex=floorIdentity>=0?floorIdentity:round(TransformObjectToWorld(float3(0,0,0)).y/_RiverLayout.z);
             o.ws=TransformObjectToWorld(i.positionOS.xyz); o.positionCS=TransformWorldToHClip(o.ws); o.normal=TransformObjectToWorldNormal(i.normalOS); o.fog=ComputeFogFactor(o.positionCS.z); return o;
+        }
+        void Aperture(Varyings i)
+        {
+            if(_RiverStage>9.5)
+            {
+                float edge=RiverChannelDistance(i.ws.xz,i.floorIndex);
+                clip(edge);
+                // Buried internal tile walls must not protrude below the glass banks.
+                if(_RadialFloor>.5 && abs(i.normal.y)<.5)clip(edge-.75);
+            }
         }
         half Reveal(Varyings i)
         {
@@ -90,7 +105,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma multi_compile_fog
             half4 Frag(Varyings i):SV_Target
             {
-                UNITY_SETUP_INSTANCE_ID(i); half build=Reveal(i);
+                UNITY_SETUP_INSTANCE_ID(i); Aperture(i); half build=Reveal(i);
                 float2 p=i.ws.xz; float t=_Time.y*_FlowSpeed;
                 // A continuous world-space field crosses tile boundaries without per-tile resets.
                 float2 warp=float2(sin(p.y*.64+t*3)+sin(p.x*.4-t*2),cos(p.x*.55+t*2.5))*.035;
@@ -108,7 +123,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
                 half3 light=SampleSH(n)+sun.color*saturate(dot(n,sun.direction))*sun.shadowAttenuation*.65;
                 half3 col=lerp(bed*(light+.25),reflected,fresnel*.7)+sun.color*spec*1.7;
                 col+=focused*.055+build*half3(.1,2,3);
-                float floorIndex=max(0,floor((i.ws.y+.015)/_RiverLayout.z));
+                float floorIndex=i.floorIndex;
                 float wall=max(3,_RiverLayout.x-_RiverLayout.y*(floor(floorIndex*.5)+1));
                 float2 relative=p-_RadialFloorCenter.xy;
                 float radius=length(relative); float width=min(_RiverLayout.w,max(.55,wall*.014));
@@ -149,7 +164,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma vertex Vert
             #pragma fragment Depth
             #pragma multi_compile_instancing
-            half4 Depth(Varyings i):SV_Target { UNITY_SETUP_INSTANCE_ID(i); Reveal(i); return i.positionCS.z; }
+            half4 Depth(Varyings i):SV_Target { UNITY_SETUP_INSTANCE_ID(i); Aperture(i); Reveal(i); return i.positionCS.z; }
             ENDHLSL
         }
         Pass
@@ -160,7 +175,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma vertex Vert
             #pragma fragment Depth
             #pragma multi_compile_instancing
-            half4 Depth(Varyings i):SV_Target { UNITY_SETUP_INSTANCE_ID(i); Reveal(i); return 0; }
+            half4 Depth(Varyings i):SV_Target { UNITY_SETUP_INSTANCE_ID(i); Aperture(i); Reveal(i); return 0; }
             ENDHLSL
         }
     }
