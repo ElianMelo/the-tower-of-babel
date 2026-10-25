@@ -65,6 +65,8 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
         #define _CLEARCOAT 1
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "AeroBuildingFinish.hlsl"
+        float _AeroDaylight;
         TEXTURE2D(_MarbleMap); SAMPLER(sampler_MarbleMap);
         TEXTURE2D(_NormalMap); SAMPLER(sampler_NormalMap);
         TEXTURE2D(_BakedSurface); SAMPLER(sampler_BakedSurface);
@@ -198,6 +200,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
         }
         half ClipGlassFromCore(Varyings input)
         {
+            AeroClipReflection(input.positionWS);
             half edge=ClipConstruction(input);
             #if defined(_AERO_BORDER_GLASS)
                 // Small distant borders use the original opaque finish. Both passes use
@@ -251,16 +254,19 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 AquaticFrame flow=BuildAquaticFrame(input);
                 n=AquaticNormal(flow,n,glass);
                 half2 water=AquaticLight(flow,n,view);
-                half3 interior=lerp(_WaterDeepColor.rgb,_WaterLightColor.rgb,saturate(water.y));
+                half depthTint=_AeroFinishEnabled*_AeroFinishOptics.x*flow.fade;
+                half opticalPath=1-saturate(abs(dot(n,view)));
+                half3 interior=lerp(_WaterDeepColor.rgb,_WaterLightColor.rgb,saturate(water.y-depthTint*opticalPath*.22));
                 bakedColor=lerp(bakedColor,interior,glass*_InteriorStrength);
                 surface.albedo=stone*bakedColor*lerp(_BaseColor.rgb,_DetailTint.rgb,mask*_DetailStrength);
                 surface.albedo=lerp(surface.albedo,half3(.04,.5,.85),buildEdge*.85);
                 surface.alpha=1;surface.metallic=0;surface.specular=half3(.04,.04,.04);
                 half enamel=saturate((bakedColor.b-bakedColor.r)*2);
-                surface.smoothness=lerp(_Smoothness,.96,glass);surface.normalTS=half3(0,0,1);
+                surface.smoothness=AeroPolish(lerp(_Smoothness,.96,glass),input.positionWS,1-glass);surface.normalTS=half3(0,0,1);
                 surface.clearCoatMask=_PearlCoat;surface.clearCoatSmoothness=.95;
                 half floorFace=step(.5,_ModelKind)*step(_ModelKind,1.5)*step(.99,abs(input.normalWS.y));
-                surface.occlusion=lerp(1,SAMPLE_TEXTURE2D(_BakedAO,sampler_BakedAO,input.uv).r,_AOStrength*(1-floorFace));
+                half recess=SAMPLE_TEXTURE2D(_BakedAO,sampler_BakedAO,input.uv).r;
+                surface.occlusion=lerp(1,recess,_AOStrength*(1-floorFace));
                 InputData data=(InputData)0;
                 data.positionWS=input.positionWS;data.positionCS=input.positionCS;
                 data.normalWS=n;data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(input.positionWS);
@@ -268,6 +274,8 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 surface.emission=half3(.42,.78,1)*water.x*_WaterLightStrength*glass*.3;
                 surface.emission+=_WaterLightColor.rgb*glass*(water.x*_InnerCausticStrength+rim*_GlassEdgeStrength)*_GlazeGlow;
                 surface.emission+=half3(.08,.65,1)*buildEdge*2.2;
+                half boundary=saturate((1-recess)*3)*glass;
+                surface.emission+=half3(.7,.94,1)*boundary*_AeroFinishOptics.w*_AeroFinishEnabled*lerp(.3,1,saturate(_AeroDaylight));
                 data.shadowCoord=TransformWorldToShadowCoord(input.positionWS);
                 data.bakedGI=SampleSH(n);data.shadowMask=half4(1,1,1,1);
                 data.vertexLighting=VertexLighting(input.positionWS,n);
@@ -284,6 +292,11 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                     half3 coatLight=min(max(color.rgb-scattered,0),half3(.65,.75,.85));
                     color.rgb=lerp(color.rgb,scattered+coatLight*reflection,glass);
                 }
+                color.rgb=AeroFinishReflection(color.rgb,input.positionWS,n,view,floorFace,3.2,_AeroDaylight);
+                color.rgb+=AeroThinFilm(n,view,glass*flow.fade,_AeroDaylight);
+                Light glintLight=GetMainLight(data.shadowCoord);
+                color.rgb+=glintLight.color*AeroFilteredGlint(n,view,glintLight.direction,240,flow.fade)*
+                    glintLight.shadowAttenuation*glass*_AeroFinishOptics.z*_AeroFinishEnabled*.25;
                 color.rgb=MixFog(color.rgb,input.fog);color.a=1;
                 return color;
             }

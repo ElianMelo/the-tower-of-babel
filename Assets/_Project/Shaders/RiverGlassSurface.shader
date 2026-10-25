@@ -27,6 +27,7 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
         HLSLINCLUDE
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "AeroBuildingFinish.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareDepthTexture.hlsl"
         TEXTURE2D(_RippleNormal); SAMPLER(sampler_RippleNormal);
         TEXTURE2D(_CausticsTex); SAMPLER(sampler_CausticsTex);
@@ -115,7 +116,7 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
             half3 second=SAMPLE_TEXTURE2D_BIAS(_CausticsTex,sampler_TrilinearRepeat,pattern*.6-float2(t,t*.73),_RiverPattern.z).rgb;
             half caustic=max(first.r,max(first.g,first.b))*.65+max(second.r,max(second.g,second.b))*.35;
             Light sun=GetMainLight(TransformWorldToShadowCoord(i.ws));
-            half glint=pow(saturate(dot(n,SafeNormalize(view+sun.direction))),110)*sun.shadowAttenuation;
+            half glint=AeroFilteredGlint(n,view,sun.direction,110,1)*sun.shadowAttenuation;
             half3 shine=(Environment(n,view,.8)*fresnel*_RiverOptics.z+sun.color*glint*.9)*detail;
             // Broad, low-contrast branches read as submerged light, rather than clipped white debris.
             half whiteCore=smoothstep(.04,.6,caustic)*_RiverMotion.z*_RiverPattern.y;
@@ -158,8 +159,12 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
             half side=1-abs(n.y);
             half alpha=saturate(.012+frame*.16+side*.12+fresnel*.10);
             Light sun=GetMainLight(TransformWorldToShadowCoord(i.ws));
-            half glint=pow(saturate(dot(n,SafeNormalize(view+sun.direction))),320)*sun.shadowAttenuation;
+            half glint=AeroFilteredGlint(n,view,sun.direction,320,detail)*sun.shadowAttenuation;
+            glint*=lerp(1,_AeroFinishOptics.z,_AeroFinishEnabled);
             half3 shine=Environment(n,view,.35)*fresnel*_RiverShell.z+sun.color*glint*.65;
+            half3 legacy=Environment(n,view,.35)*fresnel*_RiverShell.z;
+            half3 sharedReflection=AeroFinishReflection(legacy,i.ws,n,view,1,.65,_AeroDaylight);
+            shine+=sharedReflection-legacy+AeroThinFilm(n,view,1,_AeroDaylight);
             shine+=_GlassTint.rgb*(frame*.15+side*.05)*lerp(.2,1,saturate(_AeroDaylight));
             return half4(MixFog((shine+_GlassTint.rgb*alpha*.12)/max(alpha,.001),i.fog)*alpha,alpha)*detail;
         }

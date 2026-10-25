@@ -59,6 +59,8 @@ The current revision separates the recessed water interior from the smooth glass
 
 ### Nearby water light and reflections
 
+- `../_Screenshots-and-previews-to-delete/Documentation/FrutigerAero/Lighting/CameraTurn/Sun-Look-After.png` and `Sun-Occluded.png` — direct-sun flare with a soft core, halo, streak and cyan ghost, including depth blocking. `Particles-After.png` shows the existing floating green/cyan particles with 30% more emission and 15% more horizontal coverage. See [camera-turn optimization and atmosphere polish](../Documentation/FrutigerAero/Lighting/CAMERA_TURN_PARTICLES_AND_FLARE.md).
+
 - `Asset/Crystal-Water-Iridescence-User.png` — supplied clear blue liquid/glass close-up: broad flowing distortions, transparent aqua depth, restrained cyan/lilac iridescence, and sparse sharp white glints. Use for future water, glazing and bubble presentation while retaining readable silhouettes and the established white architectural core.
 
 - `Asset/Sun-Beams-Forest-User.png` — supplied golden sun shafts shaped by trees and branches.
@@ -119,6 +121,8 @@ These are Edit Mode captures of the actual generated landscape. See [terrain dir
 These are sampled Edit Mode visual previews, not live gameplay captures. See [feedback and tuning notes](../Documentation/FrutigerAero/ACTION_EXPERIENCE.md).
 
 ### Building kit — white and blue only
+
+- `../_Screenshots-and-previews-to-delete/Documentation/FrutigerAero/Buildings/Finish/Floor0-Day-Arch-After.png` and `Floor0-Day-Glass-After.png` — implemented pearl/aqua finish and bounded floor reflections, based on building samples 2, 3, 6, 9 and 11. [Implementation and validation limits](../Documentation/FrutigerAero/Buildings/BUILDING_FINISH.md) and [walking/turning preview](../_Screenshots-and-previews-to-delete/Documentation/FrutigerAero/Buildings/Finish/Motion.gif) accompany this pass. Pending visual acceptance; existing geometry and lighting directions remain the baseline.
 
 - `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Lineup.png` — pillar-only stages 0–10: sparse blue guides and scattered, irregular chunks filling in a seeded random order. Horizontal slices and staggered radial columns are superseded.
 - `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Sequence.gif` — static stage sequence.

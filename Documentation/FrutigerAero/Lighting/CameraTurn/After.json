@@ -1,0 +1,22 @@
+{
+  "revision": "After",
+  "gpu": "NVIDIA GeForce RTX 4060",
+  "api": "Direct3D12",
+  "scope": "Manual CPU-only Edit Mode review of completed tower. Two 360-degree sweeps for environment and live reflections, 3 degrees/frame; first 10 frames of each sweep excluded. Synchronous editor render timings, not gameplay FPS.",
+  "environment": {
+    "samples": 220,
+    "medianMs": 4.9875,
+    "p95Ms": 8.475200000000001,
+    "maxMs": 10.286200000000001,
+    "medianManagedBytes": 0,
+    "maxManagedBytes": 0
+  },
+  "live": {
+    "samples": 220,
+    "medianMs": 6.9220000000000006,
+    "p95Ms": 9.9078,
+    "maxMs": 11.7483,
+    "medianManagedBytes": 0,
+    "maxManagedBytes": 0
+  }
+}

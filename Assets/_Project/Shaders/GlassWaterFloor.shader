@@ -35,6 +35,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         #define _CLEARCOAT 1
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+        #include "AeroBuildingFinish.hlsl"
         #include "Assets/Stylized Water 3/Shaders/Libraries/Caustics.hlsl"
         TEXTURECUBE(_Environment); SAMPLER(sampler_Environment);
         TEXTURE2D(_MarbleMap); SAMPLER(sampler_MarbleMap);
@@ -66,6 +67,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         }
         void Aperture(Varyings i)
         {
+            AeroClipReflection(i.ws);
             if(_RiverStage>9.5)
             {
                 float edge=RiverChannelDistance(i.ws.xz,i.floorIndex);
@@ -115,14 +117,15 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
                     normal=MarbleNormal(marblePosition,normal);
                     SurfaceData surface=(SurfaceData)0;
                     surface.albedo=stone*_BaseColor.rgb;surface.alpha=1;surface.specular=half3(.04,.04,.04);
-                    surface.smoothness=_MarbleSmoothness;surface.normalTS=half3(0,0,1);surface.occlusion=1;
+                    surface.smoothness=AeroPolish(_MarbleSmoothness,i.ws,1);surface.normalTS=half3(0,0,1);surface.occlusion=1;
                     surface.clearCoatMask=_PearlCoat;surface.clearCoatSmoothness=.95;
                     surface.emission=build*half3(.1,2,3);
                     InputData data=(InputData)0;
                     data.positionWS=i.ws;data.positionCS=i.positionCS;data.normalWS=normal;data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(i.ws);
                     data.shadowCoord=TransformWorldToShadowCoord(i.ws);data.bakedGI=SampleSH(normal);data.shadowMask=half4(1,1,1,1);
                     data.vertexLighting=VertexLighting(i.ws,normal);data.normalizedScreenSpaceUV=GetNormalizedScreenSpaceUV(i.positionCS);
-                    return half4(MixFog(UniversalFragmentPBR(data,surface).rgb,i.fog),1);
+                    half3 marble=AeroFinishReflection(UniversalFragmentPBR(data,surface).rgb,i.ws,normal,data.viewDirectionWS,1,3.2,_AeroDaylight);
+                    return half4(MixFog(marble,i.fog),1);
                 }
                 float2 p=i.ws.xz; float t=_Time.y*_FlowSpeed;
                 // A continuous world-space field crosses tile boundaries without per-tile resets.

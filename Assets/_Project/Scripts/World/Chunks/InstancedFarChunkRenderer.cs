@@ -24,7 +24,7 @@ namespace TowerOfBabel.World.Chunks
     /// Pages are rebuilt only when their member chunks change.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer, IRiverGlassDrawSource
+    public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer, IRiverGlassDrawSource, IAeroReflectionDrawSource
     {
         // Both object-to-world and world-to-object are required by our non-uniform
         // radial transforms. Unity's default instancing layout fits 511, not 1023.
@@ -59,6 +59,7 @@ namespace TowerOfBabel.World.Chunks
         public int VisiblePageCount { get; private set; }
         public int CulledPageCount { get; private set; }
         public int DrawCallCount { get; private set; }
+        public int ReflectionDrawCallCount { get; private set; }
 
         public int LoadedInstanceCount
         {
@@ -78,6 +79,7 @@ namespace TowerOfBabel.World.Chunks
             return;
 #else
             RiverGlassRenderRegistry.Register(this);
+            AeroBuildingReflectionRegistry.Register(this);
             EnsureModelBatches();
 #endif
         }
@@ -121,6 +123,7 @@ namespace TowerOfBabel.World.Chunks
         public void LoadChunk(in FarChunkSnapshot snapshot)
         {
             RiverGlassRenderRegistry.Register(this);
+            AeroBuildingReflectionRegistry.Register(this);
             EnsureModelBatches();
             RemoveChunk(snapshot.Key);
             loadedChunks.Add(snapshot.Key);
@@ -278,12 +281,14 @@ namespace TowerOfBabel.World.Chunks
         private void OnDisable()
         {
             RiverGlassRenderRegistry.Unregister(this);
+            AeroBuildingReflectionRegistry.Unregister(this);
             DisposeBatches();
         }
 
         private void OnDestroy()
         {
             RiverGlassRenderRegistry.Unregister(this);
+            AeroBuildingReflectionRegistry.Unregister(this);
             DisposeBatches();
         }
 
@@ -293,6 +298,22 @@ namespace TowerOfBabel.World.Chunks
                 (camera.cullingMask & (1 << gameObject.layer)) == 0) return;
             foreach (var pair in batches)
                 if (pair.Key.IsCompletedRiver) pair.Value.CollectRiverGlass(camera, planes, draws, maximumDrawDistance);
+        }
+
+        public int SubmitReflection(Camera camera, Camera owner, Plane[] planes, int floor, float range)
+        {
+            ReflectionDrawCallCount = 0;
+            if (!isActiveAndEnabled || !isVisible || owner.gameObject.scene != gameObject.scene ||
+                (camera.cullingMask & (1 << gameObject.layer)) == 0) return 0;
+            int count = 0;
+            // Cull cached spatial pages first and group across chunks by mesh/material.
+            // Near chunks are ordinary renderers and never enter these far cells.
+            foreach (var batch in batches.Values)
+            {
+                count += batch.SubmitReflection(camera, owner.transform.position, planes, floor, range, gameObject.layer);
+                ReflectionDrawCallCount += batch.LastReflectionDrawCalls;
+            }
+            return count;
         }
 
         private void OnValidate()
@@ -413,8 +434,56 @@ namespace TowerOfBabel.World.Chunks
             private readonly Vector2 floorCenter;
             private readonly float floorHeight;
             private readonly float radial;
+            private readonly Matrix4x4[] reflectionMatrices = new Matrix4x4[MaximumInstancesPerDraw];
+            private readonly float[] reflectionFloors = new float[MaximumInstancesPerDraw];
+            private MaterialPropertyBlock reflectionProperties;
 
             public int Count { get; private set; }
+            public int LastReflectionDrawCalls { get; private set; }
+
+            public int SubmitReflection(Camera camera, Vector3 eye, Plane[] planes, int selectedFloor,
+                float range, int layer)
+            {
+                LastReflectionDrawCalls = 0;
+                int count = 0, total = 0;
+                Bounds bounds = default;
+                foreach (var cell in cells.Values)
+                {
+                    cell.RebuildIfDirty(meshBounds, false);
+                    foreach (var page in cell.Pages)
+                    {
+                        if (page.Bounds.SqrDistance(eye) > range * range || !GeometryUtility.TestPlanesAABB(planes, page.Bounds)) continue;
+                        int end = page.StartIndex + page.Count;
+                        for (int i = page.StartIndex; i < end; i++)
+                        {
+                            int floorIndex = cell.FloorIndices[i];
+                            if (floorIndex != selectedFloor && floorIndex != selectedFloor + 1) continue;
+                            Bounds b = cell.InstanceBounds[i];
+                            if (b.SqrDistance(eye) > range * range || !GeometryUtility.TestPlanesAABB(planes, b)) continue;
+                            if (count == 0) bounds = b; else bounds.Encapsulate(b);
+                            reflectionMatrices[count] = cell.Matrices[i]; reflectionFloors[count++] = floorIndex;
+                            if (count == MaximumInstancesPerDraw) { Flush(count, bounds); total += count; count = 0; }
+                        }
+                    }
+                }
+                if (count > 0) { Flush(count, bounds); total += count; }
+                return total;
+
+                void Flush(int instances, Bounds worldBounds)
+                {
+                    LastReflectionDrawCalls++;
+                    reflectionProperties ??= new MaterialPropertyBlock();
+                    if (river) reflectionProperties.SetFloatArray("_RiverFloorIndex", reflectionFloors);
+                    var parameters = new RenderParams(material)
+                    {
+                        camera = camera, layer = layer, worldBounds = worldBounds, matProps = reflectionProperties,
+                        shadowCastingMode = ShadowCastingMode.Off, receiveShadows = false,
+                        reflectionProbeUsage = ReflectionProbeUsage.Off, lightProbeUsage = LightProbeUsage.Off,
+                        motionVectorMode = MotionVectorGenerationMode.ForceNoMotion
+                    };
+                    Graphics.RenderMeshInstanced(parameters, mesh, 0, reflectionMatrices, instances);
+                }
+            }
 
             public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, ChunkManager floorOwner, bool river, byte stage)
             {
@@ -573,11 +642,15 @@ namespace TowerOfBabel.World.Chunks
             public int Floor;
             private readonly Dictionary<ChunkKey, List<Matrix4x4>> matricesByChunk = new();
             private readonly List<Matrix4x4> matrices = new();
+            private readonly List<int> floorIndices = new();
+            private readonly List<Bounds> instanceBounds = new();
             private readonly List<RenderPage> pages = new();
             private bool dirty = true;
 
             public bool IsEmpty => matricesByChunk.Count == 0;
             public List<Matrix4x4> Matrices => matrices;
+            public IReadOnlyList<int> FloorIndices => floorIndices;
+            public IReadOnlyList<Bounds> InstanceBounds => instanceBounds;
             public IReadOnlyList<RenderPage> Pages => pages;
 
             public void SetChunk(ChunkKey key, List<Matrix4x4> chunkMatrices)
@@ -600,14 +673,19 @@ namespace TowerOfBabel.World.Chunks
                     return;
 
                 matrices.Clear();
+                floorIndices.Clear(); instanceBounds.Clear();
                 pages.Clear();
-                foreach (List<Matrix4x4> chunkMatrices in matricesByChunk.Values)
-                    matrices.AddRange(chunkMatrices);
+                foreach (var pair in matricesByChunk)
+                    foreach (var matrix in pair.Value)
+                    {
+                        matrices.Add(matrix); floorIndices.Add(pair.Key.FloorIndex);
+                        instanceBounds.Add(TransformBounds(meshBounds, matrix));
+                    }
 
                 for (int start = 0; start < matrices.Count; start += MaximumInstancesPerDraw)
                 {
                     int count = Mathf.Min(MaximumInstancesPerDraw, matrices.Count - start);
-                    Bounds bounds = CalculateBounds(meshBounds, matrices, start, count);
+                    Bounds bounds = CalculateBounds(instanceBounds, start, count);
                     MaterialPropertyBlock probeProperties = useLightProbes
                         ? BuildLightProbeProperties(bounds.center, count)
                         : null;
@@ -617,16 +695,16 @@ namespace TowerOfBabel.World.Chunks
                 dirty = false;
             }
 
-            private static Bounds CalculateBounds(Bounds meshBounds, List<Matrix4x4> source,
+            private static Bounds CalculateBounds(List<Bounds> source,
                 int start, int count)
             {
-                Bounds bounds = TransformBounds(meshBounds, source[start]);
+                Bounds bounds = source[start];
                 for (int i = 1; i < count; i++)
-                    bounds.Encapsulate(TransformBounds(meshBounds, source[start + i]));
+                    bounds.Encapsulate(source[start + i]);
                 return bounds;
             }
 
-            private static Bounds TransformBounds(Bounds localBounds, Matrix4x4 matrix)
+            public static Bounds TransformBounds(Bounds localBounds, Matrix4x4 matrix)
             {
                 Vector3 center = matrix.MultiplyPoint3x4(localBounds.center);
                 Vector3 extents = localBounds.extents;

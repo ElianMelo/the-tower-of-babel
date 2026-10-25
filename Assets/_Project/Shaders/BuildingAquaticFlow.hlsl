@@ -45,6 +45,7 @@ AquaticFrame BuildAquaticFrame(Varyings input)
     f.dx=ddx(uv);f.dy=ddy(uv);f.seed=seed;
     float dist=distance(GetCameraPositionWS(),input.originSeed.xyz);
     f.fade=saturate((_WaterDetailDistance-dist)/max(_WaterDetailDistance*.4,1));
+    if(_AeroFinishCapturing>.5)f.fade=0;
     if(f.fade<.001)
     {
         f.uvA=uv;f.uvB=uv;f.weight=.5;
@@ -89,7 +90,7 @@ half2 AquaticLight(AquaticFrame f,half3 n,half3 view)
     half moving=lerp(b,a,f.weight);
     // A shallow refracted offset creates an apparent second layer inside the glaze.
     float3 ray=refract(-view,n,1.0/1.333);
-    float2 depthOffset=AquaticProjection(ray)*_InnerDepth/max(abs(dot(ray,n)),.4);
+    float2 depthOffset=AquaticProjection(ray)*_InnerDepth*(1+_AeroFinishEnabled*_AeroFinishOptics.x*.7)/max(abs(dot(ray,n)),.4);
     float2 deepUV=RotateAquatic(f.uvA*.73+depthOffset,.19)+float2(.37,.71);
     float2 deepUVB=RotateAquatic(f.uvB*.73+depthOffset,.19)+float2(.37,.71);
     half deepA=SAMPLE_TEXTURE2D_GRAD(_WaterLightMap,sampler_WaterLightMap,deepUV,RotateAquatic(f.dx*.73,.19),RotateAquatic(f.dy*.73,.19)).r;

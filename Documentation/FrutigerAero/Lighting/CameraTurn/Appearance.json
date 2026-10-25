@@ -1,0 +1,41 @@
+{
+  "mode": "Controlled Edit Mode render, deterministic 14-second particle simulation; no Play Mode or GPU profiling",
+  "particlesBefore": 21,
+  "particlesAfter": 29,
+  "emissionMultiplier": 1.3,
+  "horizontalAreaMultiplier": 1.15,
+  "cap": 125,
+  "flareElements": 4,
+  "observations": [
+    {
+      "name": "Sun-Look-Before",
+      "flareEnabled": false,
+      "flareOcclusion": true
+    },
+    {
+      "name": "Sun-Look-After",
+      "flareEnabled": true,
+      "flareOcclusion": true
+    },
+    {
+      "name": "Sun-Away",
+      "flareEnabled": true,
+      "flareOcclusion": true
+    },
+    {
+      "name": "Sun-Occluded",
+      "flareEnabled": true,
+      "flareOcclusion": true
+    },
+    {
+      "name": "Particles-Before",
+      "flareEnabled": false,
+      "flareOcclusion": true
+    },
+    {
+      "name": "Particles-After",
+      "flareEnabled": false,
+      "flareOcclusion": true
+    }
+  ]
+}

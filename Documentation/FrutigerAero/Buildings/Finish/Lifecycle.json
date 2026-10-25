@@ -1,0 +1,90 @@
+[
+  {
+    "label": "Initial fade",
+    "ReflectionFloor": 0,
+    "ReflectionWeight": 0.142857149,
+    "LastStatus": "Live bounded reflection",
+    "LastSubmittedInstances": 127,
+    "CaptureCount": 1,
+    "textureBytes": 9676672,
+    "reflectionCameras": 1,
+    "invertCulling": false
+  },
+  {
+    "label": "Settled floor 0",
+    "ReflectionFloor": 0,
+    "ReflectionWeight": 1.0,
+    "LastStatus": "Live bounded reflection",
+    "LastSubmittedInstances": 127,
+    "CaptureCount": 2,
+    "textureBytes": 9676672,
+    "reflectionCameras": 1,
+    "invertCulling": false
+  },
+  {
+    "label": "Teleport to floor 12; new fade",
+    "ReflectionFloor": 12,
+    "ReflectionWeight": 0.142857149,
+    "LastStatus": "Live bounded reflection",
+    "LastSubmittedInstances": 139,
+    "CaptureCount": 3,
+    "textureBytes": 9676672,
+    "reflectionCameras": 1,
+    "invertCulling": false
+  },
+  {
+    "label": "Settled floor 12",
+    "ReflectionFloor": 12,
+    "ReflectionWeight": 1.0,
+    "LastStatus": "Live bounded reflection",
+    "LastSubmittedInstances": 139,
+    "CaptureCount": 4,
+    "textureBytes": 9676672,
+    "reflectionCameras": 1,
+    "invertCulling": false
+  },
+  {
+    "label": "Environment fallback; resources released",
+    "ReflectionFloor": -1,
+    "ReflectionWeight": 0.0,
+    "LastStatus": "Environment only",
+    "LastSubmittedInstances": 0,
+    "CaptureCount": 4,
+    "textureBytes": 0,
+    "reflectionCameras": 0,
+    "invertCulling": false
+  },
+  {
+    "label": "Live restored",
+    "ReflectionFloor": 12,
+    "ReflectionWeight": 1.0,
+    "LastStatus": "Live bounded reflection",
+    "LastSubmittedInstances": 139,
+    "CaptureCount": 5,
+    "textureBytes": 9676672,
+    "reflectionCameras": 1,
+    "invertCulling": false
+  },
+  {
+    "label": "All tiles unfinished; no capture",
+    "ReflectionFloor": -1,
+    "ReflectionWeight": 0.0,
+    "LastStatus": "No visible completed deck",
+    "LastSubmittedInstances": 0,
+    "CaptureCount": 5,
+    "textureBytes": 9676672,
+    "reflectionCameras": 1,
+    "invertCulling": false
+  },
+  {
+    "label": "Disabled; resources released",
+    "ReflectionFloor": -1,
+    "ReflectionWeight": 0.0,
+    "LastStatus": "No visible completed deck",
+    "LastSubmittedInstances": 0,
+    "CaptureCount": 5,
+    "textureBytes": 0,
+    "reflectionCameras": 0,
+    "invertCulling": false
+  }
+]

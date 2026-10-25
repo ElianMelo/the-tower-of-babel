@@ -192,10 +192,10 @@ public static class AeroIslandAtmosphereAuthoring
     }
     private static void ConfigureFireflies(ParticleSystem ps)
     {
-        var main=ps.main; main.maxParticles=96; main.startLifetime=new ParticleSystem.MinMaxCurve(8,16); main.startSpeed=new ParticleSystem.MinMaxCurve(.01f,.06f); main.startSize3D=false; main.startSize=new ParticleSystem.MinMaxCurve(.018f,.055f);
+        var main=ps.main; main.maxParticles=125; main.startLifetime=new ParticleSystem.MinMaxCurve(8,16); main.startSpeed=new ParticleSystem.MinMaxCurve(.01f,.06f); main.startSize3D=false; main.startSize=new ParticleSystem.MinMaxCurve(.018f,.055f);
         main.startColor=new ParticleSystem.MinMaxGradient(new Color(.25f,.85f,1),new Color(.5f,1,.45f));
-        var emission=ps.emission; emission.enabled=true; emission.rateOverTime=4;
-        var shape=ps.shape; shape.enabled=true; shape.shapeType=ParticleSystemShapeType.Box; shape.scale=new Vector3(20,2.4f,20);
+        var emission=ps.emission; emission.enabled=true; emission.rateOverTime=2.535f;
+        var shape=ps.shape; shape.enabled=true; shape.shapeType=ParticleSystemShapeType.Box; shape.scale=new Vector3(20*Mathf.Sqrt(1.15f),2.4f,20*Mathf.Sqrt(1.15f));
         var noise=ps.noise; noise.enabled=true; noise.strength=.28f; noise.frequency=.18f; noise.scrollSpeed=.12f; noise.octaveCount=1; noise.damping=true; noise.quality=ParticleSystemNoiseQuality.Medium;
         var velocity=ps.velocityOverLifetime; velocity.enabled=true; velocity.space=ParticleSystemSimulationSpace.World;
         velocity.x=new ParticleSystem.MinMaxCurve(-.05f,.05f); velocity.y=new ParticleSystem.MinMaxCurve(.015f,.07f); velocity.z=new ParticleSystem.MinMaxCurve(-.05f,.05f);
@@ -208,12 +208,29 @@ public static class AeroIslandAtmosphereAuthoring
     }
     private static void ConfigureFlares(Light sun)
     {
+        var halo=Asset<Texture2D>(Folder+"/AeroSunFlareSoftHalo.asset",()=>
+        {
+            const int size=128;
+            var texture=new Texture2D(size,size,TextureFormat.RGBA32,true,true) {name="Soft sun flare halo",wrapMode=TextureWrapMode.Clamp,filterMode=FilterMode.Trilinear};
+            var pixels=new Color[size*size];
+            for(int y=0;y<size;y++)for(int x=0;x<size;x++)
+            {
+                float px=(x+.5f)/size*2-1,py=(y+.5f)/size*2-1,r2=px*px+py*py;
+                float v=Mathf.Exp(-r2*5)*Mathf.SmoothStep(0,1,Mathf.Clamp01((1-r2)*5));
+                pixels[y*size+x]=new Color(v,v,v,1);
+            }
+            texture.SetPixels(pixels);texture.Apply(true,false);return texture;
+        });
         var data=Asset<LensFlareDataSRP>(Folder+"/AeroSunFlare.asset",ScriptableObject.CreateInstance<LensFlareDataSRP>);
-        data.elements=new[]{new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.32f,uniformScale=.65f,sizeXY=new Vector2(.17f,.17f),tint=new Color(1,.88f,.68f),position=0,fallOff=.8f},
-            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.07f,uniformScale=.3f,sizeXY=new Vector2(.07f,.07f),tint=new Color(.5f,.82f,1),position=.55f,fallOff=.9f}};
+        data.elements=new[]{new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=4,uniformScale=1,sizeXY=new Vector2(.1f,.1f),tint=new Color(1,.98f,.9f),position=0,fallOff=.65f},
+            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.32f,uniformScale=1,sizeXY=new Vector2(.9f,.9f),tint=new Color(1,.86f,.63f),position=0,fallOff=.5f},
+            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.25f,uniformScale=1,sizeXY=new Vector2(2.4f,.025f),tint=new Color(1,.94f,.8f),position=0,fallOff=.6f},
+            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.12f,uniformScale=1,sizeXY=new Vector2(.07f,.07f),tint=new Color(.5f,.82f,1),position=.55f,fallOff=.9f}};
+        foreach(var element in data.elements){element.flareType=SRPLensFlareType.Image;element.lensFlareTexture=halo;}
         EditorUtility.SetDirty(data);
         var flare=sun.GetComponent<LensFlareComponentSRP>() ?? sun.gameObject.AddComponent<LensFlareComponentSRP>();
-        flare.lensFlareData=data; flare.intensity=.4f; flare.useOcclusion=true; flare.sampleCount=32; flare.occlusionRadius=.1f; flare.allowOffScreen=false; EditorUtility.SetDirty(flare);
+        flare.lensFlareData=data; flare.intensity=.85f; flare.useOcclusion=true; flare.sampleCount=32; flare.occlusionRadius=.02f; flare.allowOffScreen=false;
+        flare.radialScreenAttenuationCurve=new AnimationCurve(new Keyframe(0,1),new Keyframe(.25f,.9f),new Keyframe(.7f,.12f),new Keyframe(1,0)); EditorUtility.SetDirty(flare);
         var rp=(UniversalRenderPipelineAsset)GraphicsSettings.currentRenderPipeline; var so=new SerializedObject(rp);
         so.FindProperty("m_SupportDataDrivenLensFlare").boolValue=true; so.FindProperty("m_SupportScreenSpaceLensFlare").boolValue=true; so.ApplyModifiedPropertiesWithoutUndo();
         var global=AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/_Project/UI/FrutigerAero/AeroAtmosphere.asset");

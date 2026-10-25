@@ -83,11 +83,19 @@ namespace TowerOfBabel.Rendering
             UpdateLights(dt, duration);
             if (fireflies != null)
             {
+                float population = Mathf.Max(0, cycle.profile.fireflyPopulationMultiplier);
+                float spread = Mathf.Sqrt(Mathf.Max(.01f, cycle.profile.fireflyCoverageAreaMultiplier));
+                var main = fireflies.main;
+                int capacity = Mathf.Max(1, Mathf.CeilToInt(96 * population));
+                if (main.maxParticles != capacity) main.maxParticles = capacity;
+                var shape = fireflies.shape;
+                var coverage = new Vector3(20 * spread, 2.4f, 20 * spread);
+                if (shape.scale != coverage) shape.scale = coverage;
                 Vector3 relative = view - new Vector3(center.x, 0, center.y);
-                relative.y = 0; relative = Vector3.ClampMagnitude(relative, Mathf.Max(1, WallRadius(floor) - 12));
+                relative.y = 0; relative = Vector3.ClampMagnitude(relative, Mathf.Max(1, WallRadius(floor) - 12 * spread));
                 fireflies.transform.position = new Vector3(center.x + relative.x, floor * floorHeight + 2, center.y + relative.z);
                 var emission = fireflies.emission;
-                emission.rateOverTime = Mathf.Lerp(3, 7, 1 - cycle.Daylight) * cycle.profile.fireflyDensity * inside;
+                emission.rateOverTime = Mathf.Lerp(3, 7, 1 - cycle.Daylight) * cycle.profile.fireflyDensity * population * inside;
                 if (lastFloor != floor) fireflies.Clear();
             }
             lastFloor = floor;

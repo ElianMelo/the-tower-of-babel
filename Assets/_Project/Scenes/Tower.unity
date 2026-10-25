@@ -1379,7 +1379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.LensFlareComponentSRP
   m_LensFlareData: {fileID: 11400000, guid: 15d76ef70c24ef242aedec97efdbb43c, type: 2}
   version: 0
-  intensity: 0.4
+  intensity: 0.85
   maxAttenuationDistance: 100
   maxAttenuationScale: 100
   distanceAttenuationCurve:
@@ -1444,8 +1444,26 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
+      time: 0.25
+      value: 0.9
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.7
+      value: 0.12
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
       time: 1
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -1459,7 +1477,7 @@ MonoBehaviour:
   useBackgroundCloudOcclusion: 0
   environmentOcclusion: 0
   useWaterOcclusion: 0
-  occlusionRadius: 0.1
+  occlusionRadius: 0.02
   sampleCount: 32
   occlusionOffset: 0.05
   scale: 1
@@ -2556,7 +2574,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 96
+    maxNumParticles: 125
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -2624,7 +2642,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 20, y: 2.4, z: 20}
+    m_Scale: {x: 21.44761, y: 2.4, z: 21.44761}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -2822,7 +2840,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1.9499999
+      scalar: 2.5349998
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -7515,6 +7533,7 @@ GameObject:
   - component: {fileID: 1046978671}
   - component: {fileID: 1046978670}
   - component: {fileID: 1046978673}
+  - component: {fileID: 1046978674}
   m_Layer: 0
   m_Name: Aero island atmosphere
   m_TagString: Untagged
@@ -7599,6 +7618,20 @@ MonoBehaviour:
   chunks: {fileID: 1114320928}
   near: {fileID: 1114320932}
   atmosphere: {fileID: 1046978670}
+--- !u!114 &1046978674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046978669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1859cd8674f5f294889a558858213b67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroBuildingFinish
+  profile: {fileID: 11400000, guid: 3f2027d50521ba54abbd24db3a0ea516, type: 2}
+  liveReflections: 1
 --- !u!1 &1059284189
 GameObject:
   m_ObjectHideFlags: 0
@@ -7858,6 +7891,7 @@ GameObject:
   - component: {fileID: 1114320931}
   - component: {fileID: 1114320932}
   - component: {fileID: 1114320933}
+  - component: {fileID: 1114320934}
   m_Layer: 0
   m_Name: ChunkManager
   m_TagString: Untagged
@@ -531626,6 +531660,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Rendering.RiverGlassLighting
   profile: {fileID: 11400000, guid: 7169c53ac1ccf92408875f5d165e6309, type: 2}
   cookieShader: {fileID: 4800000, guid: 000bb30048a14414199eb3aeb929e49b, type: 3}
+--- !u!114 &1114320934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1114320927}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b264422fb6169240ad2338f5ed0efc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerBuildingFinishBridge
+  chunks: {fileID: 1114320928}
 --- !u!1001 &1114478589
 PrefabInstance:
   m_ObjectHideFlags: 0

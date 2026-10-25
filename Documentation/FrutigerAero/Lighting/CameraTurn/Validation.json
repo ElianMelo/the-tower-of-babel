@@ -1,0 +1,41 @@
+{
+  "project": "D:/PersonalProjects/the-tower-of-babel/Assets",
+  "scene": "Assets/_Project/Scenes/Tower.unity",
+  "isDirty": false,
+  "playing": false,
+  "compilationFailed": false,
+  "profiling": false,
+  "gpuProfiling": false,
+  "temporaryReflectionCameras": 0,
+  "particleCap": 125,
+  "emission": 2.53499985,
+  "area": 460.0,
+  "populationMultiplier": 1.3,
+  "coverageMultiplier": 1.15,
+  "flare": {
+    "enabled": true,
+    "intensity": 0.85,
+    "useOcclusion": true,
+    "allowOffScreen": false,
+    "elements": 4,
+    "texture": "Assets/_Project/Environment/Lighting/AeroSunFlareSoftHalo.asset"
+  },
+  "shaderErrors": [
+    {
+      "shader": "BuildingAquaticFinish",
+      "messages": []
+    },
+    {
+      "shader": "GlassWaterFloor",
+      "messages": []
+    },
+    {
+      "shader": "RiverGlassSurface",
+      "messages": []
+    },
+    {
+      "shader": "AeroSoftLightVfx",
+      "messages": []
+    }
+  ]
+}

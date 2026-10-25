@@ -23,7 +23,9 @@ namespace TowerOfBabel.Rendering
         [Range(10, 30)] public float beamLength = 22;
         [Range(0, .8f)] public float exitVolumeStrength = .5f;
         [Range(0, 1)] public float fireflyDensity = .65f;
-        [Range(0, 1)] public float sunFlareIntensity = .4f;
+        [Min(0)] public float fireflyPopulationMultiplier = 1.3f;
+        [Min(.01f)] public float fireflyCoverageAreaMultiplier = 1.15f;
+        [Range(0, 1)] public float sunFlareIntensity = .85f;
 
         public static float DaylightAt(float time)
             => Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-.06f, .22f, Mathf.Sin((Mathf.Repeat(time, 1) - .25f) * Mathf.PI * 2)));

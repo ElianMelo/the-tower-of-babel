@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4dc335dce28c884fbcb77821f5ab792, type: 3}
+  m_Name: BuildingFinish
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroBuildingFinishProfile
+  quality: 1
+  reflections: 0.7
+  polish: 0.65
+  roughnessVariation: 0.025
+  inlayDepth: 0.55
+  iridescence: 0.075
+  glints: 0.8
+  edgeLight: 0.14
+  dayEnvironment: {fileID: 8900000, guid: bfa6913d4cb6e96459e49363b9af071e, type: 3}
+  nightEnvironment: {fileID: 8900000, guid: bfa6913d4cb6e96459e49363b9af071e, type: 3}
+  dayTint: {r: 1, g: 1, b: 1, a: 1}
+  nightTint: {r: 0.14, g: 0.21, b: 0.32, a: 1}
+  resolutionScale: 0.5
+  maximumResolution: 1024
+  range: 32
+  transitionSeconds: 0.35
+  reflectionRendererIndex: 1
+  livePipeline: {fileID: 11400000, guid: 4b83569d67af61e458304325a23e5dfd, type: 2}

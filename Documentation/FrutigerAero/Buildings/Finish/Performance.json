@@ -1,0 +1,20 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4060",
+  "api": "Direct3D12",
+  "resolution": "1920x1080",
+  "scope": "Manual Edit Mode CPU-only review, full completed tower cached; fixed floor view and lighting clock. No GPU instrumentation. Three alternating baseline/environment/live blocks; 45 measured frames after 15 warm-up frames per mode per block.",
+  "baselineCpuMs": 6.4905,
+  "environmentCpuMs": 6.413,
+  "enhancedCpuMs": 10.6028,
+  "baselineGpuMs": null,
+  "environmentGpuMs": null,
+  "enhancedGpuMs": null,
+  "baselineGpuSamples": 0,
+  "environmentGpuSamples": 0,
+  "enhancedGpuSamples": 0,
+  "addedGpuMs": null,
+  "reflectionGpuMs": null,
+  "loadedInstances": 86467,
+  "reflectionInstances": 127,
+  "note": "CPU timings include synchronous Editor overhead. GPU unavailable when sample counts are zero; no gameplay FPS claim. D3D12 GPU profiling disabled following a native driver fence/transition crash; the 2 ms GPU target remains unconfirmed."
+}

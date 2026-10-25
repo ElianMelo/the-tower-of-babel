@@ -1,5 +1,7 @@
 # Frutiger Aero building kit
 
+The 2026-10-25 [building finish pass](BUILDING_FINISH.md) adds bounded live floor reflections, shared environment reflections, pearl polish, deeper aqua inlays, subtle iridescent rims, filtered glints and steady recessed-edge accents. It retains this opaque kit and the separate enclosed glass river. [Review captures and motion](../../../_Screenshots-and-previews-to-delete/Documentation/FrutigerAero/Buildings/Finish/) are available; the 2 ms GPU target remains unconfirmed following a native graphics-driver crash during additional profiling.
+
 Current floor correction: [distant tile visibility and continuous marble/glass joins](TILE_VISIBILITY_AND_JOINS.md), including validation and tower previews.
 
 Opaque aquatic finish restored, 2026-10-21. The subsequent see-through border experiment was rejected by the user.
