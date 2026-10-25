@@ -29,3 +29,10 @@ These instructions apply to the entire `the-tower-of-babel` repository.
 - When asked for a visual guide or visual design changes, consult `Frutiger Reference/INDEX.md` and the relevant images in `Frutiger Reference/` first.
 - Use `Documentation/FrutigerAero/DESIGN_DIRECTION.md` for the accepted initial UI direction and future iteration priorities; it distinguishes accepted choices from superseded experiments.
 - References are grouped into `UI`, `Asset`, and `Character`. Keep this index current when adding reference images from this chat.
+
+## Screenshot and preview outputs
+
+- Save all generated screenshots, screen prints, comparison images, and motion previews under the project-root `_Screenshots-and-previews-to-delete/` folder, including outputs from capture scripts and editor review tools.
+- Use descriptive subfolders inside that folder. Create the destination when needed; do not save these outputs under `Assets/`, `Documentation/`, or `Frutiger Reference/`.
+- This folder is ignored by Git and its contents are disposable. Keep written findings, settings, and performance reports in `Documentation/`; link to captures at their actual location when useful.
+- Supplied visual references and production art assets retain their existing locations. See [screenshot output policy](Documentation/SCREENSHOT_OUTPUTS.md).

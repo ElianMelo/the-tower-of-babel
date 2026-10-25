@@ -1,5 +1,7 @@
 # Frutiger Aero interface
 
+All generated screenshots, comparison images, and motion previews go in the project-root `_Screenshots-and-previews-to-delete/` folder. Follow the [screenshot output policy](../SCREENSHOT_OUTPUTS.md) for future captures; keep written review findings and performance reports in this documentation.
+
 **Accepted initial version — 2026-10-21.** Start with [Design direction and future priorities](DESIGN_DIRECTION.md) for the current visual rules. The sections below include implementation notes and historical iterations; the accepted fixed-border direction supersedes earlier edge-deformation experiments.
 
 The Tower scene now uses `Assets/_Project/UI/FrutigerAero/Prefabs/FrutigerInterface.prefab`. Its inventory wallet is assigned on the scene instance; the input actions, resource definitions, and internal screen references are serialized in the prefab.
