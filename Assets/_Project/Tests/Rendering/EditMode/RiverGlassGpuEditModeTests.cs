@@ -14,6 +14,121 @@ namespace TowerOfBabel.Rendering.Tests
     public sealed class RiverGlassGpuEditModeTests
     {
         [Test]
+        public void SurfacePattern_OpacityAndBlurControlRenderedDetailWithoutChangingTransparency()
+        {
+            const int size=256;
+            var original=SceneManager.GetActiveScene();var scene=EditorSceneManager.NewPreviewScene();
+            var target=new RenderTexture(size,size,24,RenderTextureFormat.ARGBHalf);var oldTarget=RenderTexture.active;
+            var pixels=new Texture2D(size,size,TextureFormat.RGBAFloat,false);var source=new Source();
+            var feature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
+            var oldProfile=feature.profile;var profile=Object.Instantiate(oldProfile);
+            float oldClock=feature.previewTime,oldDay=Shader.GetGlobalFloat("_AeroDaylight");
+            bool oldAsync=ShaderUtil.allowAsyncCompilation;ShaderUtil.allowAsyncCompilation=false;
+            try
+            {
+                feature.profile=profile;profile.reflections=profile.glassReflections=0;profile.flowSpeed=0;profile.waterHighlights=1;
+                var go=new GameObject("Surface pattern filtering camera");SceneManager.MoveGameObjectToScene(go,scene);
+                var camera=go.AddComponent<Camera>();camera.enabled=false;camera.scene=scene;camera.targetTexture=target;camera.cullingMask=1<<31;
+                camera.orthographic=true;camera.orthographicSize=4;camera.transform.position=Vector3.down*4;camera.transform.rotation=Quaternion.Euler(-90,0,0);
+                camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.2f,.15f,.1f);
+                var mesh=AssetDatabase.LoadAssetAtPath<Mesh>("Assets/_Project/Models/Buildings/FrutigerAero/FloorTileComplete.asset");
+                var matrices=new List<Matrix4x4>();for(int x=-2;x<2;x++)for(int z=-1;z<3;z++)matrices.Add(Matrix4x4.Translate(new Vector3(x*4,0,z*4)));
+                var draw=new RiverGlassDraw {mesh=mesh,matrices=matrices.ToArray(),count=matrices.Count};draw.Configure();source.draws.Add(draw);
+                RiverGlassRenderRegistry.Register(source);Shader.SetGlobalFloat("_AeroDaylight",1);feature.previewTime=2;
+                Color[] Sample(float opacity,float blur)
+                {
+                    profile.surfacePatternOpacity=opacity;profile.surfacePatternBlur=blur;camera.Render();camera.Render();RenderTexture.active=target;
+                    pixels.ReadPixels(new Rect(0,0,size,size),0,0);pixels.Apply();return pixels.GetPixels();
+                }
+                var clear=Sample(0,0);var sharp=Sample(1,0);var faint=Sample(.25f,0);var soft=Sample(1,4);
+                float Energy(Color[] values)=>values.Select((c,i)=>Mathf.Abs(c.grayscale-clear[i].grayscale)).Average();
+                float Gradient(Color[] values)
+                {
+                    float sum=0;for(int y=33;y<223;y++)for(int x=33;x<223;x++)
+                    {int i=y*size+x;sum+=Mathf.Abs(values[i].grayscale-values[i-1].grayscale)+Mathf.Abs(values[i].grayscale-values[i-size].grayscale);}
+                    return sum/(190*190);
+                }
+                Assert.That(Energy(sharp),Is.GreaterThan(.01f),"The surface pattern must contribute visible rendered light.");
+                Assert.That(Energy(faint)/Energy(sharp),Is.InRange(.23f,.27f),"Opacity must fade the pattern independently of glass and water transmission.");
+                Assert.That(Gradient(soft),Is.LessThan(Gradient(sharp)*.75f),"Blur must reduce high-frequency surface detail in actual rendered pixels.");
+                Assert.That(Energy(soft),Is.GreaterThan(.001f),"Filtering must retain broad flowing light rather than removing the effect.");
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(2));Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(1));
+                // A profile saved before the split still renders with its original texture reference.
+                profile.surfaceCaustics=null;var fallback=Sample(1,0);
+                Assert.That(Energy(fallback),Is.GreaterThan(.001f));
+            }
+            finally
+            {
+                RiverGlassRenderRegistry.Unregister(source);feature.profile=oldProfile;feature.previewTime=oldClock;Shader.SetGlobalFloat("_AeroDaylight",oldDay);
+                RenderTexture.active=oldTarget;EditorSceneManager.ClosePreviewScene(scene);SceneManager.SetActiveScene(original);
+                target.Release();Object.DestroyImmediate(target);Object.DestroyImmediate(pixels);Object.DestroyImmediate(profile);ShaderUtil.allowAsyncCompilation=oldAsync;
+            }
+        }
+
+        [Test]
+        public void StackedFloors_OnlyTheNearestTwoAnimateAndFarWaterRemainsVisible()
+        {
+            const int size=512;
+            var original=SceneManager.GetActiveScene();var scene=EditorSceneManager.NewPreviewScene();
+            var target=new RenderTexture(size,size,24,RenderTextureFormat.ARGBHalf);var oldTarget=RenderTexture.active;
+            var pixels=new Texture2D(size,size,TextureFormat.RGBAFloat,false);var source=new Source();
+            var checker=new Texture2D(2,2,TextureFormat.RGBA32,false) {filterMode=FilterMode.Point,wrapMode=TextureWrapMode.Repeat};
+            var receiverMaterial=new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            bool oldAsync=ShaderUtil.allowAsyncCompilation;ShaderUtil.allowAsyncCompilation=false;
+            var feature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
+            float oldClock=feature.previewTime,oldDay=Shader.GetGlobalFloat("_AeroDaylight");
+            try
+            {
+                var go=new GameObject("Stacked water detail budget camera");SceneManager.MoveGameObjectToScene(go,scene);
+                var camera=go.AddComponent<Camera>();camera.enabled=false;camera.scene=scene;camera.targetTexture=target;camera.cullingMask=1<<31;
+                camera.fieldOfView=90;camera.transform.position=Vector3.up*24;camera.transform.rotation=Quaternion.Euler(90,0,0);
+                camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.3f,.2f,.15f);
+                checker.SetPixels(new[]{Color.white,new Color(.15f,.1f,.05f),new Color(.15f,.1f,.05f),Color.white});checker.Apply();
+                receiverMaterial.SetTexture("_BaseMap",checker);receiverMaterial.SetTextureScale("_BaseMap",new Vector2(24,8));
+                var receiver=GameObject.CreatePrimitive(PrimitiveType.Plane);receiver.layer=31;SceneManager.MoveGameObjectToScene(receiver,scene);
+                receiver.transform.position=Vector3.down;receiver.transform.localScale=new Vector3(3,1,1);receiver.GetComponent<Renderer>().sharedMaterial=receiverMaterial;
+                var mesh=AssetDatabase.LoadAssetAtPath<Mesh>("Assets/_Project/Models/Buildings/FrutigerAero/FloorTileComplete.asset");
+                for(int floor=0;floor<3;floor++)
+                {
+                    var draw=new RiverGlassDraw {mesh=mesh,matrices=new[]{Matrix4x4.Translate(new Vector3(-10+floor*8,floor*6,2))},count=1,floor=floor,height=floor*6};
+                    draw.Configure();source.draws.Add(draw);
+                }
+                RiverGlassRenderRegistry.Register(source);Shader.SetGlobalFloat("_AeroDaylight",1);
+                Color[] Sample(float time)
+                {
+                    feature.previewTime=time;camera.Render();camera.Render();RenderTexture.active=target;
+                    pixels.ReadPixels(new Rect(0,0,size,size),0,0);pixels.Apply();return pixels.GetPixels();
+                }
+                var before=Sample(2);var after=Sample(6);
+                float Difference(int floor)
+                {
+                    var screen=camera.WorldToScreenPoint(new Vector3(-8+floor*8,floor*6,0));
+                    int radius=Mathf.FloorToInt(camera.WorldToScreenPoint(new Vector3(-6.5f+floor*8,floor*6,0)).x-screen.x);
+                    float sum=0;for(int y=-radius;y<radius;y++)for(int x=-radius;x<radius;x++)
+                    {int index=(Mathf.RoundToInt(screen.y)+y)*size+Mathf.RoundToInt(screen.x)+x;sum+=Mathf.Abs(before[index].grayscale-after[index].grayscale);}
+                    return sum/(4*radius*radius);
+                }
+                Assert.That(Difference(0),Is.LessThan(.00001f),"A farther floor must not add animated reflections or highlights to the stack.");
+                Assert.That(Difference(2),Is.GreaterThan(.002f),"The nearest pool must keep its moving water.");
+                Assert.That(feature.LastDetailedFloors,Is.EqualTo(2));
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(5));
+                RiverGlassRenderRegistry.Unregister(source);var withoutWater=Sample(6);
+                var farPixel=camera.WorldToScreenPoint(new Vector3(-8,0,0));
+                int farIndex=Mathf.RoundToInt(farPixel.y)*size+Mathf.RoundToInt(farPixel.x);
+                Assert.That(Vector4.Distance(before[farIndex],withoutWater[farIndex]),Is.GreaterThan(.005f),
+                    "The cheaper distant pool must still render its transparent aqua tint.");
+            }
+            finally
+            {
+                RiverGlassRenderRegistry.Unregister(source);feature.previewTime=oldClock;Shader.SetGlobalFloat("_AeroDaylight",oldDay);
+                RenderTexture.active=oldTarget;EditorSceneManager.ClosePreviewScene(scene);SceneManager.SetActiveScene(original);
+                target.Release();Object.DestroyImmediate(target);Object.DestroyImmediate(pixels);
+                Object.DestroyImmediate(receiverMaterial);Object.DestroyImmediate(checker);
+                ShaderUtil.allowAsyncCompilation=oldAsync;
+            }
+        }
+
+        [Test]
         public void CompletedTower_RendersUnreadableSharedMeshesWithoutCpuExpansion()
         {
             var original=SceneManager.GetActiveScene();var scene=EditorSceneManager.NewPreviewScene();

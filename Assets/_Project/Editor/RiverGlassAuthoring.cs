@@ -36,6 +36,63 @@ public static class RiverGlassAuthoring
             profile.projectionRange=8; profile.selectionDistance=24; profile.projectionAngle=120;
             profile.presentationVersion=2;
         }
+        if(profile.presentationVersion<3)
+        {
+            profile.projectionRange=14;profile.projectionAngle=150;
+            profile.daylightIntensity=64;profile.nightIntensity=48;
+            profile.presentationVersion=3;
+        }
+        if(profile.presentationVersion<4)
+        {
+            profile.surfaceCaustics=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Stylized Water 3/Materials/Textures/Caustics/Caustics_2.png");
+            profile.surfacePatternOpacity=.22f;profile.surfacePatternBlur=3;profile.surfacePatternScale=.16f;
+            profile.presentationVersion=4;
+        }
+        if(profile.presentationVersion<5)
+        {
+            profile.projectionPatchCount=4;profile.projectionAheadDistance=28;profile.projectionPatternDensity=2.5f;
+            profile.projectionAngle=110;profile.selectionDistance=42;profile.patchSeparation=8;
+            profile.presentationVersion=5;
+        }
+        if(profile.presentationVersion<6)
+        {
+            profile.projectionPatternDensity=5;
+            profile.daylightIntensity=20;profile.nightIntensity=12;
+            profile.presentationVersion=6;
+        }
+        if(profile.presentationVersion<7)
+        {
+            profile.projectionTint=new Color(1,1,.99f);
+            profile.daylightIntensity=144;profile.nightIntensity=96;
+            profile.projectionBurstDuration=new Vector2(1.4f,3.2f);profile.projectionQuietDuration=new Vector2(2.5f,6);
+            profile.projectionBurstFade=.55f;profile.presentationVersion=7;
+        }
+        if(profile.presentationVersion<8)
+        {
+            profile.projectionAngle=60;profile.daylightIntensity=32;profile.nightIntensity=20;
+            profile.projectionBurstDuration=new Vector2(7,11);profile.projectionQuietDuration=new Vector2(3,7);
+            profile.projectionBurstFade=2.8f;profile.projectionRelocationFade=1.6f;
+            profile.presentationVersion=8;
+        }
+        if(profile.presentationVersion<9)
+        {
+            profile.daylightIntensity=96;profile.nightIntensity=64;
+            profile.projectionCutoutSpeed=.06f;profile.projectionCutoutWarp=.035f;profile.presentationVersion=9;
+        }
+        if(profile.presentationVersion<10)
+        {
+            profile.projectionAngle=90;profile.projectionPatternDensity=2.5f;
+            profile.projectionHighlightOpacity=.95f;profile.projectionDetailOpacity=.06f;profile.presentationVersion=10;
+        }
+        if(profile.presentationVersion<11)
+        {
+            profile.projectionBurstDuration=new Vector2(6,9);profile.projectionQuietDuration=new Vector2(2,4);
+            profile.projectionMaxActivePatches=2;profile.projectionStartSpacing=new Vector2(1.2f,2.5f);
+            profile.projectionGlobalQuietInterval=new Vector2(14,20);profile.projectionGlobalQuietDuration=new Vector2(1,2);
+            profile.projectionGlobalFade=1.5f;profile.projectionFlowVariation=.15f;profile.projectionFlowSway=.035f;
+            profile.projectionDetailLifetime=new Vector2(6,10);profile.projectionHighlightLifetime=new Vector2(2,4);
+            profile.projectionHighlightFade=.7f;profile.presentationVersion=11;
+        }
         glass.SetFloat("_RiverStage", 10); glass.SetFloat("_RiverFloorIndex", -1); glass.enableInstancing = true;
         EditorUtility.SetDirty(glass); EditorUtility.SetDirty(profile);
         foreach (var name in new[] { "PC_Renderer", "Mobile_Renderer" })

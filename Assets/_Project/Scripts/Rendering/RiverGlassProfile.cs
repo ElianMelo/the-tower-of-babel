@@ -11,9 +11,15 @@ namespace TowerOfBabel.Rendering
         public static bool SupportsProjection => GraphicsSettings.currentRenderPipeline is UniversalRenderPipelineAsset pipeline &&
             pipeline.supportsAdditionalLightShadows;
         public static void ConfigureProjectionLight(Light light) =>
-            JsonUtility.FromJsonOverwrite("{\"m_AdditionalLightsShadowResolutionTier\":0}", light.GetUniversalAdditionalLightData());
+            JsonUtility.FromJsonOverwrite("{\"m_AdditionalLightsShadowResolutionTier\":-1}", light.GetUniversalAdditionalLightData());
         public Texture2D ripples;
         public Texture2D caustics;
+        [Header("Water surface pattern")]
+        public Texture2D surfaceCaustics;
+        [Range(0,1)] public float surfacePatternOpacity = .22f;
+        [Tooltip("Extra texture mip filtering; softens the surface pattern without blurring objects through the glass.")]
+        [Range(0,4)] public float surfacePatternBlur = 3;
+        [Min(.01f)] public float surfacePatternScale = .16f;
         public Cubemap environment;
         public Vector4 layout = new(96, 3, 6, 1.3f);
         public Color absorption = new(.9f, .22f, .09f);
@@ -35,26 +41,54 @@ namespace TowerOfBabel.Rendering
         [Min(1)] public float refractionDistance = 24;
         [Min(1)] public float detailDistance = 42;
         [Range(1,3)] public int detailedFloorLimit = 2;
-        [Range(90,140)] public float projectionAngle = 120;
-        public Color projectionTint = new(.88f, .96f, 1);
-        [Min(0)] public float daylightIntensity = 28;
-        [Min(0)] public float nightIntensity = 36;
-        [Min(.1f)] public float projectionRange = 8;
-        [Min(1)] public float selectionDistance = 24;
-        [Min(.1f)] public float patchSeparation = 5;
+        [Header("Projected caustic patches")]
+        [Range(1,4)] public int projectionPatchCount = 4;
+        [Min(0)] public float projectionAheadDistance = 28;
+        [Tooltip("Higher density makes each caustic branch smaller without enlarging its light footprint.")]
+        [Range(1,5)] public float projectionPatternDensity = 2.5f;
+        [Range(20,155)] public float projectionAngle = 90;
+        [Tooltip("Contribution of the sparse bright focus points.")]
+        [Range(0,1)] public float projectionHighlightOpacity = .95f;
+        [Tooltip("Contribution of the faint flowing branches between bright points.")]
+        [Range(0,1)] public float projectionDetailOpacity = .06f;
+        public Color projectionTint = new(1, 1, .99f);
+        [Tooltip("Peak reflected light during a burst, before the fade envelope.")]
+        [Min(0)] public float daylightIntensity = 96;
+        [Min(0)] public float nightIntensity = 64;
+        public Vector2 projectionBurstDuration = new(6, 9);
+        public Vector2 projectionQuietDuration = new(2, 4);
+        [Range(1,2)] public int projectionMaxActivePatches = 2;
+        public Vector2 projectionStartSpacing = new(1.2f, 2.5f);
+        public Vector2 projectionGlobalQuietInterval = new(14, 20);
+        public Vector2 projectionGlobalQuietDuration = new(1, 2);
+        [Min(.1f)] public float projectionGlobalFade = 1.5f;
+        [Min(.05f)] public float projectionBurstFade = 2.8f;
+        [Min(.1f)] public float projectionRelocationFade = 1.6f;
+        [Tooltip("Cutout translation in texture UV per second; projectors do not rotate.")]
+        [Min(0)] public float projectionCutoutSpeed = .06f;
+        [Min(0)] public float projectionCutoutWarp = .035f;
+        [Range(0,.5f)] public float projectionFlowVariation = .15f;
+        [Min(0)] public float projectionFlowSway = .035f;
+        public Vector2 projectionDetailLifetime = new(6, 10);
+        public Vector2 projectionHighlightLifetime = new(2, 4);
+        [Min(.7f)] public float projectionHighlightFade = .7f;
+        [Min(.1f)] public float projectionRange = 14;
+        [Min(1)] public float selectionDistance = 42;
+        [Min(.1f)] public float patchSeparation = 8;
         public Vector4 Enclosure => new(Mathf.Clamp(waterTop,.02f,.08f), Mathf.Clamp(waterBottom,waterTop+.02f,.19f),
             Mathf.Clamp(glassThickness,.005f,.04f), Mathf.Clamp(glassThickness,.005f,.04f));
 
         public void Apply(Material material)
         {
             material.SetTexture("_RippleNormal", ripples);
-            material.SetTexture("_CausticsTex", caustics);
+            material.SetTexture("_CausticsTex", surfaceCaustics != null ? surfaceCaustics : caustics);
             material.SetTexture("_Environment", environment);
             material.SetVector("_RiverLayout", layout);
             material.SetColor("_Absorption", absorption);
             material.SetColor("_WaterColor", waterTint);
             material.SetVector("_RiverOptics", new Vector4(Enclosure.y-Enclosure.x, refraction, reflections, rippleStrength));
             material.SetVector("_RiverMotion", new Vector4(rippleScale, flowSpeed, waterHighlights, detailDistance));
+            material.SetVector("_RiverPattern",new Vector4(surfacePatternScale,Mathf.Clamp01(surfacePatternOpacity),surfacePatternBlur,0));
             material.SetColor("_GlassTint",glassTint);
             material.SetVector("_RiverShell",new Vector4(rimWidth,jointSpacing,glassReflections,glassThickness));
             material.SetVector("_RiverEnclosure",Enclosure);

@@ -37,6 +37,8 @@ Other `UI/Project-*` images document earlier UI revisions. They are dated contex
 
 ### Transparent river glass pools — 2026-10-24
 
+- `Asset/River-Surface-Flecks-User.png` — small white surface marks read as dust/dirt; replace them with softer flowing water detail and independent opacity/blur controls, while preserving the accepted projected caustics.
+- `Asset/River-Wider-Caustics-User.png` — moving projections beside overhead water. Preserve the larger pattern with sparse bright points and faint flowing detail. The approved natural-timing refinement staggers appearances across at most two active sources, occasionally fades everything quiet, and gives the two layers independent lifecycles within a gently meandering current. Keep projector orientation fixed, water excluded and wall blocking intact. Four candidate patch pairs share one high-resolution texture. See the 36-second stationary and walking/turning reviews in the river lighting notes.
 - `Asset/River-Glass-Refraction-User.png` — curved glass distorts the background while retaining a clear enclosure.
 - `Asset/River-Suspended-Glass-Pool-User.png` — separate transparent shell and moving water interior, visible from below.
 - `Asset/River-Water-Distortion-User.png` — aqua water, broad liquid distortion and bright caustic branches.
@@ -51,6 +53,8 @@ The current revision separates the recessed water interior from the smooth glass
 
 ### Continuous tower floors
 
+- `Asset/Connected-Pillar-Ledge-User.png` — on shrinking floors, join the remaining pillar supports sideways like adjoining floor tiles; preserve the stair route and the removal of pads over arches.
+- `Asset/Arch-Supported-Pillar-Pads-User.png` — remove the separate square support pads when a pillar connects directly to an arch below; keep support bridges where a setback leaves no arch beneath the pillar.
 - `Asset/Tile-Gaps-And-Distance-Culling-User.png` — reported missing distant river/floor assets and visible grid joints in the covered tower interior. See [the repair and verification](../Documentation/FrutigerAero/Buildings/TILE_VISIBILITY_AND_JOINS.md) and its floor 0, 20 and 42 previews. Tile frames should not interrupt the continuous marble or enclosed river.
 
 ### Nearby water light and reflections

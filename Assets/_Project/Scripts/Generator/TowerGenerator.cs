@@ -238,6 +238,9 @@ public class TowerGenerator : MonoBehaviour
         if (!TowerFloorLayout.SupportsRadialFloor(floorTileObject)) return;
         var assets = parent.GetComponentsInChildren<TowerAsset>();
         var pillars = assets.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease)).ToDictionary(g => g.Key, g => g.ToArray());
+        var archMesh=archObject!=null?archObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10):null;
+        var arches=archMesh!=null?new TowerArchSupport(assets.Where(a=>a.AssetType==TowerAssetType.Arch)
+            .Select(a=>new ChunkAssetData(0,TowerAssetType.Arch,a.transform.position,a.transform.rotation,a.transform.lossyScale)),archMesh.bounds):null;
         var groups = assets.Where(a => a.AssetType.IsFloor()).GroupBy(a => Mathf.FloorToInt((a.transform.position.y + .001f) / heighIncrease));
         var completed = floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? floorTileObject.GetComponent<MeshFilter>().sharedMesh;
         var template = floorTileObject.GetComponent<MeshFilter>().sharedMesh;
@@ -246,16 +249,18 @@ public class TowerGenerator : MonoBehaviour
             var data = group.Select(a => new ChunkAssetData(0, TowerAssetType.Floor, a.transform.position, a.transform.rotation, a.transform.lossyScale)).ToArray();
             var support = new TowerFloorSupport(data, center, completed.bounds.max.y);
             if (!pillars.TryGetValue(group.Key, out var levelPillars)) levelPillars = System.Array.Empty<TowerAsset>();
+            var ledge=new TowerPillarLedge(levelPillars.Select(p=>p.transform.position),center,PillarSupportRadius);
+            var mainland=new TowerFloorSupport(data,center,completed.bounds.max.y);
             foreach (var pillar in levelPillars)
             {
                 var point = new Vector2(pillar.transform.position.x, pillar.transform.position.z);
-                if (support.SupportsDisk(point, PillarSupportRadius - .05f, out _)) continue;
+                if (support.SupportsDisk(point, PillarSupportRadius - .05f, out _) || arches?.SupportsBase(pillar.transform.position)==true) continue;
                 var sector = TowerFloorLayout.SupportPad(center, data[0].Position.y, point, PillarSupportRadius, data[0].Scale.y);
                 if (group.Key > 0 && GetWallRadius(group.Key) < GetWallRadius(group.Key - 1) - .01f)
                 {
-                    if (!support.TryFindInnerConnection(point, PillarSupportRadius, out float connection))
+                    if (!ledge.TryFindInnerConnection(mainland,point,out float connection))
                         throw new System.InvalidOperationException($"No connected deck behind pillar at {point}.");
-                    sector = TowerFloorLayout.SupportBridge(center, data[0].Position.y, point, PillarSupportRadius, connection, data[0].Scale.y);
+                    sector = ledge.Bridge(point,data[0].Position.y,connection,data[0].Scale.y,mainland);
                 }
                 var instance = CreateTowerAsset(floorTileObject, TowerAssetType.Floor, sector.Position, sector.Rotation, "Pillar support deck");
                 instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x, sector.Scale.y / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);

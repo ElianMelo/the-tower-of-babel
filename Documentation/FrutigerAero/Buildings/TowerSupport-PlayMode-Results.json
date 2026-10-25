@@ -1,0 +1,100 @@
+{
+  "mode": "PlayMode",
+  "PassCount": 13,
+  "FailCount": 0,
+  "SkipCount": 0,
+  "Duration": 15.8440506,
+  "cases": [
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 2.6516792
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildFirstFloor_NextFloorCanBeTargetedAndBuiltThroughInteraction",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 1.0629289
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildFloor_AlwaysAdvancesTheNextUnfinishedFloorRegardlessOfPlayerOrSelection",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.8065256
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.BuildWholeTower_KeepsSharedWaterGeometryAndRespondsToTheNextCommand",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 1.3585946
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.F3AndEscape_ToggleTheMenuWhilePausedAndRestoreCursorAndControls",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.767746
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.GodMode_FliesThroughCollisionsAndRestoresEveryPreviousColliderState",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.6131423
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.InstantBuildToggle_OnlyBuildsOnInteractionCompletesAllStagesAndChargesNothing",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.8192311
+    },
+    {
+      "FullName": "TowerOfBabel.Resources.Tests.CheatMenuPlayModeTests.MenuActions_UpdateServerProgressCapacityResourcesAndConstruction",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 2.2330875
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.BushRendering_WaitsForEveryAssetOnItsFloorAndHidesAfterRollback",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0146659
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Floors_RevealOnlyAfterThePreviousFloorIsSolidAndComplete",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0148578
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_ClearsOnCompletionPoolingAndDisconnectAndRespectsMenus",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.009692
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_OnlyHighlightsNearbyUnfinishedAssetsOnTheActiveFloorForTwoSeconds",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 2.1744971
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionPlayModeTests.Scan_RetriggerRefreshesExpiryAndHoverRemainsAfterExpiry",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 3.2624775
+    }
+  ]
+}

@@ -10,6 +10,7 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
         _GlassTint("Clear glass edges",Color)=(.55,.86,.94,1)
         _RiverOptics("Thickness, refraction, reflection, ripples",Vector)=(.14,.003,.42,.24)
         _RiverMotion("Ripple scale, flow speed, highlights, detail distance",Vector)=(.46,.045,.7,42)
+        _RiverPattern("Surface pattern scale, opacity, blur",Vector)=(.16,.22,3,0)
         _RiverShell("Rim width, joint spacing, reflection, thickness",Vector)=(.045,12,.32,.02)
         _RiverEnclosure("Water top, bottom, glass thickness, side inset",Vector)=(.04,.18,.02,.02)
         _RiverLayout("Layout",Vector)=(96,3,6,1.3)
@@ -33,7 +34,7 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
         TEXTURE2D_X(_RiverBackground); SAMPLER(sampler_RiverBackground);
         float _RiverClock, _AeroDaylight;
         CBUFFER_START(UnityPerMaterial)
-        float4 _Absorption,_WaterColor,_GlassTint,_RiverOptics,_RiverMotion,_RiverShell,_RiverEnclosure,_RiverLayout,_RadialFloorCenter;
+        float4 _Absorption,_WaterColor,_GlassTint,_RiverOptics,_RiverMotion,_RiverPattern,_RiverShell,_RiverEnclosure,_RiverLayout,_RadialFloorCenter;
         float _RadialFloor,_RiverFloorIndex,_RiverRefractionWeight,_RiverReveal,_RiverDetailWeight;
         CBUFFER_END
         #include "RiverChannel.hlsl"
@@ -108,15 +109,16 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
                 float distortedDepth=LinearEyeDepth(SampleSceneDepth(saturate(uv+offset)),_ZBufferParams);
                 offset*=smoothstep(0,.3,min(originalDepth,distortedDepth)-surfaceDepth);
             }
-            float2 pattern=i.ws.xz*.38+swell*.15-view.xz/max(abs(view.y),.25)*.09;
-            // Implicit derivatives select caustic mips instead of forcing mip zero at distance.
-            half3 first=SAMPLE_TEXTURE2D(_CausticsTex,sampler_CausticsTex,pattern+float2(t,t*.73)).rgb;
-            half3 second=SAMPLE_TEXTURE2D(_CausticsTex,sampler_CausticsTex,pattern*.6-float2(t,t*.73)).rgb;
-            half caustic=max(max(first.r,max(first.g,first.b))*.8,max(second.r,max(second.g,second.b))*.6);
+            float2 pattern=i.ws.xz*_RiverPattern.x+swell*.1-view.xz/max(abs(view.y),.25)*.09;
+            // Derivative-based mips plus adjustable filtering soften the pattern with the same two reads.
+            half3 first=SAMPLE_TEXTURE2D_BIAS(_CausticsTex,sampler_TrilinearRepeat,pattern+float2(t,t*.73),_RiverPattern.z).rgb;
+            half3 second=SAMPLE_TEXTURE2D_BIAS(_CausticsTex,sampler_TrilinearRepeat,pattern*.6-float2(t,t*.73),_RiverPattern.z).rgb;
+            half caustic=max(first.r,max(first.g,first.b))*.65+max(second.r,max(second.g,second.b))*.35;
             Light sun=GetMainLight(TransformWorldToShadowCoord(i.ws));
             half glint=pow(saturate(dot(n,SafeNormalize(view+sun.direction))),110)*sun.shadowAttenuation;
             half3 shine=(Environment(n,view,.8)*fresnel*_RiverOptics.z+sun.color*glint*.9)*detail;
-            half whiteCore=smoothstep(.25,.9,caustic)*_RiverMotion.z;
+            // Broad, low-contrast branches read as submerged light, rather than clipped white debris.
+            half whiteCore=smoothstep(.04,.6,caustic)*_RiverMotion.z*_RiverPattern.y;
             shine+=lerp(_WaterColor.rgb,half3(1,1,1),.88)*whiteCore*lerp(.35,.85,saturate(_AeroDaylight))*detail;
             half opacity=saturate(1-dot(transmission,half3(.2126,.7152,.0722)));
             half3 tint=_WaterColor.rgb*opacity*.65;

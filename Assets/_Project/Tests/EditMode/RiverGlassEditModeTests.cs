@@ -11,6 +11,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal;
 using Object = UnityEngine.Object;
 
 namespace TowerOfBabel.World.Tests
@@ -116,41 +117,73 @@ namespace TowerOfBabel.World.Tests
             SceneManager.MoveGameObjectToScene(root,scene);
             var cameraRoot = new GameObject("Projection camera"); var camera = cameraRoot.AddComponent<Camera>(); camera.enabled = false;
             SceneManager.MoveGameObjectToScene(cameraRoot,scene);
-            camera.transform.position = new Vector3(3,2,0); camera.scene = scene;
+            camera.transform.position = new Vector3(0,2,4); camera.transform.rotation = Quaternion.Euler(0,180,0); camera.scene = scene;
             RiverGlassLighting lighting = null;
             try
             {
                 var manager = root.AddComponent<ChunkManager>();
                 var assets = new List<ChunkAssetData>();
-                for (int i=0;i<4;i++) assets.Add(new ChunkAssetData(i,TowerAssetType.GlassWaterFloor,new Vector3(i*4-8,0,2),Quaternion.identity,Vector3.one,10));
+                for (int i=0;i<4;i++) assets.Add(new ChunkAssetData(i,TowerAssetType.GlassWaterFloor,new Vector3(-2,0,2-i*8),Quaternion.identity,Vector3.one,10));
                 var chunk = (ChunkSceneCache)Activator.CreateInstance(typeof(ChunkSceneCache),Private,null,new object[]{new ChunkKey(0,0,0),assets},null);
                 typeof(ChunkManager).GetField("cachedChunks",Private).SetValue(manager,new List<ChunkSceneCache>{chunk});
                 lighting=root.AddComponent<RiverGlassLighting>(); lighting.profile=Profile;
                 lighting.cookieShader=Shader.Find("Hidden/TowerOfBabel/River caustic cookie"); root.SetActive(true);
-                lighting.Sample(camera,0,1); lighting.Sample(camera,.3f,1);
-                Assert.That(lighting.ActiveLightCount,Is.EqualTo(2)); Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(1));
+                lighting.Sample(camera,0,1); lighting.Sample(camera,.1f,1);
+                Assert.That(lighting.ActiveLightCount,Is.Zero,"New patches must begin in their randomized quiet interval.");
+                float sampleTime=.1f;
+                for(int frame=0;frame<240&&lighting.ActiveLightCount==0;frame++)
+                {sampleTime+=1f/30;lighting.Sample(camera,sampleTime,1f/30);}
+                Assert.That(lighting.ActiveLightCount,Is.InRange(2,RiverGlassLighting.MaximumActivePatches*2)); Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(1));
                 var lights=root.GetComponentsInChildren<Light>();
-                Assert.That(lights.All(l=>l.shadows==LightShadows.Hard&&l.shadowCustomResolution==256),Is.True);
-                Assert.That(lights.All(l=>l.spotAngle==120&&l.range==8),Is.True);
+                Assert.That(lights.All(l=>l.shadows==LightShadows.Hard&&l.shadowCustomResolution==512),Is.True);
+                Assert.That(lights.All(l=>l.GetUniversalAdditionalLightData().additionalLightsShadowResolutionTier==UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierCustom),Is.True,
+                    "URP must honor the custom resolution instead of silently using its 256px low tier.");
+                Assert.That(lights.Length,Is.EqualTo(RiverGlassLighting.MaximumLights));
+                Assert.That(lights.All(l=>l.spotAngle>=80&&l.spotAngle<=90&&l.range==14&&(l.cullingMask&RiverGlassLighting.WaterLayerMask)==0),Is.True);
                 var cookie=lights[0].cookie as RenderTexture; var before=CookiePixels(cookie);
-                lighting.Sample(camera,4,1); var after=CookiePixels(cookie);
+                Assert.That(cookie.width,Is.EqualTo(2048));Assert.That(cookie.height,Is.EqualTo(2048));Assert.That(lights.All(l=>l.cookie==cookie),Is.True);
+                uint version=cookie.updateCount;lighting.Sample(camera,sampleTime+.001f,0);
+                Assert.That(cookie.updateCount,Is.EqualTo(version),"Higher resolution must retain the 8Hz refresh budget.");
+                var rotations=lights.Select(l=>l.transform.rotation).ToArray();
+                int starts=lighting.WindowStartCount;float lastStart=lighting.LastWindowStartedAt;int quietFrames=0;
+                for(int frame=1;frame<=1080;frame++)
+                {
+                    lighting.Sample(camera,sampleTime+frame/30f,1f/30);
+                    Assert.That(lighting.RunningWindowCount,Is.InRange(0,2));
+                    Assert.That(lighting.ActiveLightCount,Is.InRange(0,4));
+                    if(lighting.GlobalVisibility==0){quietFrames++;Assert.That(lighting.ActiveLightCount,Is.Zero);}
+                    if(lighting.WindowStartCount!=starts)
+                    {
+                        Assert.That(lighting.WindowStartsAllowed,Is.True);
+                        Assert.That(lighting.LastWindowStartedAt-lastStart,Is.GreaterThanOrEqualTo(1.2f));
+                        starts=lighting.WindowStartCount;lastStart=lighting.LastWindowStartedAt;
+                    }
+                }
+                Assert.That(quietFrames,Is.GreaterThanOrEqualTo(30),"The sequence must contain a complete gentle quiet interval.");
+                var after=CookiePixels(cookie);
+                Assert.That(lights.Select((l,i)=>Quaternion.Angle(l.transform.rotation,rotations[i])).Max(),Is.LessThan(.001f),
+                    "Projectors stay fixed while cutouts stream across their footprint.");
                 Assert.That(before.Where((v,i)=>!v.Equals(after[i])).Count(),Is.GreaterThan(50),"The cookie must advance, not just the CPU clock.");
                 for(int i=0;i<4;i++)manager.SetAssetStage(new ChunkKey(0,0,0),i,9);
-                lighting.Sample(camera,4.3f,1); Assert.That(lighting.ActiveLightCount,Is.Zero);
+                lighting.Sample(camera,sampleTime+36.2f,1); Assert.That(lighting.ActiveLightCount,Is.Zero);
                 lighting.enabled=false; Assert.That(lighting.AllocatedCookieCount,Is.Zero);
                 Assert.That(root.GetComponentsInChildren<Light>(true),Is.Empty);
             }
             finally { if(lighting!=null)lighting.Release(); EditorSceneManager.ClosePreviewScene(scene);SceneManager.SetActiveScene(original); }
         }
 
-        [TestCase(false)] [TestCase(true)]
-        public void ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(bool below)
+        [TestCase(false,.8f,3f,false)] [TestCase(true,.8f,3f,false)]
+        [TestCase(false,1.2f,5f,false)] [TestCase(true,1.2f,5f,false)]
+        [TestCase(false,2.5f,9f,false)] [TestCase(true,2.5f,9f,false)]
+        [TestCase(false,2.5f,9f,true)] [TestCase(true,2.5f,9f,true)]
+        public void ProjectionNativeLight_IlluminatesReceiversAndSolidWallsBlockIt(bool below,float reach,float height,bool horizontal)
         {
             var scene=EditorSceneManager.NewPreviewScene();
             var root=new GameObject("Native river light fixture");root.SetActive(false);root.layer=31;SceneManager.MoveGameObjectToScene(root,scene);
             var cameraRoot=new GameObject("Native caustic camera");SceneManager.MoveGameObjectToScene(cameraRoot,scene);
             var camera=cameraRoot.AddComponent<Camera>();camera.enabled=false;camera.scene=scene;camera.cullingMask=1<<31;
-            camera.transform.position=new Vector3(4,below?-2:2,-1);camera.transform.LookAt(new Vector3(0,below?-2:2,3));
+            float y=below?-height:height;
+            camera.transform.position=new Vector3(4,y+(horizontal?(below?3:-3):0),-1);camera.transform.LookAt(new Vector3(0,y,reach));
             var target=new RenderTexture(256,256,24,RenderTextureFormat.ARGBHalf);camera.targetTexture=target;
             var pixels=new Texture2D(256,256,TextureFormat.RGBAFloat,false);var oldTarget=RenderTexture.active;
             var oldLights=Object.FindObjectsByType<Light>(FindObjectsSortMode.None).Where(l=>l.enabled).ToArray();
@@ -165,23 +198,35 @@ namespace TowerOfBabel.World.Tests
                 typeof(ChunkManager).GetField("cachedChunks",Private).SetValue(manager,new List<ChunkSceneCache>{chunk});
                 lighting=root.AddComponent<RiverGlassLighting>();lighting.profile=Profile;lighting.cookieShader=Shader.Find("Hidden/TowerOfBabel/River caustic cookie");root.SetActive(true);
                 var receiver=GameObject.CreatePrimitive(PrimitiveType.Cube);SceneManager.MoveGameObjectToScene(receiver,scene);receiver.layer=31;
-                receiver.transform.position=new Vector3(0,below?-2:2,3);receiver.transform.localScale=new Vector3(5,4,.2f);receiver.GetComponent<Renderer>().sharedMaterial=material;
+                receiver.transform.position=new Vector3(0,y,reach);receiver.transform.localScale=horizontal?new Vector3(5,.2f,5):new Vector3(5,4,.2f);receiver.GetComponent<Renderer>().sharedMaterial=material;
                 float Brightness()
                 {
                     camera.Render();camera.Render();RenderTexture.active=target;pixels.ReadPixels(new Rect(0,0,256,256),0,0);pixels.Apply();
                     return pixels.GetPixels(120,120,16,16).Average(c=>c.grayscale);
                 }
-                float dark=Brightness();lighting.Sample(camera,1,1);lighting.Sample(camera,1.3f,1);float lit=Brightness();
+                float dark=Brightness();lighting.Sample(camera,0,1);float clock=0;
+                while(lighting.WindowStartCount==0&&clock<8){clock+=1f/30;lighting.Sample(camera,clock,1f/30);}
+                float litTime=lighting.LastWindowStartedAt+lighting.LastWindowDuration*.5f;
+                while(clock<litTime){float next=Mathf.Min(litTime,clock+1f/30);lighting.Sample(camera,next,next-clock);clock=next;}
+                float lit=Brightness();
                 var review=new Texture2D(256,256,TextureFormat.RGB24,false);review.SetPixels(pixels.GetPixels());review.Apply();
-                System.IO.File.WriteAllBytes($"Documentation/FrutigerAero/Lighting/Previews/River-Receiver-{(below?"Below":"Above")}.png",review.EncodeToPNG());Object.DestroyImmediate(review);
+                System.IO.File.WriteAllBytes($"Documentation/FrutigerAero/Lighting/Previews/River-Receiver-{(below?"Below":"Above")}-{reach:0}{(horizontal?"-Floor":"")}.png",review.EncodeToPNG());Object.DestroyImmediate(review);
                 Assert.That(lit-dark,Is.GreaterThan(.01f),"The pooled cookie must actually illuminate a native URP receiver.");
-                var before=pixels.GetPixels();lighting.Sample(camera,5,1);Brightness();var after=pixels.GetPixels();
+                if(reach*reach+height*height>64)
+                {
+                    foreach(var light in root.GetComponentsInChildren<Light>())light.range=8;
+                    float previousReach=Brightness();
+                    Assert.That(previousReach-dark,Is.LessThan((lit-dark)*.25f),"The newly affected receiver must lie beyond the previous light range.");
+                    lighting.Sample(camera,litTime+.1f,0);Brightness();
+                }
+                var before=pixels.GetPixels();lighting.Sample(camera,litTime+.8f,.7f);Brightness();var after=pixels.GetPixels();
                 Assert.That(before.Where((v,i)=>Mathf.Abs(v.grayscale-after[i].grayscale)>.005f).Count(),Is.GreaterThan(20),
                     "Moving light must reach rendered receiver pixels, not merely update a cookie texture.");
+                float unblocked=Brightness();
                 var blocker=GameObject.CreatePrimitive(PrimitiveType.Cube);SceneManager.MoveGameObjectToScene(blocker,scene);blocker.layer=31;
-                blocker.transform.position=new Vector3(0,below?-1:1,1.5f);blocker.transform.localScale=new Vector3(1.3f,4,.3f);blocker.GetComponent<Renderer>().sharedMaterial=material;
+                blocker.transform.position=new Vector3(0,y*.5f,reach*.5f);blocker.transform.localScale=horizontal?new Vector3(4,.3f,5):new Vector3(1.3f,4,.3f);blocker.GetComponent<Renderer>().sharedMaterial=material;
                 float blocked=Brightness();
-                Assert.That(blocked-dark,Is.LessThan((lit-dark)*.65f),"A solid wall between source and receiver must stop projection.");
+                Assert.That(blocked-dark,Is.LessThan((unblocked-dark)*.65f),"A solid wall between source and receiver must stop projection.");
             }
             finally
             {

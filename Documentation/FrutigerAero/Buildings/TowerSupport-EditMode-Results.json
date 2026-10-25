@@ -1,0 +1,142 @@
+{
+  "mode": "EditMode",
+  "PassCount": 19,
+  "FailCount": 0,
+  "SkipCount": 0,
+  "Duration": 10.4861228,
+  "cases": [
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.ArchBearing_RequiresContactWithTheUpperBeamAndRespectsTransforms",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0287165
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.FloorSupport_BridgeConnectsToTheDeckWithoutAddingAnOuterIsland",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0057802
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.InstantBuild_ProfileIsAnOffByDefaultBooleanAndResets",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.000641
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.PillarLedge_NeighbouringTilesShareWalkingCollisionAcrossTheJoint",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0137317
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.PillarSupportPad_HasRealWalkingCollisionAcrossItsBase",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0017262
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.RegeneratedTower_RetainsPillarSupportsAfterCuttingStairOpenings",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0673811
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.DebugSupportEditModeTests.SavedTower_EveryPillarAndBushHasSupportIncludingShrinkingFloors",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 9.9037225
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.BoundBuildings_RefreshTheirPresentationWhenTheFloorUnlocks",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0106408
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Bushes_AppearOnlyOnCompletedAndUnlockedFloors",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.001589
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Floors_UnlockOnlyAfterEveryAssetAcrossAllChunksIsComplete",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0011843
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.SnapshotAndRollback_RecomputeTheFirstUnfinishedFloor",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.001132
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_HidesLaterFloorsEvenWhenSnapshotsContainBuiltAssets",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0009778
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerProgressionEditModeTests.Visibility_KeepsLockedChunksOutOfBothNearAndFarRendering",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0222443
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.ExplicitLegacyModels_FillMissingGlassTypeWithoutReplacingOverrides",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0206097
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.FinishedFloorFaces_AreFlushSharedAndCloseTheCentre",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.036896
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(False)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0522483
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.GlassSurround_MatchesContinuousMarbleFromAboveAndBelow(True)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0365829
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(Floor)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0658601
+    },
+    {
+      "FullName": "TowerOfBabel.World.Tests.TowerTileVisibilityEditModeTests.NativeFarDraw_RendersAll1024NonUniformInstancesAcrossPageBoundaries(GlassWaterFloor)",
+      "ResultState": "Passed",
+      "Message": null,
+      "StackTrace": null,
+      "Duration": 0.0562747
+    }
+  ]
+}
