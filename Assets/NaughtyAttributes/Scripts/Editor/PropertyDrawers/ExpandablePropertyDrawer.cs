@@ -113,7 +113,11 @@ namespace NaughtyAttributes.Editor
                         // Draw the child properties
                         if (property.isExpanded)
                         {
-                            DrawChildProperties(rect, property);
+                            bool isReadonly = PropertyUtility.GetAttribute<ExpandableAttribute>(property)?.IsReadonly ?? false;
+                            using (new EditorGUI.DisabledScope(isReadonly))
+                            {
+                                DrawChildProperties(rect, property);
+                            }
                         }
                     }
                 }

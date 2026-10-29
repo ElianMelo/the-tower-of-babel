@@ -5,7 +5,7 @@
 //------------------------------------------------------------------------------
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal; // Ported from HDRP: project uses URP.
 using UnityEngine.VFX;
 
 #if UNITY_EDITOR

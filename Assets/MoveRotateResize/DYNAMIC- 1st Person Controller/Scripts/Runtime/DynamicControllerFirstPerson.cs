@@ -458,7 +458,7 @@ namespace MoveRotateResize.DynamicControllers
 
         public Vector3 GetVelocity()
         {
-            return rb.velocity;
+            return rb.linearVelocity;
         }
 
         private float ClampAngle(float angle, float min, float max)

@@ -4,7 +4,7 @@
 //     Version: 1.1
 //------------------------------------------------------------------------------
 using UnityEngine;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal; // Ported from HDRP: project uses URP.
 
 namespace MoveRotateResize.Dynamic.PuddlePainter
 {
@@ -59,7 +59,7 @@ namespace MoveRotateResize.Dynamic.PuddlePainter
             {
                 targetProjector.size = sourceProjector.size;
                 targetProjector.pivot = sourceProjector.pivot;
-                targetProjector.decalLayerMask = sourceProjector.decalLayerMask;
+                targetProjector.renderingLayerMask = sourceProjector.renderingLayerMask;
                 targetProjector.drawDistance = sourceProjector.drawDistance;
                 targetProjector.fadeScale = sourceProjector.fadeScale;
                 targetProjector.startAngleFade = sourceProjector.startAngleFade;

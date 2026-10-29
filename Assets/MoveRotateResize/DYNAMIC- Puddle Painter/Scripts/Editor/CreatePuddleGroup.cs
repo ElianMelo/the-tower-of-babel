@@ -6,7 +6,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal; // Ported from HDRP: project uses URP.
 using Object = UnityEngine.Object;
 
 namespace MoveRotateResize.Dynamic.PuddlePainter

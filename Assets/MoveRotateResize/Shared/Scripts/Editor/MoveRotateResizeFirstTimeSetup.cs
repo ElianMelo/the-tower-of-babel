@@ -49,9 +49,9 @@ namespace MoveRotateResize.EditorInterface
         static void InstallDefinitions()
         {
             string symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
-            if (GraphicsSettings.renderPipelineAsset != null)
+            if (GraphicsSettings.defaultRenderPipeline != null)
             {
-                if (GraphicsSettings.renderPipelineAsset.GetType().Name.Contains("UniversalRenderPipelineAsset"))
+                if (GraphicsSettings.defaultRenderPipeline.GetType().Name.Contains("UniversalRenderPipelineAsset"))
                 {
                     Debug.Log("Using Universal Render Pipeline (URP)");
                     if (!symbols.Contains("USING_URP"))
@@ -60,7 +60,7 @@ namespace MoveRotateResize.EditorInterface
                         Debug.Log("Scripting Define Symbol 'USING_URP' added."); 
                     }
                 }
-                else if (GraphicsSettings.renderPipelineAsset.GetType().Name.Contains("HDRenderPipelineAsset"))
+                else if (GraphicsSettings.defaultRenderPipeline.GetType().Name.Contains("HDRenderPipelineAsset"))
                 {
                     Debug.Log("Using High Definition Render Pipeline (HDRP)");
                     if (!symbols.Contains("USING_HDRP"))

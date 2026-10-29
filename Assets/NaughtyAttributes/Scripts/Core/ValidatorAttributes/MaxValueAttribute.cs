@@ -12,6 +12,14 @@ namespace NaughtyAttributes
             MaxValue = maxValue;
         }
 
+        /// <summary>Name of a field, property or parameterless method on the owner that supplies the bound.</summary>
+        public string MaxValueName { get; private set; }
+
+        public MaxValueAttribute(string maxValueName)
+        {
+            MaxValueName = maxValueName;
+        }
+
         public MaxValueAttribute(int maxValue)
         {
             MaxValue = maxValue;

@@ -8,18 +8,17 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Occlusion Zone
-  m_Shader: {fileID: -6465566751694194690, guid: 2fbe5ec323554784d8fb5ca57fbe3742,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 2fbe5ec323554784d8fb5ca57fbe3742, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _DISABLE_DECALS
   - _DISABLE_SSR_TRANSPARENT
   - _DOUBLESIDED_ON
-  - _SURFACE_TYPE_TRANSPARENT
-  m_InvalidKeywords:
   - _MATERIAL_FEATURE_TRANSMISSION
   - _NORMALMAP_TANGENT_SPACE
+  - _SURFACE_TYPE_TRANSPARENT
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 1
@@ -275,6 +274,7 @@ Material:
     - _UVMappingMask: {r: 1, g: 0, b: 0, a: 0}
     - _UVMappingMaskEmissive: {r: 1, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &5040636180323409080
 MonoBehaviour:
   m_ObjectHideFlags: 11

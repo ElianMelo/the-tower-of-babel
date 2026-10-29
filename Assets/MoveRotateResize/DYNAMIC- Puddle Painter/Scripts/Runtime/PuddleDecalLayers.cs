@@ -1,10 +1,10 @@
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 //     This code is the copyright of MoveRotateResize
 //     Created by Gregory Wells-Bruneau
 //     Version: 1.3.2
 //------------------------------------------------------------------------------
 using UnityEngine;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.Universal; // Ported from HDRP: project uses URP.
 
 namespace MoveRotateResize.Dynamic.PuddlePainter
 {
@@ -13,13 +13,8 @@ namespace MoveRotateResize.Dynamic.PuddlePainter
     {
         DecalProjector decalProjector;
 
-    #if USING_UNITY_6
-        [SerializeField] UnityEngine.Rendering.HighDefinition.RenderingLayerMask decalLayerMaskNew = 
-        (UnityEngine.Rendering.HighDefinition.RenderingLayerMask)(1 << 1 | 1 << 9); 
-    #endif
-    #if USING_UNITY_2022
-        [SerializeField] DecalLayerEnum decalLayerMaskOld = (DecalLayerEnum)(1 << 1 | 1 << 9);
-    #endif
+        // URP rendering layers 1 and 9 (matches the original HDRP default).
+        [SerializeField] RenderingLayerMask decalLayerMask = (RenderingLayerMask)(uint)(1 << 1 | 1 << 9);
 
         void Awake()
         {
@@ -43,12 +38,7 @@ namespace MoveRotateResize.Dynamic.PuddlePainter
                 decalProjector = GetComponent<DecalProjector>();
             }
 
-            #if USING_UNITY_6
-            decalProjector.decalLayerMask = decalLayerMaskNew;
-            #endif
-            #if USING_UNITY_2022
-            decalProjector.decalLayerMask = decalLayerMaskOld;
-            #endif
+            decalProjector.renderingLayerMask = decalLayerMask;
         }
     }
 }

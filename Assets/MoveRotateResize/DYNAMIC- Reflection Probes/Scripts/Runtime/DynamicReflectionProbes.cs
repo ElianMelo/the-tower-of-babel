@@ -1,11 +1,10 @@
-//------------------------------------------------------------------------------
+﻿//------------------------------------------------------------------------------
 //     This code is the copyright of MoveRotateResize
 //     Created by Gregory Wells-Bruneau
 //     Version: 1.3
 //------------------------------------------------------------------------------
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
 using MoveRotateResize.Dynamic.MultiTag;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,6 +22,7 @@ namespace MoveRotateResize.Dynamic.ReflectionProbes
         [Foldout("Sphere Cast")][SerializeField] bool debugDetectionRadius = true; 
     #endif
         Transform player;
+        [SerializeField] int maxActiveProbesLimit = 8;
         int maxActiveProbes;
         Dictionary<ReflectionProbe, bool> probeStates = new Dictionary<ReflectionProbe, bool>();
         List<ReflectionProbe> detectedProbes = new List<ReflectionProbe>();
@@ -33,21 +33,8 @@ namespace MoveRotateResize.Dynamic.ReflectionProbes
         {
             CacheGlobalVariables();
 
-            var renderPipelineAsset = GraphicsSettings.currentRenderPipeline as HDRenderPipelineAsset;
-            if (renderPipelineAsset != null)
-            {
-                maxActiveProbes = renderPipelineAsset.currentPlatformRenderPipelineSettings.lightLoopSettings.maxCubeReflectionOnScreen;
-                #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                //Debug.Log("Max active reflection probes allowed: " + maxActiveProbes);
-                #endif
-            }
-            else
-            {
-                #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                Debug.LogError("Failed to get the active render pipeline asset or it is not HDRP.");
-                #endif
-                maxActiveProbes = 0;
-            }
+            // Ported from HDRP: URP has no on-screen cube reflection limit, so it is set here.
+            maxActiveProbes = Mathf.Max(0, maxActiveProbesLimit);
 
             ReflectionProbe[] allProbes = FindObjectsOfType<ReflectionProbe>();
             foreach (var probe in allProbes)
