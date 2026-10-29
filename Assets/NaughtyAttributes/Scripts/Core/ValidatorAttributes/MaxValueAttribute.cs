@@ -6,7 +6,6 @@ namespace NaughtyAttributes
     public class MaxValueAttribute : ValidatorAttribute
     {
         public float MaxValue { get; private set; }
-        public string MaxValueName { get; private set; }
 
         public MaxValueAttribute(float maxValue)
         {
@@ -16,11 +15,6 @@ namespace NaughtyAttributes
         public MaxValueAttribute(int maxValue)
         {
             MaxValue = maxValue;
-        }
-
-        public MaxValueAttribute(string maxValueName)
-        {
-            MaxValueName = maxValueName;
         }
     }
 }

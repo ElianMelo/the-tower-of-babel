@@ -10,12 +10,15 @@ namespace NaughtyAttributes.Editor
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                if (property.objectReferenceValue == null)
+                Texture2D previewTexture = GetAssetPreview(property);
+                if (previewTexture != null)
+                {
+                    return GetPropertyHeight(property) + GetAssetPreviewSize(property).y;
+                }
+                else
                 {
                     return GetPropertyHeight(property);
                 }
-
-                return GetPropertyHeight(property) + GetReservedPreviewSize(property).y;
             }
             else
             {
@@ -39,34 +42,18 @@ namespace NaughtyAttributes.Editor
 
                 EditorGUI.PropertyField(propertyRect, property, label);
 
-                Object target = property.objectReferenceValue;
-                if (target != null)
+                Texture2D previewTexture = GetAssetPreview(property);
+                if (previewTexture != null)
                 {
-                    Texture2D previewTexture = AssetPreview.GetAssetPreview(target);
-                    if (previewTexture != null)
+                    Rect previewRect = new Rect()
                     {
-                        Rect previewRect = new Rect()
-                        {
-                            x = rect.x + NaughtyEditorGUI.GetIndentLength(rect),
-                            y = rect.y + EditorGUIUtility.singleLineHeight,
-                            width = rect.width,
-                            height = GetReservedPreviewSize(property).y
-                        };
+                        x = rect.x + NaughtyEditorGUI.GetIndentLength(rect),
+                        y = rect.y + EditorGUIUtility.singleLineHeight,
+                        width = rect.width,
+                        height = GetAssetPreviewSize(property).y
+                    };
 
-                        GUI.Label(previewRect, previewTexture);
-                    }
-#if UNITY_6000_4_OR_NEWER
-                    else if (AssetPreview.IsLoadingAssetPreview(target.GetEntityId()))
-#else
-                    else if (AssetPreview.IsLoadingAssetPreview(target.GetInstanceID()))
-#endif
-                    {
-                        EditorWindow focused = EditorWindow.focusedWindow;
-                        if (focused != null)
-                        {
-                            focused.Repaint();
-                        }
-                    }
+                    GUI.Label(previewRect, previewTexture);
                 }
             }
             else
@@ -78,19 +65,46 @@ namespace NaughtyAttributes.Editor
             EditorGUI.EndProperty();
         }
 
-        private static Vector2 GetReservedPreviewSize(SerializedProperty property)
+        private Texture2D GetAssetPreview(SerializedProperty property)
         {
-            int targetWidth = ShowAssetPreviewAttribute.DefaultWidth;
-            int targetHeight = ShowAssetPreviewAttribute.DefaultHeight;
-
-            ShowAssetPreviewAttribute showAssetPreviewAttribute = PropertyUtility.GetAttribute<ShowAssetPreviewAttribute>(property);
-            if (showAssetPreviewAttribute != null)
+            if (property.propertyType == SerializedPropertyType.ObjectReference)
             {
-                targetWidth = showAssetPreviewAttribute.Width;
-                targetHeight = showAssetPreviewAttribute.Height;
+                if (property.objectReferenceValue != null)
+                {
+                    Texture2D previewTexture = AssetPreview.GetAssetPreview(property.objectReferenceValue);
+                    return previewTexture;
+                }
+
+                return null;
             }
 
-            return new Vector2(targetWidth, targetHeight);
+            return null;
+        }
+
+        private Vector2 GetAssetPreviewSize(SerializedProperty property)
+        {
+            Texture2D previewTexture = GetAssetPreview(property);
+            if (previewTexture == null)
+            {
+                return Vector2.zero;
+            }
+            else
+            {
+                int targetWidth = ShowAssetPreviewAttribute.DefaultWidth;
+                int targetHeight = ShowAssetPreviewAttribute.DefaultHeight;
+
+                ShowAssetPreviewAttribute showAssetPreviewAttribute = PropertyUtility.GetAttribute<ShowAssetPreviewAttribute>(property);
+                if (showAssetPreviewAttribute != null)
+                {
+                    targetWidth = showAssetPreviewAttribute.Width;
+                    targetHeight = showAssetPreviewAttribute.Height;
+                }
+
+                int width = Mathf.Clamp(targetWidth, 0, previewTexture.width);
+                int height = Mathf.Clamp(targetHeight, 0, previewTexture.height);
+
+                return new Vector2(width, height);
+            }
         }
     }
 }

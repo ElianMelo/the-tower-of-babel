@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &68560729418395539
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3505910999136308190}
+  - component: {fileID: 1861279222566193609}
+  m_Layer: 0
+  m_Name: Fog_Mask_01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &3505910999136308190
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68560729418395539}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.09206995, z: -0, w: 0.9957526}
+  m_LocalPosition: {x: 5.459999, y: -2.1517963, z: -14.260002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -10.565, z: 0}
+--- !u!114 &1861279222566193609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 68560729418395539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1fbb15bf92b84f40a1eb030765b5afe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parameters:
+    albedo: {r: 1, g: 1, b: 1, a: 1}
+    meanFreePath: 60
+    blendingMode: 0
+    priority: 0
+    anisotropy: 0
+    volumeMask: {fileID: 0}
+    textureScrollingSpeed: {x: 0, y: 0, z: 0}
+    textureTiling: {x: 1, y: 1, z: 1}
+    positiveFade: {x: 0.42686102, y: 0.44157243, z: 0.2607313}
+    negativeFade: {x: 0.42686102, y: 0.44157243, z: 0.2607313}
+    m_EditorUniformFade: 8.2
+    m_EditorPositiveFade: {x: 0.005205619, y: 0, z: 0.00317965}
+    m_EditorNegativeFade: {x: 0.005205619, y: 0, z: 0.00317965}
+    m_EditorAdvancedFade: 0
+    size: {x: 19.21, y: 18.57, z: 31.45}
+    invertFade: 1
+    distanceFadeStart: 1000
+    distanceFadeEnd: 5000
+    textureOffset: {x: 0, y: 0, z: 0}
+    falloffMode: 1
+    maskMode: 1
+    materialMask: {fileID: 2100000, guid: 78643188554d62943935abc6839f1b12, type: 2}
+  m_Version: 3

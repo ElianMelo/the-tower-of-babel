@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &904904154517322209
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5927653214870873787}
+  - component: {fileID: 1912998139384889261}
+  - component: {fileID: 5946580086552672896}
+  - component: {fileID: 3738247953745208947}
+  - component: {fileID: 5845913459590880990}
+  - component: {fileID: 7426471193255143580}
+  - component: {fileID: 3799621343060422471}
+  m_Layer: 0
+  m_Name: DYNAMIC- RainWetness Managers
+  m_TagString: Untagged
+  m_Icon: {fileID: 2800000, guid: 85ec8a4c1d74eb245ad25e1b23de97f5, type: 3}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5927653214870873787
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1912998139384889261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5a88bc13fec4d146855b4f6727e8089, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5946580086552672896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c94b92c054636f54793cd0d5cc8be715, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  globalRain: 1
+  currentGlobalRain: 1
+  globalRainTransitionDuration: 10
+  globalRainStreakSize: {x: 5, y: 1.5}
+  globalRainStreakDistortionStrength: 0.05
+  globalRainStreakSpeed: 0.2
+  globalRainDropSize: 5
+  globalRainDropSpeed: 0.2
+  globalRainExtended: 1
+  currentGlobalRainExtended: 1
+  globalRainExtendedTransitionDuration: 25
+  mainRainInsideVolume: 0.7
+  mainRainOutsideVolume: 1
+  mainRainAudioTransitionDuration: 1
+  heavyRainClip: {fileID: 8300000, guid: a88c439a9c6031747bd93112dccc69ce, type: 3}
+  isPlayerOccluded: 0
+  fallingRainVFXGraph: {fileID: 0}
+  rainParticlesMinMax: {x: 0, y: 3000}
+  fallingRainParticleSystem: {fileID: 0}
+  rainParticleCountMinMax: {x: 0, y: 700}
+  rainEmissionRateMinMax: {x: 0, y: 1000}
+  globalPostProcessingVolume: {fileID: 0}
+  fogDensityNoRain: 1500
+  fogDensityRaining: 700
+  enableEnviroIntegration: 0
+  enviroIntegrationCurrentWetness: 0
+  weatherType: {fileID: 0}
+  toggleUI: {fileID: 0}
+  toggleRainKey: 282
+  toggleUIKey: 283
+--- !u!114 &3738247953745208947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6454d8ef0da9386419b80142b90119b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RainOccludeeTag: {fileID: 11400000, guid: 057347c1ff148a04ebf3e10f423773a3, type: 2}
+  occlusionTransitionDuration: 2
+  triggerLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  occlusionZoneMaterial: {fileID: 2100000, guid: 8498745c42e152f41a3b9b93b4b5fe5b,
+    type: 2}
+  occlusionZoneMaterialAlpha: 0
+  enableDebugSphere: 1
+  occlusionSphereSize: 50
+  editModeOcclusion: 0
+  editModeOcclusionDebug: 1
+  editModeOcclusionDebugSize: 0.5
+  globalShaderRainOcclusionID: 676
+--- !u!114 &5845913459590880990
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 961f1782dedae5a43a59fcc6ee2c6e83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectionLayer:
+    serializedVersion: 2
+    m_Bits: 1073741824
+  sphereCastRadius: 20
+  sphereCastRefreshRate: 1
+  enableDebugSphere: 1
+--- !u!114 &7426471193255143580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 038a6c3d3f79c9646916e6e8495b5308, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolConfigs:
+  - spawn: {fileID: 7366910802030497626, guid: 67c93a6886b6f9f4183079741f847abb, type: 3}
+    poolTag: {fileID: 11400000, guid: 89029efdf3e90e3489729dc5fd091bb0, type: 2}
+    initialPoolSize: 10
+    maxPoolSize: 20
+    useCollectionChecks: 1
+    audioClips:
+    - {fileID: 8300000, guid: ef4c9b585d4e9044ba814d6e6ef0c815, type: 3}
+--- !u!114 &3799621343060422471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904904154517322209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18e2e131947773e4fb222874982d518d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poolConfigs:
+  - spawn: {fileID: -370754782621359346, guid: a1582af00c22b8c42a2756de2bcc852f, type: 3}
+    poolTag: {fileID: 11400000, guid: dc6d4c9c59fa9954cbaaf8b7d71ee655, type: 2}
+    initialPoolSize: 10
+    maxPoolSize: 20
+    useCollectionChecks: 1
+  - spawn: {fileID: -370754782621359346, guid: 9be77e6e86a1c054b8f5944c450016ce, type: 3}
+    poolTag: {fileID: 11400000, guid: c4b23bc3f059fed45964410bdf6b0cfd, type: 2}
+    initialPoolSize: 10
+    maxPoolSize: 20
+    useCollectionChecks: 1
+  - spawn: {fileID: -370754782621359346, guid: 1fba0e5dbb005f047b60bdaf1148b17c, type: 3}
+    poolTag: {fileID: 11400000, guid: febe4edf9b227c543817da45bdb56000, type: 2}
+    initialPoolSize: 5
+    maxPoolSize: 10
+    useCollectionChecks: 1
+  - spawn: {fileID: -370754782621359346, guid: 599944a4515461549868b16e16d58cfa, type: 3}
+    poolTag: {fileID: 11400000, guid: 74827dcb973a44b4fb048d433cc478b2, type: 2}
+    initialPoolSize: 5
+    maxPoolSize: 10
+    useCollectionChecks: 1
+  - spawn: {fileID: -370754782621359346, guid: b80f4a97913ab7643a79424db9e8f717, type: 3}
+    poolTag: {fileID: 11400000, guid: d36f2e7e443927144a8970c3ac22f354, type: 2}
+    initialPoolSize: 10
+    maxPoolSize: 20
+    useCollectionChecks: 1

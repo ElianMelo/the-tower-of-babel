@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.Experimental.SceneManagement;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace NaughtyAttributes.Editor
 {
     public static class NaughtyEditorGUI
     {
+
+        private static Dictionary<string, int> tabIndices = new Dictionary<string, int>();
         public const float IndentLength = 15.0f;
         public const float HorizontalSpacing = 2.0f;
 
@@ -132,6 +135,51 @@ namespace NaughtyAttributes.Editor
             }
         }
 
+        /// <summary>
+        /// Begin a tab group.
+        /// </summary>
+        /// <param name="groupKey">Unique key for the tab group</param>
+        /// <param name="tabNames">Array of tab names</param>
+        public static void BeginTabGroup(string groupKey, string[] tabNames)
+        {
+            if (!tabIndices.ContainsKey(groupKey))
+            {
+                tabIndices[groupKey] = 0;
+            }
+
+            GUILayout.BeginHorizontal();
+
+            for (int i = 0; i < tabNames.Length; i++)
+            {
+                bool isActive = tabIndices[groupKey] == i;
+                if (GUILayout.Toggle(isActive, tabNames[i], "Button"))
+                {
+                    tabIndices[groupKey] = i;
+                }
+            }
+
+            GUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// Check if the current tab is active.
+        /// </summary>
+        /// <param name="groupKey">Unique key for the tab group</param>
+        /// <param name="tabIndex">Index of the tab</param>
+        /// <returns>True if the tab is active, false otherwise</returns>
+        public static bool IsTabActive(string groupKey, int tabIndex)
+        {
+            return tabIndices.ContainsKey(groupKey) && tabIndices[groupKey] == tabIndex;
+        }
+
+        /// <summary>
+        /// End the tab group.
+        /// </summary>
+        public static void EndTabGroup()
+        {
+            EditorGUILayout.Space();
+        }
+
         public static void Button(UnityEngine.Object target, MethodInfo methodInfo)
         {
             bool visible = ButtonUtility.IsVisible(target, methodInfo);
@@ -164,60 +212,28 @@ namespace NaughtyAttributes.Editor
                 if (GUILayout.Button(buttonText, _buttonStyle))
                 {
                     object[] defaultParams = methodInfo.GetParameters().Select(p => p.DefaultValue).ToArray();
-                    Type targetType = target.GetType();
-                    List<UnityEngine.Object> targets = new List<UnityEngine.Object>();
+                    IEnumerator methodResult = methodInfo.Invoke(target, defaultParams) as IEnumerator;
 
-                    foreach (UnityEngine.Object obj in Selection.objects)
+                    if (!Application.isPlaying)
                     {
-                        if (obj == null)
-                        {
-                            continue;
-                        }
+                        // Set target object and scene dirty to serialize changes to disk
+                        EditorUtility.SetDirty(target);
 
-                        if (obj is GameObject go)
+                        PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
+                        if (stage != null)
                         {
-                            Component component = go.GetComponent(targetType);
-                            if (component != null)
-                            {
-                                targets.Add(component);
-                            }
+                            // Prefab mode
+                            EditorSceneManager.MarkSceneDirty(stage.scene);
                         }
-                        else if (targetType.IsInstanceOfType(obj))
+                        else
                         {
-                            targets.Add(obj);
+                            // Normal scene
+                            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
                         }
                     }
-
-                    if (targets.Count == 0)
+                    else if (methodResult != null && target is MonoBehaviour behaviour)
                     {
-                        targets.Add(target);
-                    }
-
-                    foreach (UnityEngine.Object t in targets)
-                    {
-                        IEnumerator methodResult = methodInfo.Invoke(t, defaultParams) as IEnumerator;
-
-                        if (!Application.isPlaying)
-                        {
-                            // Set target object and scene dirty to serialize changes to disk
-                            EditorUtility.SetDirty(t);
-
-                            PrefabStage stage = PrefabStageUtility.GetCurrentPrefabStage();
-                            if (stage != null)
-                            {
-                                // Prefab mode
-                                EditorSceneManager.MarkSceneDirty(stage.scene);
-                            }
-                            else
-                            {
-                                // Normal scene
-                                EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-                            }
-                        }
-                        else if (methodResult != null && t is MonoBehaviour behaviour)
-                        {
-                            behaviour.StartCoroutine(methodResult);
-                        }
+                        behaviour.StartCoroutine(methodResult);
                     }
                 }
 

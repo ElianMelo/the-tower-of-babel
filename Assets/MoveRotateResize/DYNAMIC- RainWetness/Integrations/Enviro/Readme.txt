@@ -1,0 +1,1 @@
+NO assets from Enviro are included. This just makes DYNAMIC- Rain Wetness work with Enviro 3
