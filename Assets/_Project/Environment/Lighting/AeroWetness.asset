@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b44a586ce11811e448d70469f55eb0bd, type: 3}
+  m_Name: AeroWetness
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroWetnessProfile
+  dewDay: 0.1
+  dewDawn: 0.25
+  rainWetness: 1
+  dewByTimeOfDay:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.25
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.4
+      value: 0.15
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.6
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.85
+      value: 0.55
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  rampIn: 6
+  dryOut: 40
+  rainFade: 3
+  dropTileSize: 0.45
+  dropSpeed: 0.9
+  dewDropWeight: 0.55
+  normalStrength: 0.9
+  streakSize: {x: 0.9, y: 1.6}
+  streakSpeed: 0.55
+  streakDistortion: 0.6
+  shelterEnabled: 1
+  drops: {fileID: 2800000, guid: 0afd5f2222928a044820a097e05f432e, type: 3}
+  streaks: {fileID: 2800000, guid: da538b58e9e86de47839e92986ff0440, type: 3}
+  ripples: {fileID: 2800000, guid: f712d8594876ee6458dddb434fd214d3, type: 3}

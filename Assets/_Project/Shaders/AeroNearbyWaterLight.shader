@@ -20,6 +20,7 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
             #define _CausticsTex _AeroCaustics
             #define sampler_CausticsTex sampler_AeroCaustics
             #include "Assets/Stylized Water 3/Shaders/Libraries/Caustics.hlsl"
+            #include "Aero/AeroCaustics.hlsl"
             TEXTURECUBE(_AeroEnvironment); SAMPLER(sampler_AeroEnvironment);
             float4 _AeroRange, _AeroMotion;
             half4 _AeroTint;
@@ -53,7 +54,8 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
 
             half WaterLight(float2 uv, float clock)
             {
-                return SampleCaustics(uv, float2(clock, clock * .73), 1, .35).r;
+                // Crest-style averaged net (Aero/AeroCaustics.hlsl) instead of the sparse min of two layers.
+                return AeroCausticBrightness(AeroCrestCaustics(TEXTURE2D_ARGS(_CausticsTex, sampler_CausticsTex), uv, clock * 4, 1, 0));
             }
 
             half4 Frag(Varyings input) : SV_Target

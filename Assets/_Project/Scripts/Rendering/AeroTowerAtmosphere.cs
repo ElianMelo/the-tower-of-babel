@@ -50,6 +50,9 @@ namespace TowerOfBabel.Rendering
             if (actualOpenings != null) for (int i = 0; i < actualOpenings.Count; i++) openings.Add(actualOpenings[i]);
             nextSelection = 0;
         }
+        /// <summary>Firefly spawns per second. Daytime base raised 3 -> 6 (2026-10-29) so world-space particles appear more often.</summary>
+        public static float FireflyRate(float daylight, AeroDayNightProfile profile, float inside) =>
+            Mathf.Lerp(6, 10, 1 - daylight) * profile.fireflyDensity * Mathf.Max(0, profile.fireflyPopulationMultiplier) * inside;
         public float WallRadius(int floor) => Mathf.Max(3, baseRadius - decrease * (floor / 2 + 1));
         public float ExitProximity(Vector3 view)
         {
@@ -95,7 +98,7 @@ namespace TowerOfBabel.Rendering
                 relative.y = 0; relative = Vector3.ClampMagnitude(relative, Mathf.Max(1, WallRadius(floor) - 12 * spread));
                 fireflies.transform.position = new Vector3(center.x + relative.x, floor * floorHeight + 2, center.y + relative.z);
                 var emission = fireflies.emission;
-                emission.rateOverTime = Mathf.Lerp(3, 7, 1 - cycle.Daylight) * cycle.profile.fireflyDensity * population * inside;
+                emission.rateOverTime = FireflyRate(cycle.Daylight, cycle.profile, inside);
                 if (lastFloor != floor) fireflies.Clear();
             }
             lastFloor = floor;

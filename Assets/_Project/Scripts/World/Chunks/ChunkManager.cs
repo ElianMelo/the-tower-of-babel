@@ -132,6 +132,35 @@ namespace TowerOfBabel.World.Chunks
         public event Action<ChunkKey, int, byte> AssetStageChanged;
         public event Action ConstructionFloorChanged;
 
+        // Pooled buildings listen here instead of ConstructionFloorChanged +=: a multicast
+        // delegate copies its whole invocation list on every subscribe/unsubscribe, which made a
+        // floor change O(n^2) and allocated tens of MB (Documentation/Performance/LAG_SPIKES.md).
+        private readonly List<Building> floorListeners = new();
+        public int FloorListenerCount => floorListeners.Count;
+
+        public void AddFloorListener(Building building)
+        {
+            if (building == null || building.FloorListenerIndex >= 0) return;
+            building.FloorListenerIndex = floorListeners.Count;
+            floorListeners.Add(building);
+        }
+
+        public void RemoveFloorListener(Building building)
+        {
+            if (building == null) return;
+            int index = building.FloorListenerIndex;
+            building.FloorListenerIndex = -1;
+            if (index < 0 || index >= floorListeners.Count || floorListeners[index] != building) return;
+            int last = floorListeners.Count - 1;
+            if (index != last)
+            {
+                Building moved = floorListeners[last];
+                floorListeners[index] = moved;
+                moved.FloorListenerIndex = index;
+            }
+            floorListeners.RemoveAt(last);
+        }
+
         private void OnEnable()
         {
 #if UNITY_SERVER
@@ -649,6 +678,8 @@ namespace TowerOfBabel.World.Chunks
             if (visibilityInitialized && hasCurrentChunk)
                 ApplyTowerVisibility(currentChunk, true);
             ConstructionFloorChanged?.Invoke();
+            for (int i = floorListeners.Count - 1; i >= 0; i--)
+                if (i < floorListeners.Count && floorListeners[i] != null) floorListeners[i].NotifyConstructionFloorChanged();
         }
 
         private void ResolveFarChunkRenderer()

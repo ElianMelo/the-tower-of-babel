@@ -51,6 +51,11 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
         _GlassIOR("Glass index of refraction", Range(1,2)) = 1.45
         _GlassTint("Glass absorption tint", Color) = (.68,.93,1,1)
         _PatternSeed("Model variation seed", Float) = 0
+        [Toggle(_AERO_WETNESS)] _WetnessOn("Wetness (global dew and rain)", Float) = 0
+        _Porosity("Stone porosity", Range(0,1)) = .12
+        _WetExposure("Weather exposure", Range(0,1)) = 1
+        _WetBeads("Visible drops (0 for walkable floors)", Range(0,1)) = 1
+        _AlbedoCeiling("Bright-white ceiling", Range(.5,1)) = 1
         [PerRendererData] _BuildMode("Incoming chunk dissolve", Float) = 0
         [PerRendererData] _BuildReveal("Construction reveal", Range(0,1)) = 1
         [PerRendererData] _BuildClock("Construction clock", Float) = 0
@@ -89,6 +94,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             float _GlassThickness,_GlassRefraction,_GlassIOR;
             half _BorderGlass,_GlassTransmission;
             half4 _GlassTint;
+            half _WetnessOn,_Porosity,_WetExposure,_AlbedoCeiling,_WetBeads;
             float _RadialFloor;
             float4 _RadialFloorCenter;
         CBUFFER_END
@@ -222,6 +228,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             #pragma fragment Frag
             #pragma multi_compile_instancing
             #pragma shader_feature_local _AERO_BORDER_GLASS
+            #pragma shader_feature_local_fragment _AERO_WETNESS
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -234,6 +241,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             #pragma multi_compile_fragment _ REFLECTION_PROBE_ROTATION
             #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
             #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #include "Aero/AeroWetness.hlsl"
             half4 Frag(Varyings input):SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(input);
@@ -263,6 +271,12 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 surface.alpha=1;surface.metallic=0;surface.specular=half3(.04,.04,.04);
                 half enamel=saturate((bakedColor.b-bakedColor.r)*2);
                 surface.smoothness=AeroPolish(lerp(_Smoothness,.96,glass),input.positionWS,1-glass);surface.normalTS=half3(0,0,1);
+                // Keep pure white stone just under the bloom threshold of the brighter post looks.
+                surface.albedo=min(surface.albedo,_AlbedoCeiling.xxx);
+                #if defined(_AERO_WETNESS)
+                    // Polished marble beads water: glossier, with drops on decks and streaks on walls.
+                    AeroApplyWetnessBeads(surface.albedo,surface.smoothness,n,input.positionWS,normalize(input.normalWS),_Porosity,_WetExposure,_WetBeads);
+                #endif
                 surface.clearCoatMask=_PearlCoat;surface.clearCoatSmoothness=.95;
                 half floorFace=step(.5,_ModelKind)*step(_ModelKind,1.5)*step(.99,abs(input.normalWS.y));
                 half recess=SAMPLE_TEXTURE2D(_BakedAO,sampler_BakedAO,input.uv).r;

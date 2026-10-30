@@ -91,6 +91,10 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(menu.ToggleControls["God mode"].graphic.canvasRenderer.GetAlpha(), Is.Zero, "An off toggle must not show the green on mark.");
                 Canvas.ForceUpdateCanvases();
                 Assert.That(menu.ToggleControls["God mode"].graphic.gameObject.activeSelf, Is.False, "Canvas rebuilds must keep the off indicator hidden.");
+                menu.SelectCategory("World");
+                Assert.That(menu.ToggleControls.ContainsKey("Rain"), Is.True, "Visual rain toggle for the wetness driver.");
+                Assert.That(menu.ActionButtons.ContainsKey("Wetness preset"), Is.True);
+                Assert.That(menu.ActionButtons.ContainsKey("Post look"), Is.True);
                 menu.SelectAllProfessions(); Assert.That(menu.AllProfessions, Is.True);
                 menu.SelectCategory("Stats");
                 Assert.That(root.GetComponentsInChildren<TMPro.TMP_InputField>(true).Length, Is.GreaterThan(20));

@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: a3fec570f4cce3a48b3e50d5ce22fcac, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _AERO_WETNESS
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 1
@@ -26,10 +27,16 @@ Material:
     m_Ints: []
     m_Floats:
     - _Smoothness: 0.25
+    - _SubsurfaceWrap: 0.45
+    - _TranslucencyStrength: 1.1
+    - _WetExposure: 1
+    - _WetnessOn: 1
     - _WindSpeed: 0.85
     - _WindStrength: 0.09
     - _WindTime: -1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SubsurfaceColor: {r: 0.75, g: 1, b: 0.34999996, a: 1}
+    - _TranslucencyColor: {r: 0.9, g: 1, b: 0.47999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

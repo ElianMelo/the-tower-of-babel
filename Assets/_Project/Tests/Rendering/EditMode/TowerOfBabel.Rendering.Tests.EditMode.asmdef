@@ -1,6 +1,6 @@
 {
   "name": "TowerOfBabel.Rendering.Tests.EditMode",
-  "references": ["TowerOfBabel.Rendering", "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Universal.Runtime", "Unity.ugui"],
+  "references": ["TowerOfBabel.Rendering", "TowerOfBabel.Gameplay", "Unity.RenderPipelines.Core.Runtime", "Unity.RenderPipelines.Universal.Runtime", "Unity.ugui"],
   "includePlatforms": ["Editor"],
   "optionalUnityReferences": ["TestAssemblies"],
   "autoReferenced": false

@@ -641,6 +641,11 @@ namespace TowerOfBabel.World.Chunks
         {
             public int Floor;
             private readonly Dictionary<ChunkKey, List<Matrix4x4>> matricesByChunk = new();
+            // World bounds keyed by the prepared matrix list: reloading an unchanged chunk (every
+            // near/far hand-off) reuses them; a new chunk version brings a new list.
+            private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<List<Matrix4x4>, List<Bounds>> boundsByMatrices = new();
+            private static readonly Unity.Profiling.ProfilerMarker BoundsMarker = new("Tower.FarRenderer.Bounds");
+            private static readonly Unity.Profiling.ProfilerMarker ProbesMarker = new("Tower.FarRenderer.Probes");
             private readonly List<Matrix4x4> matrices = new();
             private readonly List<int> floorIndices = new();
             private readonly List<Bounds> instanceBounds = new();
@@ -675,20 +680,28 @@ namespace TowerOfBabel.World.Chunks
                 matrices.Clear();
                 floorIndices.Clear(); instanceBounds.Clear();
                 pages.Clear();
+                using (BoundsMarker.Auto())
                 foreach (var pair in matricesByChunk)
-                    foreach (var matrix in pair.Value)
+                {
+                    if (!boundsByMatrices.TryGetValue(pair.Value, out List<Bounds> chunkBounds) || chunkBounds.Count != pair.Value.Count)
                     {
-                        matrices.Add(matrix); floorIndices.Add(pair.Key.FloorIndex);
-                        instanceBounds.Add(TransformBounds(meshBounds, matrix));
+                        chunkBounds = new List<Bounds>(pair.Value.Count);
+                        foreach (var matrix in pair.Value) chunkBounds.Add(TransformBounds(meshBounds, matrix));
+                        boundsByMatrices.AddOrUpdate(pair.Value, chunkBounds);
                     }
+                    matrices.AddRange(pair.Value);
+                    instanceBounds.AddRange(chunkBounds);
+                    for (int i = 0; i < pair.Value.Count; i++) floorIndices.Add(pair.Key.FloorIndex);
+                }
 
                 for (int start = 0; start < matrices.Count; start += MaximumInstancesPerDraw)
                 {
                     int count = Mathf.Min(MaximumInstancesPerDraw, matrices.Count - start);
                     Bounds bounds = CalculateBounds(instanceBounds, start, count);
-                    MaterialPropertyBlock probeProperties = useLightProbes
-                        ? BuildLightProbeProperties(bounds.center, count)
-                        : null;
+                    MaterialPropertyBlock probeProperties = null;
+                    if (useLightProbes)
+                        using (ProbesMarker.Auto())
+                            probeProperties = BuildLightProbeProperties(bounds.center, count);
                     pages.Add(new RenderPage(start, count, bounds, probeProperties));
                 }
 

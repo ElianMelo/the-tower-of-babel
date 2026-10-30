@@ -23,6 +23,12 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         _RadialFloorCenter("Floor center",Vector)=(0,0,0,0)
         _RiverStage("Construction stage",Float)=10
         _RiverFloorIndex("Explicit floor identity",Float)=-1
+        _LipWidth("Polished glass lip width (m)",Range(0,.2))=.06
+        _LipStrength("Polished glass lip",Range(0,1))=1
+        [Toggle(_AERO_WETNESS)] _WetnessOn("Wetness (global dew and rain)",Float)=0
+        _Porosity("Stone porosity",Range(0,1))=.12
+        _WetExposure("Weather exposure",Range(0,1))=1
+        _WetBeads("Visible drops (0 for walkable floors)",Range(0,1))=0
         [PerRendererData] _BuildMode("Build mode",Float)=0
         [PerRendererData] _BuildReveal("Build reveal",Float)=1
         [PerRendererData] _BuildClock("Build clock",Float)=0
@@ -45,6 +51,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         half4 _WaterColor,_GlassTint; float _Smoothness,_FlowSpeed,_Refraction,_RadialFloor,_RiverStage; float4 _RadialFloorCenter,_RiverLayout;
         half4 _BaseColor; half _VeinStrength,_NormalStrength,_MarbleSmoothness,_PearlCoat;
         float _MarbleScale,_TextureAspect;
+        half _LipWidth,_LipStrength,_WetnessOn,_Porosity,_WetExposure,_WetBeads;
         CBUFFER_END
         #include "BuildingMarbleSurface.hlsl"
         UNITY_INSTANCING_BUFFER_START(Construction)
@@ -105,6 +112,8 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma multi_compile_fragment _ REFLECTION_PROBE_ROTATION
             #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
             #pragma multi_compile_fog
+            #pragma shader_feature_local_fragment _AERO_WETNESS
+            #include "Aero/AeroWetness.hlsl"
             half4 Frag(Varyings i):SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i); Aperture(i); half build=Reveal(i);
@@ -120,8 +129,18 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
                     surface.smoothness=AeroPolish(_MarbleSmoothness,i.ws,1);surface.normalTS=half3(0,0,1);surface.occlusion=1;
                     surface.clearCoatMask=_PearlCoat;surface.clearCoatSmoothness=.95;
                     surface.emission=build*half3(.1,2,3);
+                    half3 lipView=GetWorldSpaceNormalizeViewDir(i.ws);
+                    // A polished cyan glass lip frames each channel on the deck and its underside.
+                    half lip=(1-smoothstep(_LipWidth*.7,_LipWidth,RiverChannelDistance(i.ws.xz,i.floorIndex)))*step(.5,abs(i.normal.y))*_LipStrength;
+                    surface.albedo=lerp(surface.albedo,_GlassTint.rgb*.6,lip);
+                    surface.smoothness=lerp(surface.smoothness,.985,lip);
+                    surface.clearCoatMask=lerp(surface.clearCoatMask,1,lip);
+                    surface.emission+=_GlassTint.rgb*lip*pow(1-saturate(dot(normal,lipView)),3)*.6*lerp(.25,1,saturate(_AeroDaylight));
+                    #if defined(_AERO_WETNESS)
+                        AeroApplyWetnessBeads(surface.albedo,surface.smoothness,normal,i.ws,normalize(i.normal),_Porosity,_WetExposure,_WetBeads);
+                    #endif
                     InputData data=(InputData)0;
-                    data.positionWS=i.ws;data.positionCS=i.positionCS;data.normalWS=normal;data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(i.ws);
+                    data.positionWS=i.ws;data.positionCS=i.positionCS;data.normalWS=normal;data.viewDirectionWS=lipView;
                     data.shadowCoord=TransformWorldToShadowCoord(i.ws);data.bakedGI=SampleSH(normal);data.shadowMask=half4(1,1,1,1);
                     data.vertexLighting=VertexLighting(i.ws,normal);data.normalizedScreenSpaceUV=GetNormalizedScreenSpaceUV(i.positionCS);
                     half3 marble=AeroFinishReflection(UniversalFragmentPBR(data,surface).rgb,i.ws,normal,data.viewDirectionWS,1,3.2,_AeroDaylight);

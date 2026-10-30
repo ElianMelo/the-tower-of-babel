@@ -64,6 +64,15 @@ namespace TowerOfBabel.World.Tests
                 manager.SetAssetStage(new ChunkKey(0,0,0),0,0);bridge.Refresh(0,0);
                 Assert.That(bridge.CachedShadowChunks,Is.EqualTo(2));
                 bridge.Refresh(10,10);Assert.That(bridge.CachedShadowChunks,Is.Zero);
+                // Lag-spike fix: walking back to a floor reuses parked proxies instead of recombining.
+                Assert.That(bridge.ParkedShadowChunks,Is.EqualTo(2));
+                builds=bridge.ShadowMeshBuilds;bridge.Refresh(0,0);
+                Assert.That(bridge.CachedShadowChunks,Is.EqualTo(2));Assert.That(bridge.ShadowMeshBuilds,Is.EqualTo(builds),"Parked floors come back without a rebuild.");
+                // A zero build budget defers combining to later frames rather than stalling one frame.
+                bridge.Refresh(10,10);manager.SetAssetStage(new ChunkKey(0,1,0),0,5);
+                builds=bridge.ShadowMeshBuilds;bridge.Refresh(0,0,0);
+                Assert.That(bridge.RefreshPending,Is.True);Assert.That(bridge.ShadowMeshBuilds-builds,Is.LessThanOrEqualTo(1));
+                bridge.Refresh(0,0);Assert.That(bridge.RefreshPending,Is.False);Assert.That(bridge.CachedShadowChunks,Is.EqualTo(2));
             }
             finally{Object.DestroyImmediate(root);Object.DestroyImmediate(profile);}
         }

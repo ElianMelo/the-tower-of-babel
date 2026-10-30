@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 942c077abc1dba74db25cc0c7b810f53, type: 3}
   m_Name: RiverGlass
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.RiverGlassProfile
-  presentationVersion: 11
+  presentationVersion: 13
   ripples: {fileID: 2800000, guid: c94169d55087aee43a4ebd71c975f082, type: 3}
-  caustics: {fileID: 2800000, guid: 6a6111d7c04a2aa41a70e3595cc26c9c, type: 3}
-  surfaceCaustics: {fileID: 2800000, guid: 4a228663f34027f4689410ae3c8974cc, type: 3}
+  caustics: {fileID: 2800000, guid: ab22e5b5339fb0d4cbc31dba61b74e85, type: 3}
+  surfaceCaustics: {fileID: 2800000, guid: ab22e5b5339fb0d4cbc31dba61b74e85, type: 3}
   surfacePatternOpacity: 0.22
   surfacePatternBlur: 3
   surfacePatternScale: 0.16
   environment: {fileID: 8900000, guid: bfa6913d4cb6e96459e49363b9af071e, type: 3}
   layout: {x: 96, y: 3, z: 6, w: 1.3}
-  absorption: {r: 0.9, g: 0.22, b: 0.09, a: 1}
+  absorption: {r: 4.5, g: 1.1, b: 0.42, a: 1}
   waterTint: {r: 0.08, g: 0.5, b: 0.65, a: 1}
   opticalThickness: 0.14
   rippleScale: 0.46
@@ -40,6 +40,24 @@ MonoBehaviour:
   refractionDistance: 24
   detailDistance: 42
   detailedFloorLimit: 2
+  shallowColor: {r: 0.25, g: 0.83, b: 0.94, a: 1}
+  deepColor: {r: 0.04, g: 0.5, b: 0.82, a: 1}
+  deepPath: 0.6
+  wallColor: {r: 0.93, g: 0.96, b: 1, a: 1}
+  edgeTint: {r: 0.35, g: 0.82, b: 0.74, a: 1}
+  waterIor: 1.33
+  glassIor: 1.5
+  refractionStrength: 0.4
+  bedTileSize: 0.6
+  bedEtchOpacity: 0.05
+  bedCausticStrength: 1.6
+  meniscusIntensity: 1.2
+  meniscusWidth: 0.008
+  wallTint: 0.35
+  inscatter: 1.6
+  bubbleDensity: 2.2
+  volumeSteps: 12
+  liteSteps: 6
   projectionPatchCount: 4
   projectionAheadDistance: 28
   projectionPatternDensity: 2.5
@@ -49,12 +67,12 @@ MonoBehaviour:
   projectionTint: {r: 1, g: 1, b: 0.99, a: 1}
   daylightIntensity: 96
   nightIntensity: 64
-  projectionBurstDuration: {x: 6, y: 9}
-  projectionQuietDuration: {x: 2, y: 4}
+  projectionBurstDuration: {x: 7, y: 11}
+  projectionQuietDuration: {x: 0.6, y: 1.4}
   projectionMaxActivePatches: 2
-  projectionStartSpacing: {x: 1.2, y: 2.5}
-  projectionGlobalQuietInterval: {x: 14, y: 20}
-  projectionGlobalQuietDuration: {x: 1, y: 2}
+  projectionStartSpacing: {x: 0.5, y: 1.2}
+  projectionGlobalQuietInterval: {x: 30, y: 45}
+  projectionGlobalQuietDuration: {x: 1, y: 1.6}
   projectionGlobalFade: 1.5
   projectionBurstFade: 2.8
   projectionRelocationFade: 1.6

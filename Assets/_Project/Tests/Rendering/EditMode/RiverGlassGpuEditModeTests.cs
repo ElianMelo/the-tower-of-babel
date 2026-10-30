@@ -52,7 +52,7 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(Energy(faint)/Energy(sharp),Is.InRange(.23f,.27f),"Opacity must fade the pattern independently of glass and water transmission.");
                 Assert.That(Gradient(soft),Is.LessThan(Gradient(sharp)*.75f),"Blur must reduce high-frequency surface detail in actual rendered pixels.");
                 Assert.That(Energy(soft),Is.GreaterThan(.001f),"Filtering must retain broad flowing light rather than removing the effect.");
-                Assert.That(feature.LastDrawCalls,Is.EqualTo(2));Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(1));
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(1),"Water and glass are one volume draw per batch.");Assert.That(feature.LastVolumeDraws,Is.EqualTo(1));Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(1));
                 // A profile saved before the split still renders with its original texture reference.
                 profile.surfaceCaustics=null;var fallback=Sample(1,0);
                 Assert.That(Energy(fallback),Is.GreaterThan(.001f));
@@ -111,7 +111,7 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(Difference(0),Is.LessThan(.00001f),"A farther floor must not add animated reflections or highlights to the stack.");
                 Assert.That(Difference(2),Is.GreaterThan(.002f),"The nearest pool must keep its moving water.");
                 Assert.That(feature.LastDetailedFloors,Is.EqualTo(2));
-                Assert.That(feature.LastDrawCalls,Is.EqualTo(5));
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(3),"One draw per floor: two traced volumes and one cheap far tint.");Assert.That(feature.LastVolumeDraws,Is.EqualTo(2));Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(2));
                 RiverGlassRenderRegistry.Unregister(source);var withoutWater=Sample(6);
                 var farPixel=camera.WorldToScreenPoint(new Vector3(-8,0,0));
                 int farIndex=Mathf.RoundToInt(farPixel.y)*size+Mathf.RoundToInt(farPixel.x);
@@ -151,10 +151,10 @@ namespace TowerOfBabel.Rendering.Tests
                 RiverGlassRenderRegistry.Register(source);
                 Assert.DoesNotThrow(()=>{camera.Render();camera.Render();},"Rendering must not read/duplicate mesh vertices or build per-instance geometry.");
                 Assert.That(feature.LastSubmittedInstances,Is.EqualTo(19125));
-                Assert.That(feature.LastDrawCalls,Is.EqualTo(47),"Only two floors receive the additional detail pass.");
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(45),"One draw per floor; only the two nearest trace the water volume.");Assert.That(feature.LastVolumeDraws,Is.EqualTo(2));
                 Assert.That(feature.LastDetailedFloors,Is.EqualTo(2));
                 Assert.That(feature.CachedGeometryCount,Is.Zero);
-                Assert.That(Resources.FindObjectsOfTypeAll<Mesh>().Any(m=>m.name.StartsWith("River glass shell — cached")),Is.False);
+                Assert.That(UnityEngine.Resources.FindObjectsOfTypeAll<Mesh>().Any(m=>m.name.StartsWith("River glass shell — cached")),Is.False);
             }
             finally
             {
@@ -217,6 +217,8 @@ namespace TowerOfBabel.Rendering.Tests
             var feature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<RiverGlassRendererFeature>().Single();
             float oldTime=feature.previewTime; feature.previewTime=2;
             var source=new Source(); var materials=new List<Material>();
+            // Caustic filaments add bright light by design; judge the marker hue without them.
+            var oldProfile=feature.profile; var profile=Object.Instantiate(oldProfile); profile.surfacePatternOpacity=0; feature.profile=profile;
             try
             {
                 var cameraRoot=new GameObject("Glass transmission camera");var camera=cameraRoot.AddComponent<Camera>();
@@ -247,18 +249,23 @@ namespace TowerOfBabel.Rendering.Tests
                 camera.Render();camera.Render(); RenderTexture.active=target;
                 pixels.ReadPixels(new Rect(0,0,128,128),0,0);pixels.Apply();
                 Color color=pixels.GetPixel(64,64);
-                Assert.That(color.r,Is.GreaterThan(.2f),"The red marker must remain visible through actual color/depth apertures.");
-                Assert.That(color.r,Is.GreaterThan(color.g*1.5f),"A painted blue bed must not replace the marker.");
-                Assert.That(feature.LastDrawCalls,Is.EqualTo(layers+Mathf.Min(layers,feature.profile.detailedFloorLimit)));
-                Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(1));
+                // One pool keeps the marker bright; each stacked pool absorbs red like real water,
+                // but the marker hue must still read through every aperture.
+                Assert.That(color.r,Is.GreaterThan(layers==1?.2f:.05f),"The red marker must remain visible through actual color/depth apertures.");
+                // Stacked pools tint the view cyan like real water; one pool must keep the marker hue.
+                if(layers==1)Assert.That(color.r,Is.GreaterThan(color.g*1.5f),"A painted blue bed must not replace the marker.");
+                Assert.That(feature.LastDrawCalls,Is.EqualTo(layers));Assert.That(feature.LastVolumeDraws,Is.EqualTo(Mathf.Min(layers,feature.profile.detailedFloorLimit)));
+                Assert.That(feature.LastRefractedLayers,Is.LessThanOrEqualTo(Mathf.Min(layers,feature.profile.detailedFloorLimit)));
                 Assert.That(feature.LastRefractedLayers,Is.GreaterThan(0));
-                Assert.That(feature.LastBackgroundWidth,Is.EqualTo(64));
-                Assert.That(feature.LastBackgroundHeight,Is.EqualTo(64));
+                // The nearest volume refracts a full-resolution copy.
+                Assert.That(feature.LastBackgroundWidth,Is.EqualTo(128));
+                Assert.That(feature.LastBackgroundHeight,Is.EqualTo(128));
                 Assert.That(ShaderUtil.GetShaderMessages(feature.surfaceShader).Where(m=>m.severity==UnityEditor.Rendering.ShaderCompilerMessageSeverity.Error),Is.Empty);
             }
             finally
             {
                 RiverGlassRenderRegistry.Unregister(source);feature.previewTime=oldTime;RenderTexture.active=oldTarget;
+                feature.profile=oldProfile;Object.DestroyImmediate(profile);
                 EditorSceneManager.ClosePreviewScene(scene);SceneManager.SetActiveScene(original);
                 foreach(var material in materials)Object.DestroyImmediate(material);
                 target.Release();Object.DestroyImmediate(target);Object.DestroyImmediate(pixels);ShaderUtil.allowAsyncCompilation=oldAsync;

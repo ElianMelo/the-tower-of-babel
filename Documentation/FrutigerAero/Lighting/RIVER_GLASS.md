@@ -2,6 +2,91 @@
 
 The 2026-10-24 enhancement separates the moving aqua water from its smooth glass enclosure. It retains the two rings, cardinal spokes, central pool, 20 cm slab envelope, walking colliders, construction stages, costs and save identities. Existing edits to the Tower scene and day/night asset were preserved.
 
+## Presentation 13: Crest caustics and more frequent white light (2026-10-29)
+
+User feedback: the glass river is "amazing", the white projected caustic should appear more often, and the overall caustics looked low quality.
+
+**One caustic source.** Every water light now samples `Environment/Lighting/Caustics/CrestCaustics.png`.
+- It is the chromatic caustic net from the open-source Crest Ocean System (MIT).
+- It is byte-identical to the copy in the owner's Crest 5 install, and attributed in `THIRD_PARTY_NOTICE.md`.
+- Consumers: the river cookie and volume, the lake surface, the lamp cookie, the nearby-water light feature and the river floor.
+- `AeroIslandAtmosphereAuthoring.CausticPath` points at it, and `AeroShadingAuthoring.ConfigureCaustics` assigns it.
+
+**Crest-style sampling.** `Shaders/Aero/AeroCaustics.hlsl` follows Crest:
+- two layers at scales 1 and 1.37, scrolling in unrelated directions and averaged (not the sparse minimum of two layers);
+- centred on the texture's 0.07 grey point;
+- an explicit mip for focus and distance blur;
+- light-direction projection with Crest's ¼ fudge.
+
+The river volume, `AeroNearbyWaterLight` and the lamp cookie use it. The projected cookie keeps its accepted aperture, cutout and lifecycle logic, and only reads the new net.
+
+**More frequent white light** (`RiverGlassAuthoring.MigrateToCrestCaustics`):
+
+| Setting | Before | Now |
+| --- | --- | --- |
+| Appearances | 6–9 s | 7–11 s |
+| Gaps | 2–4 s | 0.6–1.4 s |
+| Start spacing | 1.2–2.5 s | 0.5–1.2 s |
+| Complete quiet | every 14–20 s for 1–2 s | every 30–45 s for 1–1.6 s |
+
+In the cookie shader:
+- focus-point islands cover more area (0.42–0.64);
+- point rest is 0.45 s.
+
+The accepted 90° footprint, 2.5 density, 0.95/0.06 opacities, 96/64 peaks, two active sources and 2048 px cookie are unchanged.
+
+## Presentation 12: water inside glass (2026-10-29, experimental)
+
+**Why the river was reworked.** The river previously read as a thin tinted film over a hole:
+- two sheets had no bed, no walls and no waterline;
+- the glass was nearly invisible;
+- refraction was tiny and applied to the nearest floor only;
+- the caustics sat on the surface as an overlay.
+
+**What the volume pass does.** `RiverGlassSurface.shader` + `RiverVolume.hlsl` now trace each detailed pixel through the real enclosure. Each enclosure dimension scales with the tile's vertical scale.
+
+| Layer | Depth below the slab top |
+| --- | --- |
+| Glass lid | 0–2 cm |
+| Air gap | 2–4 cm |
+| Rippled water surface | 4 cm |
+| Water | 4–18 cm |
+| Glass bed | 18–20 cm |
+
+- **Walls.** A 2D sphere trace of the analytic channel (`RiverChannel.hlsl`; 12 steps on PC, 6 on mobile) finds the inner glass walls. The marble behind them shows a bright silver meniscus at the waterline.
+- **Optics.** Beer-Lambert absorption uses the actual water path. Absorption is a linear vector, (4.5, 1.1, 0.42) per metre, and is no longer gamma-converted as a colour. In-scattered light runs from shallow `#3FD4F0` to deep `#0B7FD0`.
+- **Refraction.** The scene below is refracted through the water surface and the bed into the existing aperture, with the foreground depth guard.
+- **Caustics.** They are sampled inside the volume, on the bed and the walls, rather than overlaid on the surface.
+- **From below.** The underside shows Snell's window, total internal reflection outside it and bright caustic ripples.
+- **Edges and lid.** A thick cyan-green glass band runs along every channel edge, sparse micro-bubbles sit on three depth layers, the lid takes rain drops from the [global wetness](WETNESS.md), and the shared Aero reflections apply.
+
+`GlassWaterFloor.shader` adds a polished cyan glass lip around each aperture on the deck and its underside.
+
+**Draw and copy budget**
+
+| | Before (v11) | Now (v12) |
+| --- | --- | --- |
+| Draws per floor batch | water draw, plus a glass draw on detailed floors | one: the volume pass on detailed floors, the time-independent tint pass otherwise |
+| 45-floor fixture | 47 draws | 45 draws |
+| Background copies | one, half resolution | one per detailed floor: the nearest at full resolution, the second at half; mobile keeps one half-resolution copy |
+
+`RiverGlassRendererFeature` binds the global textures (shadows, lights, Aero cubemaps), sets `_RiverSteps` and reports `LastVolumeDraws`.
+
+**Profile changes.** `RiverGlass.asset` presentation version 12 adds:
+- shallow, deep, wall and edge colours;
+- the water/glass IOR pair (1.33 / 1.5);
+- `refractionStrength` 0.4 (1 is physical; the floor 6 m below is easier to read at 0.4);
+- bed tile, etch and caustic strength;
+- meniscus intensity and width;
+- wall tint, inscatter, bubble density and step budgets.
+
+The migration lives in `RiverGlassAuthoring.MigrateToVolume`. **The accepted projected-caustic settings are untouched and protected by a regression test:** 90°, density 2.5, 0.95/0.06, 96/64 peaks, two active sources and the 2048 px cookie.
+
+**Notes:**
+- **Additional lights.** They are not shaded on the water. The caustic projector spotlights would paint it, and they deliberately exclude the Water layer.
+- **Superseded statements.** Older sections of this page describe the v11 budget (47 draws and one half-resolution copy); this section supersedes those numbers.
+- **Review captures.** They are in `_Screenshots-and-previews-to-delete/aero-shading/<label>/river-*.png`.
+- **The 6 m view.** At the steep top view, the cyan patches below are the lower floor's real aquatic inlays seen through the water.
 ## Gameplay regression repair
 
 The first enhancement expanded every submitted water batch into CPU-clipped water and glass meshes inside RecordRenderGraph. Completing the saved tower exposes 19,114 water tiles, and this unbounded synchronous work could stall the main thread and allocate large amounts of geometry. The previous fixture-only verification missed the real full-tower cheat and subsequent interaction.

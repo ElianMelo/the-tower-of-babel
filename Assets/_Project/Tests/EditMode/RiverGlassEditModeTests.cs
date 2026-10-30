@@ -146,7 +146,9 @@ namespace TowerOfBabel.World.Tests
                 Assert.That(cookie.updateCount,Is.EqualTo(version),"Higher resolution must retain the 8Hz refresh budget.");
                 var rotations=lights.Select(l=>l.transform.rotation).ToArray();
                 int starts=lighting.WindowStartCount;float lastStart=lighting.LastWindowStartedAt;int quietFrames=0;
-                for(int frame=1;frame<=1080;frame++)
+                // Long enough to include one complete quiet interval (30-45 s apart since presentation 13).
+                int frames=Mathf.CeilToInt((Profile.projectionGlobalQuietInterval.y+Profile.projectionGlobalQuietDuration.y+2)*30);
+                for(int frame=1;frame<=frames;frame++)
                 {
                     lighting.Sample(camera,sampleTime+frame/30f,1f/30);
                     Assert.That(lighting.RunningWindowCount,Is.InRange(0,2));
@@ -155,7 +157,7 @@ namespace TowerOfBabel.World.Tests
                     if(lighting.WindowStartCount!=starts)
                     {
                         Assert.That(lighting.WindowStartsAllowed,Is.True);
-                        Assert.That(lighting.LastWindowStartedAt-lastStart,Is.GreaterThanOrEqualTo(1.2f));
+                        Assert.That(lighting.LastWindowStartedAt-lastStart,Is.GreaterThanOrEqualTo(Profile.projectionStartSpacing.x-.001f));
                         starts=lighting.WindowStartCount;lastStart=lighting.LastWindowStartedAt;
                     }
                 }
@@ -165,7 +167,7 @@ namespace TowerOfBabel.World.Tests
                     "Projectors stay fixed while cutouts stream across their footprint.");
                 Assert.That(before.Where((v,i)=>!v.Equals(after[i])).Count(),Is.GreaterThan(50),"The cookie must advance, not just the CPU clock.");
                 for(int i=0;i<4;i++)manager.SetAssetStage(new ChunkKey(0,0,0),i,9);
-                lighting.Sample(camera,sampleTime+36.2f,1); Assert.That(lighting.ActiveLightCount,Is.Zero);
+                lighting.Sample(camera,sampleTime+frames/30f+.2f,1); Assert.That(lighting.ActiveLightCount,Is.Zero);
                 lighting.enabled=false; Assert.That(lighting.AllocatedCookieCount,Is.Zero);
                 Assert.That(root.GetComponentsInChildren<Light>(true),Is.Empty);
             }

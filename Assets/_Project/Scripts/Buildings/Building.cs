@@ -121,13 +121,13 @@ namespace TowerOfBabel.Buildings
             chunkKey = key;
             localIndex = assetLocalIndex;
             isBound = owner != null && assetLocalIndex >= 0;
-            if (chunkManager != null) chunkManager.ConstructionFloorChanged += HandleConstructionFloorChanged;
+            if (chunkManager != null) chunkManager.AddFloorListener(this);
             ApplyStage(stage,false);
         }
 
         public void Unbind()
         {
-            if (chunkManager != null) chunkManager.ConstructionFloorChanged -= HandleConstructionFloorChanged;
+            if (chunkManager != null) chunkManager.RemoveFloorListener(this);
             interactionFocused = false;
             scanHighlighted = false;
             interactionMotion?.Stop(true);
@@ -176,6 +176,10 @@ namespace TowerOfBabel.Buildings
         {
             outline?.SetVisible((interactionFocused || scanHighlighted) && IsConstructionAvailable);
         }
+
+        /// <summary>Slot in ChunkManager's floor listener registry; -1 when not registered.</summary>
+        public int FloorListenerIndex { get; internal set; } = -1;
+        public void NotifyConstructionFloorChanged() => HandleConstructionFloorChanged();
 
         private void HandleConstructionFloorChanged()
         {
@@ -273,7 +277,7 @@ namespace TowerOfBabel.Buildings
 
         private void OnDestroy()
         {
-            if (chunkManager != null) chunkManager.ConstructionFloorChanged -= HandleConstructionFloorChanged;
+            if (chunkManager != null) chunkManager.RemoveFloorListener(this);
         }
 
         private void OnValidate()

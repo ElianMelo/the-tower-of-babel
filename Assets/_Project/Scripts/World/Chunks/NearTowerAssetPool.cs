@@ -22,6 +22,12 @@ namespace TowerOfBabel.World.Chunks
             new("Tower.NearPool.Synchronize");
         private static readonly ProfilerMarker TransformMarker =
             new("Tower.NearPool.ApplyTransforms");
+        // Finer breakdown of floor-change cost (see Documentation/Performance/LAG_SPIKES.md).
+        private static readonly ProfilerMarker ReleaseMarker = new("Tower.NearPool.ReleaseChunks");
+        private static readonly ProfilerMarker AddMarker = new("Tower.NearPool.RentAndBind");
+        private static readonly ProfilerMarker FloorGeometryMarker = new("Tower.NearPool.FloorGeometry");
+        private static readonly ProfilerMarker ActivateMarker = new("Tower.NearPool.Activate");
+        private static readonly ProfilerMarker FlushMarker = new("Tower.NearPool.FlushReturns");
 
         [SerializeField] private Transform poolRoot;
 
@@ -119,6 +125,7 @@ namespace TowerOfBabel.World.Chunks
                         chunksToRelease.Add(pair.Key);
                 }
 
+                using (ReleaseMarker.Auto())
                 for (int i = 0; i < chunksToRelease.Count; i++)
                 {
                     ReleaseChunk(chunksToRelease[i], true);
@@ -126,6 +133,7 @@ namespace TowerOfBabel.World.Chunks
                 }
 
                 pendingActivations.Clear();
+                using (AddMarker.Auto())
                 foreach (KeyValuePair<ChunkKey, ChunkSceneCache> pair in desiredChunks)
                 {
                     if (activeChunks.ContainsKey(pair.Key))
@@ -136,6 +144,7 @@ namespace TowerOfBabel.World.Chunks
                 }
 
                 ApplyPendingTransforms();
+                using (FlushMarker.Auto())
                 foreach (TypePool pool in pools.Values)
                     pool.FlushDeferredReturns();
                 desiredChunks.Clear();
@@ -242,11 +251,12 @@ namespace TowerOfBabel.World.Chunks
                     }
                 }
 
+                using (FloorGeometryMarker.Auto())
                 for (int i = 0; i < count; i++)
-                {
                     ConfigureFloorGeometry(pendingActivations[i].Instance, pendingActivations[i].Asset);
+                using (ActivateMarker.Auto())
+                for (int i = 0; i < count; i++)
                     ActivateInstance(pendingActivations[i].Instance);
-                }
             }
 
             LastPositionedAssetCount = count;

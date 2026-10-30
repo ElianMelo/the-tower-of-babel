@@ -8,6 +8,20 @@ The 2026-10-24 [inner glass river blueprint](../../Frutiger%20Reference/Asset/In
 
 For projected river caustics, preserve the accepted larger 90-degree footprint, density 2.5, sparse bright points and faint flowing detail at 0.95/0.06 contributions, 2048 px detail, and 96/64 day/night peaks. The approved natural-timing refinement staggers 6–9-second appearances, allows at most two active water sources, and introduces occasional complete quiet moments with gentle fades. Cutouts follow a meandering current without projector rotation. Faint detail swells over 6–10 seconds while bright points form, travel and dissolve independently over 2–4 seconds. Keep water excluded, opaque-wall blocking and persistent motion clocks while walking or turning. Compact/dense patterns, synchronized flashes and rotational motion remain superseded. The implementation and 36-second motion reviews are recorded in [river glass lighting](Lighting/RIVER_GLASS.md).
 
+**Experimental, 2026-10-29 — awaiting user review.** A Frutiger Aero shading pass draws on all 116 images in `Assets/_Project/References/`. It is not yet the accepted direction:
+
+- **Glass river.** The river is now traced as [water inside glass](Lighting/RIVER_GLASS.md) (presentation 12). It has a glass lid, a rippled surface, real absorption depth, inner walls with a silver meniscus, caustics on the bed, Snell's window from below and cyan-green glass edges. The projected caustics above are unchanged.
+- **Shading library.** The [Aero shading library](Lighting/AERO_SHADING_LIBRARY.md) adds brushed-steel anisotropy, pearlescent thin film, clear "jelly" Y2K plastic, refractive glass, subsurface and back-lit leaves, and soap-film bubbles.
+- **Wetness.** A [global dew/rain wetness](Lighting/WETNESS.md) driver is ported from DYNAMIC Rain/Wetness.
+- **Post looks.** Three switchable [post looks](Lighting/POST_PROFILES.md): Restrained (default), Bright Aero and Y2K.
+- **Feedback round, 2026-10-29.**
+  - **Accepted:** the glass river.
+  - **Floors:** walkable decks now stay clean under dew and rain (no beads).
+  - **Caustics:** every caustic now uses the Crest net (MIT) with Crest-style sampling.
+  - **Timing:** the white projected light appears more often (presentation 13 timing, which supersedes the 6–9 s / 2–4 s natural-timing gaps above).
+  - **Fireflies:** they spawn about 2.4× as often by day (AeroTowerAtmosphere.FireflyRate).
+- **What stays.** Keep the white marble core and controlled bloom while the remaining looks are reviewed.
+
 ## Visual identity to preserve
 
 The [dynamic side-entry rays](Lighting/DYNAMIC_SIDE_RAYS.md) were accepted by the user on 2026-10-24 as the current tower interior lighting baseline and supersede the fixed crossed beam sheets. Sunlight and two restrained arch-anchored fills use bounded construction-aware shadows and world-space drifting interior density. Preserve covered roofs, pillar-separated shafts, white construction readability, the independent fireflies and local aquatic projections. Use the accepted [lighting capture](Lighting/DynamicRays/Floor0-Side3-After.png), [standing motion](Lighting/DynamicRays/Motion.gif) and [walking preview](Lighting/DynamicRays/Walk.gif) when reviewing future changes. Tune quality and appearance through `TowerInteriorRays.asset`.

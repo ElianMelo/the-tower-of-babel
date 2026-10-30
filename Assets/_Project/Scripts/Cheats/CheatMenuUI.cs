@@ -302,6 +302,14 @@ namespace TowerOfBabel.Cheats
             Action("World", "Teleport to selected floor", "Move to a safe floor tile on an unlocked floor", TeleportFloor, "Teleport");
             Action("World", "Return to spawn", "Move back to the saved starting position", () => { ResolvePlayer(); if (hasSpawn) Teleport(spawn); }, "Return");
             foreach (float scale in new[] { 0f, .25f, 1f, 2f, 5f }) { float value = scale; Action("World", "Time scale " + scale.ToString("0.##", CultureInfo.InvariantCulture), "Local simulation speed; menu remains responsive while paused", () => { Time.timeScale = value; SetStatus("Time scale: " + value); }, "Apply"); }
+            // Visual-only weather and post look; local to this client.
+            ToggleRow("World", "Rain", "Wet the tower: moving drops on decks, streaks on walls, ripples; dries out when off",
+                () => TowerOfBabel.Rendering.AeroWetnessController.Instance != null && TowerOfBabel.Rendering.AeroWetnessController.Instance.Raining,
+                value => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; if (wet == null) { SetStatus("No wetness controller in this scene."); return; } wet.Raining = value; SetStatus(value ? "Rain started." : "Rain stopped; surfaces dry out."); });
+            Action("World", "Wetness preset", "Cycle dry, dew, soaked and weather-driven surface film",
+                () => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; SetStatus(wet != null ? "Wetness: " + wet.CycleWetnessPreset() : "No wetness controller in this scene."); }, "Cycle");
+            Action("World", "Post look", "Cycle Restrained, Bright Aero and Y2K colour grading",
+                () => { var post = FindFirstObjectByType<TowerOfBabel.Rendering.AeroPostProfileSwitcher>(); SetStatus(post != null ? "Post look: " + post.Cycle() : "No post look switcher in this scene."); }, "Cycle");
             Action("World", "Scan construction", "Close this menu and highlight nearby unfinished work", () => { Hide(); FindFirstObjectByType<PlayerInteractionRaycaster>()?.ScanNearbyConstruction(); }, "Scan");
             Action("World", "Cancel current action", "Stop gathering, processing or construction", () => { ResolvePlayer(); player?.GetComponent<PlayerInteractionRaycaster>()?.CancelCurrentInteraction(); SetStatus("Action cancelled."); }, "Cancel");
             foreach (PlayerAnimationTrigger trigger in Enum.GetValues(typeof(PlayerAnimationTrigger)))

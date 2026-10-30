@@ -2,7 +2,7 @@ Shader "Hidden/TowerOfBabel/River caustic cookie"
 {
     Properties
     {
-        _CausticsTex("Stylized Water 3 caustics",2D)="white"{}
+        _CausticsTex("Caustics (Crest net)",2D)="white"{}
         _PatternDensity("Projected pattern density",Float)=1
         _HighlightOpacity("Bright focus point opacity",Range(0,1))=.95
         _DetailOpacity("Faint flowing detail opacity",Range(0,1))=.06
@@ -92,11 +92,12 @@ Shader "Hidden/TowerOfBabel/River caustic cookie"
                 half aperture=(1-smoothstep(.32,.42,length(centered)))*outline*cutouts;
                 // Separate sparse, near-opaque focus points from the faint connected
                 // branches, so scaling up coverage does not create a solid bright wash.
-                half pointIslands=smoothstep(.55,.72,Field(moving*17.3+51.7));
+                // More islands than v11 so white focus points appear more often (user request 2026-10-29).
+                half pointIslands=smoothstep(.42,.64,Field(moving*17.3+51.7));
                 half pointCore=pow(smoothstep(.18,.55,caustic),2);
                 half highlights=pointCore*pointIslands*saturate(_HighlightOpacity);
                 half details=smoothstep(.025,.4,caustic)*saturate(_DetailOpacity);
-                highlights*=LifeField(moving*17.3+float2(13.3,-29.1),_RiverClock,_HighlightLifetime.xy,max(.7,_HighlightFade),1.2);
+                highlights*=LifeField(moving*17.3+float2(13.3,-29.1),_RiverClock,_HighlightLifetime.xy,max(.7,_HighlightFade),.45);
                 details*=lerp(.35,1,LifeField(moving*3.7+float2(83.7,19.1),_RiverClock,_DetailLifetime.xy,2,0));
                 // Bright points remain strong inside a cutout; the soft flowing detail
                 // retains the full low-opacity mask instead of dimming both layers alike.

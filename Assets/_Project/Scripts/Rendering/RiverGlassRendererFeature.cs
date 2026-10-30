@@ -7,7 +7,11 @@ using UnityEngine.Rendering.Universal;
 
 namespace TowerOfBabel.Rendering
 {
-    /// <summary>Composites enclosed water from far floors to near floors against accumulated scene color.</summary>
+    /// <summary>
+    /// Composites water inside glass from far floors to near floors against accumulated
+    /// scene color. Each detailed floor gets its own background copy (nearest at full
+    /// resolution) and traces the water volume; farther floors use the cheap tint pass.
+    /// </summary>
     public sealed class RiverGlassRendererFeature : ScriptableRendererFeature
     {
         public RiverGlassProfile profile;
@@ -23,6 +27,8 @@ namespace TowerOfBabel.Rendering
         public int CachedGeometryCount => 0;
         public int LastSubmittedInstances { get; private set; }
         public int LastDetailedFloors { get; private set; }
+        public int LastVolumeDraws { get; private set; }
+        public const int VolumePass = 0, SimplePass = 1;
         private Material material;
         private GlassPass pass;
 
@@ -38,7 +44,7 @@ namespace TowerOfBabel.Rendering
 
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            LastDrawCalls = LastRefractedLayers = LastBackgroundWidth = LastBackgroundHeight = LastSubmittedInstances = LastDetailedFloors = 0;
+            LastDrawCalls = LastRefractedLayers = LastBackgroundWidth = LastBackgroundHeight = LastSubmittedInstances = LastDetailedFloors = LastVolumeDraws = 0;
             LastStatus = "Camera rejected";
             if (material != null && profile != null && renderingData.cameraData.renderType == CameraRenderType.Base &&
                 AeroLightRendererFeature.SupportsCamera(renderingData.cameraData.camera)) { LastStatus = "Queued"; renderer.EnqueuePass(pass); }
@@ -70,7 +76,7 @@ namespace TowerOfBabel.Rendering
                 public TextureHandle depth;
                 public Material material;
                 public List<RiverGlassDraw> draws;
-                public float weight, clock;
+                public float weight, clock, steps;
                 public bool detailed;
             }
             public GlassPass(RiverGlassRendererFeature owner) { this.owner = owner; requiresIntermediateTexture = true; }
@@ -87,7 +93,7 @@ namespace TowerOfBabel.Rendering
                 { owner.LastStatus = resources.isActiveTargetBackBuffer ? "Backbuffer" : "Missing depth"; return; }
                 GeometryUtility.CalculateFrustumPlanes(camera, planes);
                 RiverGlassRenderRegistry.Collect(camera, planes, draws);
-                owner.LastStatus = "Compositing shared instanced water and glass";
+                owner.LastStatus = "Compositing shared instanced water volumes";
                 foreach(var group in floors)group.draws.Clear();
                 floors.Clear();
                 foreach (var draw in draws)
@@ -107,7 +113,9 @@ namespace TowerOfBabel.Rendering
                     FloorGroup floor = floors[i];
                     bool detailed=i<(owner.reducedRefraction?1:Mathf.Clamp(owner.profile.detailedFloorLimit,1,3));
                     if(detailed)owner.LastDetailedFloors++;
-                    float weight = i==0 ? 1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(owner.profile.refractionDistance*.5f,
+                    // Every detailed floor refracts its own copy of what lies behind it, so
+                    // stacked pools see the water already composited on farther floors.
+                    float weight = detailed ? 1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(owner.profile.refractionDistance*.5f,
                         owner.profile.refractionDistance,floor.distance)) : 0;
                     if (owner.reducedRefraction) weight *= .35f;
                     TextureHandle background = default;
@@ -115,14 +123,16 @@ namespace TowerOfBabel.Rendering
                     {
                         var description = graph.GetTextureDesc(resources.activeColorTexture);
                         description.name = "River glass accumulated background";
-                        description.width = Mathf.Max(1,description.width/2);
-                        description.height = Mathf.Max(1,description.height/2);
+                        int divisor = i==0 && !owner.reducedRefraction ? 1 : 2;
+                        description.width = Mathf.Max(1,description.width/divisor);
+                        description.height = Mathf.Max(1,description.height/divisor);
                         description.filterMode = FilterMode.Bilinear;
                         description.clearBuffer = false;
                         description.msaaSamples = MSAASamples.None;
                         background = graph.CreateTexture(description);
                         graph.AddBlitPass(new RenderGraphUtils.BlitMaterialParameters(resources.activeColorTexture,
                             background, Blitter.GetBlitMaterial(TextureDimension.Tex2D), 0), passName: "River glass background copy");
+                        // Report the nearest copy, which is recorded last.
                         owner.LastRefractedLayers++;
                         owner.LastBackgroundWidth=description.width; owner.LastBackgroundHeight=description.height;
                     }
@@ -130,6 +140,7 @@ namespace TowerOfBabel.Rendering
                     data.background = background; data.depth = resources.cameraDepthTexture;
                     data.material = owner.material; data.draws = floor.draws; data.weight = weight;
                     data.detailed=detailed;
+                    data.steps=owner.profile.Steps(owner.reducedRefraction);
                     data.clock = owner.previewTime >= 0 ? owner.previewTime : Time.time;
                     if (background.IsValid()) builder.UseTexture(background, AccessFlags.Read);
                     builder.UseTexture(data.depth, AccessFlags.Read);
@@ -137,6 +148,8 @@ namespace TowerOfBabel.Rendering
                     builder.SetRenderAttachment(resources.activeColorTexture, 0, AccessFlags.ReadWrite);
                     builder.SetRenderAttachmentDepth(resources.activeDepthTexture, AccessFlags.Read);
                     builder.AllowGlobalStateModification(true);
+                    // Shadows, lights and the shared Aero reflection cubemaps are read as globals.
+                    builder.UseAllGlobalTextures(true);
                     builder.SetRenderFunc(static (PassData d, RasterGraphContext context) =>
                     {
                         if (d.background.IsValid()) context.cmd.SetGlobalTexture(Background, d.background);
@@ -146,12 +159,14 @@ namespace TowerOfBabel.Rendering
                             draw.properties.SetFloat("_RiverRefractionWeight", d.weight);
                             draw.properties.SetFloat("_RiverDetailWeight",d.detailed?1:0);
                             draw.properties.SetFloat("_RadialFloor",draw.radial);
-                            context.cmd.DrawMeshInstanced(draw.mesh, 0, d.material, 0, draw.matrices, draw.count, draw.properties);
+                            draw.properties.SetFloat("_RiverSteps",d.steps);
+                            // One draw per batch: the volume pass on detailed floors, the cheap tint otherwise.
+                            context.cmd.DrawMeshInstanced(draw.mesh, 0, d.material, d.detailed ? VolumePass : SimplePass,
+                                draw.matrices, draw.count, draw.properties);
                         }
-                        if(d.detailed)foreach(var draw in d.draws)
-                            context.cmd.DrawMeshInstanced(draw.mesh,0,d.material,1,draw.matrices,draw.count,draw.properties);
                     });
-                    owner.LastDrawCalls += data.draws.Count*(detailed?2:1);
+                    owner.LastDrawCalls += data.draws.Count;
+                    if (detailed) owner.LastVolumeDraws += data.draws.Count;
                 }
             }
         }

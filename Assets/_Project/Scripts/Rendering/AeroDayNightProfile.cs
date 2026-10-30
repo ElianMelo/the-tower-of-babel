@@ -22,8 +22,8 @@ namespace TowerOfBabel.Rendering
         [Range(3, 20)] public float beamDownAngle = 14;
         [Range(10, 30)] public float beamLength = 22;
         [Range(0, .8f)] public float exitVolumeStrength = .5f;
-        [Range(0, 1)] public float fireflyDensity = .65f;
-        [Min(0)] public float fireflyPopulationMultiplier = 1.3f;
+        [Range(0, 1)] public float fireflyDensity = 1f;
+        [Min(0)] public float fireflyPopulationMultiplier = 2.2f;
         [Min(.01f)] public float fireflyCoverageAreaMultiplier = 1.15f;
         [Range(0, 1)] public float sunFlareIntensity = .85f;
 

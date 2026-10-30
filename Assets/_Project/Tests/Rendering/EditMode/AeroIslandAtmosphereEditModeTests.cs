@@ -67,7 +67,7 @@ namespace TowerOfBabel.Rendering.Tests
             }
             var river=AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Environment/Lighting/GlassWaterFloor.mat");
             Assert.That(river.GetTexture("_Environment"),Is.Not.Null);
-            var native=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Stylized Water 3/Materials/Textures/Caustics/Caustics_1.png");
+            var native=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Environment/Lighting/Caustics/CrestCaustics.png");
             Assert.That(river.GetTexture("_CausticsTex"),Is.SameAs(native));
             Assert.That(AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Environment/Lighting/AquaProjectionCookie.mat").GetTexture("_CausticsTex"),Is.SameAs(native));
         }

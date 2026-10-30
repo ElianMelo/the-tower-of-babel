@@ -10,6 +10,8 @@ namespace TowerOfBabel.Rendering
         public Light sun;
         public Light moon;
         [Range(0, 1)] public float timeOfDay = .29f;
+        [Tooltip("Daytime haze colour; post looks may tint it (see AeroPostProfileSwitcher).")]
+        public Color dayFogColor = new(.62f, .76f, .86f);
         public float Daylight => AeroDayNightProfile.DaylightAt(timeOfDay);
         private Material originalSky, ownedSky;
         private bool initialized;
@@ -63,7 +65,7 @@ namespace TowerOfBabel.Rendering
             ambient.AddDirectionalLight(Vector3.down, sky * .4f, .2f);
             RenderSettings.ambientProbe = ambient;
             RenderSettings.reflectionIntensity = Mathf.Lerp(.12f, 1, day);
-            RenderSettings.fogColor = Color.Lerp(profile.nightSky, new Color(.62f,.76f,.86f), day);
+            RenderSettings.fogColor = Color.Lerp(profile.nightSky, dayFogColor, day);
             RenderSettings.fog = true; RenderSettings.fogMode = FogMode.ExponentialSquared; RenderSettings.fogDensity = .0006f;
             if (ownedSky != null && ownedSky.HasProperty("_Exposure")) ownedSky.SetFloat("_Exposure", Mathf.Lerp(profile.nightExposure, profile.dayExposure, day));
             Shader.SetGlobalFloat("_AeroDaylight", day);

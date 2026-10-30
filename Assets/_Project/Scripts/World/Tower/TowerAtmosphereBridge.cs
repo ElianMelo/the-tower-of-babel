@@ -24,7 +24,15 @@ namespace TowerOfBabel.World.Tower
         private float nextRefresh;
         private int floor = -100, previous = -100;
         private bool dirty = true;
+        // Left-behind floors stay built but hidden, so walking back never recombines them.
+        private readonly Dictionary<ChunkKey, Proxy> parked = new();
+        private readonly List<ChunkKey> parkedOrder = new();
+        private const int ParkedLimit = 64;
+        private readonly System.Diagnostics.Stopwatch budgetClock = new();
         public int CachedShadowChunks => cache.Count;
+        public int ParkedShadowChunks => parked.Count;
+        /// <summary>True while a time-sliced refresh still has chunks to build.</summary>
+        public bool RefreshPending => dirty;
         public int ShadowMeshBuilds { get; private set; }
         private sealed class Proxy { public GameObject Object; public Mesh Mesh; public int Version; }
 
@@ -42,9 +50,11 @@ namespace TowerOfBabel.World.Tower
             if (!Application.isPlaying || atmosphere == null || chunks == null) return;
             if (Time.unscaledTime < nextRefresh && !dirty) return;
             nextRefresh = Time.unscaledTime + .1f;
-            Refresh(atmosphere.CurrentFloor, atmosphere.PreviousFloor);
+            // At most ~3 ms of mesh combining per frame; floor changes used to stall 45-60 ms.
+            Refresh(atmosphere.CurrentFloor, atmosphere.PreviousFloor, 3);
         }
-        public void Refresh(int viewedFloor, int outgoingFloor)
+        public void Refresh(int viewedFloor, int outgoingFloor) => Refresh(viewedFloor, outgoingFloor, float.PositiveInfinity);
+        public void Refresh(int viewedFloor, int outgoingFloor, float buildBudgetMs)
         {
             if (chunks == null || atmosphere == null || chunks.AssetPrefabs == null) return;
             bool changed = floor != viewedFloor || previous != outgoingFloor;
@@ -53,23 +63,41 @@ namespace TowerOfBabel.World.Tower
             removals.Clear();
             foreach (var entry in cache)
                 if (!Selected(entry.Key.FloorIndex) || !chunks.IsFloorVisible(entry.Key.FloorIndex)) removals.Add(entry.Key);
-            foreach (var key in removals) { Release(cache[key]); cache.Remove(key); }
+            foreach (var key in removals)
+            {
+                var proxy = cache[key]; cache.Remove(key);
+                if (chunks.IsFloorVisible(key.FloorIndex)) Park(key, proxy); else Release(proxy);
+            }
             if (dirty || changed)
             {
                 EnsureTemplates(); openings.Clear();
+                budgetClock.Restart();
+                bool pending = false;
+                // The viewed floor and the roof above shade the player first.
+                for (int pass = 0; pass < 2; pass++)
+                foreach (var chunk in chunks.CachedChunks)
+                {
+                    int f = chunk.Key.FloorIndex;
+                    bool primary = f == floor || f == floor + 1;
+                    if ((pass == 0) != primary || !Selected(f) || !chunks.IsFloorVisible(f)) continue;
+                    if (cache.TryGetValue(chunk.Key, out var proxy) && proxy.Version == chunk.Version) continue;
+                    if (proxy == null && parked.Remove(chunk.Key, out var reused))
+                    {
+                        parkedOrder.Remove(chunk.Key);
+                        if (reused.Version == chunk.Version) { cache[chunk.Key] = reused; continue; }
+                        Release(reused);
+                    }
+                    if (budgetClock.Elapsed.TotalMilliseconds > buildBudgetMs) { pending = true; continue; }
+                    if (proxy != null) Release(proxy);
+                    cache[chunk.Key] = Build(chunk);
+                }
                 // Stable chunk/local identity survives pool rentals and camera movement.
                 int assetOffset = 0;
                 foreach (var chunk in chunks.CachedChunks)
                 {
                     int chunkOffset = assetOffset; assetOffset += chunk.Assets.Count;
                     int f = chunk.Key.FloorIndex;
-                    if (!Selected(f) || !chunks.IsFloorVisible(f)) continue;
-                    if (!cache.TryGetValue(chunk.Key, out var proxy) || proxy.Version != chunk.Version)
-                    {
-                        if (proxy != null) Release(proxy);
-                        cache[chunk.Key] = Build(chunk);
-                    }
-                    if (f != floor) continue;
+                    if (f != floor || !chunks.IsFloorVisible(f)) continue;
                     foreach (var asset in chunk.Assets)
                     {
                         // A source needs a built arch, never a locked/blueprint opening.
@@ -84,7 +112,7 @@ namespace TowerOfBabel.World.Tower
                     }
                 }
                 atmosphere.SetConstructionContext(chunks.IsFloorVisible(floor), openings);
-                dirty = false;
+                dirty = pending;
             }
             // No mesh rebuilding when the near pool moves: activate cached distant shadows only.
             foreach (var entry in cache) entry.Value.Object.SetActive(near == null || !near.HasActiveChunk(entry.Key));
@@ -159,6 +187,17 @@ namespace TowerOfBabel.World.Tower
             var mesh=new Mesh {name="Shadow pillar",hideFlags=HideFlags.DontSave}; mesh.vertices=vertices;mesh.triangles=triangles.ToArray();mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
         }
         private static void Delete(Object value) { if (value == null) return; if (Application.isPlaying) Destroy(value); else DestroyImmediate(value); }
+        private void Park(ChunkKey key, Proxy proxy)
+        {
+            if (proxy.Object != null) proxy.Object.SetActive(false);
+            if (parked.Remove(key, out var old)) { parkedOrder.Remove(key); if (old != proxy) Release(old); }
+            parked[key] = proxy; parkedOrder.Add(key);
+            while (parkedOrder.Count > ParkedLimit)
+            {
+                var oldest = parkedOrder[0]; parkedOrder.RemoveAt(0);
+                if (parked.Remove(oldest, out var evicted)) Release(evicted);
+            }
+        }
         private static void Release(Proxy proxy)
         {
             // Destroy is deferred in Play Mode; hide immediately so rollback cannot leave a one-frame solid ceiling.
@@ -169,7 +208,9 @@ namespace TowerOfBabel.World.Tower
         {
             if (chunks != null) { chunks.AssetStageChanged -= StageChanged; chunks.ConstructionFloorChanged -= VisibilityChanged; }
             near?.SetShadowFloors(int.MaxValue, int.MinValue);
-            foreach (var item in cache.Values) Release(item); cache.Clear(); stages.Clear(); bentMeshes.Dispose();
+            foreach (var item in cache.Values) Release(item); cache.Clear();
+            foreach (var item in parked.Values) Release(item); parked.Clear(); parkedOrder.Clear();
+            stages.Clear(); bentMeshes.Dispose();
             Delete(shadowMaterial); Delete(slab); Delete(pillar); shadowMaterial=null;
             atmosphere?.SetConstructionContext(false, null);
         }

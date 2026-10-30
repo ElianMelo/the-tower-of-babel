@@ -18,7 +18,8 @@ public static class AeroIslandAtmosphereAuthoring
     public const string ProfilePath = Folder + "/AeroDayNight.asset";
     public const string GlassPrefabPath = "Assets/_Project/Prefabs/Buildings/GlassWaterFloor.prefab";
     public const string GlassMaterialPath = Folder + "/GlassWaterFloor.mat";
-    public const string CausticPath = "Assets/Stylized Water 3/Materials/Textures/Caustics/Caustics_1.png";
+    // Crest Ocean System caustic net (MIT); see Environment/Lighting/Caustics/THIRD_PARTY_NOTICE.md.
+    public const string CausticPath = "Assets/_Project/Environment/Lighting/Caustics/CrestCaustics.png";
     public const string CompleteMeshPath = "Assets/_Project/Models/Buildings/FrutigerAero/GlassWaterFloorComplete.asset";
 
     private static T Asset<T>(string path, Func<T> create) where T : UnityEngine.Object
@@ -42,7 +43,7 @@ public static class AeroIslandAtmosphereAuthoring
         var manager = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
         var landscape = UnityEngine.Object.FindFirstObjectByType<AeroTowerTerrain>();
         var caustics = AssetDatabase.LoadAssetAtPath<Texture2D>(CausticPath);
-        if (caustics == null) throw new InvalidOperationException("Installed Stylized Water 3 caustics are required.");
+        if (caustics == null) throw new InvalidOperationException("The project caustics texture is required: " + CausticPath);
         var patternImporter = (TextureImporter)AssetImporter.GetAtPath(CausticPath);
         if (patternImporter.wrapMode != TextureWrapMode.Repeat) { patternImporter.wrapMode = TextureWrapMode.Repeat; patternImporter.SaveAndReimport(); }
 

@@ -12,6 +12,29 @@ public static class RiverGlassAuthoring
 {
     public const string ProfilePath = "Assets/_Project/Environment/Lighting/RiverGlass.asset";
     public const string GlassPath = "Assets/_Project/Environment/Lighting/GlassWaterFloor.mat";
+    /// <summary>Presentation 13 (user request 2026-10-29): Crest caustic net everywhere and more frequent white projected light.</summary>
+    public static void MigrateToCrestCaustics(RiverGlassProfile profile)
+    {
+        var crest=AssetDatabase.LoadAssetAtPath<Texture2D>(AeroIslandAtmosphereAuthoring.CausticPath);
+        profile.caustics=crest; profile.surfaceCaustics=crest;
+        profile.projectionBurstDuration=new Vector2(7,11); profile.projectionQuietDuration=new Vector2(.6f,1.4f);
+        profile.projectionStartSpacing=new Vector2(.5f,1.2f);
+        profile.projectionGlobalQuietInterval=new Vector2(30,45); profile.projectionGlobalQuietDuration=new Vector2(1,1.6f);
+        profile.presentationVersion=13;
+    }
+
+    /// <summary>Presentation 12: water inside glass. Never touches projection/caustic-cookie fields.</summary>
+    public static void MigrateToVolume(RiverGlassProfile profile)
+    {
+        profile.absorption=new Color(4.5f,1.1f,.42f);
+        profile.shallowColor=new Color(.25f,.83f,.94f); profile.deepColor=new Color(.04f,.5f,.82f); profile.deepPath=.6f;
+        profile.wallColor=new Color(.93f,.96f,1); profile.edgeTint=new Color(.35f,.82f,.74f);
+        profile.waterIor=1.33f; profile.glassIor=1.5f; profile.refractionStrength=.4f;
+        profile.bedTileSize=.6f; profile.bedEtchOpacity=.05f; profile.bedCausticStrength=1.6f;
+        profile.meniscusIntensity=1.2f; profile.meniscusWidth=.008f; profile.wallTint=.35f; profile.inscatter=1.6f;
+        profile.bubbleDensity=2.2f; profile.volumeSteps=12; profile.liteSteps=6;
+        profile.presentationVersion=12;
+    }
     public static RiverGlassProfile ConfigureAssets()
     {
         if (Application.dataPath.Replace('\\', '/') != "D:/PersonalProjects/the-tower-of-babel/Assets" || EditorApplication.isPlayingOrWillChangePlaymode)
@@ -92,6 +115,15 @@ public static class RiverGlassAuthoring
             profile.projectionGlobalFade=1.5f;profile.projectionFlowVariation=.15f;profile.projectionFlowSway=.035f;
             profile.projectionDetailLifetime=new Vector2(6,10);profile.projectionHighlightLifetime=new Vector2(2,4);
             profile.projectionHighlightFade=.7f;profile.presentationVersion=11;
+        }
+        if(profile.presentationVersion<12)
+        {
+            // Water inside glass: real path absorption and colour. Projection fields stay as accepted.
+            MigrateToVolume(profile);
+        }
+        if(profile.presentationVersion<13)
+        {
+            MigrateToCrestCaustics(profile);
         }
         glass.SetFloat("_RiverStage", 10); glass.SetFloat("_RiverFloorIndex", -1); glass.enableInstancing = true;
         EditorUtility.SetDirty(glass); EditorUtility.SetDirty(profile);

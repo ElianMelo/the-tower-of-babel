@@ -41,6 +41,28 @@ namespace TowerOfBabel.Rendering
         [Min(1)] public float refractionDistance = 24;
         [Min(1)] public float detailDistance = 42;
         [Range(1,3)] public int detailedFloorLimit = 2;
+        [Header("Water volume (presentation 12)")]
+        public Color shallowColor = new(.25f, .83f, .94f);
+        public Color deepColor = new(.04f, .5f, .82f);
+        [Tooltip("Water path (m) at which the colour reaches the deep tint.")]
+        [Min(.05f)] public float deepPath = .6f;
+        public Color wallColor = new(.93f, .96f, 1f);
+        public Color edgeTint = new(.35f, .82f, .74f);
+        [Range(1, 1.6f)] public float waterIor = 1.33f;
+        [Range(1, 2)] public float glassIor = 1.5f;
+        [Tooltip("1 is physical refraction through the real water path; lower keeps the floor below readable.")]
+        [Range(0, 2)] public float refractionStrength = .4f;
+        [Min(.05f)] public float bedTileSize = .6f;
+        [Range(0, 1)] public float bedEtchOpacity = .05f;
+        [Range(0, 3)] public float bedCausticStrength = 1.6f;
+        [Range(0, 3)] public float meniscusIntensity = 1.2f;
+        [Range(.001f, .03f)] public float meniscusWidth = .008f;
+        [Range(0, 1)] public float wallTint = .35f;
+        [Range(0, 3)] public float inscatter = 1.6f;
+        [Tooltip("Micro-bubble cells per metre on three depth layers; 0 disables.")]
+        [Range(0, 6)] public float bubbleDensity = 2.2f;
+        [Range(1, 24)] public int volumeSteps = 12;
+        [Range(1, 24)] public int liteSteps = 6;
         [Header("Projected caustic patches")]
         [Range(1,4)] public int projectionPatchCount = 4;
         [Min(0)] public float projectionAheadDistance = 28;
@@ -84,7 +106,8 @@ namespace TowerOfBabel.Rendering
             material.SetTexture("_CausticsTex", surfaceCaustics != null ? surfaceCaustics : caustics);
             material.SetTexture("_Environment", environment);
             material.SetVector("_RiverLayout", layout);
-            material.SetColor("_Absorption", absorption);
+            // Absorption is a physical coefficient per metre, not a colour: no gamma conversion.
+            material.SetVector("_Absorption", new Vector4(absorption.r, absorption.g, absorption.b, 0));
             material.SetColor("_WaterColor", waterTint);
             material.SetVector("_RiverOptics", new Vector4(Enclosure.y-Enclosure.x, refraction, reflections, rippleStrength));
             material.SetVector("_RiverMotion", new Vector4(rippleScale, flowSpeed, waterHighlights, detailDistance));
@@ -92,7 +115,17 @@ namespace TowerOfBabel.Rendering
             material.SetColor("_GlassTint",glassTint);
             material.SetVector("_RiverShell",new Vector4(rimWidth,jointSpacing,glassReflections,glassThickness));
             material.SetVector("_RiverEnclosure",Enclosure);
+            material.SetColor("_ShallowColor",shallowColor);
+            material.SetColor("_DeepColor",deepColor);
+            material.SetColor("_WallColor",wallColor);
+            material.SetColor("_EdgeTint",edgeTint);
+            material.SetVector("_RiverVolume",new Vector4(waterIor,glassIor,refractionStrength,deepPath));
+            material.SetVector("_RiverBed",new Vector4(bedTileSize,bedEtchOpacity,bedCausticStrength,meniscusIntensity));
+            material.SetVector("_RiverDetail",new Vector4(bubbleDensity,wallTint,meniscusWidth,inscatter));
         }
+
+        /// <summary>Volume march steps for a floor (lite budget on mobile).</summary>
+        public int Steps(bool reduced) => Mathf.Clamp(reduced ? liteSteps : volumeSteps, 1, 24);
 
         public static float WaterPath(float thickness, float normalViewCosine) =>
             Mathf.Max(.001f, thickness) / Mathf.Max(.15f, Mathf.Abs(normalViewCosine));
