@@ -347,7 +347,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1024560205301068166, guid: 4ce092e6a855a4341a9996f2660925ee, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -96
+      value: -112
       objectReference: {fileID: 0}
     - target: {fileID: 1024560205301068166, guid: 4ce092e6a855a4341a9996f2660925ee, type: 3}
       propertyPath: m_LocalRotation.w
@@ -423,7 +423,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -0.000015258789
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -7897,6 +7897,7 @@ GameObject:
   - component: {fileID: 1046978673}
   - component: {fileID: 1046978674}
   - component: {fileID: 1046978675}
+  - component: {fileID: 1046978676}
   m_Layer: 0
   m_Name: Aero island atmosphere
   m_TagString: Untagged
@@ -8014,6 +8015,23 @@ MonoBehaviour:
   wetnessEnabled: 0
   raining: 0
   previewTime: -1
+--- !u!114 &1046978676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1046978669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b9cf0446db41bf45bc739c3d1577605, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroRainController
+  profile: {fileID: 11400000, guid: 7cb79a08fecf09c48aa3a46e2927289f, type: 2}
+  wetness: {fileID: 1046978675}
+  dayNight: {fileID: 1046978671}
+  tower: {fileID: 1046978670}
+  follow: {fileID: 0}
 --- !u!1 &1059284189
 GameObject:
   m_ObjectHideFlags: 0
@@ -8110,6 +8128,7 @@ GameObject:
   - component: {fileID: 1099652834}
   - component: {fileID: 1099652835}
   - component: {fileID: 1099652836}
+  - component: {fileID: 1099652837}
   m_Layer: 0
   m_Name: ResourceAuthority
   m_TagString: Untagged
@@ -8259,6 +8278,29 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 1099652833}
   _networkObjectCache: {fileID: 0}
   config: {fileID: 11400000, guid: 3b670234ebb7476498fb72a8794158ca, type: 2}
+--- !u!114 &1099652837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1099652830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9cb57257ad8d224490874a5d40542d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Networking.Weather.NetworkWeatherService
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 1099652833}
+  _networkObjectCache: {fileID: 0}
+  dayNight: {fileID: 1046978671}
+  wetness: {fileID: 1046978675}
+  schedule:
+    clearSeconds: {x: 420, y: 900}
+    rainSeconds: {x: 150, y: 360}
+  automaticWeather: 1
+  resyncSeconds: 10
+  snapSeconds: 1.5
 --- !u!1 &1114320927
 GameObject:
   m_ObjectHideFlags: 0

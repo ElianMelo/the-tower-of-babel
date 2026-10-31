@@ -17,7 +17,7 @@ namespace TowerOfBabel.Rendering
 
         [Header("Timing (seconds)")]
         [Min(.1f)] public float rampIn = 6f;
-        [Min(.1f)] public float dryOut = 40f;
+        [Min(.1f)] public float dryOut = 10f;
         [Min(.1f)] public float rainFade = 3f;
 
         [Header("Drops (top faces)")]

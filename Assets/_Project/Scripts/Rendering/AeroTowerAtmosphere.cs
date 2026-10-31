@@ -54,6 +54,31 @@ namespace TowerOfBabel.Rendering
         public static float FireflyRate(float daylight, AeroDayNightProfile profile, float inside) =>
             Mathf.Lerp(6, 10, 1 - daylight) * profile.fireflyDensity * Mathf.Max(0, profile.fireflyPopulationMultiplier) * inside;
         public float WallRadius(int floor) => Mathf.Max(3, baseRadius - decrease * (floor / 2 + 1));
+
+        /// <summary>Floors 0..BuiltFloors-1 have a solid deck (set by TowerAtmosphereBridge from construction).</summary>
+        public int BuiltFloors { get; set; } = int.MaxValue;
+        private int DeckCount => Mathf.Min(levels, BuiltFloors);
+        private int FloorAt(float y) => Mathf.FloorToInt((y - .2f) / Mathf.Max(.01f, floorHeight));
+        private float RadiusOf(Vector3 p) => Vector2.Distance(new Vector2(p.x, p.z), center);
+
+        /// <summary>True when a built deck above <paramref name="point"/> covers it (inside the tower, under a roof).
+        /// Same stepped-cone rule as the wetness shelter (AeroWetness.hlsl), widened by <paramref name="margin"/>.</summary>
+        public bool IsUnderRoof(Vector3 point, float margin = 0)
+        {
+            int roof = Mathf.Max(0, FloorAt(point.y) + 1);
+            if (point.y < -.3f) return false;
+            return roof < DeckCount && RadiusOf(point) <= WallRadius(roof) + margin;
+        }
+
+        /// <summary>Top of the highest built deck at or below <paramref name="point"/> covering its column, or false (open ground).</summary>
+        public bool TryDeckBelow(Vector3 point, out float deckY)
+        {
+            float radius = RadiusOf(point);
+            // Decks widen going down, so the first covering deck found from the top is the one a drop meets.
+            for (int floor = Mathf.Min(FloorAt(point.y), DeckCount - 1); floor >= 0; floor--)
+                if (radius <= WallRadius(floor) + .5f) { deckY = floor * floorHeight; return true; }
+            deckY = 0; return false;
+        }
         public float ExitProximity(Vector3 view)
         {
             int floor = Mathf.Clamp(Mathf.FloorToInt((view.y - .2f) / floorHeight), 0, levels - 1);
@@ -80,7 +105,8 @@ namespace TowerOfBabel.Rendering
             if (exitVolume != null)
             {
                 exitVolume.transform.position = new Vector3(center.x, CurrentFloor * floorHeight + 3, center.y);
-                exitVolume.weight = InteriorWeight * ExitWeight * cycle.profile.exitVolumeStrength;
+                // Calm interior grade everywhere inside, a little stronger toward the open edge (2026-10-31 feedback).
+                exitVolume.weight = InteriorWeight * Mathf.Lerp(.65f, 1, ExitWeight) * cycle.profile.exitVolumeStrength;
             }
             if (clock >= nextSelection) { SelectSources(view); nextSelection = clock + .1f; }
             UpdateLights(dt, duration);

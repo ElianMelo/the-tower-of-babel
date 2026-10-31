@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a75ac771d2c5e044a88cdb5c897d617, type: 3}
+  m_Name: AeroRain
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroRainProfile
+  dropMaterial: {fileID: 2100000, guid: 737b949e2d74a5244803b56700530135, type: 2}
+  splashMaterial: {fileID: 2100000, guid: 9e2413ba6cfdc66498b9dbf7f3d256d2, type: 2}
+  rainLoop: {fileID: 8300000, guid: a88c439a9c6031747bd93112dccc69ce, type: 3}
+  dropsPerSecond: 16000
+  maxDrops: 24000
+  areaRadius: 14
+  spawnHeight: 14
+  fallBelow: 12
+  dropSpeed: 20
+  dropWidth: {x: 0.08, y: 0.13}
+  dropLength: {x: 0.8, y: 1.3}
+  wind: {x: 1.2, y: 0.5}
+  lookAhead: 6
+  collidesWith:
+    serializedVersion: 2
+    m_Bits: 4294967241
+  maxSplashes: 5000
+  splashChance: 0.3
+  splashSize: {x: 0.1, y: 0.26}
+  splashLifetime: 0.22
+  dayTint: {r: 0.66, g: 0.74, b: 0.84, a: 0.95}
+  nightTint: {r: 0.4, g: 0.5, b: 0.66, a: 0.8}
+  splashDayTint: {r: 0.92, g: 0.97, b: 1, a: 0.65}
+  splashNightTint: {r: 0.5, g: 0.64, b: 0.84, a: 0.5}
+  overcast: 1
+  sunScale: 0.45
+  skyScale: 0.78
+  fogScale: 2.2
+  outsideVolume: 0.8
+  shelteredVolume: 0.3
+  shelterCheckDistance: 40

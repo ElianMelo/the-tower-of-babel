@@ -27,7 +27,12 @@ namespace TowerOfBabel.Rendering
         private float? overrideWetness;
         private float clock;
 
-        public bool Raining { get => raining; set => raining = value; }
+        /// <summary>Starting or stopping rain also drops any forced preset, so "rain off" always dries the world.</summary>
+        public bool Raining
+        {
+            get => raining;
+            set { if (value != raining) overrideWetness = null; raining = value; }
+        }
         /// <summary>When false (the default) there is no dew; only rain or a forced preset wets surfaces.</summary>
         public bool WetnessEnabled { get => wetnessEnabled; set => wetnessEnabled = value; }
         /// <summary>True while anything should reach the shaders.</summary>

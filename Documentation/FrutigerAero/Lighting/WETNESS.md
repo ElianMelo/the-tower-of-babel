@@ -1,8 +1,8 @@
 # Global wetness: dew and rain
 
-Added 2026-10-29. This is experimental until the user accepts it. Wetness is visual only and local to each client; nothing is networked.
+Added 2026-10-29. This is experimental until the user accepts it. The film itself is visual only, but since 2026-10-31 whether it rains is decided by the server and synced to every player; see [rain and synced weather](RAIN.md).
 
-**Off by default (2026-10-31).** Wetness stays off until rain is implemented. While `WetnessEnabled` is off, there is no dew, and `_AeroWetReady` stays 0, so shaders skip the wet path entirely. The F3 **Rain** toggle and **Wetness preset** still preview the film. Afterwards the surfaces dry completely, not back to dew. Turn it on with the controller's **Wetness Enabled** field (or `WetnessEnabled = true`) once rain ships.
+**Dew off by default (2026-10-31).** Rain now ships ([RAIN.md](RAIN.md)) and wets surfaces without this switch. While `WetnessEnabled` is off, there is no dew, and `_AeroWetReady` stays 0, so shaders skip the wet path entirely. The F3 **Rain** toggle and **Wetness preset** still preview the film. Afterwards the surfaces dry completely, not back to dew. Turn it on with the controller's **Wetness Enabled** field (or `WetnessEnabled = true`) once rain ships.
 
 ## Driver
 
@@ -22,7 +22,7 @@ Tuning lives in `Environment/Lighting/AeroWetness.asset` (`AeroWetnessProfile`):
 | Dew | 0.10 by day, 0.25 at dawn, following the day/night time |
 | Rain film | 1.0 |
 | Ramp in | 6 s |
-| Dry out | 40 s |
+| Dry out | 10 s (was 40 s; shortened 2026-10-31) |
 | Rain fade | 3 s |
 | Drop tile | 0.45 m |
 | Streaks | 0.9 × 1.6 m, falling at 0.55 |
@@ -35,12 +35,12 @@ Textures are the package originals, linear and repeating:
 API:
 - `Raining` toggles rain.
 - `OverrideWetness(value | null)` forces a film.
-- `CycleWetnessPreset()` steps Dry → Dew → Soaked → Weather.
+- `CycleWetnessPreset()` steps Dry → Dew → Soaked → Weather. Changing `Raining` clears a forced preset, so turning rain off always dries the world.
 - `Tick(dt)` advances the ramps for tests.
 - `previewTime` fixes the shader clock.
 
 The F3 developer menu's **World** section has:
-- a **Rain** toggle;
+- a **Rain** toggle (synced through `NetworkWeatherService`, see [rain](RAIN.md));
 - **Wetness preset**;
 - **Post look** (see [post profiles](POST_PROFILES.md)).
 

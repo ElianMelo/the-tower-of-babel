@@ -13,17 +13,17 @@ MonoBehaviour:
   m_Name: TowerInteriorRays
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroRaySettings
   quality: 0
-  intensity: 1.65
-  density: 0.035
+  intensity: 1.15
+  density: 0.028
   distance: 32
   softness: 0.4
   noiseScale: 0.23
   noiseVelocity: {x: 0.035, y: 0.016, z: -0.025}
-  noiseContrast: 0.65
-  fillStrength: 2.2
+  noiseContrast: 0.45
+  fillStrength: 1.5
   fillRange: 24
   fillAngle: 38
   fillDownAngle: 12
   transitionSeconds: 0.85
   selectionHysteresis: 0.25
-  interiorHaze: 0.12
+  interiorHaze: 0.05

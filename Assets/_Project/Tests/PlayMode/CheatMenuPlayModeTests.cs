@@ -285,6 +285,47 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(resources.GetLocalAmount(type), Is.EqualTo(resources.LocalCapacity), "Disabling instant build must retain granted resources");
         }
 
+        [UnityTest]
+        public IEnumerator WeatherControls_DriveSyncedRainDayNightAndFreezeOnTheHost()
+        {
+            var weather = TowerOfBabel.Networking.Weather.NetworkWeatherService.Instance;
+            Assert.That(weather, Is.Not.Null);
+            Assert.That(weather.GetComponent<FishNet.Object.NetworkObject>().IsServerInitialized, Is.True, "The weather service spawns with the network authority.");
+            Assert.That(weather.HasAuthority, Is.True);
+            var cycle = UnityEngine.Object.FindFirstObjectByType<TowerOfBabel.Rendering.AeroDayNightCycle>();
+            var wetness = TowerOfBabel.Rendering.AeroWetnessController.Instance;
+            var rain = TowerOfBabel.Rendering.AeroRainController.Instance;
+            Assert.That(cycle != null && wetness != null && rain != null, Is.True);
+            menu.Show(); menu.SelectCategory("World");
+            try
+            {
+                menu.ToggleControls["Rain"].isOn = true;
+                Assert.That(weather.Raining && wetness.Raining, Is.True);
+                Assert.That(weather.AutomaticWeather, Is.False, "Manual rain pauses automatic weather.");
+                Assert.That(menu.ToggleControls["Rain"].isOn, Is.True);
+                menu.ActionButtons["Set night"].onClick.Invoke();
+                Assert.That(Mathf.Abs(TowerOfBabel.Weather.WeatherClock.Delta(cycle.timeOfDay, 0)), Is.LessThan(.001f));
+                menu.ToggleControls["Freeze time of day"].isOn = true;
+                Assert.That(cycle.paused, Is.True);
+                float frozenAt = cycle.timeOfDay;
+                yield return Wait(() => rain.Amount > .99f && rain.Drops != null && rain.Drops.particleCount > 50, "Falling rain did not start");
+                Assert.That(cycle.timeOfDay, Is.EqualTo(frozenAt), "Frozen time does not advance.");
+                Assert.That(cycle.overcast, Is.GreaterThan(.9f));
+                Assert.That(rain.Audio != null && rain.Audio.isPlaying, Is.True, "The DYNAMIC rain loop plays.");
+                menu.ActionButtons["Set day"].onClick.Invoke();
+                Assert.That(cycle.timeOfDay, Is.EqualTo(.5f).Within(.001f));
+                Assert.That(weather.Raining, Is.True, "Rain continues by day.");
+                menu.ToggleControls["Rain"].isOn = false;
+                yield return Wait(() => rain.Amount <= 0 && rain.EmissionRate <= 0, "Rain did not stop");
+                Assert.That(cycle.overcast, Is.Zero);
+            }
+            finally
+            {
+                weather.RequestRain(false); weather.RequestFreezeTime(false); weather.RequestAutomaticWeather(true);
+            }
+            Assert.That(weather.AutomaticWeather && !cycle.paused, Is.True);
+        }
+
         private static IEnumerator Wait(Func<bool> condition, string message)
         {
             float deadline = Time.realtimeSinceStartup + 12;

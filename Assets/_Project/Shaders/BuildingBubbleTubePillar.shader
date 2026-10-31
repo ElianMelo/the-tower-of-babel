@@ -16,6 +16,7 @@ Shader "TowerOfBabel/Buildings/Bubble Tube Pillar"
         _ChromeColor("Chrome collars", Color) = (.88,.92,.97,1)
         _GlowColor("Aqua lamp glow", Color) = (.3,.9,1,1)
         _GlowStrength("Aqua lamp strength", Range(0,8)) = 2.5
+        _NightWaterGlow("Night aquarium light", Range(0,1)) = .16
         _Smoothness("Pearl polish", Range(0,1)) = .8
         _PearlCoat("Pearl clear coat", Range(0,1)) = .85
         _AlbedoCeiling("Bright-white ceiling", Range(.5,1)) = .94
@@ -59,7 +60,7 @@ Shader "TowerOfBabel/Buildings/Bubble Tube Pillar"
         TEXTURE2D(_NormalMap); SAMPLER(sampler_NormalMap);
         CBUFFER_START(UnityPerMaterial)
             half4 _BaseColor,_EnamelColor,_ChromeColor,_GlowColor,_WaterDeepColor,_WaterLightColor,_SpineColor;
-            half _NormalStrength,_VeinStrength,_GlowStrength,_Smoothness,_PearlCoat,_AlbedoCeiling,_GlassReflection;
+            half _NormalStrength,_VeinStrength,_GlowStrength,_NightWaterGlow,_Smoothness,_PearlCoat,_AlbedoCeiling,_GlassReflection;
             float _MarbleScale,_TextureAspect,_WaterDensity;
             float _BubbleAmountMin,_BubbleAmountMax,_WaterMotionMin,_WaterMotionMax,_InstanceVariation;
             float _BubbleSpeed,_WaterDetailDistance,_MotionTime,_PatternSeed;
@@ -202,6 +203,10 @@ Shader "TowerOfBabel/Buildings/Bubble Tube Pillar"
                     float3 lightOS=normalize(TransformWorldToObjectDir(key.direction,false));
                     half3 ambient=SampleSH(geometric);
                     half3 lightColor=key.color*lerp(.35,1,key.shadowAttenuation);
+                    // At night the collar lamps light the whole column like an aquarium, so water,
+                    // spine and bubbles stay readable when sky and moon are too dim.
+                    half night=1-saturate(_AeroDaylight);
+                    ambient+=_GlowColor.rgb*_GlowStrength*_NightWaterGlow*night;
                     half3 interior=BubbleTubeInterior(input.positionOS,dOS,nOS,variation,BubbleTubeTime(),detail,ambient,lightOS,lightColor);
                     half facing=saturate(dot(geometric,view));
                     half fresnel=.04+.96*pow(1-facing,5);

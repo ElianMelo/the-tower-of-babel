@@ -48,6 +48,8 @@ namespace TowerOfBabel.World.Tower
         private void LateUpdate()
         {
             if (!Application.isPlaying || atmosphere == null || chunks == null) return;
+            // The floor under construction is not a roof yet; every floor below it is (rain shelter).
+            atmosphere.BuiltFloors = chunks.ActiveConstructionFloor ?? int.MaxValue;
             if (Time.unscaledTime < nextRefresh && !dirty) return;
             nextRefresh = Time.unscaledTime + .1f;
             // At most ~3 ms of mesh combining per frame; floor changes used to stall 45-60 ms.

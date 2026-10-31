@@ -136,7 +136,7 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(profile.TryGet<ScreenSpaceLensFlare>(out var flare),Is.True); Assert.That(flare.intensity.value,Is.InRange(.001f,.08f));
             var local=AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/_Project/Environment/Lighting/TowerExitAtmosphere.asset");
             Assert.That(local.TryGet<AeroShaftVolume>(out var shafts),Is.True);
-            Assert.That(shafts.intensity.value,Is.GreaterThan(1)); Assert.That(shafts.density.value,Is.GreaterThan(1));
+            Assert.That(shafts.intensity.value,Is.InRange(.6f,1.2f)); Assert.That(shafts.density.value,Is.InRange(.6f,1.2f)); // calmer interior, 2026-10-31
         }
     }
 }

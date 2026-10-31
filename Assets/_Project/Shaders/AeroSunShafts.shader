@@ -13,6 +13,9 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
         float _AeroShaftClock, _AeroSunHasCasters;
         float4 _AeroTowerVolume0, _AeroTowerVolume1, _AeroTowerBlend;
         float4 _AeroNoise, _AeroNoiseVelocity, _AeroFillIndices;
+        // Fill scattering is capped at its ~3 m value: near the arch the 1/d^2 falloff otherwise
+        // saturates into blinding orbs (user feedback 2026-10-31: interior too bright and dramatic).
+        #define AERO_FILL_SCATTER_CAP .11
         TEXTURE2D_SHADOW(_AeroSunShadow); SAMPLER_CMP(sampler_AeroSunShadow);
         TEXTURE2D_X_FLOAT(_AeroFullDepth);
         float3 WorldPosition(float2 uv, float depth)
@@ -121,7 +124,7 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
                         if(fill.distanceAttenuation>.00001)
                         {
                             half visibility=AdditionalLightRealtimeShadow(index,samplePosition,fill.direction);
-                            illumination+=min(fill.color,3)*fill.distanceAttenuation*visibility*(.4+.6*pow(saturate(dot(direction,fill.direction)),3));
+                            illumination+=min(fill.color,3)*min(fill.distanceAttenuation,AERO_FILL_SCATTER_CAP)*visibility*(.4+.6*pow(saturate(dot(direction,fill.direction)),3));
                         }
                     }
                     illumination+=half3(.025,.04,.05)*_AeroNoise.z;

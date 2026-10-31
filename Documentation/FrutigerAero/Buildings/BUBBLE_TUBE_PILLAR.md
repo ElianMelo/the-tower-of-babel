@@ -68,6 +68,7 @@ The table shows the current accepted values on the material. `BubbleTubePillarAu
 | `_BubbleIridescence` | 1.2 | Strength of the thin-film rim, swirl and highlights. |
 | `_BubbleSpeed` | 0.22 m/s | Rise speed; each column varies it by 0.6–1.4×. |
 | `_GlassDistortion` | 1 | Waviness of the hand-blown glass; 0 is perfect glass. |
+| `_NightWaterGlow` | 0.16 | Night aquarium light (added 2026-10-31). As daylight fades, the collar lamps add `_GlowColor × _GlowStrength × this` to the water's ambient, so water, spine and bubbles stay readable at night instead of going black. No effect by day. |
 | `_WaterMotionMin` / `_WaterMotionMax` | 0.15 / 1.25 | Range of ripples, caustic speed, swirl and bubble wobble per pillar. |
 | `_InstanceVariation` | 1 | 0 makes every pillar identical; the tests use this. |
 | `_WaterDensity` | 3.2 | Water absorption; higher values hide the spine more. |

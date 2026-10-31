@@ -149,11 +149,11 @@ public static class AeroIslandAtmosphereAuthoring
         var sphere = volume.GetComponent<SphereCollider>(); if (sphere == null) sphere = volume.gameObject.AddComponent<SphereCollider>(); sphere.isTrigger = true; sphere.radius = generator.radius;
         var vp = Asset<VolumeProfile>(Folder + "/TowerExitAtmosphere.asset", ScriptableObject.CreateInstance<VolumeProfile>);
         if (!vp.TryGet<Bloom>(out var bloom)) { bloom = vp.Add<Bloom>(); AssetDatabase.AddObjectToAsset(bloom,vp); }
-        bloom.intensity.Override(.65f); bloom.threshold.Override(1.15f); bloom.scatter.Override(.62f);
+        bloom.intensity.Override(.35f); bloom.threshold.Override(1.15f); bloom.scatter.Override(.62f);
         if (!vp.TryGet<ColorAdjustments>(out var color)) { color = vp.Add<ColorAdjustments>(); AssetDatabase.AddObjectToAsset(color,vp); }
-        color.postExposure.Override(.13f); color.contrast.Override(4); color.colorFilter.Override(new Color(.92f,.98f,1));
+        color.postExposure.Override(-.4f); color.contrast.Override(0); // calmer interior (user feedback 2026-10-31) color.colorFilter.Override(new Color(.92f,.98f,1));
         if (!vp.TryGet<AeroShaftVolume>(out var shaftVolume)) { shaftVolume = vp.Add<AeroShaftVolume>(); AssetDatabase.AddObjectToAsset(shaftVolume,vp); }
-        shaftVolume.intensity.Override(1.6f); shaftVolume.density.Override(1.5f); EditorUtility.SetDirty(shaftVolume);
+        shaftVolume.intensity.Override(.9f); shaftVolume.density.Override(.85f); EditorUtility.SetDirty(shaftVolume);
         volume.sharedProfile = vp; fx.exitVolume = volume;
         fx.bounceLights = new Light[2];
         for (int i = 0; i < 2; i++)

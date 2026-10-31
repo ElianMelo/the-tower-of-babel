@@ -92,7 +92,11 @@ namespace TowerOfBabel.Resources.Tests
                 Canvas.ForceUpdateCanvases();
                 Assert.That(menu.ToggleControls["God mode"].graphic.gameObject.activeSelf, Is.False, "Canvas rebuilds must keep the off indicator hidden.");
                 menu.SelectCategory("World");
-                Assert.That(menu.ToggleControls.ContainsKey("Rain"), Is.True, "Visual rain toggle for the wetness driver.");
+                Assert.That(menu.ToggleControls.ContainsKey("Rain"), Is.True, "Synced rain toggle.");
+                Assert.That(menu.ToggleControls.ContainsKey("Automatic weather"), Is.True);
+                Assert.That(menu.ToggleControls.ContainsKey("Freeze time of day"), Is.True);
+                Assert.That(menu.ActionButtons.ContainsKey("Set day"), Is.True);
+                Assert.That(menu.ActionButtons.ContainsKey("Set night"), Is.True);
                 Assert.That(menu.ActionButtons.ContainsKey("Wetness preset"), Is.True);
                 Assert.That(menu.ActionButtons.ContainsKey("Post look"), Is.True);
                 menu.SelectAllProfessions(); Assert.That(menu.AllProfessions, Is.True);

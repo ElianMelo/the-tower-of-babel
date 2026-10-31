@@ -9,6 +9,7 @@ using TowerOfBabel.Interface;
 using TowerOfBabel.Networking;
 using TowerOfBabel.Networking.Resources;
 using TowerOfBabel.Networking.Upgrades;
+using TowerOfBabel.Networking.Weather;
 using TowerOfBabel.Resources;
 using TowerOfBabel.Resources.Interaction;
 using TowerOfBabel.Upgrades;
@@ -160,6 +161,14 @@ namespace TowerOfBabel.Cheats
         private void Unbind() { if (boundService != null) boundService.CheatResult -= SetStatus; boundService = null; }
         private void SetStatus(string message) { if (status != null) status.text = message; }
         private void Sent(bool sent) { SetStatus(sent ? "Request sent..." : "Connect to a session first, then try again."); }
+        private void RequestWeather(Func<NetworkWeatherService, bool> request, string done)
+        {
+            var service = NetworkWeatherService.Instance;
+            if (service == null) { SetStatus("No weather service in this scene."); return; }
+            if (!request(service)) { SetStatus("Connect to a session first, then try again."); return; }
+            SetStatus(service.HasAuthority ? done : "Request sent... " + done);
+            RefreshValues();
+        }
         private void Command(CheatCommand command)
         {
             ResolvePlayer(); player?.GetComponent<PlayerInteractionRaycaster>()?.CancelCurrentInteraction();
@@ -308,10 +317,18 @@ namespace TowerOfBabel.Cheats
             Action("World", "Teleport to selected floor", "Move to a safe floor tile on an unlocked floor", TeleportFloor, "Teleport");
             Action("World", "Return to spawn", "Move back to the saved starting position", () => { ResolvePlayer(); if (hasSpawn) Teleport(spawn); }, "Return");
             foreach (float scale in new[] { 0f, .25f, 1f, 2f, 5f }) { float value = scale; Action("World", "Time scale " + scale.ToString("0.##", CultureInfo.InvariantCulture), "Local simulation speed; menu remains responsive while paused", () => { Time.timeScale = value; SetStatus("Time scale: " + value); }, "Apply"); }
-            // Visual-only weather and post look; local to this client.
-            ToggleRow("World", "Rain", "Wet the tower: moving drops on decks, streaks on walls, ripples; dries out when off",
-                () => TowerOfBabel.Rendering.AeroWetnessController.Instance != null && TowerOfBabel.Rendering.AeroWetnessController.Instance.Raining,
-                value => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; if (wet == null) { SetStatus("No wetness controller in this scene."); return; } wet.Raining = value; SetStatus(value ? "Rain started." : "Rain stopped; surfaces dry out."); });
+            // Weather and time of day are server-authoritative and synced to every player.
+            ToggleRow("World", "Rain", "Falling rain, splashes and wet surfaces for every player; pauses automatic weather",
+                () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.Raining,
+                value => RequestWeather(service => service.RequestRain(value), value ? "Rain started for everyone." : "Rain stopped; surfaces dry out."));
+            ToggleRow("World", "Automatic weather", "Let the server start and stop rain on its own, by day or night",
+                () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.AutomaticWeather,
+                value => RequestWeather(service => service.RequestAutomaticWeather(value), value ? "Automatic weather on." : "Automatic weather off; rain stays as set."));
+            Action("World", "Set day", "Jump everyone to noon", () => RequestWeather(service => service.RequestDay(), "Time of day: noon."), "Day");
+            Action("World", "Set night", "Jump everyone to midnight", () => RequestWeather(service => service.RequestNight(), "Time of day: midnight."), "Night");
+            ToggleRow("World", "Freeze time of day", "Stop the day/night cycle for everyone to inspect assets",
+                () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.TimeFrozen,
+                value => RequestWeather(service => service.RequestFreezeTime(value), value ? "Time of day frozen." : "Day/night cycle running."));
             Action("World", "Wetness preset", "Cycle dry, dew, soaked and weather-driven surface film",
                 () => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; SetStatus(wet != null ? "Wetness: " + wet.CycleWetnessPreset() : "No wetness controller in this scene."); }, "Cycle");
             Action("World", "Post look", "Cycle Restrained, Bright Aero and Y2K colour grading",

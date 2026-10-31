@@ -126,6 +126,7 @@ public static class BubbleTubePillarAuthoring
         material.SetFloat("_BubbleAmountMin", .06f); material.SetFloat("_BubbleAmountMax", .45f);
         material.SetFloat("_BubbleBurstiness", .85f); material.SetFloat("_BigBubbleChance", .45f);
         material.SetFloat("_BubbleIridescence", 1.2f); material.SetFloat("_GlassDistortion", 1f);
+        material.SetFloat("_NightWaterGlow", .16f);
         material.enableInstancing = true;
         material.SetFloat("_WetnessOn", 1); material.EnableKeyword("_AERO_WETNESS");
         EditorUtility.SetDirty(material);

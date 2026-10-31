@@ -12,7 +12,7 @@ For projected river caustics, preserve the accepted larger 90-degree footprint, 
 
 - **Glass river.** The river is now traced as [water inside glass](Lighting/RIVER_GLASS.md) (presentation 12). It has a glass lid, a rippled surface, real absorption depth, inner walls with a silver meniscus, caustics on the bed, Snell's window from below and cyan-green glass edges. The projected caustics above are unchanged.
 - **Shading library.** The [Aero shading library](Lighting/AERO_SHADING_LIBRARY.md) adds brushed-steel anisotropy, pearlescent thin film, clear "jelly" Y2K plastic, refractive glass, subsurface and back-lit leaves, and soap-film bubbles.
-- **Wetness.** A [global dew/rain wetness](Lighting/WETNESS.md) driver is ported from DYNAMIC Rain/Wetness. It is off by default until rain is implemented.
+- **Wetness.** A [global dew/rain wetness](Lighting/WETNESS.md) driver is ported from DYNAMIC Rain/Wetness. [Falling rain](Lighting/RAIN.md) (2026-10-31, awaiting review) adds URP drops, splashes, rain audio and an overcast sky, by day or night, with weather and time of day synced to every player.
 - **Post looks.** Three switchable [post looks](Lighting/POST_PROFILES.md): Restrained (default), Bright Aero and Y2K.
 - **Feedback round, 2026-10-29.**
   - **Accepted:** the glass river.
