@@ -1,0 +1,1056 @@
+{
+  "seed": 431907,
+  "span": 2.094353566883016,
+  "opening": {
+    "legWidth": 0.3,
+    "halfWidth": 0.747176783441508,
+    "rise": 0.62,
+    "springing": 0.14,
+    "crown": 0.76
+  },
+  "complete": {
+    "name": "Arch_AuroraCurtain",
+    "triangles": 1040,
+    "boundaryEdges": 0,
+    "nonManifoldEdges": 0,
+    "volume": 1.507835,
+    "bounds": [
+      [
+        -0.2,
+        -0.2,
+        0.14
+      ],
+      [
+        2.09435,
+        0.2,
+        2.15
+      ]
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true
+  },
+  "stages": [
+    {
+      "stage": 0,
+      "phase": "Blueprint",
+      "filledPieceIds": [],
+      "triangles": 432,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.002286
+    },
+    {
+      "stage": 1,
+      "phase": "Random fill 10%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59
+      ],
+      "triangles": 704,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.161962
+    },
+    {
+      "stage": 2,
+      "phase": "Random fill 20%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61
+      ],
+      "triangles": 1170,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.300075
+    },
+    {
+      "stage": 3,
+      "phase": "Random fill 30%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10
+      ],
+      "triangles": 1742,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.453179
+    },
+    {
+      "stage": 4,
+      "phase": "Random fill 40%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10,
+        24,
+        8,
+        26,
+        52,
+        58,
+        23,
+        42,
+        79
+      ],
+      "triangles": 2200,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.607089
+    },
+    {
+      "stage": 5,
+      "phase": "Random fill 50%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10,
+        24,
+        8,
+        26,
+        52,
+        58,
+        23,
+        42,
+        79,
+        32,
+        40,
+        55,
+        25,
+        37,
+        34,
+        41,
+        14
+      ],
+      "triangles": 2560,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.752683
+    },
+    {
+      "stage": 6,
+      "phase": "Random fill 60%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10,
+        24,
+        8,
+        26,
+        52,
+        58,
+        23,
+        42,
+        79,
+        32,
+        40,
+        55,
+        25,
+        37,
+        34,
+        41,
+        14,
+        12,
+        73,
+        30,
+        66,
+        75,
+        9,
+        64,
+        18
+      ],
+      "triangles": 3132,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.919285
+    },
+    {
+      "stage": 7,
+      "phase": "Random fill 70%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10,
+        24,
+        8,
+        26,
+        52,
+        58,
+        23,
+        42,
+        79,
+        32,
+        40,
+        55,
+        25,
+        37,
+        34,
+        41,
+        14,
+        12,
+        73,
+        30,
+        66,
+        75,
+        9,
+        64,
+        18,
+        72,
+        68,
+        29,
+        2,
+        57,
+        48,
+        71,
+        7
+      ],
+      "triangles": 3498,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 1.036942
+    },
+    {
+      "stage": 8,
+      "phase": "Random fill 80%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10,
+        24,
+        8,
+        26,
+        52,
+        58,
+        23,
+        42,
+        79,
+        32,
+        40,
+        55,
+        25,
+        37,
+        34,
+        41,
+        14,
+        12,
+        73,
+        30,
+        66,
+        75,
+        9,
+        64,
+        18,
+        72,
+        68,
+        29,
+        2,
+        57,
+        48,
+        71,
+        7,
+        76,
+        4,
+        35,
+        3,
+        77,
+        70,
+        49,
+        11
+      ],
+      "triangles": 3800,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 1.189209
+    },
+    {
+      "stage": 9,
+      "phase": "Random fill 90%",
+      "filledPieceIds": [
+        16,
+        21,
+        27,
+        6,
+        17,
+        28,
+        39,
+        59,
+        0,
+        69,
+        5,
+        54,
+        78,
+        63,
+        38,
+        61,
+        47,
+        43,
+        56,
+        50,
+        19,
+        44,
+        22,
+        10,
+        24,
+        8,
+        26,
+        52,
+        58,
+        23,
+        42,
+        79,
+        32,
+        40,
+        55,
+        25,
+        37,
+        34,
+        41,
+        14,
+        12,
+        73,
+        30,
+        66,
+        75,
+        9,
+        64,
+        18,
+        72,
+        68,
+        29,
+        2,
+        57,
+        48,
+        71,
+        7,
+        76,
+        4,
+        35,
+        3,
+        77,
+        70,
+        49,
+        11,
+        53,
+        74,
+        51,
+        46,
+        67,
+        65,
+        31,
+        1
+      ],
+      "triangles": 4298,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 1.372624
+    }
+  ],
+  "chunks": [
+    {
+      "name": "Arch_Chunk_02_00",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.010703
+    },
+    {
+      "name": "Arch_Chunk_09_01",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.022101
+    },
+    {
+      "name": "Arch_Chunk_07_02",
+      "triangles": 16,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.010676
+    },
+    {
+      "name": "Arch_Chunk_08_03",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.030284
+    },
+    {
+      "name": "Arch_Chunk_08_04",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.012658
+    },
+    {
+      "name": "Arch_Chunk_02_05",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016343
+    },
+    {
+      "name": "Arch_Chunk_01_06",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016752
+    },
+    {
+      "name": "Arch_Chunk_07_07",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.010231
+    },
+    {
+      "name": "Arch_Chunk_04_08",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.012308
+    },
+    {
+      "name": "Arch_Chunk_06_09",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016164
+    },
+    {
+      "name": "Arch_Chunk_03_10",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.023235
+    },
+    {
+      "name": "Arch_Chunk_08_11",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.018878
+    },
+    {
+      "name": "Arch_Chunk_06_12",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017409
+    },
+    {
+      "name": "Arch_Chunk_10_13",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017089
+    },
+    {
+      "name": "Arch_Chunk_05_14",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016741
+    },
+    {
+      "name": "Arch_Chunk_10_15",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.013316
+    },
+    {
+      "name": "Arch_Chunk_01_16",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.028563
+    },
+    {
+      "name": "Arch_Chunk_01_17",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.012677
+    },
+    {
+      "name": "Arch_Chunk_06_18",
+      "triangles": 80,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.034292
+    },
+    {
+      "name": "Arch_Chunk_03_19",
+      "triangles": 140,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.019645
+    },
+    {
+      "name": "Arch_Chunk_10_20",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.014592
+    },
+    {
+      "name": "Arch_Chunk_01_21",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.023985
+    },
+    {
+      "name": "Arch_Chunk_03_22",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.01181
+    },
+    {
+      "name": "Arch_Chunk_04_23",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.024511
+    },
+    {
+      "name": "Arch_Chunk_04_24",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.027554
+    },
+    {
+      "name": "Arch_Chunk_05_25",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.015241
+    },
+    {
+      "name": "Arch_Chunk_04_26",
+      "triangles": 210,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.025044
+    },
+    {
+      "name": "Arch_Chunk_01_27",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.019701
+    },
+    {
+      "name": "Arch_Chunk_01_28",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017587
+    },
+    {
+      "name": "Arch_Chunk_07_29",
+      "triangles": 114,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.01897
+    },
+    {
+      "name": "Arch_Chunk_06_30",
+      "triangles": 16,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.009121
+    },
+    {
+      "name": "Arch_Chunk_09_31",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.059319
+    },
+    {
+      "name": "Arch_Chunk_05_32",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.026198
+    },
+    {
+      "name": "Arch_Chunk_10_33",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017194
+    },
+    {
+      "name": "Arch_Chunk_05_34",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.018503
+    },
+    {
+      "name": "Arch_Chunk_08_35",
+      "triangles": 70,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.023928
+    },
+    {
+      "name": "Arch_Chunk_10_36",
+      "triangles": 46,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.011281
+    },
+    {
+      "name": "Arch_Chunk_05_37",
+      "triangles": 16,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.008472
+    },
+    {
+      "name": "Arch_Chunk_02_38",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.01839
+    },
+    {
+      "name": "Arch_Chunk_01_39",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.01862
+    },
+    {
+      "name": "Arch_Chunk_05_40",
+      "triangles": 130,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.031753
+    },
+    {
+      "name": "Arch_Chunk_05_41",
+      "triangles": 20,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.015279
+    },
+    {
+      "name": "Arch_Chunk_04_42",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.01447
+    },
+    {
+      "name": "Arch_Chunk_03_43",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.025167
+    },
+    {
+      "name": "Arch_Chunk_03_44",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.012174
+    },
+    {
+      "name": "Arch_Chunk_10_45",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.027158
+    },
+    {
+      "name": "Arch_Chunk_09_46",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017285
+    },
+    {
+      "name": "Arch_Chunk_03_47",
+      "triangles": 216,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.030342
+    },
+    {
+      "name": "Arch_Chunk_07_48",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017376
+    },
+    {
+      "name": "Arch_Chunk_08_49",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.025828
+    },
+    {
+      "name": "Arch_Chunk_03_50",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017146
+    },
+    {
+      "name": "Arch_Chunk_09_51",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.010976
+    },
+    {
+      "name": "Arch_Chunk_04_52",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.007589
+    },
+    {
+      "name": "Arch_Chunk_09_53",
+      "triangles": 114,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.01633
+    },
+    {
+      "name": "Arch_Chunk_02_54",
+      "triangles": 206,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.024398
+    },
+    {
+      "name": "Arch_Chunk_05_55",
+      "triangles": 46,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.013408
+    },
+    {
+      "name": "Arch_Chunk_03_56",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.013585
+    },
+    {
+      "name": "Arch_Chunk_07_57",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.022711
+    },
+    {
+      "name": "Arch_Chunk_04_58",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.019263
+    },
+    {
+      "name": "Arch_Chunk_01_59",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.021791
+    },
+    {
+      "name": "Arch_Chunk_10_60",
+      "triangles": 20,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.017159
+    },
+    {
+      "name": "Arch_Chunk_02_61",
+      "triangles": 88,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.027608
+    },
+    {
+      "name": "Arch_Chunk_10_62",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.019707
+    },
+    {
+      "name": "Arch_Chunk_02_63",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.014093
+    },
+    {
+      "name": "Arch_Chunk_06_64",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.019835
+    },
+    {
+      "name": "Arch_Chunk_09_65",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.015951
+    },
+    {
+      "name": "Arch_Chunk_06_66",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.012841
+    },
+    {
+      "name": "Arch_Chunk_09_67",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016453
+    },
+    {
+      "name": "Arch_Chunk_07_68",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.011745
+    },
+    {
+      "name": "Arch_Chunk_02_69",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016959
+    },
+    {
+      "name": "Arch_Chunk_08_70",
+      "triangles": 24,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.009272
+    },
+    {
+      "name": "Arch_Chunk_07_71",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.009935
+    },
+    {
+      "name": "Arch_Chunk_07_72",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.016012
+    },
+    {
+      "name": "Arch_Chunk_06_73",
+      "triangles": 212,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.024743
+    },
+    {
+      "name": "Arch_Chunk_09_74",
+      "triangles": 128,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.025
+    },
+    {
+      "name": "Arch_Chunk_06_75",
+      "triangles": 116,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.032196
+    },
+    {
+      "name": "Arch_Chunk_08_76",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.015923
+    },
+    {
+      "name": "Arch_Chunk_08_77",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.015497
+    },
+    {
+      "name": "Arch_Chunk_02_78",
+      "triangles": 20,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.009617
+    },
+    {
+      "name": "Arch_Chunk_04_79",
+      "triangles": 72,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0,
+      "volume": 0.023171
+    }
+  ],
+  "chunkVolumeSum": 1.507832
+}

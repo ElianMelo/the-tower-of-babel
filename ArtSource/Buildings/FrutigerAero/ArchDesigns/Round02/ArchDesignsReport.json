@@ -1,0 +1,218 @@
+{
+  "Arch_R2D01_InflatedPillow": {
+    "title": "Inflated Pillow",
+    "triangles": 3652,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2045,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2045,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_R2D02_GlassSlab": {
+    "title": "Glass Slab",
+    "triangles": 3560,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_AquaGlass",
+      "Aero_Pearl",
+      "Aero_Chrome"
+    ]
+  },
+  "Arch_R2D03_LitSeam": {
+    "title": "Lit Seam",
+    "triangles": 1696,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_R2D04_CloudLobes": {
+    "title": "Cloud Lobes",
+    "triangles": 10628,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.214,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.214,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaEnamel",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_R2D05_LouveredGlass": {
+    "title": "Louvered Glass",
+    "triangles": 3452,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_BlueGlass"
+    ]
+  },
+  "Arch_R2D06_BubbleFoam": {
+    "title": "Bubble Foam",
+    "triangles": 25268,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.235,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.235,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_Bubble"
+    ]
+  },
+  "Arch_R2D07_WindowTiles": {
+    "title": "Window Tiles",
+    "triangles": 6304,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.213,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.213,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_BlueGlass",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_R2D08_HaloOrbit": {
+    "title": "Halo Orbit",
+    "triangles": 3108,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2285,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2285,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlow",
+      "Aero_Bubble",
+      "Aero_Chrome"
+    ]
+  },
+  "Arch_R2D09_WaveDrape": {
+    "title": "Wave Drape",
+    "triangles": 10380,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2126,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2126,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlass",
+      "Aero_Chrome"
+    ]
+  },
+  "Arch_R2D10_CrystalFacet": {
+    "title": "Crystal Facet",
+    "triangles": 248,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Crystal",
+      "Aero_Pearl"
+    ]
+  }
+}

@@ -1,5 +1,7 @@
 # Arch construction chunks
 
+> **Superseded mesh, current method (2026-10-31).** The arch now uses the [Aurora Arch](AURORA_ARCH.md). Its stages and chunks are generated the same way: 80 Voronoi chunks (seed 431907), eight per step, with a blueprint stage 0.
+
 The arch now follows the pillar's construction structure: a sparse blue blueprint at stage 0, randomly filled stages 1–9, and the unchanged completed arch at stage 10. Eight of its 80 irregular chunks arrive at each step. Their sizes and positions come from a seeded Voronoi partition, with a shuffled fill order across both legs and the upper panel. No horizontal lift or repeated column pattern determines the progression.
 
 Incoming pieces form outside the arch using the existing cyan dissolve shader, then fly and rotate into their exact final positions. Only these pieces dissolve; the previously built stage remains solid. The same `PillarConstructionMotion` controller and `PillarChunkLibrary` data structure are reused with an arch-specific mesh library. Their original type names are retained for compatibility with the pillar prefab and existing `Building` hooks.

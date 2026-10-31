@@ -44,6 +44,13 @@ The [Bubble Tube pillar](Buildings/BUBBLE_TUBE_PILLAR.md) was accepted by the us
 - **Constraints:** it remains opaque, single-submesh and instanced, inside the original ±0.41 m × 4 m footprint.
 - **Changes:** tune it through `Aero_BubbleTube_Pillar.mat` and the authoring script. The pillar doc lists the iteration history, tuning values, contracts and open items.
 
+The [Aurora Arch](Buildings/AURORA_ARCH.md) was picked by the user on 2026-10-31 (Round05 design 10) and replaces the white marble arch.
+
+- **Look:** glossy bright white with a low, round opening that rises straight from the pillar tops, a soft rounded rim and no line along the opening edge.
+- **Aurora:** an animated curtain with a soft, swaying lower edge, drifting and flickering rays inside soft veils, folds, travelling surges and calm or active spells. Its colours blend from green through teal and blue to violet-pink, following the user's aurora reference, and it runs around each floor through every arch. Green is an aurora-only exception to the white-and-blue building palette.
+- **Fit:** each arch spans exactly pillar axis to pillar axis, and the generator closes every ring with a whole number of bays.
+- **Changes:** tune it through `Aero_AuroraArch.mat`. The arch doc lists the shader controls, contracts and open items.
+
 The [pillar](Buildings/PILLAR_CONSTRUCTION.md), [arch](Buildings/ARCH_CONSTRUCTION.md), and [floor/step construction sequences](Buildings/DECK_CONSTRUCTION.md) fill irregular chunks across each shape in a fixed random order. Incoming chunks form outside the asset through a cyan dissolve, then fly and turn into their correct positions. Existing pieces remain solid. Preserve sparse blueprints, original completed meshes, the open arch passage, full walking colliders, curved floor layout and step scale. Horizontal slices and staggered column patterns are superseded.
 
 The [tower landscape](TERRAIN_LANDSCAPE.md) keeps the actual tower foundation level, with grass-free ground inside the boundary and rolling meadows starting just outside it. The 2026-10-23 requested revision replaces the broad 108-metre flat clearing and four crater-like ponds with a tighter 98-metre footprint, curving outer terrain, three more visible lakes with low approaches, and staggered undulating mountain ridges. Grass is populated across the dry outer terrain instead of inheriting empty source patches. Preserve gradual transitions, existing turquoise water and matte green meadow surfaces.

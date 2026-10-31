@@ -1,0 +1,177 @@
+{
+  "prefab": "Assets/_Project/Prefabs/Buildings/Arch.prefab",
+  "prefabGuidPreserved": true,
+  "material": "Assets/_Project/Models/Buildings/FrutigerAero/Aero_AuroraArch.mat",
+  "shader": "TowerOfBabel/Buildings/Aurora Arch",
+  "instancing": true,
+  "shaderMessages": [],
+  "collider": "Assets/_Project/Models/Buildings/FrutigerAero/AuroraArch.fbx Arch_AuroraCurtain",
+  "chunkCount": 80,
+  "chunksPerStage": [
+    {
+      "stage": 1,
+      "count": 8
+    },
+    {
+      "stage": 2,
+      "count": 8
+    },
+    {
+      "stage": 3,
+      "count": 8
+    },
+    {
+      "stage": 4,
+      "count": 8
+    },
+    {
+      "stage": 5,
+      "count": 8
+    },
+    {
+      "stage": 6,
+      "count": 8
+    },
+    {
+      "stage": 7,
+      "count": 8
+    },
+    {
+      "stage": 8,
+      "count": 8
+    },
+    {
+      "stage": 9,
+      "count": 8
+    },
+    {
+      "stage": 10,
+      "count": 8
+    }
+  ],
+  "stages": [
+    {
+      "stage": 0,
+      "mesh": "Arch_Stage_00",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 432,
+      "vertexCount": 240,
+      "subMeshCount": 1,
+      "uv1": 240,
+      "min": "(-0.1970, 0.1442, -0.1970)",
+      "max": "(2.0914, 2.1458, 0.1970)"
+    },
+    {
+      "stage": 1,
+      "mesh": "Arch_Stage_01",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 704,
+      "vertexCount": 694,
+      "subMeshCount": 1,
+      "uv1": 694,
+      "min": "(-0.1970, 0.1442, -0.2000)",
+      "max": "(2.0944, 2.1458, 0.2000)"
+    },
+    {
+      "stage": 2,
+      "mesh": "Arch_Stage_02",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 1170,
+      "vertexCount": 1424,
+      "subMeshCount": 1,
+      "uv1": 1424,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 3,
+      "mesh": "Arch_Stage_03",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 1742,
+      "vertexCount": 2278,
+      "subMeshCount": 1,
+      "uv1": 2278,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 4,
+      "mesh": "Arch_Stage_04",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 2200,
+      "vertexCount": 3003,
+      "subMeshCount": 1,
+      "uv1": 3003,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 5,
+      "mesh": "Arch_Stage_05",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 2560,
+      "vertexCount": 3545,
+      "subMeshCount": 1,
+      "uv1": 3545,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 6,
+      "mesh": "Arch_Stage_06",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 3132,
+      "vertexCount": 4368,
+      "subMeshCount": 1,
+      "uv1": 4368,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 7,
+      "mesh": "Arch_Stage_07",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 3498,
+      "vertexCount": 4891,
+      "subMeshCount": 1,
+      "uv1": 4891,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 8,
+      "mesh": "Arch_Stage_08",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 3800,
+      "vertexCount": 5327,
+      "subMeshCount": 1,
+      "uv1": 5327,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 9,
+      "mesh": "Arch_Stage_09",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/Construction/AuroraArchStages.fbx",
+      "triangles": 4298,
+      "vertexCount": 6039,
+      "subMeshCount": 1,
+      "uv1": 6039,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    },
+    {
+      "stage": 10,
+      "mesh": "Arch_AuroraCurtain",
+      "asset": "Assets/_Project/Models/Buildings/FrutigerAero/AuroraArch.fbx",
+      "triangles": 1040,
+      "vertexCount": 670,
+      "subMeshCount": 1,
+      "uv1": 670,
+      "min": "(-0.2000, 0.1400, -0.2000)",
+      "max": "(2.0944, 2.1500, 0.2000)"
+    }
+  ],
+  "playing": false,
+  "compileFailed": false
+}

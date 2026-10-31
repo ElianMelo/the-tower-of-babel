@@ -1,0 +1,322 @@
+{
+  "Arch_R4D01_BigWaveInlay": {
+    "title": "Big Wave Inlay",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.01,
+      0.022
+    ],
+    "maskCoverage": {
+      "R": 0.136,
+      "G": 0.0,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D01_Normal.png",
+      "Arch_R4D01_AO.png",
+      "Arch_R4D01_Mask.png"
+    ]
+  },
+  "Arch_R4D02_GlowingCrest": {
+    "title": "Glowing Crest",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.005,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.0,
+      "G": 0.0293,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D02_Normal.png",
+      "Arch_R4D02_AO.png",
+      "Arch_R4D02_Mask.png"
+    ]
+  },
+  "Arch_R4D03_WaterGlassBand": {
+    "title": "Water Glass Band",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.012,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.0,
+      "G": 0.0001,
+      "B": 0.1645,
+      "A": 0.019
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D03_Normal.png",
+      "Arch_R4D03_AO.png",
+      "Arch_R4D03_Mask.png"
+    ]
+  },
+  "Arch_R4D04_RisingBubbles": {
+    "title": "Rising Bubbles",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.008,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.1334,
+      "G": 0.0013,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D04_Normal.png",
+      "Arch_R4D04_AO.png",
+      "Arch_R4D04_Mask.png"
+    ]
+  },
+  "Arch_R4D05_DoubleWave": {
+    "title": "Double Wave",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.008,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.0939,
+      "G": 0.0,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D05_Normal.png",
+      "Arch_R4D05_AO.png",
+      "Arch_R4D05_Mask.png"
+    ]
+  },
+  "Arch_R4D06_AeroSwoosh": {
+    "title": "Aero Swoosh",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.012,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.0566,
+      "G": 0.0031,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D06_Normal.png",
+      "Arch_R4D06_AO.png",
+      "Arch_R4D06_Mask.png"
+    ]
+  },
+  "Arch_R4D07_RingLight": {
+    "title": "Ring Light",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.01,
+      0.018
+    ],
+    "maskCoverage": {
+      "R": 0.1026,
+      "G": 0.057,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D07_Normal.png",
+      "Arch_R4D07_AO.png",
+      "Arch_R4D07_Mask.png"
+    ]
+  },
+  "Arch_R4D08_OceanGradient": {
+    "title": "Ocean Gradient",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      0.0,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.5822,
+      "G": 0.0,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D08_Normal.png",
+      "Arch_R4D08_AO.png",
+      "Arch_R4D08_Mask.png"
+    ]
+  },
+  "Arch_R4D09_RippleRings": {
+    "title": "Ripple Rings",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.0099,
+      0.021
+    ],
+    "maskCoverage": {
+      "R": 0.057,
+      "G": 0.0025,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D09_Normal.png",
+      "Arch_R4D09_AO.png",
+      "Arch_R4D09_Mask.png"
+    ]
+  },
+  "Arch_R4D10_PearlWave": {
+    "title": "Pearl Wave",
+    "basedOn": "Round03 05 Wave Scroll",
+    "triangles": 360,
+    "reliefRangeMetres": [
+      -0.006,
+      0.024
+    ],
+    "maskCoverage": {
+      "R": 0.2073,
+      "G": 0.0,
+      "B": 0.0,
+      "A": 0.0
+    },
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "maps": [
+      "Arch_R4D10_Normal.png",
+      "Arch_R4D10_AO.png",
+      "Arch_R4D10_Mask.png"
+    ]
+  }
+}

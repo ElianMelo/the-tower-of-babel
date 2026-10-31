@@ -178,31 +178,25 @@ public class TowerGenerator : MonoBehaviour
             baseHeight = 0f;
             stairs.Clear();
             float currentRadius = radius;
-            float currentPillarAngle = pillarAngle;
             for (int i = 0; i < levels; i++)
             {
                 currentRadius -= i % 2 == 0 ? decreaseAmount : 0;
-                currentPillarAngle = pillarAngle / (currentRadius / radius);
-
-                float angleRad = currentPillarAngle * Mathf.Deg2Rad;
-                for (float angle = 0f; angle < Mathf.PI * 2f; angle += angleRad)
+                foreach (var bay in RingLayout(i))
                 {
-                    Vector2 point = CalculatePillarPoint(angle, currentRadius);
-                    Vector2 nextPoint = CalculatePillarPoint(angle + angleRad, currentRadius);
-                    Vector2 dir = (nextPoint - point).normalized;
-                    float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
-                    yAngle -= 90f;
                     CreateTowerAsset(
                         pillarObject,
                         TowerAssetType.Pillar,
-                        new Vector3(point.x, baseHeight, point.y),
+                        bay.Pillar,
                         Quaternion.identity,
-                        "Pillar " + angle);
-                    CreateTowerAsset(
+                        "Pillar " + bay.Angle);
+                    GameObject arch = CreateTowerAsset(
                         archObject,
                         TowerAssetType.Arch,
-                        new Vector3(point.x, baseHeight + yOffset, point.y),
-                        Quaternion.Euler(0, yAngle, 0));
+                        bay.Arch,
+                        bay.ArchRotation);
+                    // Stretch along the bay so the arch ends exactly on the next pillar's axis.
+                    Vector3 scale = arch.transform.localScale;
+                    arch.transform.localScale = new Vector3(scale.x * bay.ArchScale, scale.y, scale.z);
                 }
                 var calculatedFloorRadius = GetFloorOuterRadius(i);
                 FillCurrentLevelFloor(calculatedFloorRadius, baseHeight + 0.2f);
@@ -223,6 +217,49 @@ public class TowerGenerator : MonoBehaviour
         {
             IsBusy = false;
         }
+    }
+
+    public readonly struct RingBay
+    {
+        public readonly float Angle; public readonly Vector3 Pillar, Arch; public readonly Quaternion ArchRotation; public readonly float ArchScale;
+        public RingBay(float angle, Vector3 pillar, Vector3 arch, Quaternion archRotation, float archScale)
+        { Angle = angle; Pillar = pillar; Arch = arch; ArchRotation = archRotation; ArchScale = archScale; }
+    }
+
+    /// <summary>
+    /// Pillar and arch placement for one level. A whole number of bays closes the ring exactly; the old float
+    /// loop added an overlapping extra pillar and arch where the angle wrapped on about half the floors.
+    /// </summary>
+    public IEnumerable<RingBay> RingLayout(int level)
+    {
+        float ringRadius = GetWallRadius(level);
+        int bays = PillarsPerRing(pillarAngle / (ringRadius / radius));
+        float step = Mathf.PI * 2f / bays;
+        float archScale = ArchChordScale(ringRadius, bays, radius, pillarAngle);
+        float height = level * heighIncrease;
+        for (int bay = 0; bay < bays; bay++)
+        {
+            float angle = bay * step;
+            Vector2 point = CalculatePillarPoint(angle, ringRadius);
+            Vector2 dir = (CalculatePillarPoint(angle + step, ringRadius) - point).normalized;
+            float yAngle = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg - 90f;
+            yield return new RingBay(angle, new Vector3(point.x, height, point.y), new Vector3(point.x, height + yOffset, point.y),
+                Quaternion.Euler(0, yAngle, 0), archScale);
+        }
+    }
+
+    /// <summary>Whole number of pillar bays closest to the requested angular spacing.</summary>
+    public static int PillarsPerRing(float pillarAngleDegrees) =>
+        Mathf.Max(3, Mathf.RoundToInt(360f / Mathf.Max(pillarAngleDegrees, .01f)));
+
+    /// <summary>
+    /// X scale that fits the arch, modelled for the base ring's chord, to a ring of <paramref name="bays"/> bays.
+    /// </summary>
+    public static float ArchChordScale(float ringRadius, int bays, float baseRadius, float basePillarAngleDegrees)
+    {
+        float modelled = 2f * baseRadius * Mathf.Sin(basePillarAngleDegrees * Mathf.Deg2Rad * .5f);
+        float chord = 2f * ringRadius * Mathf.Sin(Mathf.PI / bays);
+        return modelled > 0f ? chord / modelled : 1f;
     }
 
     private Vector2 CalculatePillarPoint(float value, float radius)

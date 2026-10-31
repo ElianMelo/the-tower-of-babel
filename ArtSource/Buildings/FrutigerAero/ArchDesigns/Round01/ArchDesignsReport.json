@@ -1,0 +1,227 @@
+{
+  "Arch_D01_PearlEllipse": {
+    "title": "Pearl Ellipse",
+    "triangles": 3180,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2125,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2125,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlass",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_D02_AquariumSpandrel": {
+    "title": "Aquarium Spandrel",
+    "triangles": 6092,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2361,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2361,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_Water",
+      "Aero_Chrome",
+      "Aero_Bubble"
+    ]
+  },
+  "Arch_D03_RingLight": {
+    "title": "Ring Light",
+    "triangles": 5236,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.234,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.234,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlow",
+      "Aero_Chrome",
+      "Aero_AquaEnamel"
+    ]
+  },
+  "Arch_D04_Porthole": {
+    "title": "Porthole",
+    "triangles": 6500,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.22,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.22,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_Water",
+      "Aero_Chrome",
+      "Aero_Bubble",
+      "Aero_DeepBlueEnamel"
+    ]
+  },
+  "Arch_D05_WaveCrest": {
+    "title": "Wave Crest",
+    "triangles": 7116,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.213,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.213,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaEnamel",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_D06_GothicPearl": {
+    "title": "Gothic Pearl",
+    "triangles": 2188,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.249,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.249,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaEnamel",
+      "Aero_AquaGlass"
+    ]
+  },
+  "Arch_D07_GlassKeystone": {
+    "title": "Glass Keystone",
+    "triangles": 1672,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.212,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.212,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_BlueGlass",
+      "Aero_Chrome",
+      "Aero_AquaEnamel"
+    ]
+  },
+  "Arch_D08_BubbleCascade": {
+    "title": "Bubble Cascade",
+    "triangles": 9532,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2712,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2712,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_Bubble",
+      "Aero_AquaGlass"
+    ]
+  },
+  "Arch_D09_LayeredShell": {
+    "title": "Layered Shell",
+    "triangles": 5244,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaEnamel",
+      "Aero_AquaGlow"
+    ]
+  },
+  "Arch_D10_Ribbon": {
+    "title": "Ribbon",
+    "triangles": 4892,
+    "bounds_min_xyz_blender": [
+      -0.2,
+      -0.2127,
+      0.14
+    ],
+    "bounds_max_xyz_blender": [
+      2.0944,
+      0.2127,
+      2.15
+    ],
+    "endsAtNextPillarAxis": true,
+    "onlyCapBehindStartAxis": true,
+    "openingCentredOffsetMetres": 0.0,
+    "materials": [
+      "Aero_Pearl",
+      "Aero_AquaGlass",
+      "Aero_AquaGlow"
+    ]
+  }
+}

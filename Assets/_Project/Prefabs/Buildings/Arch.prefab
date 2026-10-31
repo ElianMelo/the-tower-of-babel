@@ -45,7 +45,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7803406487178166736}
-  m_Mesh: {fileID: -8585578973374763522, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
+  m_Mesh: {fileID: -8585578973374763522, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
 --- !u!23 &8596167359093563397
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6f37f54db43fdad48af27eed2c32f420, type: 2}
+  - {fileID: 2100000, guid: b2ee6b974260ef546bb1b0f2c9585901, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -129,17 +129,17 @@ MonoBehaviour:
   outline: {fileID: 900000000000000001}
   meshFilter: {fileID: 5813953479370380495}
   stageMeshes:
-  - {fileID: -8585578973374763522, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 2523935928718131704, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 1374614543010291748, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 1311548570813917748, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 8121067535300681271, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 4778673282590200659, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: -2165660608803846129, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: -4417792176762034924, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 1565255515660584037, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: -1280680626605409089, guid: 1301e00818c8d0b4997c2dea293915ea, type: 3}
-  - {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  - {fileID: -8585578973374763522, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 2523935928718131704, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 1374614543010291748, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 1311548570813917748, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 8121067535300681271, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 4778673282590200659, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: -2165660608803846129, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: -4417792176762034924, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 1565255515660584037, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: -1280680626605409089, guid: b4f7c53a7bcac9646b5938e3c79c345a, type: 3}
+  - {fileID: 8267645789123834913, guid: ebb61267011d8484dba766ecb39dece4, type: 3}
 --- !u!114 &900000000000000001
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,7 +174,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1960654409700015248, guid: f448f09961b9e4c499f19ed7ef3455bc, type: 3}
+  m_Mesh: {fileID: 8267645789123834913, guid: ebb61267011d8484dba766ecb39dece4, type: 3}
 --- !u!114 &5719173355332943081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -187,4 +187,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdeec63d05a02447b5ee8a02f273d6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Buildings.PillarConstructionMotion
-  library: {fileID: 11400000, guid: 51eedfd414c73b64b8184ba182351aef, type: 2}
+  library: {fileID: 11400000, guid: b139dcc476b5f774185223aa8e687369, type: 2}

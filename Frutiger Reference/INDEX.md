@@ -122,6 +122,10 @@ These are sampled Edit Mode visual previews, not live gameplay captures. See [fe
 
 ### Building kit — white and blue only
 
+- `Asset/Arch-Light-Ribbons-User.png`: arch direction supplied 2026-10-30. Return to glossy bright white with detail like these luminous, translucent ribbons of fine strands that twist, fold and loop. Arch Rounds 01–04 (decorated spandrels, form and material experiments, carved marble, Wave Scroll Aero variations) were rejected as art directions. The reference's green and yellow are interpreted in the building palette's cyan, aqua and blue unless the user asks otherwise.
+- `../_Screenshots-and-previews-to-delete/ArchDesigns/Round05/Arch-Designs-Lineup.png`: ten glossy white ribbon arches. The user picked **10 Aurora Curtain** on 2026-10-31, asking for a rounder opening, no line along the opening edge, and a shader that mimics real aurora behaviour. It is now the prefab arch; see [Aurora Arch](../Documentation/FrutigerAero/Buildings/AURORA_ARCH.md) and its [day](../_Screenshots-and-previews-to-delete/Buildings/AuroraArch/AuroraArch-Ring.png) and [night](../_Screenshots-and-previews-to-delete/Buildings/AuroraArch/AuroraArch-Ring-Night.png) captures.
+- `Asset/Aurora-Colours-User.png`: aurora reference supplied 2026-10-31 for the Aurora Arch shader. It shows soft swaying veils with fading bases, and green, teal, blue, violet and pink blending into each other. Green is allowed for the aurora only, at the user's request.
+
 Bubble Tube pillar bubble references, supplied 2026-10-30. Bubbles should be subtle, vary per instance and over time, and appear distorted by the tube glass.
 
 - `Asset/Bubble-Iridescent-Single-User.png`: soft bubble with pink, violet, cyan and gold thin-film colour, bright rim and window highlights. Vary colour, transparency and shape.

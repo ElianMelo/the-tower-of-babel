@@ -267,9 +267,13 @@ namespace TowerOfBabel.World.Chunks
 
 #if UNITY_EDITOR
         /// <summary>Rebuild only floor data while retaining the other assets and their stages.</summary>
-        public void ReplaceCachedFloors(IEnumerable<ChunkAssetData> floors)
+        public void ReplaceCachedFloors(IEnumerable<ChunkAssetData> floors) =>
+            ReplaceCachedAssets(type => type.IsFloor(), floors);
+
+        /// <summary>Replaces every cached asset whose type matches <paramref name="replaced"/>; all other assets are kept.</summary>
+        public void ReplaceCachedAssets(Predicate<TowerAssetType> replaced, IEnumerable<ChunkAssetData> assets)
         {
-            if (Application.isPlaying) throw new InvalidOperationException("Rebuild floor data in Edit Mode.");
+            if (Application.isPlaying) throw new InvalidOperationException("Rebuild tower data in Edit Mode.");
             var grouped = new Dictionary<ChunkKey, List<ChunkAssetData>>();
             void Add(ChunkAssetData asset)
             {
@@ -279,8 +283,8 @@ namespace TowerOfBabel.World.Chunks
             }
             foreach (var chunk in cachedChunks)
                 foreach (var asset in chunk.Assets)
-                    if (!asset.AssetType.IsFloor()) Add(asset);
-            foreach (var asset in floors) Add(asset);
+                    if (!replaced(asset.AssetType)) Add(asset);
+            foreach (var asset in assets) Add(asset);
             var keys = new List<ChunkKey>(grouped.Keys); keys.Sort(); cachedChunks.Clear();
             foreach (var key in keys)
             {
