@@ -29,6 +29,13 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [Test]
+        public void ClearGlassCastsNoDitheredShadow()
+        {
+            // Any density above zero leaves an ordered-dither dot grid on the floor below the stairs.
+            Assert.That(StepMaterial.GetFloat("_ShadowDensity"), Is.EqualTo(0f));
+        }
+
+        [Test]
         public void ShaderCompilesWithAllLightingVariants()
         {
             bool asynchronous = ShaderUtil.allowAsyncCompilation; ShaderUtil.allowAsyncCompilation = false;

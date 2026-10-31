@@ -8,6 +8,9 @@ namespace TowerOfBabel.World.Tower
     public static class TowerFloorLayout
     {
         public const float TemplateSize = 4f;
+        /// <summary>White deck tiles extend 25% further down (0.2 m to 0.25 m) so their underside overlaps the arch
+        /// tops instead of meeting them edge to edge. The walking surface stays at the mesh top (local y = 0).</summary>
+        public const float DeckThicknessStretch = 1.25f;
 
         public static Sector SupportPad(Vector2 center, float height, Vector2 pillar, float margin, float thicknessScale)
         {

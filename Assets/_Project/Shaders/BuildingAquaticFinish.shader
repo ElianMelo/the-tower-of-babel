@@ -170,10 +170,16 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
             return normalize(tangent*detail.x+bitangent*detail.y+n*detail.z);
         }
         #include "BuildingAquaticFlow.hlsl"
+        // Aqua glaze band from the model palette; the white marble deck tile keeps none.
+        half GlazeMask(Varyings input)
+        {
+            if(_RadialFloor>.5 && _ModelKind>.5 && _ModelKind<1.5)return 0;
+            return step(.2,input.paletteUV.x);
+        }
         half3 ArchitecturalColor(Varyings input)
         {
             half3 baked=SAMPLE_TEXTURE2D(_BakedSurface,sampler_BakedSurface,input.uv).rgb;
-            return lerp(baked,lerp(half3(1,1,1),_GlazeColor.rgb,step(.2,input.paletteUV.x)),_UseGeometryColors);
+            return lerp(baked,lerp(half3(1,1,1),_GlazeColor.rgb,GlazeMask(input)),_UseGeometryColors);
         }
         float ConstructionHash(float3 p)
         {
@@ -255,7 +261,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 half mask=saturate((.9-dot(palette,half3(.2126,.7152,.0722)))*1.5);
                 SurfaceData surface=(SurfaceData)0;
                 half3 bakedColor=SAMPLE_TEXTURE2D(_BakedSurface,sampler_BakedSurface,input.uv).rgb;
-                half3 geometryColor=lerp(half3(1,1,1),_GlazeColor.rgb,step(.2,input.paletteUV.x));
+                half3 geometryColor=lerp(half3(1,1,1),_GlazeColor.rgb,GlazeMask(input));
                 bakedColor=lerp(bakedColor,geometryColor,_UseGeometryColors);
                 half glass=GlassRegion(input,bakedColor);
                 half3 view=GetWorldSpaceNormalizeViewDir(input.positionWS);
@@ -461,7 +467,7 @@ Shader "TowerOfBabel/Buildings/Aquatic Finish"
                 ClipGlassFromCore(input);
                 float3 n=MarbleNormal(MarblePosition(input),OrnamentNormal(input,normalize(input.normalWS)));
                 half3 color=SAMPLE_TEXTURE2D(_BakedSurface,sampler_BakedSurface,input.uv).rgb;
-                color=lerp(color,lerp(half3(1,1,1),_GlazeColor.rgb,step(.2,input.paletteUV.x)),_UseGeometryColors);
+                color=lerp(color,lerp(half3(1,1,1),_GlazeColor.rgb,GlazeMask(input)),_UseGeometryColors);
                 n=AquaticNormal(BuildAquaticFrame(input),n,GlassRegion(input,color));
                 #if defined(_GBUFFER_NORMALS_OCT)
                     float2 oct=PackNormalOctQuadEncode(n)*.5+.5;

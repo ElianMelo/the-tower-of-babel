@@ -78,8 +78,9 @@ public class TowerGenerator : MonoBehaviour
                 GlassWaterFloorLayout.TileCenter(sector.Position, sector.Rotation, sector.Scale, center), GetWallRadius(floor), tileDecreaseRate);
             var prefab = glass ? glassWaterFloorObject : floorTileObject;
             GameObject instance = CreateTowerAsset(prefab, glass ? TowerAssetType.GlassWaterFloor : TowerAssetType.Floor, sector.Position, sector.Rotation);
+            float thickness = sector.Scale.y * (glass ? 1f : TowerFloorLayout.DeckThicknessStretch);
             instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x,
-                sector.Scale.y / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
+                thickness / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
             if (template != null)
             {
                 Mesh mesh = floorMeshes.Get(prefab.GetComponent<MeshFilter>().sharedMesh, sector.Radius, sector.Scale);
@@ -313,7 +314,8 @@ public class TowerGenerator : MonoBehaviour
                     sector = ledge.Bridge(point,data[0].Position.y,connection,data[0].Scale.y,mainland);
                 }
                 var instance = CreateTowerAsset(floorTileObject, TowerAssetType.Floor, sector.Position, sector.Rotation, "Pillar support deck");
-                instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x, sector.Scale.y / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
+                float padThickness = floorTileObject.transform.localScale.y * TowerFloorLayout.DeckThicknessStretch;
+                instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x, padThickness / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
                 if (TowerFloorLayout.SupportsRadialFloor(floorTileObject))
                 {
                     instance.GetComponent<MeshFilter>().sharedMesh = floorMeshes.Get(template, sector.Radius, sector.Scale);
