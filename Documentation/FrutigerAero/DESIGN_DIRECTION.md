@@ -44,6 +44,13 @@ The [Bubble Tube pillar](Buildings/BUBBLE_TUBE_PILLAR.md) was accepted by the us
 - **Constraints:** it remains opaque, single-submesh and instanced, inside the original ±0.41 m × 4 m footprint.
 - **Changes:** tune it through `Aero_BubbleTube_Pillar.mat` and the authoring script. The pillar doc lists the iteration history, tuning values, contracts and open items.
 
+The [glass stair steps](Buildings/GLASS_STEP.md) were requested on 2026-10-31 and replace the white marble tread.
+
+- **Look:** clear, thick glass, white with a slight blue. The edges look like real glass: a deep aqua band with crisp dark and bright lines, streaky polished sides and refraction. The first, frosted version was rejected the same day.
+- **See-through:** floors, lower steps and objects below show through, refracted. Fresnel reflections and a sun glint add gloss.
+- **Constraints:** the step mesh, construction stages, scale and walking collider are unchanged. Steps cast lighter shadows.
+- **Changes:** tune it through `Aero_Glass_Step_Tile.mat`. The step doc lists the contracts and open items.
+
 The [Aurora Arch](Buildings/AURORA_ARCH.md) was picked by the user on 2026-10-31 (Round05 design 10) and replaces the white marble arch.
 
 - **Look:** glossy bright white with a low, round opening that rises straight from the pillar tops, a soft rounded rim and no line along the opening edge.

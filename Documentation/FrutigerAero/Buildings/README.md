@@ -17,7 +17,7 @@ See [the current aquatic finish](AERO_FLOW_SHADER.md) for moving water, material
 - **Arch:** replaced on 2026-10-31 by the [Aurora Arch](AURORA_ARCH.md): glossy bright white with a low, round opening rising from the pillar tops and an animated aurora curtain that runs through every arch on a floor. It now spans exactly pillar axis to pillar axis. The earlier white marble spandrel with an elliptical opening and recessed aqua panels is retained as history.
 - **Floor_Tile:** polished white marble slab with an integral aqua side band and smoother rounded edges.
 - **Pillar:** replaced on 2026-10-30 by the [Bubble Tube pillar](BUBBLE_TUBE_PILLAR.md): a pearl base and cap with a glass water tube, a pearl spine and rising bubbles. Bubbles and water motion vary per instance. The earlier continuous white support with aqua collars is retained as history.
-- **Step_Tile:** matching white tread with a rounded white nosing and aqua side band.
+- **Step_Tile:** replaced on 2026-10-31 by [glass stair steps](GLASS_STEP.md): clear thick glass, white with a slight blue, with refraction and deep aqua glass edges. Floors and objects below show through. The geometry and collider are unchanged. The earlier white marble tread with an aqua side band is retained as history.
 
 All assets use one root MeshFilter, one root MeshRenderer and one submesh. Each model has one opaque preset using the shared `TowerOfBabel/Buildings/Aquatic Finish` shader. The active finish supports the existing instanced renderer and submesh zero. The glass keyword is disabled on all four presets and the extra renderer feature has been removed from both PC and mobile renderers.
 

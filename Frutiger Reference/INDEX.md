@@ -188,6 +188,20 @@ See [building kit notes](../Documentation/FrutigerAero/Buildings/README.md) for 
 
 The game consumes the originals in `Assets/_Project/UI/FrutigerAero/Art/`. Generation prompts are recorded in `Documentation/FrutigerAero/ArtPrompts.md`. The reusable UpgradesIcon prefab now uses the generated growth-arrow image; the earlier tower-and-leaf emblem is superseded.
 
+### Glass stair steps — 2026-10-31
+
+The user asked for stair steps made of glass, white with a slight blue colour. See [glass stair steps](../Documentation/FrutigerAero/Buildings/GLASS_STEP.md) and the [preview renders](../_Screenshots-and-previews-to-delete/Buildings/GlassStep/).
+
+- `Asset/Glass-Stair-Spiral-Frosted-User.webp`: frosted aqua-white treads on a curved glass stair.
+- `Asset/Glass-Stair-Treads-Stone-Wall-User.webp`: pale frosted treads on steel stringers with glass balustrades.
+- `Asset/Glass-Stair-Thick-Edge-User.png`: thick laminated treads; the edges show the glass's blue-green colour.
+
+Second pass, same day: the user found the frosted version looked like a "transparent rectangle", not glass. The treads must be more transparent, and the edges must look like real glass. These references replace the frosted direction:
+
+- `Asset/Glass-Panel-Edge-User.png`: clear glass panel. The body is almost invisible; the polished edges are aqua-green with bright and dark lines. This is the main edge reference.
+- `Asset/Glass-Tumbler-Clear-User.webp` and `Asset/Glass-Tumbler-Illustrated-User.png`: thick glass shows dark outlines at grazing angles, bright rim lines and a refracted, distorted base.
+- `Asset/Glass-Ribbons-Teal-User.webp` and `Asset/Glass-Ribbons-Blue-User.webp`: thick curved glass with deep teal/blue where light travels further, strong refraction and streaky internal reflections.
+
 ## Inner glass river blueprint — 2026-10-24
 
 - `Asset/Inner-Glass-Water-Blueprint-User.png` — current floor plan: two concentric blue glass/water channels, four cardinal spokes and a central pool within the white circular deck. This replaces the provisional outer-ring-only interpretation. Composite tiles keep the ordinary floor footprint and stages, consume glass, and use a reflective glass-covered water finish. See [implementation and previews](../Documentation/FrutigerAero/Lighting/ISLAND_GLASS_AND_DAY_NIGHT.md).
