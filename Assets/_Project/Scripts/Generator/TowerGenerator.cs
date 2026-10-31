@@ -49,7 +49,20 @@ public class TowerGenerator : MonoBehaviour
                 Mathf.Max(Mathf.Abs(bounds.min.z), Mathf.Abs(bounds.max.z)) * scale.z).magnitude + .05f;
         }
     }
-    public float GetFloorOuterRadius(int floor) => Mathf.Max(GetWallRadius(floor), GetWallRadius(Mathf.Max(0, floor - 1))) + PillarSupportRadius;
+    /// <summary>Radial half-thickness of the arch: its outer face sits this far outside the wall ring.</summary>
+    public float ArchOuterHalfDepth
+    {
+        get
+        {
+            var mesh = archObject != null ? archObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) : null;
+            if (mesh == null) return .2f;
+            var b = mesh.bounds; return Mathf.Max(Mathf.Abs(b.min.z), Mathf.Abs(b.max.z)) * archObject.transform.localScale.z;
+        }
+    }
+    // The ground floor ends just past its pillar bases. Every upper floor rests on the arcade below and ends
+    // flush with that arcade's outer arch face instead of overhanging it.
+    public float GetFloorOuterRadius(int floor) =>
+        floor <= 0 ? GetWallRadius(0) + PillarSupportRadius : GetWallRadius(floor - 1) + ArchOuterHalfDepth;
 
     public void FillCurrentLevelFloor(float floorRadius, float baseLevel)
     {

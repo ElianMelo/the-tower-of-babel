@@ -24,6 +24,21 @@ namespace TowerOfBabel.World.Tower
                 pad.Radius - Mathf.Max(0, Mathf.Min(innerRadius, pad.Radius - margin * 2)), thicknessScale);
         }
 
+        /// <summary>Clips a saved sector (position on its outer edge) so it ends at <paramref name="maxRadius"/>. False when nothing remains.</summary>
+        public static bool TryTrimOuter(Vector3 position, Vector3 scale, Vector2 center, float maxRadius,
+            out Vector3 trimmedPosition, out Vector3 trimmedScale)
+        {
+            trimmedPosition = position; trimmedScale = scale;
+            Vector2 delta = new Vector2(position.x, position.z) - center; float radius = delta.magnitude;
+            if (radius <= maxRadius + .002f) return true;
+            float depth = scale.x * TemplateSize - (radius - maxRadius);
+            if (depth <= .01f) return false;
+            Vector2 point = center + delta / radius * maxRadius;
+            trimmedPosition = new Vector3(point.x, position.y, point.y);
+            trimmedScale = new Vector3(depth / TemplateSize, scale.y, scale.z * maxRadius / radius);
+            return true;
+        }
+
         public static bool SupportsRadialFloor(GameObject prefab)
         {
             if (prefab == null) return false;

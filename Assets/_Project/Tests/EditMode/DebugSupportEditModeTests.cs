@@ -71,6 +71,33 @@ namespace TowerOfBabel.World.Tests
             finally {UnityEngine.Object.DestroyImmediate(go);}
         }
         [Test]
+        public void UpperFloors_EndFlushWithTheArchFaceBelow()
+        {
+            var go = new GameObject("gen"); try {
+                var g = go.AddComponent<TowerGenerator>(); g.radius = 96; g.decreaseAmount = 3;
+                Assert.That(g.GetFloorOuterRadius(0), Is.EqualTo(g.GetWallRadius(0) + g.PillarSupportRadius).Within(1e-5f));
+                Assert.That(g.GetFloorOuterRadius(1), Is.EqualTo(g.GetWallRadius(0) + g.ArchOuterHalfDepth).Within(1e-5f));
+                Assert.That(g.GetFloorOuterRadius(3), Is.EqualTo(g.GetWallRadius(2) + g.ArchOuterHalfDepth).Within(1e-5f));
+                Assert.That(g.GetFloorOuterRadius(2), Is.EqualTo(g.GetWallRadius(1) + g.ArchOuterHalfDepth).Within(1e-5f));
+                Assert.That(g.GetFloorOuterRadius(2), Is.LessThan(g.GetWallRadius(1) + g.PillarSupportRadius));
+            } finally { UnityEngine.Object.DestroyImmediate(go); }
+        }
+
+        [Test]
+        public void TrimOuter_ClipsOverhangKeepsAngleAndDropsOuterOnlyRows()
+        {
+            var sector = new TowerFloorLayout.Sector(Vector2.zero, 2, 30, .3f, .1f, 4, 1);
+            Assert.That(TowerFloorLayout.TryTrimOuter(sector.Position, sector.Scale, Vector2.zero, 28, out var p, out var s), Is.True);
+            Assert.That(new Vector2(p.x, p.z).magnitude, Is.EqualTo(28).Within(1e-4f));
+            Assert.That(Mathf.Atan2(p.z, p.x), Is.EqualTo(.3f).Within(1e-4f));
+            Assert.That(s.x * TowerFloorLayout.TemplateSize, Is.EqualTo(2).Within(1e-4f));
+            Assert.That(s.z * TowerFloorLayout.TemplateSize, Is.EqualTo(28 * .1f).Within(1e-4f));
+            Assert.That(TowerFloorLayout.TryTrimOuter(sector.Position, sector.Scale, Vector2.zero, 26, out _, out _), Is.False);
+            Assert.That(TowerFloorLayout.TryTrimOuter(sector.Position, sector.Scale, Vector2.zero, 31, out p, out s), Is.True);
+            Assert.That(p, Is.EqualTo(sector.Position));
+        }
+
+        [Test]
         public void InstantBuild_ProfileIsAnOffByDefaultBooleanAndResets()
         {
             var profile = new CheatProfile(); Assert.That(profile.Get(CheatStat.InstantBuild), Is.Zero);
@@ -206,8 +233,14 @@ namespace TowerOfBabel.World.Tests
                     Assert.That(bush.position.y + bottom * bush.scale.y, Is.EqualTo(top - TowerBushScatter.RootEmbedDepth).Within(.002f));
                     Assert.That(Vector2.Distance(new Vector2(bush.position.x, bush.position.z), g.center) - bush.footprint, Is.GreaterThan(bush.wallRadius));
                 }
-                for (int floor = 2; floor < g.levels; floor += 2)
-                    Assert.That(g.GetFloorOuterRadius(floor), Is.GreaterThan(g.GetWallRadius(floor - 1) + .5f));
+                for (int floor = 1; floor < g.levels; floor++)
+                    Assert.That(g.GetFloorOuterRadius(floor), Is.EqualTo(g.GetWallRadius(floor - 1) + g.ArchOuterHalfDepth).Within(.001f));
+                foreach (var tile in all.Where(a => a.AssetType.IsFloor()))
+                {
+                    int floor = Mathf.FloorToInt((tile.Position.y + .001f) / g.heighIncrease);
+                    float outer = Vector2.Distance(new Vector2(tile.Position.x, tile.Position.z), g.center);
+                    Assert.That(outer, Is.LessThanOrEqualTo(g.GetFloorOuterRadius(floor) + .01f), $"Floor {floor} tile overhangs the arch below at {tile.Position}.");
+                }
                 int connected=0;
                 foreach(var group in all.Where(a=>a.AssetType.IsFloor()).GroupBy(a=>Mathf.FloorToInt(a.Position.y/g.heighIncrease)))
                 {

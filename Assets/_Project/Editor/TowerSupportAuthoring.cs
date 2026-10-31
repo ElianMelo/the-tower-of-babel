@@ -24,7 +24,7 @@ public static class TowerSupportAuthoring
         var pillars = all.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(a => Mathf.FloorToInt((a.Position.y + .001f) / generator.heighIncrease)).ToDictionary(g => g.Key, g => g.ToArray());
         float meshTop = generator.floorTileObject.GetComponent<Building>().GetStageMesh(10).bounds.max.y;
         float footprint = generator.PillarSupportRadius - .05f;
-        int extended = 0, pads = 0, bridges = 0, removedSupports = 0, archSupported = 0, unsupportedBefore = 0, unsupportedAfter = 0;
+        int trimmed = 0, extended = 0, pads = 0, bridges = 0, removedSupports = 0, archSupported = 0, unsupportedBefore = 0, unsupportedAfter = 0;
         var repaired = new List<ChunkAssetData>();
         foreach (var group in floors)
         {
@@ -33,7 +33,15 @@ public static class TowerSupportAuthoring
             var ledge=new TowerPillarLedge(levelPillars.Select(p=>p.Position),generator.center,generator.PillarSupportRadius);
             var oldSupports = group.Where(a=>TowerFloorSupport.IsPillarSupport(a,generator.center,generator.PillarSupportRadius,wall,previousWall) || ledge.IsConnectedSupport(a)).ToArray();
             removedSupports += oldSupports.Length;
-            var list = group.Except(oldSupports).ToList(); var before = new TowerFloorSupport(list, generator.center, meshTop);
+            float floorOuter = generator.GetFloorOuterRadius(group.Key);
+            var list = new List<ChunkAssetData>();
+            foreach (var a in group.Except(oldSupports))
+            {
+                if (!TowerFloorLayout.TryTrimOuter(a.Position, a.Scale, generator.center, floorOuter, out var p, out var s)) { trimmed++; continue; }
+                if (p != a.Position) trimmed++;
+                list.Add(new ChunkAssetData(a.LocalIndex, a.AssetType, p, a.Rotation, s, a.Stage));
+            }
+            var before = new TowerFloorSupport(list, generator.center, meshTop);
             foreach (var pillar in levelPillars) if (!before.SupportsDisk(new Vector2(pillar.Position.x, pillar.Position.z), footprint, out _) && !arches.SupportsBase(pillar.Position)) unsupportedBefore++;
             float oldRadius = list.Max(a => Vector2.Distance(new Vector2(a.Position.x, a.Position.z), generator.center));
             float targetRadius = Mathf.Max(oldRadius, generator.GetFloorOuterRadius(group.Key));
@@ -78,7 +86,7 @@ public static class TowerSupportAuthoring
         const string reportPath = "Documentation/FrutigerAero/Buildings/TowerSupportInspection.json";
         var prior = System.IO.File.Exists(reportPath) ? Newtonsoft.Json.Linq.JObject.Parse(System.IO.File.ReadAllText(reportPath)) : new Newtonsoft.Json.Linq.JObject();
         int priorExtended = (int?)(prior["totalExtended"] ?? prior["extended"]) ?? 0;
-        var report = new { extended, pads, bridges, removedSupports, removedRedundantSupports=removedSupports-pads, archSupported, totalExtended = priorExtended + extended, totalPads = pads, unsupportedBefore, unsupportedAfter, bushes = scatter.Placements.Count, constructionAssets = manager.CachedAssetCount,
+        var report = new { trimmed, extended, pads, bridges, removedSupports, removedRedundantSupports=removedSupports-pads, archSupported, totalExtended = priorExtended + extended, totalPads = pads, unsupportedBefore, unsupportedAfter, bushes = scatter.Placements.Count, constructionAssets = manager.CachedAssetCount,
             nonFloorAssetsPreserved = all.Count(a => !a.AssetType.IsFloor()), playing = EditorApplication.isPlaying, sceneDirty = scene.isDirty };
         System.IO.File.WriteAllText(reportPath, Newtonsoft.Json.JsonConvert.SerializeObject(report, Newtonsoft.Json.Formatting.Indented));
         return report;
