@@ -1,0 +1,954 @@
+{
+  "seed": 712809,
+  "complete": {
+    "name": "Pillar_BubbleTube",
+    "triangles": 860,
+    "boundaryEdges": 0,
+    "nonManifoldEdges": 0,
+    "bounds": [
+      [
+        -0.41002,
+        -0.41002,
+        0.0
+      ],
+      [
+        0.41002,
+        0.41002,
+        4.0
+      ]
+    ]
+  },
+  "stages": [
+    {
+      "stage": 0,
+      "phase": "Blueprint",
+      "filledPieceIds": [],
+      "triangles": 1082,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 1,
+      "phase": "Random fill 10%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79
+      ],
+      "triangles": 1474,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 2,
+      "phase": "Random fill 20%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30
+      ],
+      "triangles": 1866,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 3,
+      "phase": "Random fill 30%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63
+      ],
+      "triangles": 2348,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 4,
+      "phase": "Random fill 40%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63,
+        10,
+        34,
+        6,
+        29,
+        76,
+        16,
+        24,
+        17
+      ],
+      "triangles": 2842,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 5,
+      "phase": "Random fill 50%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63,
+        10,
+        34,
+        6,
+        29,
+        76,
+        16,
+        24,
+        17,
+        33,
+        2,
+        25,
+        56,
+        72,
+        70,
+        35,
+        18
+      ],
+      "triangles": 3244,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 6,
+      "phase": "Random fill 60%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63,
+        10,
+        34,
+        6,
+        29,
+        76,
+        16,
+        24,
+        17,
+        33,
+        2,
+        25,
+        56,
+        72,
+        70,
+        35,
+        18,
+        44,
+        75,
+        61,
+        48,
+        59,
+        26,
+        49,
+        53
+      ],
+      "triangles": 3954,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 7,
+      "phase": "Random fill 70%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63,
+        10,
+        34,
+        6,
+        29,
+        76,
+        16,
+        24,
+        17,
+        33,
+        2,
+        25,
+        56,
+        72,
+        70,
+        35,
+        18,
+        44,
+        75,
+        61,
+        48,
+        59,
+        26,
+        49,
+        53,
+        11,
+        66,
+        64,
+        77,
+        31,
+        5,
+        62,
+        15
+      ],
+      "triangles": 4556,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 8,
+      "phase": "Random fill 80%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63,
+        10,
+        34,
+        6,
+        29,
+        76,
+        16,
+        24,
+        17,
+        33,
+        2,
+        25,
+        56,
+        72,
+        70,
+        35,
+        18,
+        44,
+        75,
+        61,
+        48,
+        59,
+        26,
+        49,
+        53,
+        11,
+        66,
+        64,
+        77,
+        31,
+        5,
+        62,
+        15,
+        43,
+        14,
+        40,
+        1,
+        52,
+        57,
+        4,
+        41
+      ],
+      "triangles": 5172,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "stage": 9,
+      "phase": "Random fill 90%",
+      "filledPieceIds": [
+        20,
+        68,
+        3,
+        55,
+        58,
+        39,
+        9,
+        79,
+        21,
+        47,
+        50,
+        19,
+        73,
+        12,
+        27,
+        30,
+        69,
+        65,
+        78,
+        8,
+        51,
+        54,
+        74,
+        63,
+        10,
+        34,
+        6,
+        29,
+        76,
+        16,
+        24,
+        17,
+        33,
+        2,
+        25,
+        56,
+        72,
+        70,
+        35,
+        18,
+        44,
+        75,
+        61,
+        48,
+        59,
+        26,
+        49,
+        53,
+        11,
+        66,
+        64,
+        77,
+        31,
+        5,
+        62,
+        15,
+        43,
+        14,
+        40,
+        1,
+        52,
+        57,
+        4,
+        41,
+        42,
+        13,
+        36,
+        71,
+        46,
+        60,
+        67,
+        0
+      ],
+      "triangles": 5648,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    }
+  ],
+  "chunks": [
+    {
+      "name": "Pillar_Chunk_09_00",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_01",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_02",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_03",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_04",
+      "triangles": 116,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_05",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_06",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_07",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_08",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_09",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_10",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_11",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_12",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_13",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_14",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_15",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_16",
+      "triangles": 96,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_17",
+      "triangles": 98,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_18",
+      "triangles": 62,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_19",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_20",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_21",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_22",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_23",
+      "triangles": 94,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_24",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_25",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_26",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_27",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_28",
+      "triangles": 74,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_29",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_30",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_31",
+      "triangles": 154,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_32",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_33",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_34",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_35",
+      "triangles": 68,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_36",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_37",
+      "triangles": 48,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_38",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_39",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_40",
+      "triangles": 68,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_41",
+      "triangles": 108,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_42",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_43",
+      "triangles": 72,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_44",
+      "triangles": 146,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_10_45",
+      "triangles": 138,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_46",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_47",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_48",
+      "triangles": 134,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_49",
+      "triangles": 102,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_50",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_51",
+      "triangles": 102,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_52",
+      "triangles": 100,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_53",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_54",
+      "triangles": 32,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_55",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_56",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_08_57",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_58",
+      "triangles": 68,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_59",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_60",
+      "triangles": 78,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_61",
+      "triangles": 40,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_62",
+      "triangles": 28,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_63",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_64",
+      "triangles": 126,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_65",
+      "triangles": 72,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_66",
+      "triangles": 122,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_67",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_68",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_69",
+      "triangles": 72,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_70",
+      "triangles": 56,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_09_71",
+      "triangles": 122,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_05_72",
+      "triangles": 64,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_02_73",
+      "triangles": 60,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_74",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_06_75",
+      "triangles": 112,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_04_76",
+      "triangles": 44,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_07_77",
+      "triangles": 52,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_03_78",
+      "triangles": 64,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    },
+    {
+      "name": "Pillar_Chunk_01_79",
+      "triangles": 36,
+      "boundaryEdges": 0,
+      "nonManifoldEdges": 0
+    }
+  ]
+}

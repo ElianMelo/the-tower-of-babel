@@ -45,7 +45,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8453861318134773522}
-  m_Mesh: {fileID: 6332559704608143952, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
+  m_Mesh: {fileID: 6332559704608143952, guid: 94a419cf59d0c734498922c98d108691, type: 3}
 --- !u!23 &7949656416258168519
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -71,7 +71,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fef0718b2fa9de54eb9d0d21d6c523cb, type: 2}
+  - {fileID: 2100000, guid: 62f8137ff4a1520458bf5a28f7e9f36c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -152,17 +152,17 @@ MonoBehaviour:
   outline: {fileID: 1429859748983638673}
   meshFilter: {fileID: 5311482485373788685}
   stageMeshes:
-  - {fileID: 6332559704608143952, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: 6945620952374474599, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: -7062936622248024942, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: 4962954138633056684, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: -6124665183416354617, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: 3396105749460511912, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: -7469533408586481317, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: 7746385057247137621, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: -8870114952462736590, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: -1083832598764911733, guid: 5a33738d117b3824e9160c1ee5bb4bac, type: 3}
-  - {fileID: -8116138440861595531, guid: e7a8995e51c73914aae80be8518e91a6, type: 3}
+  - {fileID: 6332559704608143952, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: 6945620952374474599, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: -7062936622248024942, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: 4962954138633056684, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: -6124665183416354617, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: 3396105749460511912, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: -7469533408586481317, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: 7746385057247137621, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: -8870114952462736590, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: -1083832598764911733, guid: 94a419cf59d0c734498922c98d108691, type: 3}
+  - {fileID: -3037810624264470533, guid: 4898f59903e4e9c4bb33023d7c19f784, type: 3}
 --- !u!114 &1429859748983638673
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -188,4 +188,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3fdeec63d05a02447b5ee8a02f273d6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Buildings.PillarConstructionMotion
-  library: {fileID: 11400000, guid: 58a3223f703c3b046902caef08942d06, type: 2}
+  library: {fileID: 11400000, guid: 9988b544570e8454da6d30d4f7e6ac48, type: 2}

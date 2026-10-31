@@ -122,6 +122,14 @@ These are sampled Edit Mode visual previews, not live gameplay captures. See [fe
 
 ### Building kit — white and blue only
 
+Bubble Tube pillar bubble references, supplied 2026-10-30. Bubbles should be subtle, vary per instance and over time, and appear distorted by the tube glass.
+
+- `Asset/Bubble-Iridescent-Single-User.png`: soft bubble with pink, violet, cyan and gold thin-film colour, bright rim and window highlights. Vary colour, transparency and shape.
+- `Asset/Bubble-Large-Distorted-User.webp`: large wobbling, elongated bubbles beside small round ones.
+- `Asset/Bubble-Cluster-Glass-Distortion-User.webp`: bubble cluster with thin iridescent rims and dark clear bodies. Emulate the glass bending bubble shapes (the user marked this as most important).
+
+- `../_Screenshots-and-previews-to-delete/PillarDesigns/Round03/Pillar-Designs-Lineup.png`: ten pillar proposals. The user selected **04 Bubble Tube** on 2026-10-30, now the prefab pillar; see [Bubble Tube pillar](../Documentation/FrutigerAero/Buildings/BUBBLE_TUBE_PILLAR.md) and its [stages](../_Screenshots-and-previews-to-delete/Buildings/BubbleTubePillar/BubbleTube-Stages.png) and [per-instance variation](../_Screenshots-and-previews-to-delete/Buildings/BubbleTubePillar/BubbleTube-Instances.png) captures.
+
 - `../_Screenshots-and-previews-to-delete/Documentation/FrutigerAero/Buildings/Finish/Floor0-Day-Arch-After.png` and `Floor0-Day-Glass-After.png` — implemented pearl/aqua finish and bounded floor reflections, based on building samples 2, 3, 6, 9 and 11. [Implementation and validation limits](../Documentation/FrutigerAero/Buildings/BUILDING_FINISH.md) and [walking/turning preview](../_Screenshots-and-previews-to-delete/Documentation/FrutigerAero/Buildings/Finish/Motion.gif) accompany this pass. Pending visual acceptance; existing geometry and lighting directions remain the baseline.
 
 - `../Documentation/FrutigerAero/Buildings/Previews/Pillar-Construction-Lineup.png` — pillar-only stages 0–10: sparse blue guides and scattered, irregular chunks filling in a seeded random order. Horizontal slices and staggered radial columns are superseded.

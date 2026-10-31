@@ -16,7 +16,7 @@ See [the current aquatic finish](AERO_FLOW_SHADER.md) for moving water, material
 
 - **Arch:** full white marble spandrel with a curved elliptical opening, rounded edges and actual recessed aqua panels and a flat upper bearing. The original curved strip's empty upper corners are filled.
 - **Floor_Tile:** polished white marble slab with an integral aqua side band and smoother rounded edges.
-- **Pillar:** continuous white support with restrained integral aqua collars and a smooth shaft.
+- **Pillar:** replaced on 2026-10-30 by the [Bubble Tube pillar](BUBBLE_TUBE_PILLAR.md): a pearl base and cap with a glass water tube, a pearl spine and rising bubbles. Bubbles and water motion vary per instance. The earlier continuous white support with aqua collars is retained as history.
 - **Step_Tile:** matching white tread with a rounded white nosing and aqua side band.
 
 All assets use one root MeshFilter, one root MeshRenderer and one submesh. Each model has one opaque preset using the shared `TowerOfBabel/Buildings/Aquatic Finish` shader. The active finish supports the existing instanced renderer and submesh zero. The glass keyword is disabled on all four presets and the extra renderer feature has been removed from both PC and mobile renderers.

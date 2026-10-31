@@ -36,6 +36,14 @@ The [stone and processor models](Resources/RESOURCE_WORKSHOP.md) use a silvery f
 
 The [sand and glass workshop](Resources/SAND_GLASS.md) adds a granular sand mound and a distinct round pearl/azure kiln with an amber chamber, chimney, flywheel and bellows. Gathering uses capped mesh fragments, dust, stroke accents and spatial sound. Sand shrinks in its render-only presentation; destroyed stone leaves four small bricks until respawn. Kiln output appears only after a confirmed exchange. Preserve fixed gameplay colliders and bounded particle costs. The terrain now uses the lightweight resolutions and separate editor/runtime grass budgets documented in [landscape performance](TERRAIN_LANDSCAPE.md).
 
+The [Bubble Tube pillar](Buildings/BUBBLE_TUBE_PILLAR.md) was accepted by the user on 2026-10-30 as the initial version of the new pillar. It replaces the white continuous support.
+
+- **Look:** a pearl base and cap, blue enamel and chrome collars, and a glass water tube with a pearl spine.
+- **Bubbles:** subtle bubbles with iridescent rims, varied shape and size, and rare large wobbling bubbles. The amount varies per pillar and over time, in streams and calm spells.
+- **Glass:** each pillar has hand-blown glass waviness that bends everything behind it.
+- **Constraints:** it remains opaque, single-submesh and instanced, inside the original ±0.41 m × 4 m footprint.
+- **Changes:** tune it through `Aero_BubbleTube_Pillar.mat` and the authoring script. The pillar doc lists the iteration history, tuning values, contracts and open items.
+
 The [pillar](Buildings/PILLAR_CONSTRUCTION.md), [arch](Buildings/ARCH_CONSTRUCTION.md), and [floor/step construction sequences](Buildings/DECK_CONSTRUCTION.md) fill irregular chunks across each shape in a fixed random order. Incoming chunks form outside the asset through a cyan dissolve, then fly and turn into their correct positions. Existing pieces remain solid. Preserve sparse blueprints, original completed meshes, the open arch passage, full walking colliders, curved floor layout and step scale. Horizontal slices and staggered column patterns are superseded.
 
 The [tower landscape](TERRAIN_LANDSCAPE.md) keeps the actual tower foundation level, with grass-free ground inside the boundary and rolling meadows starting just outside it. The 2026-10-23 requested revision replaces the broad 108-metre flat clearing and four crater-like ponds with a tighter 98-metre footprint, curving outer terrain, three more visible lakes with low approaches, and staggered undulating mountain ridges. Grass is populated across the dry outer terrain instead of inheriting empty source patches. Preserve gradual transitions, existing turquoise water and matte green meadow surfaces.

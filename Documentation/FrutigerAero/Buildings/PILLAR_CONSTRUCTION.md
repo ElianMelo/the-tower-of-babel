@@ -1,5 +1,7 @@
 # Pillar chunks, formation and arrival
 
+> **Superseded mesh, current method (2026-10-30).** The pillar now uses the [Bubble Tube pillar](BUBBLE_TUBE_PILLAR.md). Its stages and chunks are generated the same way: 80 Voronoi chunks, seed 712809, eight per step, a blueprint stage 0, and the same `PillarConstructionMotion` and dissolve. They come from `build_bubble_tube_pillar.py` and are applied by `BubbleTubePillarAuthoring`. The assets and scripts below describe the previous white pillar and remain as history.
+
 The pillar is divided into 80 closed, irregular Voronoi chunks of different sizes. Seeded random selection fills scattered areas across the whole pillar, without horizontal lifts, radial columns or a bottom-to-top pattern. Stage 0 keeps the accepted sparse blueprint; stages 1–9 add eight chunks each; the final stage 10 uses the unchanged original complete pillar and fills the remaining eight. The percentage labels refer to piece counts, not equal volume. The [arch now reuses the same controller and library structure](ARCH_CONSTRUCTION.md) with its own chunks.
 
 ## Animation sequence
