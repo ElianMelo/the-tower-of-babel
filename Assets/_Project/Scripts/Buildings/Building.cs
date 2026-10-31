@@ -53,12 +53,12 @@ namespace TowerOfBabel.Buildings
         public InteractionResourceData InteractionResources => InteractionResourceData.Build(resourceType,EffectiveResourceCost);
         public string DetailText => IsComplete
             ? "Construction complete"
-            : $"Stage {currentStage}/{ChunkAssetData.CompletedStage} - {EffectiveResourceCost} {resourceType}";
+            : $"Stage {currentStage}/{ChunkAssetData.CompletedStage} - {EffectiveResourceCost} {ResourceTypeNames.Display(resourceType)}";
         public Color DetailColor => IsComplete ? CompleteColor : HasLocalResources ? AvailableColor : UnavailableColor;
         public bool InstantBuildEnabled => NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.GetLocalCheatStat(TowerOfBabel.Cheats.CheatStat.InstantBuild) > .5f;
         public string PromptText => IsComplete
             ? "Complete"
-            : InstantBuildEnabled ? "Press 'E' - instant build" : HasLocalResources ? "Press 'E'" : $"Need {EffectiveResourceCost} {resourceType}";
+            : InstantBuildEnabled ? "Press 'E' - instant build" : HasLocalResources ? "Press 'E'" : $"Need {EffectiveResourceCost} {ResourceTypeNames.Display(resourceType)}";
         public float Duration => EffectiveInteractionDuration;
         public bool CanInteract => IsConstructionAvailable && (InstantBuildEnabled || HasLocalResources);
         public bool IsConstructionAvailable => isActiveAndEnabled && isBound && !IsComplete &&

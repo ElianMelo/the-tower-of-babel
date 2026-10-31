@@ -48,7 +48,7 @@ public static class SandGlassWorkshopPreview
             var rock = Instance(ResourceWorkshopAuthoring.StonePrefab, new Vector3(-2.6f, 1.5f, 0));
             var sand = Instance(SandGlassWorkshopAuthoring.SandPrefab, new Vector3(0, .02f, 0));
             var kiln = Instance(SandGlassWorkshopAuthoring.GlassPrefab, new Vector3(2.8f, .02f, 0));
-            var motion = kiln.GetComponent<GlassFurnaceAnimation>();
+            var motion = kiln.GetComponent<ProcessorMachineAnimation>();
             motion.ResetImmediately(); Save(camera, output + "Sand-Glass-Idle.png");
             foreach (var node in new[] { rock, sand }) node.GetComponent<Resource>().BeginInteraction(null);
             void Sample(float t)

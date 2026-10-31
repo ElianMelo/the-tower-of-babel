@@ -17,7 +17,7 @@ public static class SandGlassWorkshopAuthoring
     private const string Effects = "Assets/_Project/Audio/Resources/";
     private static readonly string[] MaterialNames = { "Sand", "SandLight", "Pearl", "Azure", "Steel", "Heat", "Glass", "Chip" };
 
-    [MenuItem("Tower of Babel/Resources/Apply sand, glass and harvest feedback")]
+    [MenuItem("Tower of Babel/Resources/Apply sand and harvest feedback")]
     public static void Apply()
     {
         if (Application.dataPath.Replace('\\', '/') != "D:/PersonalProjects/the-tower-of-babel/Assets" || EditorApplication.isPlayingOrWillChangePlaymode)
@@ -64,36 +64,9 @@ public static class SandGlassWorkshopAuthoring
             AddHarvest(node, model.transform, true); PrefabUtility.SaveAsPrefabAsset(node, SandPrefab);
         }
         finally { UnityEngine.Object.DestroyImmediate(node); }
-        var kiln = new GameObject("GlassFurnace");
-        try
-        {
-            var model = Model("GlassFurnace", kiln.transform); model.name = "Visuals";
-            foreach (var t in kiln.GetComponentsInChildren<Transform>()) t.gameObject.layer = layer;
-            var collider = kiln.AddComponent<BoxCollider>(); collider.center = new Vector3(0, 1.15f, -.08f); collider.size = new Vector3(2.6f, 2.3f, 2.3f);
-            var so = new SerializedObject(kiln.AddComponent<ResourceProcessor>());
-            so.FindProperty("sourceResource").objectReferenceValue = sand; so.FindProperty("targetResource").objectReferenceValue = glass;
-            so.FindProperty("sourceAmount").intValue = 2; so.FindProperty("targetAmount").intValue = 1;
-            so.FindProperty("interactionDuration").floatValue = 3.5f;
-            so.FindProperty("processorId").stringValue = "tower-glass-kiln-01"; so.ApplyModifiedPropertiesWithoutUndo();
-            so = new SerializedObject(kiln.AddComponent<GlassFurnaceAnimation>());
-            foreach (var pair in new[] { ("bellows", "Bellows"), ("flywheel", "Flywheel"), ("lid", "Lid"), ("sandFeed", "SandFeed"), ("glassOutput", "GlassOutput"), ("moltenPool", "MoltenPool") })
-                so.FindProperty(pair.Item1).objectReferenceValue = Find(model, pair.Item2);
-            var heat = so.FindProperty("heatSurfaces"); heat.arraySize = 3;
-            for (int i = 0; i < 3; i++) heat.GetArrayElementAtIndex(i).objectReferenceValue = Find(model, "StatusLight_" + i).GetComponent<Renderer>();
-            so.FindProperty("embers").objectReferenceValue = Particles(kiln.transform, "Kiln embers", new Vector3(.43f, 2.48f, .3f), Mat("Heat"), ChipMesh(), new Color(1, .48f, .05f), .025f, .06f, -.05f, .65f, .4f, null, 5);
-            so.FindProperty("steam").objectReferenceValue = Particles(kiln.transform, "Heat vapour", new Vector3(.43f, 2.48f, .3f), DustMaterial(), null, new Color(.84f, .92f, 1, .2f), .12f, .28f, -.06f, 1, .3f, null, 4);
-            so.FindProperty("glassSparkles").objectReferenceValue = Particles(kiln.transform, "Glass glints", new Vector3(0, .65f, -1.03f), Mat("Glass"), ChipMesh(), new Color(.55f, .95f, 1), .015f, .045f, .15f, .7f, .8f, null);
-            var motor = SoundSource(kiln, "Kiln motor"); motor.clip = Clip("KilnMotor"); motor.loop = true; motor.volume = 0;
-            so.FindProperty("motor").objectReferenceValue = motor; so.FindProperty("accents").objectReferenceValue = SoundSource(kiln, "Glass chime");
-            so.FindProperty("completionClip").objectReferenceValue = Clip("GlassChime"); so.ApplyModifiedPropertiesWithoutUndo();
-            foreach (string part in new[] { "SandFeed", "GlassOutput", "MoltenPool" }) Find(model, part).gameObject.SetActive(false);
-            PrefabUtility.SaveAsPrefabAsset(kiln, GlassPrefab);
-        }
-        finally { UnityEngine.Object.DestroyImmediate(kiln); }
+        // The glass kiln is built by ProcessorFamilyAuthoring with the rest of the processor family.
         Place(SandPrefab, "Sand", new Vector3(-2.4f, .03f, -101.5f));
-        Place(GlassPrefab, "GlassFurnace", new Vector3(1.2f, .03f, -101.5f));
         RenderIcon("Sand", AssetDatabase.LoadAssetAtPath<GameObject>(Models + "SandPile.fbx"));
-        RenderIcon("Glass", AssetDatabase.LoadAssetAtPath<GameObject>(GlassPrefab), "GlassOutput");
         foreach (string name in new[] { "Sand", "Glass" })
         {
             var so = new SerializedObject(AssetDatabase.LoadAssetAtPath<ResourceDefinition>(Data + name + ".asset"));

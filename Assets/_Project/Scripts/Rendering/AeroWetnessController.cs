@@ -17,6 +17,9 @@ namespace TowerOfBabel.Rendering
         public AeroDayNightCycle dayNight;
         [Tooltip("Optional: tower geometry for rain shelter under upper floors.")]
         public AeroTowerAtmosphere tower;
+        [Tooltip("Off until rain is implemented: surfaces stay dry and shaders skip the wet path. " +
+                 "The F3 rain toggle and wetness presets still preview it while this is off.")]
+        [SerializeField] private bool wetnessEnabled;
         [SerializeField] private bool raining;
         [Tooltip("Fixed shader clock for previews and tests; negative uses game time.")]
         public float previewTime = -1;
@@ -25,6 +28,10 @@ namespace TowerOfBabel.Rendering
         private float clock;
 
         public bool Raining { get => raining; set => raining = value; }
+        /// <summary>When false (the default) there is no dew; only rain or a forced preset wets surfaces.</summary>
+        public bool WetnessEnabled { get => wetnessEnabled; set => wetnessEnabled = value; }
+        /// <summary>True while anything should reach the shaders.</summary>
+        public bool IsActive => wetnessEnabled || raining || overrideWetness.HasValue || Wetness > 0 || RainAmount > 0;
         /// <summary>Current film coverage 0..1 sent to shaders.</summary>
         public float Wetness { get; private set; }
         /// <summary>Current active rain 0..1 (drops, streaks, ripples).</summary>
@@ -82,7 +89,7 @@ namespace TowerOfBabel.Rendering
             Tick(dt);
         }
 
-        private float TargetDew() => profile == null ? 0 : profile.DewAt(dayNight != null ? dayNight.timeOfDay : .3f);
+        private float TargetDew() => profile == null || !wetnessEnabled ? 0 : profile.DewAt(dayNight != null ? dayNight.timeOfDay : .3f);
 
         /// <summary>Advances ramps by dt seconds and publishes the globals.</summary>
         public void Tick(float dt)
@@ -101,7 +108,7 @@ namespace TowerOfBabel.Rendering
 
         private void Apply()
         {
-            bool ready = profile != null && profile.TexturesReady && isActiveAndEnabled;
+            bool ready = profile != null && profile.TexturesReady && isActiveAndEnabled && IsActive;
             Shader.SetGlobalFloat(ReadyId, ready ? 1 : 0);
             if (profile == null) return;
             Shader.SetGlobalFloat(WetnessId, Wetness);

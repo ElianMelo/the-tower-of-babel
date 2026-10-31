@@ -45,6 +45,7 @@ namespace TowerOfBabel.Rendering.Tests
             var controller = MakeController(out var go, profile);
             try
             {
+                controller.WetnessEnabled = true;
                 controller.Tick(10);
                 Assert.That(controller.Wetness, Is.EqualTo(.1f).Within(.001f), "Without rain the film settles at dew.");
                 controller.Raining = true;
@@ -61,6 +62,28 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(controller.RainAmount, Is.Zero);
             }
             finally { Object.DestroyImmediate(go); Object.DestroyImmediate(profile); RestoreSceneDriver(); }
+        }
+
+        [Test]
+        public void Wetness_IsOffByDefaultUntilRainOrAPresetIsRequested()
+        {
+            var profile = AssetDatabase.LoadAssetAtPath<AeroWetnessProfile>(ProfilePath);
+            var controller = MakeController(out var go, profile);
+            try
+            {
+                Assert.That(controller.WetnessEnabled, Is.False, "Wetness stays off until rain is implemented.");
+                controller.Tick(30);
+                Assert.That(controller.Wetness, Is.Zero, "No dew while wetness is off.");
+                Assert.That(Shader.GetGlobalFloat(AeroWetnessController.ReadyId), Is.Zero, "Shaders skip the wet path while off.");
+                Assert.That(Shader.GetGlobalFloat(AeroWetnessController.WetnessId), Is.Zero);
+                controller.Raining = true; controller.Tick(1);
+                Assert.That(controller.Wetness, Is.GreaterThan(0), "The F3 rain toggle still previews the film.");
+                Assert.That(Shader.GetGlobalFloat(AeroWetnessController.ReadyId), Is.EqualTo(1));
+                controller.Raining = false; for (int i = 0; i < 60; i++) controller.Tick(1);
+                Assert.That(controller.Wetness, Is.Zero, "Surfaces dry fully, not back to dew.");
+                Assert.That(Shader.GetGlobalFloat(AeroWetnessController.ReadyId), Is.Zero);
+            }
+            finally { Object.DestroyImmediate(go); RestoreSceneDriver(); }
         }
 
         [Test]
@@ -88,6 +111,7 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(controller.profile, Is.EqualTo(AssetDatabase.LoadAssetAtPath<AeroWetnessProfile>(ProfilePath)));
                 Assert.That(controller.dayNight, Is.Not.Null);
                 Assert.That(controller.tower, Is.Not.Null, "Rain shelter follows the stepped tower geometry.");
+                Assert.That(controller.WetnessEnabled, Is.False, "The scene keeps wetness off until rain is implemented.");
             });
         }
 

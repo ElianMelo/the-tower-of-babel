@@ -71,6 +71,12 @@ namespace TowerOfBabel.Networking.Upgrades
                 case CheatCommand.AddProcessedStone: success = resources != null && resources.ServerCheatResource(sender, ResourceType.ProcessedStone, value); break;
                 case CheatCommand.AddSand: success = resources != null && resources.ServerCheatResource(sender, ResourceType.Sand, value); break;
                 case CheatCommand.AddGlass: success = resources != null && resources.ServerCheatResource(sender, ResourceType.Glass, value); break;
+                case CheatCommand.AddRiverEssence: success = resources != null && resources.ServerCheatResource(sender, ResourceType.RiverEssence, value); break;
+                case CheatCommand.AddRiverBlock: success = resources != null && resources.ServerCheatResource(sender, ResourceType.RiverBlock, value); break;
+                case CheatCommand.AddWaterEssence: success = resources != null && resources.ServerCheatResource(sender, ResourceType.WaterEssence, value); break;
+                case CheatCommand.AddWaterBlock: success = resources != null && resources.ServerCheatResource(sender, ResourceType.WaterBlock, value); break;
+                case CheatCommand.AddSkyEssence: success = resources != null && resources.ServerCheatResource(sender, ResourceType.SkyEssence, value); break;
+                case CheatCommand.AddSkyBlock: success = resources != null && resources.ServerCheatResource(sender, ResourceType.SkyBlock, value); break;
                 case CheatCommand.FillBag: case CheatCommand.ClearBag:
                     if (resources == null) break;
                     foreach (ResourceType type in Enum.GetValues(typeof(ResourceType))) resources.ServerCheatSetResource(sender, type, command == CheatCommand.FillBag ? resources.ServerCapacity(sender) : 0);

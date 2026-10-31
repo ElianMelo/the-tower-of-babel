@@ -4,7 +4,7 @@ namespace TowerOfBabel.Resources.Interaction
 {
     /// <summary>Bounded mesh chips, dust, stroke accents and cooldown markers; no gameplay colliders move.</summary>
     [DisallowMultipleComponent]
-    public sealed class ResourceHarvestFeedback : MonoBehaviour
+    public sealed class ResourceHarvestFeedback : MonoBehaviour, IHarvestFeedback
     {
         [SerializeField] private bool sand;
         [SerializeField] private Transform visualRoot;

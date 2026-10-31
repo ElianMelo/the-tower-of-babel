@@ -248,7 +248,7 @@ namespace TowerOfBabel.Resources.Tests
             processor.transform.position = new Vector3(0, 1000, 0); player.transform.position = processor.transform.position;
             Set(processor, "processorId", "test-glass-kiln"); Set(processor, "interactionDuration", .35f);
             Invoke(service, "RebuildNodeLookup"); Seed(ResourceType.Sand, 4); Seed(ResourceType.Glass, 0);
-            var motion = processor.GetComponent<GlassFurnaceAnimation>();
+            var motion = processor.GetComponent<ProcessorMachineAnimation>();
             Begin(); yield return WaitFor(() => ActiveCount == 1, "Glass processing did not start.");
             raycaster.CancelCurrentInteraction(); yield return WaitFor(() => ActiveCount == 0, "Glass processing did not cancel.");
             Assert.That(store.GetAmount(connection.ClientId, ResourceType.Sand), Is.EqualTo(4));
@@ -288,6 +288,59 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(feedback.IsDepleted, Is.False); Assert.That(service.GetLocalAmount(ResourceType.Sand), Is.EqualTo(2));
             }
             finally { Set(sand, "definition", original); Object.Destroy(definition); }
+        }
+
+        private static readonly (ResourceType Essence, ResourceType Block, string Machine)[] EssenceFamilies =
+        {
+            (ResourceType.RiverEssence, ResourceType.RiverBlock, "RiverMill"),
+            (ResourceType.WaterEssence, ResourceType.WaterBlock, "WaterPress"),
+            (ResourceType.SkyEssence, ResourceType.SkyBlock, "SkySpinner"),
+        };
+        private static IEnumerable<int> EssenceFamilyIndices => Enumerable.Range(0, EssenceFamilies.Length);
+
+        [UnityTest]
+        public IEnumerator HostEssence_GatherThenCondenseIntoItsBlockExactlyOnce([ValueSource(nameof(EssenceFamilyIndices))] int family)
+        {
+            var (essence, block, machine) = EssenceFamilies[family];
+            var node = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == essence);
+            var original = node.Definition; var definition = Object.Instantiate(original);
+            Set(definition, "interactionDuration", .3f); Set(definition, "respawnCooldown", .5f); Set(node, "definition", definition);
+            try
+            {
+                var feedback = node.GetComponent<EssenceHarvestFeedback>();
+                Seed(essence, 0); Seed(block, 0); player.transform.position = node.transform.position;
+                Invoke(raycaster, "SetTarget", node.GetComponent<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => Get<IDictionary>(service, "activeGathers").Count == 1, essence + " gathering did not start.");
+                raycaster.CancelCurrentInteraction();
+                yield return WaitFor(() => Get<IDictionary>(service, "activeGathers").Count == 0, essence + " gathering did not cancel.");
+                Assert.That(service.GetLocalAmount(essence), Is.Zero); Assert.That(feedback.PresentationScale, Is.EqualTo(1).Within(.001f));
+                Invoke(raycaster, "SetTarget", node.GetComponent<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => service.GetLocalAmount(essence) == 2, essence + " did not reach the wallet.");
+                Assert.That(feedback.IsDepleted, Is.True); Assert.That(feedback.CompletionCount, Is.EqualTo(1));
+                yield return WaitFor(() => node.CanInteract, essence + " did not respawn.");
+                Assert.That(feedback.IsDepleted, Is.False);
+            }
+            finally { Set(node, "definition", original); Object.Destroy(definition); }
+
+            Object.Destroy(processor.gameObject); yield return null;
+            processor = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/" + machine + ".prefab")).GetComponent<ResourceProcessor>();
+            processor.transform.position = new Vector3(0, 1000, 0); player.transform.position = processor.transform.position;
+            Set(processor, "processorId", "test-" + machine); Set(processor, "interactionDuration", .35f);
+            Invoke(service, "RebuildNodeLookup"); Seed(essence, 4); Seed(block, 0);
+            var motion = processor.GetComponent<ProcessorMachineAnimation>();
+            Begin(); yield return WaitFor(() => ActiveCount == 1, machine + " did not start.");
+            raycaster.CancelCurrentInteraction(); yield return WaitFor(() => ActiveCount == 0, machine + " did not cancel.");
+            Assert.That(store.GetAmount(connection.ClientId, essence), Is.EqualTo(4));
+            Assert.That(motion.IsOutputVisible, Is.False); Assert.That(motion.CompletionCount, Is.Zero);
+            int completed = 0; processor.ServerCompleted += () => completed++;
+            Begin(); yield return WaitFor(() => completed == 1, machine + " exchange did not complete through the host RPC flow.");
+            Assert.That(service.GetLocalAmount(essence), Is.EqualTo(2)); Assert.That(service.GetLocalAmount(block), Is.EqualTo(1));
+            Assert.That(store.GetAmount(connection.ClientId, block), Is.EqualTo(1));
+            Assert.That(motion.IsOutputVisible, Is.True); Assert.That(motion.CompletionCount, Is.EqualTo(1));
+            processor.CompleteByServer(); Assert.That(motion.CompletionCount, Is.EqualTo(1));
+            yield return new WaitForSeconds(ProcessorMachineAnimation.OutputDuration + .15f); Assert.That(motion.IsOutputVisible, Is.False);
         }
 
         [UnityTest]

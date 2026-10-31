@@ -274,7 +274,9 @@ namespace TowerOfBabel.Resources.Tests
             manager.ShowInteraction("Stone","Stone",Color.blue,"Press E",stone.InteractionResources);
             Assert.That(image.sprite,Is.EqualTo(stone.Definition.Icon)); Assert.That(image.enabled,Is.True);
             manager.ShowInteraction("Pillar",pillar.DetailText,Color.blue,pillar.PromptText,pillar.InteractionResources);
-            Assert.That(AssetDatabase.GetAssetPath(image.sprite),Does.EndWith("RefinedStone.png"));
+            // Pillars are built from water blocks; the prompt shows that material's rendered icon and readable name.
+            Assert.That(AssetDatabase.GetAssetPath(image.sprite),Does.EndWith("WaterBlock-Icon.png"));
+            Assert.That(pillar.DetailText,Does.EndWith("Water Block"));
             manager.ShowInteraction("Other","Other",Color.blue,"Press E");
             Assert.That(image.enabled,Is.False);
             Assert.That(root.transform.Find("Interaction/Visuals/ActionIcon/PickaxeIcon").gameObject.activeSelf,Is.True);

@@ -49,8 +49,7 @@ namespace TowerOfBabel.Resources.Tests
             var kiln = AssetDatabase.LoadAssetAtPath<GameObject>(KilnPath).GetComponent<ResourceProcessor>();
             Assert.That(kiln.SourceResource.ResourceType, Is.EqualTo(ResourceType.Sand)); Assert.That(kiln.SourceAmount, Is.EqualTo(2));
             Assert.That(kiln.TargetResource.ResourceType, Is.EqualTo(ResourceType.Glass)); Assert.That(kiln.TargetAmount, Is.EqualTo(1));
-            Assert.That(kiln.GetComponent<GlassFurnaceAnimation>(), Is.Not.Null);
-            Assert.That(kiln.GetComponent<ProcessorWorkAnimation>(), Is.Null);
+            Assert.That(kiln.GetComponent<ProcessorMachineAnimation>().Process, Is.EqualTo(ProcessorMachineAnimation.ProcessKind.Melt));
             var sandNode = AssetDatabase.LoadAssetAtPath<GameObject>(SandPath).GetComponent<Resource>();
             Assert.That(sandNode.NodeId, Is.Not.Zero); Assert.That(sandNode.Definition.AmountGathered, Is.EqualTo(2));
         }
@@ -81,9 +80,10 @@ namespace TowerOfBabel.Resources.Tests
             var root = UnityEngine.Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(KilnPath));
             try
             {
-                var motion = root.GetComponent<GlassFurnaceAnimation>(); var before = root.GetComponent<Collider>().bounds;
+                var motion = root.GetComponent<ProcessorMachineAnimation>(); var before = root.GetComponent<Collider>().bounds;
                 var parts = root.GetComponentsInChildren<Transform>(true);
-                var feed = parts.Single(t => t.name == "SandFeed"); var pool = parts.Single(t => t.name == "MoltenPool");
+                var feed = motion.Feed; var pool = parts.Single(t => t.name == "MeltPool");
+                motion.BeginWork();
                 motion.SampleEditorPose(.4f, .1f); Assert.That(feed.gameObject.activeSelf, Is.True); Assert.That(motion.IsOutputVisible, Is.False);
                 motion.SampleEditorPose(2.5f, .9f); Assert.That(feed.gameObject.activeSelf, Is.False); Assert.That(pool.gameObject.activeSelf, Is.True);
                 Assert.That(motion.IsOutputVisible, Is.False);

@@ -28,10 +28,10 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
-        public void GlassPrefab_UsesGlassHasEveryStageAndSameWalkingDatum()
+        public void GlassPrefab_UsesRiverBlocksHasEveryStageAndSameWalkingDatum()
         {
             var prefab=AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Buildings/GlassWaterFloor.prefab");
-            var building=prefab.GetComponent<Building>(); Assert.That(building.ResourceType,Is.EqualTo(ResourceType.Glass));
+            var building=prefab.GetComponent<Building>(); Assert.That(building.ResourceType,Is.EqualTo(ResourceType.RiverBlock));
             Assert.That(prefab.GetComponent<TowerAsset>().AssetType,Is.EqualTo(TowerAssetType.GlassWaterFloor));
             for(byte i=0;i<=10;i++) Assert.That(building.GetStageMesh(i),Is.Not.Null);
             var mesh=building.GetStageMesh(10); Assert.That(Vector3.Distance(mesh.bounds.min,new Vector3(0,-.2f,-4)),Is.LessThan(.0001f));

@@ -88,7 +88,7 @@ public static class AeroIslandAtmosphereAuthoring
             root.GetComponent<TowerAsset>().SetAssetType(TowerAssetType.GlassWaterFloor);
             root.GetComponent<Renderer>().sharedMaterial = glass;
             var data = new SerializedObject(root.GetComponent<Building>());
-            data.FindProperty("resourceType").enumValueIndex = (int)ResourceType.Glass;
+            data.FindProperty("resourceType").intValue = (int)ResourceType.RiverBlock; // see EssenceWorkshopAuthoring.BuildingCosts
             data.FindProperty("stageMeshes").GetArrayElementAtIndex(10).objectReferenceValue = completed;
             data.ApplyModifiedPropertiesWithoutUndo(); root.GetComponent<MeshCollider>().sharedMesh = completed;
             var lightRoot = new GameObject("Completed water light footprint"); lightRoot.transform.SetParent(root.transform, false);

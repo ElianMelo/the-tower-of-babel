@@ -32,7 +32,12 @@ namespace TowerOfBabel.Rendering.Tests
                 root.SetActive(true);
                 yield return null;
                 Assert.That(AeroWetnessController.Instance, Is.SameAs(controller));
+                Assert.That(controller.Wetness, Is.Zero, "Wetness is off by default until rain is implemented.");
+                Assert.That(Shader.GetGlobalFloat(AeroWetnessController.ReadyId), Is.Zero, "Shaders skip the wet path while it is off.");
+                controller.WetnessEnabled = true;
+                yield return new WaitForSeconds(.8f); // dew ramps in over rampIn (0.5 s)
                 float dew = controller.Wetness;
+                Assert.That(dew, Is.GreaterThan(0), "Once enabled, dew returns.");
                 Assert.That(dew, Is.LessThan(.5f), "Dry weather settles at a light dew.");
                 Assert.That(Shader.GetGlobalFloat(AeroWetnessController.ReadyId), Is.EqualTo(1), "Textures are bound for shaders.");
                 controller.Raining = true;

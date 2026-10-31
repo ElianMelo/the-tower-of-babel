@@ -12,7 +12,7 @@ For projected river caustics, preserve the accepted larger 90-degree footprint, 
 
 - **Glass river.** The river is now traced as [water inside glass](Lighting/RIVER_GLASS.md) (presentation 12). It has a glass lid, a rippled surface, real absorption depth, inner walls with a silver meniscus, caustics on the bed, Snell's window from below and cyan-green glass edges. The projected caustics above are unchanged.
 - **Shading library.** The [Aero shading library](Lighting/AERO_SHADING_LIBRARY.md) adds brushed-steel anisotropy, pearlescent thin film, clear "jelly" Y2K plastic, refractive glass, subsurface and back-lit leaves, and soap-film bubbles.
-- **Wetness.** A [global dew/rain wetness](Lighting/WETNESS.md) driver is ported from DYNAMIC Rain/Wetness.
+- **Wetness.** A [global dew/rain wetness](Lighting/WETNESS.md) driver is ported from DYNAMIC Rain/Wetness. It is off by default until rain is implemented.
 - **Post looks.** Three switchable [post looks](Lighting/POST_PROFILES.md): Restrained (default), Bright Aero and Y2K.
 - **Feedback round, 2026-10-29.**
   - **Accepted:** the glass river.
@@ -35,6 +35,13 @@ The [sun rays and aqua projection lamps](Lighting/SUN_RAYS_AND_PROJECTION_LAMPS.
 The [stone and processor models](Resources/RESOURCE_WORKSHOP.md) use a silvery faceted rock cluster and a rounded pearl-white/azure machine with visible steel rollers and cyan status lights. Generated textures supply the surface detail. The hopper and tray are empty at idle: raw stone enters during use, and processed stone appears only after confirmation. Keep the housing, interaction collider and resource rules fixed.
 
 The [sand and glass workshop](Resources/SAND_GLASS.md) adds a granular sand mound and a distinct round pearl/azure kiln with an amber chamber, chimney, flywheel and bellows. Gathering uses capped mesh fragments, dust, stroke accents and spatial sound. Sand shrinks in its render-only presentation; destroyed stone leaves four small bricks until respawn. Kiln output appears only after a confirmed exchange. Preserve fixed gameplay colliders and bounded particle costs. The terrain now uses the lightweight resolutions and separate editor/runtime grass budgets documented in [landscape performance](TERRAIN_LANDSCAPE.md).
+
+The [essence workshop](Resources/ESSENCE_WORKSHOP.md) and [processor family](Resources/PROCESSOR_FAMILY.md) were requested on 2026-10-31. Essence nodes were reworked the same day to follow stone and sand, and the processors to look like different machines.
+
+- **Materials:** each building consumes its own processed material. Steps use glass, the water floor uses River Blocks, pillars use Water Blocks, floor tiles use processed stone and arches use Sky Blocks.
+- **Resource nodes:** natural and grounded, like the stone cluster and sand mound. The river essence is a pebble-ringed spring pool, the water essence a clump of water bubbles on moss, and the sky essence a fallen cloud on glowing crystals. Gathering shrinks the essence onto the ground like the sand pile; the base stays during cooldown. Pedestals and floating machine-like nodes are superseded.
+- **Processors:** each base is built from its material and presents its output its own way (quarry block and chute, brick hearth and cooling rack, riverbed and flume, hydraulic platform and catch basin, cloud cushion and hovering plate). The input visibly travels from the player's side into the machine. Each base carries a distinct machine: a gantry hammer and rollers (crush), a dome kiln with bellows and a chimney (melt), a water-wheel mill (mill), a tall hydraulic press (press) and a rotor-and-fan spinner (spin). Identical glass-chamber condensers and a shared plinth/tray base are superseded.
+- **Constraints:** colliders stay fixed, and effects stay capped and idle-silent. The finished material appears only after the server confirms the exchange.
 
 The [Bubble Tube pillar](Buildings/BUBBLE_TUBE_PILLAR.md) was accepted by the user on 2026-10-30 as the initial version of the new pillar. It replaces the white continuous support.
 

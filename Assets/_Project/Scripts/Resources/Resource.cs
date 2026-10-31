@@ -20,8 +20,17 @@ namespace TowerOfBabel.Resources
 
         private AeroInteractionMotion interactionMotion;
         private bool isCoolingDown;
-        private ResourceHarvestFeedback harvestFeedback;
-        private ResourceHarvestFeedback Feedback => harvestFeedback != null ? harvestFeedback : harvestFeedback = GetComponent<ResourceHarvestFeedback>();
+        private IHarvestFeedback harvestFeedback;
+        private IHarvestFeedback Feedback
+        {
+            get
+            {
+                // Unity-null check: a destroyed component must not be reused through the interface.
+                if (harvestFeedback is UnityEngine.Object alive && alive != null) return harvestFeedback;
+                harvestFeedback = GetComponent<IHarvestFeedback>();
+                return harvestFeedback is UnityEngine.Object found && found != null ? harvestFeedback : null;
+            }
+        }
 
         public string ObjectName => gameObject.name;
         public bool UsesGatheringAnimation => true;

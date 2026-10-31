@@ -2,6 +2,8 @@
 
 Added 2026-10-29. This is experimental until the user accepts it. Wetness is visual only and local to each client; nothing is networked.
 
+**Off by default (2026-10-31).** Wetness stays off until rain is implemented. While `WetnessEnabled` is off, there is no dew, and `_AeroWetReady` stays 0, so shaders skip the wet path entirely. The F3 **Rain** toggle and **Wetness preset** still preview the film. Afterwards the surfaces dry completely, not back to dew. Turn it on with the controller's **Wetness Enabled** field (or `WetnessEnabled = true`) once rain ships.
+
 ## Driver
 
 `Scripts/Rendering/AeroWetnessController.cs` sits on *Aero island atmosphere* in `Scenes/Tower.unity`, next to the day/night cycle and tower atmosphere. It publishes:

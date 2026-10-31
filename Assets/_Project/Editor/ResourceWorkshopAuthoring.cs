@@ -12,7 +12,7 @@ public static class ResourceWorkshopAuthoring
     public const string ProcessorPrefab="Assets/_Project/Prefabs/Processor/StoneProcessor.prefab";
     private static readonly string[] Kinds={"Ceramic","BlueMetal","Steel","Glow","Stone","Refined"};
 
-    [MenuItem("Tower of Babel/Resources/Apply textured stone and processor")]
+    [MenuItem("Tower of Babel/Resources/Apply textured stone")]
     public static void Apply()
     {
         if (Application.dataPath.Replace('\\','/')!="D:/PersonalProjects/the-tower-of-babel/Assets" || EditorApplication.isPlayingOrWillChangePlaymode)
@@ -48,7 +48,7 @@ public static class ResourceWorkshopAuthoring
             }
             EditorUtility.SetDirty(material); materials[i]=material;
         }
-        foreach (string name in new[]{"StoneCluster","StoneProcessor"})
+        foreach (string name in new[]{"StoneCluster"})
         {
             var importer=(ModelImporter)AssetImporter.GetAtPath(Root+name+".fbx");
             importer.globalScale=1; importer.useFileScale=true; importer.bakeAxisConversion=true; importer.importAnimation=false;
@@ -59,7 +59,7 @@ public static class ResourceWorkshopAuthoring
                 importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material),"Resource_"+Kinds[i]),materials[i]);
             importer.SaveAndReimport();
         }
-        string stoneGuid=AssetDatabase.AssetPathToGUID(StonePrefab), processorGuid=AssetDatabase.AssetPathToGUID(ProcessorPrefab);
+        string stoneGuid=AssetDatabase.AssetPathToGUID(StonePrefab);
         var stone=PrefabUtility.LoadPrefabContents(StonePrefab);
         try
         {
@@ -72,45 +72,12 @@ public static class ResourceWorkshopAuthoring
             PrefabUtility.SaveAsPrefabAsset(stone,StonePrefab);
         }
         finally { PrefabUtility.UnloadPrefabContents(stone); }
-        var processor=PrefabUtility.LoadPrefabContents(ProcessorPrefab);
-        try
-        {
-            var visuals=processor.transform.Find("Visuals");
-            var oldRenderer=visuals.GetComponent<MeshRenderer>(); if (oldRenderer!=null) UnityEngine.Object.DestroyImmediate(oldRenderer);
-            var oldFilter=visuals.GetComponent<MeshFilter>(); if (oldFilter!=null) UnityEngine.Object.DestroyImmediate(oldFilter);
-            for (int i=visuals.childCount-1; i>=0; i--) UnityEngine.Object.DestroyImmediate(visuals.GetChild(i).gameObject);
-            visuals.localScale=Vector3.one; visuals.localPosition=Vector3.zero;
-            var model=(GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>(Root+"StoneProcessor.fbx"),visuals);
-            model.name="ProcessorModel"; model.transform.localPosition=Vector3.zero;
-            var bounds=new Bounds(); bool first=true;
-            foreach (var filter in model.GetComponentsInChildren<MeshFilter>())
-            {
-                var b=filter.sharedMesh.bounds;
-                for (int x=0; x<2; x++) for (int y=0; y<2; y++) for (int z=0; z<2; z++)
-                {
-                    var point=visuals.InverseTransformPoint(filter.transform.TransformPoint(new Vector3(x==0?b.min.x:b.max.x,y==0?b.min.y:b.max.y,z==0?b.min.z:b.max.z)));
-                    if (first) {bounds=new Bounds(point,Vector3.zero); first=false;} else bounds.Encapsulate(point);
-                }
-            }
-            var collider=visuals.GetComponent<BoxCollider>(); collider.center=bounds.center; collider.size=bounds.size;
-            visuals.localPosition=new Vector3(0,.02f-processor.transform.position.y-bounds.min.y,0);
-            var animation=processor.GetComponent<ProcessorWorkAnimation>() ?? processor.AddComponent<ProcessorWorkAnimation>();
-            var serialized=new SerializedObject(animation);
-            foreach (var pair in new[]{("leftRoller","RollerLeft"),("rightRoller","RollerRight"),("pressHead","PressHead"),("feedStone","FeedStone"),("outputStone","OutputStone")})
-                serialized.FindProperty(pair.Item1).objectReferenceValue=model.GetComponentsInChildren<Transform>().Single(t=>t.name==pair.Item2);
-            var lights=serialized.FindProperty("statusLights"); lights.arraySize=3;
-            for (int i=0; i<3; i++) lights.GetArrayElementAtIndex(i).objectReferenceValue=model.GetComponentsInChildren<Renderer>().Single(r=>r.name=="StatusLight_"+i);
-            serialized.ApplyModifiedPropertiesWithoutUndo();
-            model.GetComponentsInChildren<Transform>(true).Single(t=>t.name=="FeedStone").gameObject.SetActive(false);
-            model.GetComponentsInChildren<Transform>(true).Single(t=>t.name=="OutputStone").gameObject.SetActive(false);
-            PrefabUtility.SaveAsPrefabAsset(processor,ProcessorPrefab);
-        }
-        finally { PrefabUtility.UnloadPrefabContents(processor); }
+        // The stone processor is built by ProcessorFamilyAuthoring with the rest of the processor family.
         AssetDatabase.SaveAssets();
         var report=new
         {
-            stoneGuidPreserved=stoneGuid==AssetDatabase.AssetPathToGUID(StonePrefab),processorGuidPreserved=processorGuid==AssetDatabase.AssetPathToGUID(ProcessorPrefab),
-            assets=new[]{StonePrefab,ProcessorPrefab}.Select(p=>
+            stoneGuidPreserved=stoneGuid==AssetDatabase.AssetPathToGUID(StonePrefab),
+            assets=new[]{StonePrefab}.Select(p=>
             {
                 var go=AssetDatabase.LoadAssetAtPath<GameObject>(p);
                 return new {prefab=p,rootPosition=go.transform.position.ToString(),rootScale=go.transform.localScale.ToString(),

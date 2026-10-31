@@ -1,5 +1,9 @@
 # Sand, glass and gathering feedback
 
+> **Superseded kiln (2026-10-31):** the glass kiln below has been replaced by the dome kiln of the [processor family](PROCESSOR_FAMILY.md). `SandGlassWorkshopAuthoring` now only builds the sand node. The kiln notes below are historical.
+
+The later [essence workshop](ESSENCE_WORKSHOP.md) adds river, water and sky chains. It also makes glass the stair step material.
+
 The Tower scene has a sand pile beside the existing stone station and a new round glass kiln. Gather with the usual **E** action: one sand interaction grants **2 sand**, takes **2.6 seconds** before upgrades, and respawns after **6 seconds**. The kiln converts **2 sand into 1 glass** over **3.5 seconds**. Inventory rows, interaction costs/rewards, profession upgrades, XP and bag capacity use the existing server-authoritative resource flow. F3 Inventory includes **Gain sand** and **Gain glass**; instant processing accepts the kiln recipe too.
 
 ## Models and placement
