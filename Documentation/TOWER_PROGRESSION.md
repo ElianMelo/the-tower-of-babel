@@ -4,7 +4,7 @@ Construction is shared across players. Only the lowest unfinished floor can be b
 
 ## Structure and detail phases
 
-Each floor is built in two phases. **Structure** is the floor tiles, stairs, pillars and arches. **Detail** sits on top of the structure to make it denser. The detail is buildable climbing vines (`TowerAssetType.Vine`, `VineDraped` and `VineDense`), which replaced the first placeholder detail bushes on 2026-10-31.
+Each floor is built in two phases. **Structure** is the floor tiles, stairs, pillars and arches. **Detail** sits on top of the structure to make it denser. The detail is buildable vines, which replaced the first placeholder detail bushes on 2026-10-31. There are twelve shapes (`TowerAssetType.Vine0`–`Vine11`): some climb from the pillar onto the arches, some stay on the pillar, and some cover only the arch. The outside and inside face of each pillar are separate building blocks.
 
 - Detail is hidden and cannot be built until every structure asset on that floor reaches stage 10. Completing the structure releases it immediately, near and distant, and refreshes interaction prompts.
 - The floor counts as complete, and the next floor unlocks, only after the detail also reaches stage 10.
@@ -27,7 +27,7 @@ Exterior bushes appear only after their own floor is fully built: every construc
 
 ## Verification
 
-Detail vines (2026-10-31): `DetailPhaseEditModeTests` (10), `VineGrowthEditModeTests` (5) and `GrassWorkshopEditModeTests` (6) all pass. The project's EditMode assembly runs 219 of 229 green; the 10 failures are the same pre-existing ones listed below.
+Detail vines (revised 2026-11-01): `DetailPhaseEditModeTests` (11), `VineGrowthEditModeTests` (7) and `GrassWorkshopEditModeTests` (6) all pass. The project's EditMode assembly runs 222 of 232 green; the 10 failures are the same pre-existing ones listed below.
 
 
 Detail phase (2026-10-31): all 9 new `DetailPhaseEditModeTests` passed. The project's EditMode assembly ran 207 of 217 green, and the progression (5/5) and cheat-menu (9/9) PlayMode suites passed. The 10 EditMode failures and the `GlassWaterFloorPlayModeTests.ChunkProjection` failure also fail with these changes removed: the font glyph, resource cancel, floor-tile collider, saved-island asset count and river-glass light intensity checks.

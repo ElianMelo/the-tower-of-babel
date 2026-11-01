@@ -11,6 +11,10 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
         _SubsurfaceWrap("Scatter wrap",Range(0,1))=.45
         _TranslucencyColor("Back-lit color",Color)=(.9,1,.48,1)
         _TranslucencyStrength("Back-lit strength",Range(0,4))=1.1
+        _DistanceLift("Light green at distance",Range(0,1))=.85
+        _DistanceGlow("Soft glow at distance",Range(0,1))=.55
+        _DistanceLiftStart("Lift starts (m)",Float)=12
+        _DistanceLiftRange("Lift reaches full over (m)",Float)=45
         [Toggle(_AERO_WETNESS)] _WetnessOn("Dew and rain",Float)=0
         _WetExposure("Weather exposure",Range(0,1))=1
     }
@@ -22,8 +26,8 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
         #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
         CBUFFER_START(UnityPerMaterial)
             half4 _BaseColor,_SubsurfaceColor,_TranslucencyColor;
-            half _Smoothness,_SubsurfaceWrap,_TranslucencyStrength,_WetnessOn,_WetExposure;
-            float _WindStrength,_WindSpeed,_WindTime;
+            half _Smoothness,_SubsurfaceWrap,_TranslucencyStrength,_WetnessOn,_WetExposure,_DistanceLift,_DistanceGlow;
+            float _WindStrength,_WindSpeed,_WindTime,_DistanceLiftStart,_DistanceLiftRange;
         CBUFFER_END
         struct Attributes
         {
@@ -71,6 +75,14 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
         #include "Aero/AeroWetness.hlsl"
         #include "Aero/AeroSubsurface.hlsl"
         #include "Aero/AeroTranslucency.hlsl"
+        // Distant instanced pages carry no light-probe SH when the scene has no probes, which left far vines
+        // lit by the sun alone and read dark green. Fall back to the scene's trilight ambient instead.
+        half3 VineAmbient(half3 n)
+        {
+            half3 sh=SampleSH(n);
+            if(max(sh.r,max(sh.g,sh.b))>.0001h) return sh;
+            return n.y>0 ? lerp(unity_AmbientEquator.rgb,unity_AmbientSky.rgb,n.y) : lerp(unity_AmbientEquator.rgb,unity_AmbientGround.rgb,-n.y);
+        }
         // Leaves: wrapped lime terminator plus sunlight shining through thin blades.
         half3 LeafLight(Light light,half3 n,half3 v,half3 albedo)
         {
@@ -87,6 +99,11 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             UNITY_SETUP_INSTANCE_ID(input);
             InputData data=(InputData)0;
             half3 albedo=input.color.rgb;
+            // From afar, thin stems and shaded leaf sides blend into a dark mass. Lift the colour toward a bright,
+            // airy light green with distance so the tower reads as covered in fresh growth.
+            float distance=length(GetCameraPositionWS()-input.positionWS);
+            half lift=saturate((distance-_DistanceLiftStart)/max(_DistanceLiftRange,1))*_DistanceLift;
+            albedo=lerp(albedo,saturate(albedo*1.3+half3(.16,.24,.07)),lift);
             half smoothness=_Smoothness;
             half3 n=normalize(input.normalWS);
             // Double-sided leaves: light the side facing the camera. Works for mirrored instances too.
@@ -99,7 +116,7 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             data.positionWS=input.positionWS; data.normalWS=n;
             data.viewDirectionWS=GetWorldSpaceNormalizeViewDir(input.positionWS);
             data.shadowCoord=TransformWorldToShadowCoord(input.positionWS);
-            data.bakedGI=SampleSH(data.normalWS); data.shadowMask=half4(1,1,1,1);
+            data.bakedGI=VineAmbient(data.normalWS); data.shadowMask=half4(1,1,1,1);
             data.normalizedScreenSpaceUV=GetNormalizedScreenSpaceUV(input.positionCS);
             data.vertexLighting=VertexLighting(input.positionWS,data.normalWS);
             SurfaceData surface=(SurfaceData)0;
@@ -115,7 +132,9 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
                     color.rgb+=LeafLight(GetAdditionalLight(lightIndex,input.positionWS,half4(1,1,1,1)),n,data.viewDirectionWS,albedo);
             #endif
             // Sky light filtering through the canopy from behind.
-            color.rgb+=SampleSH(-n)*albedo*_TranslucencyColor.rgb*_TranslucencyStrength*.12;
+            color.rgb+=VineAmbient(-n)*albedo*_TranslucencyColor.rgb*_TranslucencyStrength*.12;
+            // A little self-light at distance keeps far foliage airy even under a dim ambient.
+            color.rgb+=albedo*lift*_DistanceGlow;
             color.rgb=MixFog(color.rgb,input.fog);
             return color;
         }

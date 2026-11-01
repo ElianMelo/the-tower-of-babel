@@ -77,6 +77,32 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
+        public void PillarOnly_StaysOnThePillarBelowTheArch()
+        {
+            var style = Style(drape: 0); style.maxHeight = 3.85f; style.spreadHeight = 99; style.stems = 3;
+            var vine = VineGrowthBuilder.Grow(style, Facade);
+            Assert.That(vine.PillarOnly, Is.True); Assert.That(vine.ArchOnly, Is.False);
+            var mesh = vine.BuildStage(10);
+            Assert.That(mesh.bounds.max.y, Is.LessThan(4.05f));
+            Assert.That(mesh.bounds.max.y, Is.GreaterThan(3f), "It still climbs most of the pillar.");
+            Assert.That(mesh.vertices.All(v => Mathf.Abs(v.x) < .75f), Is.True);
+        }
+
+        [Test]
+        public void ArchOnly_RootsOnTheSpandrelAndNeverTouchesThePillar()
+        {
+            var style = Style(drape: 1); style.rootHeight = 4.2f; style.spreadHeight = 4.1f; style.spread = 2;
+            var vine = VineGrowthBuilder.Grow(style, Facade);
+            Assert.That(vine.ArchOnly, Is.True);
+            var sprout = vine.BuildStage(0);
+            Assert.That(sprout.vertexCount, Is.GreaterThan(0));
+            Assert.That(sprout.bounds.min.y, Is.GreaterThan(3.8f), "Stage 0 sprouts on the arch.");
+            var grown = vine.BuildStage(10);
+            Assert.That(grown.vertices.Any(v => Mathf.Abs(v.x) < .25f && v.y < 3.6f), Is.False, "Nothing grows on the pillar face.");
+            Assert.That(grown.vertices.Max(v => Mathf.Abs(v.x)), Is.GreaterThan(1f), "It spreads along the arch.");
+        }
+
+        [Test]
         public void LeavesFlutterButStemsStayStill()
         {
             var mesh = VineGrowthBuilder.Grow(Style(), Facade).BuildStage(10);

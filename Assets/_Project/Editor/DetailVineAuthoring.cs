@@ -31,15 +31,52 @@ public static class DetailVineAuthoring
         public string MeshPath => MeshFolder + "DetailVine_" + Name + ".asset";
     }
 
-    public static readonly Variant[] Variants =
+    public static readonly Variant[] Variants = Enumerable.Range(0, TowerAssetTypeExtensions.DetailCount)
+        .Select(i => new Variant { Name = i.ToString(), Type = TowerAssetTypeExtensions.DetailTypes[i], Style = RandomStyle(i) }).ToArray();
+
+    /// <summary>
+    /// Shapes cycle through four archetypes (climbing, draped, dense, sparse) so the set always covers them, and every
+    /// other setting is randomized per shape, so no two vines on the tower grow alike.
+    /// </summary>
+    public enum Archetype { Climbing, Draped, Dense, Sparse, PillarOnly, ArchOnly }
+    public static Archetype ArchetypeOf(int index) => (Archetype)(index % 6);
+
+    public static VineGrowthBuilder.Style RandomStyle(int index)
     {
-        new() { Name = "Climbing", Type = TowerAssetType.Vine, Style = new VineGrowthBuilder.Style
-            { seed = 1101, stems = 2, spreadHeight = 3.7f, spread = 1.6f, shortStems = .2f, drape = .35f, density = 1, leafSize = .18f, redChance = .02f, maxHeight = 5.85f } },
-        new() { Name = "Draped", Type = TowerAssetType.VineDraped, Style = new VineGrowthBuilder.Style
-            { seed = 2203, stems = 2, spreadHeight = 3.8f, spread = 2.1f, shortStems = .1f, drape = 1, density = .9f, leafSize = .17f, redChance = .01f, maxHeight = 5.85f } },
-        new() { Name = "Dense", Type = TowerAssetType.VineDense, Style = new VineGrowthBuilder.Style
-            { seed = 3307, stems = 3, spreadHeight = 3.5f, spread = .9f, shortStems = .45f, drape = .2f, density = 1.1f, leafSize = .19f, redChance = .06f, maxHeight = 5.85f } },
-    };
+        var r = new System.Random(9001 + index * 131);
+        float R(float a, float b) => Mathf.Lerp(a, b, (float)r.NextDouble());
+        var kind = ArchetypeOf(index);
+        var style = new VineGrowthBuilder.Style
+        {
+            seed = 1100 + index * 977,
+            stems = kind == Archetype.Dense ? 3 : 1 + r.Next(3),
+            spreadHeight = R(3.3f, 4f),
+            // Wide reach: the facade includes the neighbouring bays, so stems can run past the next pillar.
+            spread = kind switch { Archetype.Draped => R(2.4f, 3.4f), Archetype.Dense => R(1.4f, 2.2f), Archetype.Sparse => R(1f, 1.8f), _ => R(1.8f, 3f) },
+            shortStems = kind == Archetype.Dense ? R(.35f, .6f) : R(0, .3f),
+            drape = kind == Archetype.Draped ? R(.8f, 1) : R(0, .45f),
+            density = kind == Archetype.Dense ? R(1f, 1.15f) : kind == Archetype.Sparse ? R(.75f, .9f) : R(.9f, 1.1f),
+            leafSize = R(.16f, .2f),
+            redChance = R(0, .05f),
+            maxHeight = 5.85f,
+            wander = R(.25f, .6f),
+            sideBias = R(.5f, .85f),
+            spreadJitter = R(.2f, .6f)
+        };
+        if (kind == Archetype.PillarOnly)
+        {
+            // Climbs the pillar and stops under the capital; never reaches the arch.
+            style.stems = 2 + r.Next(3); style.maxHeight = 3.85f; style.spreadHeight = 99; style.drape = 0;
+            style.shortStems = R(.2f, .5f); style.density = R(1.05f, 1.25f);
+        }
+        else if (kind == Archetype.ArchOnly)
+        {
+            // Roots on the spandrel above the capital and only covers the arch, with strands hanging into the opening.
+            style.stems = 2 + r.Next(2); style.rootHeight = R(4.15f, 4.4f); style.spreadHeight = style.rootHeight - .1f;
+            style.spread = R(1.8f, 3.2f); style.drape = R(.5f, 1);
+        }
+        return style;
+    }
 
     [MenuItem("Tower of Babel/Construction/Grow detail vines and place them on pillars")]
     public static void ApplyMenu() => Apply();
@@ -63,12 +100,12 @@ public static class DetailVineAuthoring
             for (int i = 0; i < Variants.Length; i++)
             {
                 var variant = Variants[i];
-                var builder = VineGrowthBuilder.Grow(variant.Style, facade.Sample);
+                var builder = GrowWithinBudget(variant, facade);
                 var stages = SaveStages(variant, builder);
                 var prefab = CreatePrefab(variant, stages, material);
                 generator.detailVineObjects[i] = prefab;
                 manager.AssetPrefabs.SetPrefab(variant.Type, prefab);
-                built[i] = new { variant.Name, builder.StrandCount, builder.LeafCount, builder.HangingStrandCount,
+                built[i] = new { variant.Name, archetype = ArchetypeOf(i).ToString(), builder.StrandCount, builder.LeafCount, builder.HangingStrandCount,
                     length = Math.Round(builder.TotalLength, 2), triangles = stages[10].triangles.Length / 3, sproutTriangles = stages[0].triangles.Length / 3,
                     bounds = stages[10].bounds.ToString("F2") };
             }
@@ -94,6 +131,27 @@ public static class DetailVineAuthoring
         };
     }
 
+    /// <summary>Thousands of vines are drawn at once, so each shape stays near this many triangles when fully grown.</summary>
+    public const int TriangleBudget = 6000;
+
+    // Wide-spreading shapes collect many leaves; thin their leaves and branches until the grown vine fits the budget.
+    private static VineGrowthBuilder GrowWithinBudget(Variant variant, Facade facade)
+    {
+        var style = variant.Style;
+        var builder = VineGrowthBuilder.Grow(style, facade.Sample);
+        for (int attempt = 0; attempt < 4; attempt++)
+        {
+            var grown = builder.BuildStage(10);
+            int triangles = grown.triangles.Length / 3;
+            UnityEngine.Object.DestroyImmediate(grown);
+            if (triangles <= TriangleBudget) break;
+            style.density *= Mathf.Clamp((float)TriangleBudget / triangles, .55f, .92f);
+            style.leafSize *= 1.05f;
+            builder = VineGrowthBuilder.Grow(style, facade.Sample);
+        }
+        return builder;
+    }
+
     /// <summary>Front surface of a pillar with the two arches springing from it, built from the real meshes.</summary>
     public sealed class Facade : IDisposable
     {
@@ -106,11 +164,14 @@ public static class DetailVineAuthoring
             physics = scene.GetPhysicsScene();
             var bays = generator.RingLayout(0).Take(2).ToArray();
             float chord = Vector3.Distance(bays[0].Pillar, bays[1].Pillar);
-            Collider(generator.pillarObject, Vector3.zero, generator.pillarObject.transform.localScale);
             Vector3 archScale = generator.archObject.transform.localScale; archScale.x *= bays[0].ArchScale;
-            // In vine space the arch to the next pillar runs along +X and the one from the previous pillar ends here.
-            Collider(generator.archObject, new Vector3(0, generator.yOffset, 0), archScale);
-            Collider(generator.archObject, new Vector3(-chord, generator.yOffset, 0), archScale);
+            // In vine space the arch to the next pillar runs along +X. Two bays each way let stems run past the
+            // neighbouring pillars.
+            for (int bay = -2; bay <= 2; bay++)
+            {
+                if (Mathf.Abs(bay) < 2) Collider(generator.pillarObject, new Vector3(bay * chord, 0, 0), generator.pillarObject.transform.localScale);
+                if (bay < 2) Collider(generator.archObject, new Vector3(bay * chord, generator.yOffset, 0), archScale);
+            }
             physics.Simulate(0);
         }
 
@@ -144,6 +205,8 @@ public static class DetailVineAuthoring
         material.SetColor("_BaseColor", Color.white);
         material.SetColor("_SubsurfaceColor", new Color(.72f, 1, .38f));
         material.SetColor("_TranslucencyColor", new Color(.85f, 1, .45f));
+        // Far foliage reads light green: lift toward lime and add a soft glow with distance.
+        material.SetFloat("_DistanceLift", .85f); material.SetFloat("_DistanceGlow", .55f);
         EditorUtility.SetDirty(material);
         return material;
     }
@@ -182,9 +245,19 @@ public static class DetailVineAuthoring
         {
             root.GetComponent<MeshFilter>().sharedMesh = stages[0];
             root.GetComponent<MeshRenderer>().sharedMaterial = material;
-            // Covers the vine on the pillar face only, so the arch opening stays walkable.
             var collider = root.AddComponent<BoxCollider>();
-            collider.center = new Vector3(0, 1.95f, .5f); collider.size = new Vector3(.95f, 3.9f, .3f);
+            Bounds grown = stages[10].bounds;
+            if (grown.min.y < 3.5f)
+            {
+                // Covers the vine on the pillar face only, so the arch opening and the stair ramp stay walkable.
+                float top = Mathf.Min(3.9f, grown.max.y);
+                collider.center = new Vector3(0, top * .5f, .49f); collider.size = new Vector3(.9f, top, .18f);
+            }
+            else
+            {
+                // Arch-only vines sit well above head height, so the box can cover the whole vine on the arch face.
+                collider.center = new Vector3(grown.center.x, grown.center.y, .32f); collider.size = new Vector3(grown.size.x, grown.size.y, .2f);
+            }
             root.AddComponent<TowerAsset>().SetAssetType(variant.Type);
             var outline = root.AddComponent<TowerOfBabel.Outline>();
             var outlineData = new SerializedObject(outline);
@@ -207,16 +280,113 @@ public static class DetailVineAuthoring
         finally { UnityEngine.Object.DestroyImmediate(root); }
     }
 
-    // The detail bush was the placeholder detail; vines replace it.
+    // The placeholder bush and the first three named vine shapes are superseded by the numbered shapes.
     private static void RemoveBushAssets()
     {
-        foreach (string path in new[] { PrefabFolder + "Detail_Bush.prefab", MeshFolder + "DetailBushStages.asset" })
+        var stale = new[] { "Detail_Bush.prefab", "Detail_Vine_Climbing.prefab", "Detail_Vine_Draped.prefab", "Detail_Vine_Dense.prefab" }.Select(n => PrefabFolder + n)
+            .Concat(new[] { "DetailBushStages.asset", "DetailVine_Climbing.asset", "DetailVine_Draped.asset", "DetailVine_Dense.asset" }.Select(n => MeshFolder + n));
+        foreach (string path in stale)
             if (AssetDatabase.LoadMainAssetAtPath(path) != null) AssetDatabase.DeleteAsset(path);
+    }
+
+    /// <summary>
+    /// Rebuilds a real section of the cached tower (pillars, arches, stairs and finished vines) around one pillar and
+    /// renders it from outside and inside. The vines on the right are also drawn the way the distant renderer draws
+    /// them (instanced, no light probes), to compare their colour with the near view.
+    /// </summary>
+    public static string CaptureTower(int floor = 4, float angleDegrees = 20)
+    {
+        WarmShaders();
+        var generator = UnityEngine.Object.FindFirstObjectByType<TowerGenerator>(FindObjectsInactive.Include);
+        var manager = UnityEngine.Object.FindFirstObjectByType<ChunkManager>(FindObjectsInactive.Include);
+        Directory.CreateDirectory(PreviewFolder);
+        var all = manager.CachedChunks.SelectMany(c => c.Assets).ToArray();
+        Vector2 c = generator.center;
+        float a = angleDegrees * Mathf.Deg2Rad;
+        float bottom = floor * generator.heighIncrease;
+        var pillar = all.Where(p => p.AssetType == TowerAssetType.Pillar && Mathf.Abs(p.Position.y - bottom) < .1f)
+            .OrderBy(p => Vector2.Distance(new Vector2(p.Position.x, p.Position.z) - c, new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 200)).First();
+        Vector3 focus = pillar.Position;
+        Vector3 outward = new Vector3(focus.x - c.x, 0, focus.z - c.y).normalized, side = Vector3.Cross(Vector3.up, outward);
+        var preview = EditorSceneManager.NewPreviewScene();
+        bool async = ShaderUtil.allowAsyncCompilation; ShaderUtil.allowAsyncCompilation = false;
+        try
+        {
+            void Add(Mesh mesh, Material material, Matrix4x4 matrix)
+            {
+                var go = new GameObject(mesh.name, typeof(MeshFilter), typeof(MeshRenderer)); SceneManager.MoveGameObjectToScene(go, preview);
+                go.transform.SetPositionAndRotation(matrix.GetColumn(3), matrix.rotation); go.transform.localScale = matrix.lossyScale;
+                go.GetComponent<MeshFilter>().sharedMesh = mesh; go.GetComponent<MeshRenderer>().sharedMaterial = material;
+                // Light near and far copies with the same ambient probe, so only the draw path differs.
+                var renderer = go.GetComponent<MeshRenderer>();
+                renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.CustomProvided;
+                var block = new MaterialPropertyBlock();
+                block.CopySHCoefficientArraysFrom(new[] { RenderSettings.ambientProbe });
+                renderer.SetPropertyBlock(block);
+            }
+            var near = all.Where(p => (p.Position - focus).sqrMagnitude < 14 * 14 && p.Position.y > bottom - 7 && p.Position.y < bottom + 7 && !p.AssetType.IsFloor()).ToArray();
+            foreach (var asset in near)
+            {
+                var prefab = manager.AssetPrefabs.GetPrefab(asset.AssetType);
+                if (prefab == null) continue;
+                var mesh = prefab.GetComponent<Building>().GetStageMesh(10);
+                Add(mesh, prefab.GetComponent<MeshRenderer>().sharedMaterial, asset.ObjectToWorld);
+            }
+            var deck = GameObject.CreatePrimitive(PrimitiveType.Cube); SceneManager.MoveGameObjectToScene(deck, preview);
+            deck.transform.position = focus + Vector3.up * .25f - outward * 3; deck.transform.rotation = Quaternion.LookRotation(outward);
+            deck.transform.localScale = new Vector3(30, .1f, 9);
+            deck.GetComponent<Renderer>().sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(ResourceStationKit.Models + "Materials/Workshop_Pearl.mat");
+            var sun = new GameObject("Sun"); SceneManager.MoveGameObjectToScene(sun, preview);
+            var light = sun.AddComponent<Light>(); light.type = LightType.Directional; light.intensity = 1.3f; light.shadows = LightShadows.Soft;
+            sun.transform.rotation = Quaternion.LookRotation(-outward * .6f + Vector3.down + side * .4f);
+            var camGo = new GameObject("Camera"); SceneManager.MoveGameObjectToScene(camGo, preview);
+            var camera = camGo.AddComponent<Camera>(); camera.scene = preview; camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(.62f, .8f, .97f); camera.fieldOfView = 50;
+            // Far-renderer path: the same vines drawn instanced with no probes, beside the near ones.
+            var farVines = near.Where(v => v.AssetType.IsDetail()).ToArray();
+            string Shot(string name, Vector3 eye, Vector3 look)
+            {
+                camera.transform.position = eye; camera.transform.LookAt(look);
+                foreach (var group in farVines.GroupBy(v => v.AssetType))
+                {
+                    var prefab = manager.AssetPrefabs.GetPrefab(group.Key);
+                    var matrices = group.Select(v => Matrix4x4.Translate(side * 30) * v.ObjectToWorld).ToArray();
+                    // Same lighting as the distant renderer: no baked probes, so the scene's ambient probe is provided.
+                    var rp = new RenderParams(prefab.GetComponent<MeshRenderer>().sharedMaterial)
+                        { camera = camera, lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.CustomProvided,
+                          matProps = InstancedFarChunkRenderer.AmbientProbeProperties(), worldBounds = new Bounds(focus + side * 30, Vector3.one * 60) };
+                    Graphics.RenderMeshInstanced(rp, prefab.GetComponent<Building>().GetStageMesh(10), 0, matrices);
+                }
+                var rt = new RenderTexture(1600, 900, 24) { antiAliasing = 4 }; var old = RenderTexture.active;
+                try
+                {
+                    camera.targetTexture = rt; camera.Render(); RenderTexture.active = rt;
+                    var texture = new Texture2D(1600, 900, TextureFormat.RGB24, false); texture.ReadPixels(new Rect(0, 0, 1600, 900), 0, 0); texture.Apply();
+                    string path = PreviewFolder + name + ".png"; File.WriteAllBytes(path, texture.EncodeToPNG()); UnityEngine.Object.DestroyImmediate(texture);
+                    return path;
+                }
+                finally { camera.targetTexture = null; RenderTexture.active = old; UnityEngine.Object.DestroyImmediate(rt); }
+            }
+            string outside = Shot("Tower-Outside", focus + outward * 9 + Vector3.up * 3, focus + Vector3.up * 3);
+            string inside = Shot("Tower-Inside", focus - outward * 6 + Vector3.up * 2.4f, focus + Vector3.up * 3);
+            string far = Shot("Tower-Far-Compare", focus + outward * 34 + side * 15 + Vector3.up * 6, focus + side * 15 + Vector3.up * 3);
+            return string.Join("\n", outside, inside, far) + $"\nvines near pillar: {farVines.Length}";
+        }
+        finally { ShaderUtil.allowAsyncCompilation = async; EditorSceneManager.ClosePreviewScene(preview); }
+    }
+
+    // Offscreen preview renders draw nothing, or a stale variant, for passes still compiling; compile them first.
+    private static void WarmShaders()
+    {
+        var material = AssetDatabase.LoadAssetAtPath<Material>(MaterialPath);
+        if (material == null) return;
+        for (int i = 0; i < material.passCount; i++) ShaderUtil.CompilePass(material, i, true);
     }
 
     /// <summary>Review stills of every variant and the growth stages on a pillar and its arches.</summary>
     public static string Capture()
     {
+        WarmShaders();
         var generator = UnityEngine.Object.FindFirstObjectByType<TowerGenerator>(FindObjectsInactive.Include);
         Directory.CreateDirectory(PreviewFolder);
         var preview = EditorSceneManager.NewPreviewScene();
@@ -263,12 +433,12 @@ public static class DetailVineAuthoring
                 finally { ShaderUtil.allowAsyncCompilation = async; camera.targetTexture = null; RenderTexture.active = old; UnityEngine.Object.DestroyImmediate(rt); }
             }
 
-            // Three variants, one per pillar, plus a mirrored climbing vine.
-            for (int i = -1; i <= 4; i++) Bay(i * chord);
+            // Every shape, one per pillar.
+            for (int i = -1; i <= Variants.Length; i++) Bay(i * chord);
             for (int i = 0; i < Variants.Length; i++)
                 Place(AssetDatabase.LoadAssetAtPath<GameObject>(Variants[i].PrefabPath), new Vector3(i * chord, 0, 0), Vector3.one);
-            Place(AssetDatabase.LoadAssetAtPath<GameObject>(Variants[0].PrefabPath), new Vector3(3 * chord, 0, 0), new Vector3(-1, 1, 1));
-            string variants = Shot("Vine-Variants", new Vector3(3.2f, 2.8f, 9.5f), new Vector3(3.2f, 3.1f, 0));
+            float middle = (Variants.Length - 1) * chord * .5f;
+            string variants = Shot("Vine-Variants", new Vector3(middle, 3, 23), new Vector3(middle, 3, 0), 2400, 800);
             string close = Shot("Vine-Close", new Vector3(1.2f, 3.6f, 3.2f), new Vector3(.6f, 3.9f, .3f));
             foreach (var root in preview.GetRootGameObjects()) if (root.GetComponent<Camera>() == null && root.GetComponent<Light>() == null) UnityEngine.Object.DestroyImmediate(root);
 

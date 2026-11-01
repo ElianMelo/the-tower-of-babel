@@ -29,7 +29,20 @@ namespace TowerOfBabel.World.Tower
             public float leafSize;
             [Tooltip("Chance for a leaf to turn red, like Virginia creeper.")] public float redChance;
             public float maxHeight;
+            [Tooltip("How much stems meander. 0 uses the default of 0.35.")] public float wander;
+            [Tooltip("Share of stems that spread towards +X rather than -X. 0 uses the default of 0.72.")] public float sideBias;
+            [Tooltip("Random spread from stem to stem in where it leaves the pillar, in metres.")] public float spreadJitter;
+            [Tooltip("0 roots the vine on the deck. Above 0 the vine roots at this height on the arch and never touches the pillar.")]
+            public float rootHeight;
         }
+
+        /// <summary>Pillar-only vines never reach their spread height before their ceiling.</summary>
+        public bool PillarOnly => style.spreadHeight >= style.maxHeight;
+        /// <summary>Arch-only vines root on the spandrel above the pillar instead of the deck.</summary>
+        public bool ArchOnly => style.rootHeight > 0;
+
+        private float Wander => style.wander > 0 ? style.wander : .35f;
+        private float SideBias => style.sideBias > 0 ? style.sideBias : .72f;
 
         public const float SproutGrowth = .07f;
         public const float StemOffset = .025f;
@@ -53,8 +66,8 @@ namespace TowerOfBabel.World.Tower
         }
 
         // Bright Frutiger greens from the references: deep ivy at the base, lime and yellow-green new growth.
-        private static readonly Color Deep = new(.18f, .52f, .14f), Mid = new(.32f, .7f, .18f), Lime = new(.56f, .88f, .24f),
-            Young = new(.72f, .92f, .32f), Red = new(.74f, .24f, .14f), Bark = new(.36f, .29f, .17f), Shoot = new(.4f, .62f, .2f);
+        private static readonly Color Deep = new(.24f, .6f, .17f), Mid = new(.4f, .78f, .22f), Lime = new(.6f, .9f, .27f),
+            Young = new(.76f, .94f, .36f), Red = new(.74f, .24f, .14f), Bark = new(.42f, .4f, .2f), Shoot = new(.46f, .7f, .24f);
 
         private readonly List<Strand> strands = new();
         private readonly List<Leaf> leaves = new();
@@ -91,11 +104,25 @@ namespace TowerOfBabel.World.Tower
             {
                 float x = Mathf.Lerp(-.26f, .26f, stems == 1 ? .5f : i / (float)(stems - 1)) + Range(-.06f, .06f);
                 bool shortStem = i > 0 && random.NextDouble() < style.shortStems;
-                float spreadSign = random.NextDouble() < .72 ? 1 : -1;
-                // Enough length to climb the pillar, work up the spandrel around the arch opening, then spread.
-                float length = shortStem ? Range(1.4f, style.spreadHeight * .8f) : style.spreadHeight + 1.6f + style.spread * Range(.75f, 1.15f);
-                var main = Walk(new Vector2(x, .02f), new Vector2(Range(-.15f, .15f), 1), 0, length, Range(.016f, .024f),
-                    shortStem ? 0 : spreadSign, true);
+                float spreadSign = random.NextDouble() < SideBias ? 1 : -1;
+                Strand main;
+                if (ArchOnly)
+                {
+                    // Rooted on the spandrel just above the capital, the stem heads straight out along the arch.
+                    float length = style.spread * Range(.7f, 1.3f) * (shortStem ? .5f : 1);
+                    main = Walk(new Vector2(x * .8f, style.rootHeight + Range(0, .15f)), new Vector2(spreadSign, Range(.1f, .5f)), 0, length,
+                        Range(.013f, .019f), spreadSign, true, style.rootHeight - .1f);
+                }
+                else
+                {
+                    // Each stem leaves the pillar at its own height, so the spread over the arch is uneven.
+                    float stemSpread = style.spreadHeight + Range(-style.spreadJitter, style.spreadJitter);
+                    // Enough length to climb the pillar, work up the spandrel around the arch opening, then spread.
+                    float length = PillarOnly ? Range(.75f, 1) * style.maxHeight * (shortStem ? .6f : 1.15f)
+                        : shortStem ? Range(1.4f, stemSpread * .8f) : stemSpread + 1.6f + style.spread * Range(.6f, 1.25f);
+                    main = Walk(new Vector2(x, .02f), new Vector2(Range(-.15f, .15f), 1), 0, length, Range(.016f, .024f),
+                        shortStem || PillarOnly ? 0 : spreadSign, true, stemSpread);
+                }
                 if (main != null) { strands.Add(main); mains.Add(main); }
             }
             foreach (var main in mains) Branch(main, 0);
@@ -107,7 +134,7 @@ namespace TowerOfBabel.World.Tower
         }
 
         // Follows the facade: steers towards the bias and bends around missing support, never leaving the surface.
-        private Strand Walk(Vector2 start, Vector2 direction, float startDistance, float maxLength, float radius, float spreadSign, bool main)
+        private Strand Walk(Vector2 start, Vector2 direction, float startDistance, float maxLength, float radius, float spreadSign, bool main, float spreadHeight = 0)
         {
             if (!surface(start, out float depth, out Vector3 normal)) return null;
             var strand = new Strand { BaseRadius = radius };
@@ -116,16 +143,16 @@ namespace TowerOfBabel.World.Tower
             float travelled = 0, wander = Range(0, 10);
             while (travelled < maxLength)
             {
-                wander += .7f;
+                wander += Range(.4f, 1f);
                 Vector2 bias = Vector2.up;
-                if (spreadSign != 0 && point.y > style.spreadHeight)
+                if (spreadSign != 0 && point.y > spreadHeight)
                 {
                     // Lean sideways more the higher it gets; the turns below steer it around the arch opening.
-                    float k = Mathf.Clamp01((point.y - style.spreadHeight) / Mathf.Max(.3f, style.maxHeight - .45f - style.spreadHeight));
+                    float k = Mathf.Clamp01((point.y - spreadHeight) / Mathf.Max(.3f, style.maxHeight - .45f - spreadHeight));
                     bias = new Vector2(spreadSign * (.35f + k), 1 - k * .95f);
                 }
                 else if (!main) bias = (dir + Vector2.up * .35f).normalized;
-                Vector2 desired = (dir * 1.6f + bias.normalized * .8f + new Vector2(Mathf.Sin(wander), Mathf.Cos(wander * 1.3f)) * .35f).normalized;
+                Vector2 desired = (dir * 1.6f + bias.normalized * .8f + new Vector2(Mathf.Sin(wander), Mathf.Cos(wander * 1.3f)) * Wander).normalized;
                 bool moved = false;
                 foreach (float turn in Turns)
                 {
@@ -150,13 +177,15 @@ namespace TowerOfBabel.World.Tower
             {
                 if (parent.Distance[i] - parent.Distance[0] < next) continue;
                 next = parent.Distance[i] - parent.Distance[0] + Range(.3f, .55f) / Mathf.Max(.3f, style.density);
-                if (random.NextDouble() > .55f * style.density) continue;
+                // On the arch, branches are more frequent and longer, so the vine fans out across it.
+                bool high = parent.Points[i].y > style.spreadHeight;
+                if (random.NextDouble() > (high ? .8f : .55f) * style.density) continue;
                 Vector2 tangent = ((Vector2)(parent.Points[i + 1] - parent.Points[i - 1])).normalized;
                 float side = random.NextDouble() < .5 ? 1 : -1;
                 Vector2 dir = Rotate(tangent, side * Range(35, 75));
                 // High on the arch, some branches trail down the face like a curtain.
-                if (parent.Points[i].y > style.spreadHeight && random.NextDouble() < .35f * style.drape) dir = Rotate(Vector2.down, Range(-25, 25));
-                float length = Range(.25f, .9f) * (parent.Points[i].y > style.spreadHeight ? 1.3f : 1f) / (depth + 1);
+                if (high && random.NextDouble() < .35f * style.drape) dir = Rotate(Vector2.down, Range(-25, 25));
+                float length = Range(.25f, .9f) * (high ? 1.9f : 1f) / (depth + 1);
                 var branch = Walk(parent.Points[i], dir, parent.Distance[i], length, parent.BaseRadius * .55f, 0, false);
                 if (branch == null) continue;
                 strands.Add(branch);

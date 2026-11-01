@@ -16,10 +16,12 @@ public class TowerGenerator : MonoBehaviour
     public GameObject stairStepObject;
 
     [Header("Detail phase")]
-    [Tooltip("Buildable vines released after a floor's structure is complete: climbing, draped and dense, in TowerAssetType order.")]
-    public GameObject[] detailVineObjects = new GameObject[3];
-    [Tooltip("One vine is placed on a random pillar in every group of this many pillars.")]
-    [FormerlySerializedAs("detailBushPillarInterval"), Min(1)] public int detailPillarInterval = 6;
+    [Tooltip("Buildable vine shapes released after a floor's structure is complete, in TowerAssetType order (Vine0..Vine7).")]
+    public GameObject[] detailVineObjects = new GameObject[TowerAssetTypeExtensions.DetailCount];
+    [Tooltip("Average share of pillar faces with a vine. The outside and inside of each pillar are separate building blocks.")]
+    [Range(0, 1)] public float detailVineCoverage = .22f;
+    [Tooltip("How strongly vines gather into patches around each ring: 0 spreads them evenly, 1 leaves bare stretches between thick patches.")]
+    [Range(0, 1)] public float detailVineClustering = .75f;
     [FormerlySerializedAs("detailBushSeed")] public int detailSeed = 2417;
 
     public float radius;
@@ -348,9 +350,10 @@ public class TowerGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Deterministic detail-phase vines: one on a random pillar in every group of <see cref="detailPillarInterval"/>.
-    /// Each gets a random shape, faces the inside or outside of the tower and may be mirrored so it spreads onto
-    /// either neighbouring arch. A side whose vine would pass through a stair is skipped.
+    /// Deterministic detail-phase vines. The outside and inside face of every pillar are considered separately, so each
+    /// face is its own building block. A smooth random density around each ring makes vines gather into patches with
+    /// bare stretches between them. Each vine gets a random shape and may be mirrored to spread onto either arch.
+    /// Outside faces crossed by stairs are skipped; inside, vines run alongside the glass stair ramp.
     /// </summary>
     public List<ChunkAssetData> BuildDetailVines(IEnumerable<ChunkAssetData> towerAssets)
     {
@@ -375,29 +378,50 @@ public class TowerGenerator : MonoBehaviour
         var stairs = all.Where(a => a.AssetType == TowerAssetType.Stair).ToArray();
         foreach (var level in all.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(FloorOf).OrderBy(g => g.Key))
         {
-            var pillars = level.OrderBy(p => Mathf.Repeat(Mathf.Atan2(p.Position.z - center.y, p.Position.x - center.x), Mathf.PI * 2)).ToArray();
             var random = new System.Random(unchecked(detailSeed + level.Key * 7919));
-            int interval = Mathf.Max(1, detailPillarInterval);
             float bottom = level.Key * heighIncrease, top = bottom + heighIncrease;
             var nearbyStairs = stairMesh == null ? System.Array.Empty<ChunkAssetData>()
                 : stairs.Where(s => s.Position.y > bottom - 1 && s.Position.y < top + 1).ToArray();
-            for (int group = 0; group < pillars.Length; group += interval)
+            // Each face of the ring gets its own patch pattern, so outside and inside patches don't line up.
+            var patterns = new[] { new Patches(random), new Patches(random) };
+            foreach (var pillar in level.OrderBy(p => Mathf.Repeat(Mathf.Atan2(p.Position.z - center.y, p.Position.x - center.x), Mathf.PI * 2)))
             {
-                var pillar = pillars[Mathf.Min(pillars.Length - 1, group + random.Next(interval))];
-                var (type, samples) = variants[random.Next(variants.Count)];
-                Vector3 scale = new(random.NextDouble() < .5 ? -1 : 1, 1, 1);
+                float angle = Mathf.Atan2(pillar.Position.z - center.y, pillar.Position.x - center.x);
                 Vector3 outward = new Vector3(pillar.Position.x - center.x, 0, pillar.Position.z - center.y).normalized;
-                foreach (float side in random.NextDouble() < .5 ? new[] { 1f, -1f } : new[] { -1f, 1f })
+                for (int face = 0; face < 2; face++)
                 {
-                    var rotation = Quaternion.LookRotation(outward * side, Vector3.up);
-                    var matrix = Matrix4x4.TRS(pillar.Position, rotation, scale);
-                    if (stairMesh != null && TouchesStair(nearbyStairs, stairMesh.bounds, matrix, samples)) continue;
+                    // Draw every random value in a fixed order so one rejected face never shifts the others.
+                    double roll = random.NextDouble();
+                    var (type, samples) = variants[random.Next(variants.Count)];
+                    Vector3 scale = new(random.NextDouble() < .5 ? -1 : 1, 1, 1);
+                    float density = Mathf.Lerp(detailVineCoverage, patterns[face].Density(angle, detailVineCoverage), detailVineClustering);
+                    if (roll >= density) continue;
+                    bool outside = face == 0;
+                    var rotation = Quaternion.LookRotation(outside ? outward : -outward, Vector3.up);
+                    if (outside && stairMesh != null && TouchesStair(nearbyStairs, stairMesh.bounds, Matrix4x4.TRS(pillar.Position, rotation, scale), samples)) continue;
                     result.Add(new ChunkAssetData(0, type, pillar.Position, rotation, scale));
-                    break;
                 }
             }
         }
         return result;
+    }
+
+    /// <summary>Smooth random density around a ring: a few overlapping waves, rescaled to keep the requested average.</summary>
+    private readonly struct Patches
+    {
+        private readonly float phaseA, phaseB, phaseC;
+        private readonly int wavesA, wavesB;
+        public Patches(System.Random random)
+        {
+            phaseA = (float)random.NextDouble() * 6.283f; phaseB = (float)random.NextDouble() * 6.283f; phaseC = (float)random.NextDouble() * 6.283f;
+            wavesA = 3 + random.Next(4); wavesB = 7 + random.Next(6);
+        }
+        public float Density(float angle, float average)
+        {
+            float wave = Mathf.Sin(angle * wavesA + phaseA) * .6f + Mathf.Sin(angle * wavesB + phaseB) * .3f + Mathf.Sin(angle * 23 + phaseC) * .1f;
+            // wave lies in [-1, 1]; patches peak near 2.6x the average and fade to nothing between them.
+            return Mathf.Clamp01(average * Mathf.Max(0, 1 + wave * 1.6f));
+        }
     }
 
     // A few hundred surface points of the grown vine are enough to find stairs crossing it.
@@ -442,9 +466,8 @@ public class TowerGenerator : MonoBehaviour
             TowerAssetType.Stair => stairStepObject,
             TowerAssetType.Pillar => pillarObject,
             TowerAssetType.Arch => archObject,
-            TowerAssetType.Vine or TowerAssetType.VineDraped or TowerAssetType.VineDense =>
-                detailVineObjects != null && (int)assetType - (int)TowerAssetType.Vine < detailVineObjects.Length
-                    ? detailVineObjects[(int)assetType - (int)TowerAssetType.Vine] : null,
+            _ when assetType.IsDetail() =>
+                detailVineObjects != null && assetType.DetailIndex() < detailVineObjects.Length ? detailVineObjects[assetType.DetailIndex()] : null,
             _ => null
         };
     }

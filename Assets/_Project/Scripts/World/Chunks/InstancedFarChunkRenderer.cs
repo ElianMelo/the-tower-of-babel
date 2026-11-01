@@ -48,6 +48,8 @@ namespace TowerOfBabel.World.Chunks
         [Tooltip("Zero means no additional distance culling.")]
         [SerializeField, Min(0f)] private float maximumDrawDistance;
         [SerializeField] private bool useLightProbes = true;
+        [Tooltip("Detail vines are small and numerous; their pages stop drawing beyond this distance. Zero disables the limit.")]
+        [SerializeField, Min(0f)] private float detailDrawDistance = 140f;
 
         private readonly Dictionary<RenderBatchKey, TypeBatch> batches = new();
         private readonly HashSet<ChunkKey> loadedChunks = new();
@@ -60,6 +62,26 @@ namespace TowerOfBabel.World.Chunks
         public int CulledPageCount { get; private set; }
         public int DrawCallCount { get; private set; }
         public int ReflectionDrawCallCount { get; private set; }
+
+        private static MaterialPropertyBlock ambientProbeProperties;
+        private static SphericalHarmonicsL2 ambientProbeSource;
+
+        /// <summary>
+        /// The scene's ambient probe, replicated for a full instanced draw. Detail foliage uses it when the scene has
+        /// no baked light probes; without it instanced pages get no ambient light at all and the vines read dark.
+        /// Rebuilt only when the ambient probe changes (day and night, weather).
+        /// </summary>
+        public static MaterialPropertyBlock AmbientProbeProperties()
+        {
+            SphericalHarmonicsL2 probe = RenderSettings.ambientProbe;
+            if (ambientProbeProperties != null && probe == ambientProbeSource) return ambientProbeProperties;
+            ambientProbeSource = probe;
+            ambientProbeProperties ??= new MaterialPropertyBlock();
+            var probes = new List<SphericalHarmonicsL2>(MaximumInstancesPerDraw);
+            for (int i = 0; i < MaximumInstancesPerDraw; i++) probes.Add(probe);
+            ambientProbeProperties.CopySHCoefficientArraysFrom(probes);
+            return ambientProbeProperties;
+        }
 
         public int LoadedInstanceCount
         {
@@ -104,6 +126,10 @@ namespace TowerOfBabel.World.Chunks
                     ? maximumDrawDistance * maximumDrawDistance
                     : 0f;
 
+                float detailDistanceSquared = detailDrawDistance > 0f
+                    ? Mathf.Min(maximumDistanceSquared > 0f ? maximumDistanceSquared : float.MaxValue, detailDrawDistance * detailDrawDistance)
+                    : maximumDistanceSquared;
+
                 foreach (TypeBatch batch in batches.Values)
                 {
                     BatchRenderStats stats = batch.Render(
@@ -111,7 +137,7 @@ namespace TowerOfBabel.World.Chunks
                         renderCamera,
                         canCull ? frustumPlanes : null,
                         cameraPosition,
-                        maximumDistanceSquared,
+                        batch.Detail ? detailDistanceSquared : maximumDistanceSquared,
                         useLightProbes);
                     VisiblePageCount += stats.VisiblePages;
                     CulledPageCount += stats.CulledPages;
@@ -264,7 +290,7 @@ namespace TowerOfBabel.World.Chunks
 
                 Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
                 if (mesh != null)
-                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType.IsFloor() ? chunkManager : null,
+                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType.IsDetail(), assetType.IsFloor() ? chunkManager : null,
                         assetType == TowerAssetType.GlassWaterFloor, stage));
             }
         }
@@ -431,6 +457,7 @@ namespace TowerOfBabel.World.Chunks
             private readonly Dictionary<ChunkKey, RenderCellKey> cellByChunk = new();
             private readonly bool river;
             private readonly bool floor;
+            public bool Detail { get; }
             private readonly Vector2 floorCenter;
             private readonly float floorHeight;
             private readonly float radial;
@@ -485,9 +512,10 @@ namespace TowerOfBabel.World.Chunks
                 }
             }
 
-            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, ChunkManager floorOwner, bool river, byte stage)
+            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, bool detail, ChunkManager floorOwner, bool river, byte stage)
             {
                 this.mesh = mesh;
+                Detail = detail;
                 this.river = river; floor = floorOwner != null;
                 floorCenter = floorOwner != null ? floorOwner.FloorCenter : Vector2.zero;
                 floorHeight = floorOwner != null ? floorOwner.FloorHeight : 6;
@@ -591,6 +619,11 @@ namespace TowerOfBabel.World.Chunks
                         renderParams.lightProbeUsage = page.LightProbeProperties != null
                             ? LightProbeUsage.CustomProvided
                             : LightProbeUsage.Off;
+                        if (Detail && page.LightProbeProperties == null)
+                        {
+                            renderParams.matProps = AmbientProbeProperties();
+                            renderParams.lightProbeUsage = LightProbeUsage.CustomProvided;
+                        }
                         Graphics.RenderMeshInstanced(renderParams, mesh, 0,
                             cell.Matrices, page.Count, page.StartIndex);
                         visiblePages++;

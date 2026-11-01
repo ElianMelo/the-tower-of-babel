@@ -25,6 +25,10 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
+    - _DistanceGlow: 0.55
+    - _DistanceLift: 0.85
+    - _DistanceLiftRange: 45
+    - _DistanceLiftStart: 12
     - _Smoothness: 0.25
     - _SubsurfaceWrap: 0.45
     - _TranslucencyStrength: 1.1

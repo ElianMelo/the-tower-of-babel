@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2907673946623765275
+--- !u!1 &5247356769487085613
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,27 +8,27 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 106460443245506949}
-  - component: {fileID: 9220109801681725397}
-  - component: {fileID: 9202279672627568049}
-  - component: {fileID: 2207705667246337045}
-  - component: {fileID: 6319470965881529358}
-  - component: {fileID: 945916644267926168}
-  - component: {fileID: 7884706146007507137}
+  - component: {fileID: 3521621161796709055}
+  - component: {fileID: 1456091454937533525}
+  - component: {fileID: 7377809997775622331}
+  - component: {fileID: 3832506492111393933}
+  - component: {fileID: 2470765137449377591}
+  - component: {fileID: 1049513298223463019}
+  - component: {fileID: 5968107128535018458}
   m_Layer: 0
-  m_Name: Detail_Vine_Climbing
+  m_Name: Detail_Vine_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &106460443245506949
+--- !u!4 &3521621161796709055
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
+  m_GameObject: {fileID: 5247356769487085613}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -37,21 +37,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &9220109801681725397
+--- !u!33 &1456091454937533525
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
-  m_Mesh: {fileID: 5766422583036826060, guid: a493e6d99a4579042b5d834869a272af, type: 2}
---- !u!23 &9202279672627568049
+  m_GameObject: {fileID: 5247356769487085613}
+  m_Mesh: {fileID: 7281981919663349966, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+--- !u!23 &7377809997775622331
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
+  m_GameObject: {fileID: 5247356769487085613}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -94,13 +94,13 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2207705667246337045
+--- !u!65 &3832506492111393933
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
+  m_GameObject: {fileID: 5247356769487085613}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -113,41 +113,41 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.95, y: 3.9, z: 0.3}
-  m_Center: {x: 0, y: 1.95, z: 0.5}
---- !u!114 &6319470965881529358
+  m_Size: {x: 0.9, y: 3.872001, z: 0.18}
+  m_Center: {x: 0, y: 1.9360005, z: 0.49}
+--- !u!114 &2470765137449377591
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
+  m_GameObject: {fileID: 5247356769487085613}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c7f11c1f07a662048af91c0e6a1e1111, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerAsset
-  assetType: 5
---- !u!114 &945916644267926168
+  assetType: 9
+--- !u!114 &1049513298223463019
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
+  m_GameObject: {fileID: 5247356769487085613}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e9351dffeafc734f971e35967334c71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
   settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
---- !u!114 &7884706146007507137
+--- !u!114 &5968107128535018458
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2907673946623765275}
+  m_GameObject: {fileID: 5247356769487085613}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0db77396aaf32945ad7890fc52f24d5, type: 3}
@@ -158,18 +158,18 @@ MonoBehaviour:
   interactionDuration: 2.5
   shakeStrength: 0.015
   shakeSpeed: 24
-  visuals: {fileID: 106460443245506949}
-  outline: {fileID: 945916644267926168}
-  meshFilter: {fileID: 9220109801681725397}
+  visuals: {fileID: 3521621161796709055}
+  outline: {fileID: 1049513298223463019}
+  meshFilter: {fileID: 1456091454937533525}
   stageMeshes:
-  - {fileID: 5766422583036826060, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: 493657865259940105, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: -6403674079627410478, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: 6351881129190843113, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: 7308352210155072441, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: 6013760654080820544, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: -4044534833192923085, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: 3064405650002563363, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: -7572487797513260594, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: 3161992744685566169, guid: a493e6d99a4579042b5d834869a272af, type: 2}
-  - {fileID: -8135134499154133255, guid: a493e6d99a4579042b5d834869a272af, type: 2}
+  - {fileID: 7281981919663349966, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: -2871399960209937323, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: -2807398293707454642, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: -370903020040675113, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: 2257420517828421288, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: 8789398601251484274, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: -8655773714433316565, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: 920907569701684292, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: 2433907048921727516, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: 6216508083397937014, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}
+  - {fileID: -6170681063857945397, guid: ba24ee856e3bb23428ae35f075dbd321, type: 2}

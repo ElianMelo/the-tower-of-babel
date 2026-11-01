@@ -18,7 +18,7 @@ namespace TowerOfBabel.Resources.Tests
         private const string NodePath = "Assets/_Project/Prefabs/Resources/Grass.prefab";
         private const string PlanterPath = "Assets/_Project/Prefabs/Processor/GrassPlanter.prefab";
         private static readonly string[] VinePrefabs =
-            { "Detail_Vine_Climbing", "Detail_Vine_Draped", "Detail_Vine_Dense" };
+            Enumerable.Range(0, TowerAssetTypeExtensions.DetailCount).Select(i => "Detail_Vine_" + i).ToArray();
 
         [Test]
         public void GrassTypes_AreAppendedWithReadableNames()
@@ -117,11 +117,21 @@ namespace TowerOfBabel.Resources.Tests
                     Assert.That(mesh.vertexCount, Is.GreaterThanOrEqualTo(previous), $"{prefab.name} stage {stage}");
                     previous = mesh.vertexCount;
                 }
-                Assert.That(building.GetStageMesh(0).bounds.max.y, Is.LessThan(1.2f), "Stage 0 is a sprout.");
-                Assert.That(building.GetStageMesh(10).bounds.max.y, Is.GreaterThan(4.2f), "The finished vine reaches the arch.");
-                Assert.That(building.GetStageMesh(10).triangles.Length / 3, Is.LessThan(7000), "Keep distant batches affordable.");
+                Assert.That(building.GetStageMesh(0).bounds.size.magnitude, Is.LessThan(1.6f), "Stage 0 is a small sprout.");
+                Assert.That(building.GetStageMesh(10).bounds.size.magnitude, Is.GreaterThan(building.GetStageMesh(0).bounds.size.magnitude * 2));
+                Assert.That(building.GetStageMesh(10).triangles.Length / 3, Is.LessThan(8000), "Keep distant batches affordable.");
             }
-            Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Buildings/Detail_Bush.prefab"), Is.Null, "Vines replace the detail bush.");
+            // Some shapes stay on the pillar, some cover only the arch, and the rest climb from one onto the other.
+            bool OnPillar(Vector3 v) => Mathf.Abs(v.x) < .25f && v.y < 3.6f;
+            var grown = types.Select(t => t.GetComponent<Building>().GetStageMesh(10)).ToArray();
+            Assert.That(grown.Count(m => m.bounds.max.y < 4.05f), Is.GreaterThanOrEqualTo(1), "A pillar-only shape.");
+            Assert.That(grown.Count(m => !m.vertices.Any(OnPillar) && m.bounds.min.y > 2.5f), Is.GreaterThanOrEqualTo(1), "An arch-only shape.");
+            Assert.That(grown.Count(m => m.vertices.Any(OnPillar) && m.bounds.max.y > 4.6f), Is.GreaterThanOrEqualTo(4), "Shapes spanning pillar and arch.");
+            Assert.That(grown.Max(m => m.bounds.size.x), Is.GreaterThan(4f), "The widest vines reach well past the neighbouring pillar.");
+            foreach (string stale in new[] { "Detail_Bush", "Detail_Vine_Climbing", "Detail_Vine_Draped", "Detail_Vine_Dense" })
+                Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Buildings/" + stale + ".prefab"), Is.Null, stale + " is superseded.");
+            Assert.That(types.Select(t => t.GetComponent<Building>().GetStageMesh(10).vertexCount).Distinct().Count(), Is.EqualTo(types.Length), "Every shape grows differently.");
+            Assert.That(types.Average(t => t.GetComponent<Building>().GetStageMesh(10).triangles.Length / 3), Is.LessThan(5000), "Thousands of vines must stay affordable on average.");
         }
 
         [Test]
