@@ -89,6 +89,9 @@ namespace TowerOfBabel.World.Chunks
         private readonly Dictionary<ChunkKey, HashSet<PlayerInstance>> playersByChunk = new();
         private readonly Dictionary<uint, PlayerInstance> trackedPlayers = new();
         private readonly Dictionary<int, int> unfinishedAssetsByFloor = new();
+        // Structure assets only; the floor's detail is released once this reaches zero.
+        private readonly Dictionary<int, int> unfinishedStructureByFloor = new();
+        private readonly HashSet<int> floorsWithDetail = new();
         private int? activeConstructionFloor;
 
         private ChunkKey currentChunk;
@@ -131,6 +134,8 @@ namespace TowerOfBabel.World.Chunks
         public event Action<ChunkKey, ChunkKey> CurrentChunkChanged;
         public event Action<ChunkKey, int, byte> AssetStageChanged;
         public event Action ConstructionFloorChanged;
+        /// <summary>Raised with the floor index when its detail phase is released or withdrawn again.</summary>
+        public event Action<int> DetailReleaseChanged;
 
         // Pooled buildings listen here instead of ConstructionFloorChanged +=: a multicast
         // delegate copies its whole invocation list on every subscribe/unsubscribe, which made a
@@ -259,6 +264,7 @@ namespace TowerOfBabel.World.Chunks
             assetPrefabs.SetPrefab(TowerAssetType.Pillar, generator.GetModelPrefab(TowerAssetType.Pillar));
             assetPrefabs.SetPrefab(TowerAssetType.Arch, generator.GetModelPrefab(TowerAssetType.Arch));
             assetPrefabs.SetPrefab(TowerAssetType.GlassWaterFloor, generator.GetModelPrefab(TowerAssetType.GlassWaterFloor));
+            assetPrefabs.SetPrefab(TowerAssetType.Bush, generator.GetModelPrefab(TowerAssetType.Bush));
             radialFloors = TowerFloorLayout.SupportsRadialFloor(generator.GetModelPrefab(TowerAssetType.Floor));
             floorCenter = generator.center;
             floorRadialDepth = generator.tileDecreaseRate;
@@ -317,9 +323,16 @@ namespace TowerOfBabel.World.Chunks
 
             bool wasComplete = previous.Stage >= ChunkAssetData.CompletedStage;
             bool isComplete = appliedStage >= ChunkAssetData.CompletedStage;
+            bool releaseChanged = false;
             if (wasComplete != isComplete)
             {
                 unfinishedAssetsByFloor[key.FloorIndex] += isComplete ? -1 : 1;
+                if (!previous.AssetType.IsDetail())
+                {
+                    bool wasReleased = IsStructureComplete(key.FloorIndex);
+                    unfinishedStructureByFloor[key.FloorIndex] += isComplete ? -1 : 1;
+                    releaseChanged = wasReleased != IsStructureComplete(key.FloorIndex);
+                }
                 RefreshConstructionFloor();
             }
 
@@ -333,6 +346,7 @@ namespace TowerOfBabel.World.Chunks
                 SetFarChunkVisible(chunk, false);
                 SetFarChunkVisible(chunk, true);
             }
+            if (releaseChanged) ApplyDetailRelease(key.FloorIndex);
             AssetStageChanged?.Invoke(key, localIndex, appliedStage);
             return true;
         }
@@ -362,7 +376,22 @@ namespace TowerOfBabel.World.Chunks
 
         public bool CanConstructAsset(ChunkKey key, int localIndex) =>
             TryGetAsset(key, localIndex, out ChunkAssetData asset) &&
-            asset.Stage < ChunkAssetData.CompletedStage && activeConstructionFloor == key.FloorIndex;
+            asset.Stage < ChunkAssetData.CompletedStage && activeConstructionFloor == key.FloorIndex &&
+            IsAssetReleased(key.FloorIndex, asset.AssetType);
+
+        /// <summary>True once every structure asset on the floor reaches the final stage.</summary>
+        public bool IsStructureComplete(int floorIndex)
+        {
+            if (chunkLookup.Count == 0) RebuildChunkLookup();
+            return !unfinishedStructureByFloor.TryGetValue(floorIndex, out int unfinished) || unfinished == 0;
+        }
+
+        /// <summary>Structure is always released; detail only after the floor's structure is complete.</summary>
+        public bool IsAssetReleased(int floorIndex, TowerAssetType assetType) =>
+            !assetType.IsDetail() || IsStructureComplete(floorIndex);
+
+        public TowerConstructionPhase GetFloorPhase(int floorIndex) =>
+            IsStructureComplete(floorIndex) ? TowerConstructionPhase.Detail : TowerConstructionPhase.Structure;
 
         public bool IsFloorVisible(int floorIndex)
         {
@@ -379,6 +408,8 @@ namespace TowerOfBabel.World.Chunks
         public int SetConstructionStage(int? floorIndex, byte stage)
         {
             if (chunkLookup.Count == 0) RebuildChunkLookup();
+            var releasedBefore = new Dictionary<int, bool>();
+            foreach (var pair in unfinishedStructureByFloor) releasedBefore[pair.Key] = pair.Value == 0;
             var changedChunks = new List<ChunkSceneCache>();
             var changes = new List<(ChunkKey key, int index, byte stage)>();
             foreach (var chunk in cachedChunks)
@@ -400,6 +431,8 @@ namespace TowerOfBabel.World.Chunks
                 }
                 else { SetFarChunkVisible(chunk, false); SetFarChunkVisible(chunk, true); }
             }
+            foreach (var pair in releasedBefore)
+                if (pair.Value != IsStructureComplete(pair.Key)) ApplyDetailRelease(pair.Key);
             foreach (var change in changes) AssetStageChanged?.Invoke(change.key, change.index, change.stage);
             return changes.Count;
         }
@@ -658,15 +691,24 @@ namespace TowerOfBabel.World.Chunks
         {
             chunkLookup.Clear();
             unfinishedAssetsByFloor.Clear();
+            unfinishedStructureByFloor.Clear();
+            floorsWithDetail.Clear();
             for (int i = 0; i < cachedChunks.Count; i++)
             {
                 ChunkSceneCache chunk = cachedChunks[i];
                 if (chunk == null) continue;
                 chunkLookup[chunk.Key] = chunk;
                 unfinishedAssetsByFloor.TryGetValue(chunk.Key.FloorIndex, out int unfinished);
+                unfinishedStructureByFloor.TryGetValue(chunk.Key.FloorIndex, out int structure);
                 foreach (ChunkAssetData asset in chunk.Assets)
-                    if (asset.Stage < ChunkAssetData.CompletedStage) unfinished++;
+                {
+                    if (asset.AssetType.IsDetail()) floorsWithDetail.Add(chunk.Key.FloorIndex);
+                    if (asset.Stage >= ChunkAssetData.CompletedStage) continue;
+                    unfinished++;
+                    if (!asset.AssetType.IsDetail()) structure++;
+                }
                 unfinishedAssetsByFloor[chunk.Key.FloorIndex] = unfinished;
+                unfinishedStructureByFloor[chunk.Key.FloorIndex] = structure;
             }
             RefreshConstructionFloor();
         }
@@ -684,6 +726,31 @@ namespace TowerOfBabel.World.Chunks
             ConstructionFloorChanged?.Invoke();
             for (int i = floorListeners.Count - 1; i >= 0; i--)
                 if (i < floorListeners.Count && floorListeners[i] != null) floorListeners[i].NotifyConstructionFloorChanged();
+        }
+
+        // Show or withdraw one floor's detail in the near pool and distant batches, then refresh prompts.
+        private void ApplyDetailRelease(int floorIndex)
+        {
+            // Floors without detail have nothing to release; avoid a redundant presentation refresh.
+            if (!floorsWithDetail.Contains(floorIndex)) return;
+            foreach (ChunkSceneCache chunk in cachedChunks)
+            {
+                if (chunk == null || chunk.Key.FloorIndex != floorIndex) continue;
+                if (loadedChunks.Contains(chunk.Key))
+                {
+                    ResolveNearAssetPool();
+                    for (int i = 0; i < chunk.Assets.Count; i++)
+                        if (chunk.Assets[i].AssetType.IsDetail()) nearAssetPool?.ApplyAssetStage(chunk, i, false);
+                }
+                else if (visibilityInitialized)
+                {
+                    SetFarChunkVisible(chunk, false);
+                    SetFarChunkVisible(chunk, true);
+                }
+            }
+            for (int i = floorListeners.Count - 1; i >= 0; i--)
+                if (i < floorListeners.Count && floorListeners[i] != null) floorListeners[i].NotifyConstructionFloorChanged();
+            DetailReleaseChanged?.Invoke(floorIndex);
         }
 
         private void ResolveFarChunkRenderer()
@@ -741,13 +808,30 @@ namespace TowerOfBabel.World.Chunks
 
             if (visible && IsFloorVisible(chunk.Key.FloorIndex))
             {
-                FarChunkSnapshot snapshot = new(chunk.Key, chunk.Assets, chunk.Version);
+                // Withheld detail never draws at distance, even if a rollback left it partly built.
+                bool released = IsStructureComplete(chunk.Key.FloorIndex);
+                IReadOnlyList<ChunkAssetData> assets = chunk.Assets;
+                if (!released && HasBuiltDetail(assets))
+                {
+                    var structure = new List<ChunkAssetData>(assets.Count);
+                    foreach (ChunkAssetData asset in assets)
+                        if (!asset.AssetType.IsDetail()) structure.Add(asset);
+                    assets = structure;
+                }
+                FarChunkSnapshot snapshot = new(chunk.Key, assets, unchecked(chunk.Version * 2 + (released ? 1 : 0)));
                 farChunkRenderer.LoadChunk(in snapshot);
             }
             else
             {
                 farChunkRenderer.RemoveChunk(chunk.Key);
             }
+        }
+
+        private static bool HasBuiltDetail(IReadOnlyList<ChunkAssetData> assets)
+        {
+            for (int i = 0; i < assets.Count; i++)
+                if (assets[i].AssetType.IsDetail() && assets[i].Stage > 0) return true;
+            return false;
         }
 
         private static int CompareTowerAssets(TowerAsset first, TowerAsset second)

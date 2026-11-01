@@ -95,6 +95,7 @@ namespace TowerOfBabel.World.Chunks
             CreateTypePool(TowerAssetType.Pillar);
             CreateTypePool(TowerAssetType.Arch);
             if (prefabs.GetPrefab(TowerAssetType.GlassWaterFloor) != null) CreateTypePool(TowerAssetType.GlassWaterFloor);
+            if (prefabs.GetPrefab(TowerAssetType.Bush) != null) CreateTypePool(TowerAssetType.Bush);
         }
 
         public void BeginUpdate()
@@ -160,6 +161,16 @@ namespace TowerOfBabel.World.Chunks
 
             ChunkAssetData asset = chunk.Assets[localIndex];
             PooledInstance current = lease.Assets[localIndex];
+            if (!IsReleased(chunk.Key, asset))
+            {
+                // Detail withheld until the floor's structure is complete (or withdrawn after a rollback).
+                if (current != null)
+                {
+                    ReturnInstance(current, false);
+                    lease.Assets[localIndex] = null;
+                }
+                return false;
+            }
             if (current == null)
             {
                 if (!pools.TryGetValue(asset.AssetType, out TypePool pool))
@@ -209,7 +220,7 @@ namespace TowerOfBabel.World.Chunks
             for (int i = 0; i < assets.Count; i++)
             {
                 ChunkAssetData asset = assets[i];
-                if (!pools.TryGetValue(asset.AssetType, out TypePool pool))
+                if (!IsReleased(chunk.Key, asset) || !pools.TryGetValue(asset.AssetType, out TypePool pool))
                     continue;
 
                 PooledInstance instance = pool.Rent();
@@ -218,6 +229,9 @@ namespace TowerOfBabel.World.Chunks
                 pendingActivations.Add(new PendingActivation(instance, asset));
             }
         }
+
+        private bool IsReleased(ChunkKey key, ChunkAssetData asset) =>
+            chunkManager == null || chunkManager.IsAssetReleased(key.FloorIndex, asset.AssetType);
 
         private void ReleaseChunk(ChunkKey key, bool deferDisable)
         {

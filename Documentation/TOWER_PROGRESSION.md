@@ -1,6 +1,21 @@
 # Tower construction progression
 
-Construction is shared across players. Only the lowest unfinished floor can be built. Every cached asset on that floor must reach stage 10, including floor tiles, stairs, pillars and arches in all of its chunks, before the next unfinished floor unlocks. Completed floors and missing floor indices are skipped. The client presentation and server build validation use the same cached progression; the server checks both the start and completion of a build.
+Construction is shared across players. Only the lowest unfinished floor can be built. Every cached asset on that floor must reach stage 10, including floor tiles, stairs, pillars and arches in all of its chunks, before the next unfinished floor unlocks.
+
+## Structure and detail phases
+
+Each floor is built in two phases. **Structure** is the floor tiles, stairs, pillars and arches. **Detail** sits on top of the structure to make it denser; for now it is buildable bushes (`TowerAssetType.Bush`).
+
+- Detail is hidden and cannot be built until every structure asset on that floor reaches stage 10. Completing the structure releases it immediately, near and distant, and refreshes interaction prompts.
+- The floor counts as complete, and the next floor unlocks, only after the detail also reaches stage 10.
+- Rolling any structure asset back withdraws the floor's detail again. Built detail is also left out of distant rendering while it is withdrawn.
+- `ChunkManager.GetFloorPhase`, `IsStructureComplete` and `IsAssetReleased` expose the phase; `DetailReleaseChanged` fires once per release or withdrawal. Server build validation goes through the same `CanConstructAsset` check.
+
+Detail bushes sit beside one random pillar in every group of six (`TowerGenerator.detailBushPillarInterval`), with a small random sideways and radial offset, random size (85–115%) and rotation. They prefer the inner deck side, fall back to the outer ledge, rest on the deck surface and skip spots near low stairs. Placement is deterministic (`detailBushSeed`). The current tower has 842 detail bushes: 35 on the ground floor, tapering to 10 on the top floor. Each costs 1 Stone per stage and grows from a 30% sprout at stage 0 to full size at stage 10.
+
+Run **Tower of Babel → Construction → Create detail bush and place beside pillars** with the Tower scene open to rebuild the `Detail_Bush` prefab, its stage meshes and the cached bush data without touching other assets. `ConfigureTower` also generates them with the rest of the tower.
+
+These detail bushes are separate from the decorative exterior bushes described below, which still appear only once the whole floor, including its detail, is complete. Completed floors and missing floor indices are skipped. The client presentation and server build validation use the same cached progression; the server checks both the start and completion of a build.
 
 Only completed floors and the current unlocked floor are visible. Every higher floor stays hidden, including blueprints, partially built meshes, completed meshes and colliders, until all lower floors reach stage 10. Unlocking refreshes visibility immediately without requiring the player to move. Completed floors remain solid and cannot be built again. If construction is rolled back, later floors are hidden again.
 
@@ -13,6 +28,10 @@ The scan radius is configurable on `PlayerInteractionRaycaster`. Scans inspect m
 Exterior bushes appear only after their own floor is fully built: every construction asset on that floor must reach stage 10, and the floor must be unlocked. Bush rendering reads the current construction data every frame, so completion reveals the plants immediately and rollback hides them again. Placement, wind and distance culling are unchanged.
 
 ## Verification
+
+Detail phase (2026-10-31): all 9 new `DetailPhaseEditModeTests` passed. The project's EditMode assembly ran 207 of 217 green, and the progression (5/5) and cheat-menu (9/9) PlayMode suites passed. The 10 EditMode failures and the `GlassWaterFloorPlayModeTests.ChunkProjection` failure also fail with these changes removed: the font glyph, resource cancel, floor-tile collider, saved-island asset count and river-glass light intensity checks.
+
+Earlier verification:
 
 Verified with Unity CLI 1.0.0-beta.14 and Unity MCP in this project's Unity 6000.3.11f1 Editor. Compilation passed. All 25 chunk/progression Edit Mode checks and all 5 floor-unlock, foliage and scan Play Mode checks passed. Coverage includes hiding locked near and distant chunks even when snapshots contain built stages, revealing each next floor only after every prior asset reaches stage 10, retaining non-interactive completed floors, hiding later floors after rollback, bush batch submission only on completed floors, and the scan's expiry, retriggering, hover preservation, pooling, disconnects and modal menus. The Editor was restored to the Tower scene in Edit Mode.
 

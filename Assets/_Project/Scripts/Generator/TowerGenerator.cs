@@ -14,6 +14,13 @@ public class TowerGenerator : MonoBehaviour
     public GameObject glassWaterFloorObject;
     public GameObject stairStepObject;
 
+    [Header("Detail phase")]
+    [Tooltip("Buildable bush released after a floor's structure is complete.")]
+    public GameObject detailBushObject;
+    [Tooltip("One bush is placed beside a random pillar in every group of this many pillars.")]
+    [Min(1)] public int detailBushPillarInterval = 6;
+    public int detailBushSeed = 2417;
+
     public float radius;
     public float pillarAngle;
     public float tileAngle;
@@ -224,6 +231,7 @@ public class TowerGenerator : MonoBehaviour
             Physics.SyncTransforms();
             RemoveBlockingFloor();
             EnsurePillarSupports();
+            CreateDetailBushes();
             // Decoration data survives ConfigureTower's removal of temporary construction objects.
             GetComponent<TowerBushScatter>()?.Generate(this);
         }
@@ -326,6 +334,99 @@ public class TowerGenerator : MonoBehaviour
         }
     }
 
+    private void CreateDetailBushes()
+    {
+        if (detailBushObject == null) return;
+        var assets = parent.GetComponentsInChildren<TowerAsset>()
+            .Select(a => new ChunkAssetData(0, a.AssetType, a.transform.position, a.transform.rotation, a.transform.lossyScale));
+        foreach (var bush in BuildDetailBushes(assets))
+        {
+            var instance = CreateTowerAsset(detailBushObject, TowerAssetType.Bush, bush.Position, bush.Rotation, "Detail bush");
+            instance.transform.localScale = new Vector3(bush.Scale.x / parent.lossyScale.x,
+                bush.Scale.y / parent.lossyScale.y, bush.Scale.z / parent.lossyScale.z);
+        }
+    }
+
+    /// <summary>
+    /// Deterministic detail-phase bushes: one beside a random pillar in every group of
+    /// <see cref="detailBushPillarInterval"/>, nudged by a small random offset, resting on the deck and clear of stairs.
+    /// </summary>
+    public List<ChunkAssetData> BuildDetailBushes(IEnumerable<ChunkAssetData> towerAssets)
+    {
+        var result = new List<ChunkAssetData>();
+        if (detailBushObject == null || heighIncrease <= 0) return result;
+        Mesh bushMesh = detailBushObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10)
+            ?? detailBushObject.GetComponent<MeshFilter>()?.sharedMesh;
+        if (bushMesh == null) return result;
+        Bounds bushBounds = bushMesh.bounds;
+        float bushRadius = new Vector2(Mathf.Max(Mathf.Abs(bushBounds.min.x), Mathf.Abs(bushBounds.max.x)),
+            Mathf.Max(Mathf.Abs(bushBounds.min.z), Mathf.Abs(bushBounds.max.z))).magnitude;
+        Vector3 baseScale = detailBushObject.transform.localScale;
+        Mesh floorMesh = floorTileObject != null
+            ? floorTileObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? floorTileObject.GetComponent<MeshFilter>()?.sharedMesh
+            : null;
+        float floorTop = floorMesh != null ? floorMesh.bounds.max.y : 0f;
+        Mesh stairMesh = stairStepObject != null
+            ? stairStepObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? stairStepObject.GetComponent<MeshFilter>()?.sharedMesh
+            : null;
+
+        int FloorOf(ChunkAssetData a) => Mathf.FloorToInt((a.Position.y + .001f) / heighIncrease);
+        var all = towerAssets.ToArray();
+        var floorsByLevel = all.Where(a => a.AssetType.IsFloor()).GroupBy(FloorOf).ToDictionary(g => g.Key, g => g.ToArray());
+        var stairs = all.Where(a => a.AssetType == TowerAssetType.Stair).ToArray();
+        float pillarClearance = PillarSupportRadius;
+        foreach (var level in all.Where(a => a.AssetType == TowerAssetType.Pillar).GroupBy(FloorOf).OrderBy(g => g.Key))
+        {
+            if (!floorsByLevel.TryGetValue(level.Key, out var floors)) continue;
+            var support = new TowerFloorSupport(floors, center, floorTop);
+            var pillars = level.OrderBy(p => Mathf.Repeat(Mathf.Atan2(p.Position.z - center.y, p.Position.x - center.x), Mathf.PI * 2)).ToArray();
+            var random = new System.Random(unchecked(detailBushSeed + level.Key * 7919));
+            int interval = Mathf.Max(1, detailBushPillarInterval);
+            for (int group = 0; group < pillars.Length; group += interval)
+            {
+                var pillar = pillars[Mathf.Min(pillars.Length - 1, group + random.Next(interval))];
+                float size = Range(random, .85f, 1.15f);
+                Vector3 scale = baseScale * size;
+                float footprint = bushRadius * Mathf.Max(scale.x, scale.z);
+                Quaternion rotation = Quaternion.Euler(0, Range(random, 0, 360), 0);
+                Vector2 point = new(pillar.Position.x, pillar.Position.z);
+                Vector2 outward = (point - center).normalized;
+                Vector2 tangent = new(-outward.y, outward.x);
+                float sideways = Range(random, -.35f, .35f);
+                float gap = pillarClearance + footprint + Range(random, .05f, .25f);
+                // Prefer the inner (walkable) side; fall back to the outer ledge when it has room.
+                foreach (float side in random.NextDouble() < .75 ? new[] { -1f, 1f } : new[] { 1f, -1f })
+                {
+                    Vector2 candidate = point + outward * (side * gap) + tangent * sideways;
+                    if (!support.SupportsDisk(candidate, footprint, out float surface)) continue;
+                    float bottom = surface - bushBounds.min.y * scale.y - TowerBushScatter.RootEmbedDepth;
+                    float top = bottom + bushBounds.max.y * scale.y;
+                    if (stairMesh != null && OverlapsStair(stairs, stairMesh.bounds, candidate, footprint + .35f, bottom, top)) continue;
+                    result.Add(new ChunkAssetData(0, TowerAssetType.Bush, new Vector3(candidate.x, bottom, candidate.y), rotation, scale));
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    private static bool OverlapsStair(ChunkAssetData[] stairs, Bounds mesh, Vector2 point, float radius, float bottom, float top)
+    {
+        foreach (var stair in stairs)
+        {
+            Vector3 c = Vector3.Scale(mesh.center, stair.Scale), e = Vector3.Scale(mesh.extents, stair.Scale);
+            float stairBottom = stair.Position.y + c.y - e.y, stairTop = stair.Position.y + c.y + e.y;
+            // Steps well overhead leave head room; anything near walking height must stay clear.
+            if (stairTop < bottom - .2f || stairBottom > top + .6f) continue;
+            Vector3 local = Quaternion.Inverse(stair.Rotation) * (new Vector3(point.x, stair.Position.y, point.y) - stair.Position) - c;
+            float x = Mathf.Max(0, Mathf.Abs(local.x) - e.x), z = Mathf.Max(0, Mathf.Abs(local.z) - e.z);
+            if (x * x + z * z < radius * radius) return true;
+        }
+        return false;
+    }
+
+    private static float Range(System.Random random, float low, float high) => Mathf.Lerp(low, high, (float)random.NextDouble());
+
     private void OnDestroy() => floorMeshes.Dispose();
 
     public GameObject GetModelPrefab(TowerAssetType assetType)
@@ -337,6 +438,7 @@ public class TowerGenerator : MonoBehaviour
             TowerAssetType.Stair => stairStepObject,
             TowerAssetType.Pillar => pillarObject,
             TowerAssetType.Arch => archObject,
+            TowerAssetType.Bush => detailBushObject,
             _ => null
         };
     }
