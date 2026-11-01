@@ -90,6 +90,17 @@ The current revision separates the recessed water interior from the smooth glass
 - `../Documentation/FrutigerAero/Foliage/Previews/Bush-Wind.gif` — sampled slow wind bending and leaf flutter, with anchored bases.
 - `../Documentation/FrutigerAero/Foliage/Previews/Bush-Terrace.png` — irregular detail clusters on the outer terrace, outside the wall and clear of the stairs. See [placement and rendering notes](../Documentation/FrutigerAero/Foliage/BUSHES.md).
 
+### Climbing vines (detail phase) — 2026-10-31
+
+Supplied for the buildable detail vines that climb a pillar from the deck and spill onto part of its arch, inside or outside the tower. They replace the earlier detail bushes. See [vine notes](../Documentation/FrutigerAero/Foliage/VINES.md).
+
+- `Asset/Vine-Glass-Gym-Hanging-User.webp`, `Vine-Glass-Facade-Bubble-User.png`, `Vine-Ceiling-Canopy-User.png` — the target mood: bright green vines draped over white and blue glass architecture with soft bubbles.
+- `Asset/Vine-Overgrown-Street-User.png`, `Vine-Overgrown-City-User.png` — reclaimed buildings; vines gather at the base and climb the corners.
+- `Asset/Vine-Iron-Stair-Ivy-User.png`, `Vine-Chimney-Climb-User.webp`, `Vine-Brick-Climb-Large-Leaf-User.png` — a vine climbing one vertical support, thick at the bottom and thinning as it rises.
+- `Asset/Vine-Arched-Window-User.webp`, `Vine-Brick-Window-Ivy-User.png`, `Vine-Window-Creeper-User.webp`, `Vine-Dense-Window-User.webp` — leaves framing an opening or arch and leaving the centre clear.
+- `Asset/Vine-Strands-White-Wall-User.webp`, `Vine-Hanging-Leaves-User.webp`, `Vine-Blue-Doors-Drape-User.png`, `Vine-Balcony-Drape-User.png` — loose strands and curtains hanging down from a ledge.
+- `Asset/Vine-Ivy-Facade-Windows-User.webp`, `Vine-House-Gable-User.png`, `Vine-Stone-Wall-Creeper-User.webp`, `Vine-Balcony-Overgrown-User.webp` — leaf colour range from yellow-green to deep green, with occasional red leaves.
+
 ### Tower terrain landscape
 
 - `../Documentation/FrutigerAero/Previews/Terrain-Overview-Lightweight.png` and `Terrain-Lake-1-Lightweight.png` — reduced terrain and grass cost, with the rolling landscape and lakes preserved. Current settings and validation are in [landscape notes](../Documentation/FrutigerAero/TERRAIN_LANDSCAPE.md).

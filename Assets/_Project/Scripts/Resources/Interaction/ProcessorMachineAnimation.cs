@@ -12,7 +12,7 @@ namespace TowerOfBabel.Resources.Interaction
     [DisallowMultipleComponent]
     public sealed class ProcessorMachineAnimation : MonoBehaviour
     {
-        public enum ProcessKind : byte { Crush, Melt, Mill, Press, Spin }
+        public enum ProcessKind : byte { Crush, Melt, Mill, Press, Spin, Grow }
 
         [Serializable] public sealed class Spin
         {

@@ -264,7 +264,8 @@ namespace TowerOfBabel.World.Chunks
             assetPrefabs.SetPrefab(TowerAssetType.Pillar, generator.GetModelPrefab(TowerAssetType.Pillar));
             assetPrefabs.SetPrefab(TowerAssetType.Arch, generator.GetModelPrefab(TowerAssetType.Arch));
             assetPrefabs.SetPrefab(TowerAssetType.GlassWaterFloor, generator.GetModelPrefab(TowerAssetType.GlassWaterFloor));
-            assetPrefabs.SetPrefab(TowerAssetType.Bush, generator.GetModelPrefab(TowerAssetType.Bush));
+            foreach (TowerAssetType detail in TowerAssetTypeExtensions.DetailTypes)
+                assetPrefabs.SetPrefab(detail, generator.GetModelPrefab(detail));
             radialFloors = TowerFloorLayout.SupportsRadialFloor(generator.GetModelPrefab(TowerAssetType.Floor));
             floorCenter = generator.center;
             floorRadialDepth = generator.tileDecreaseRate;

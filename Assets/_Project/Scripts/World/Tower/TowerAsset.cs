@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace TowerOfBabel.World.Tower
 {
@@ -11,7 +12,10 @@ namespace TowerOfBabel.World.Tower
         Arch = 3,
         GlassWaterFloor = 4,
         // Detail phase: released only after every structure asset on the floor is complete.
-        Bush = 5
+        // Three procedural vine shapes that climb a pillar and spill onto its arches.
+        Vine = 5,
+        VineDraped = 6,
+        VineDense = 7
     }
 
     /// <summary>Each floor is built in two phases: the structure first, then the detail that dresses it.</summary>
@@ -29,7 +33,9 @@ namespace TowerOfBabel.World.Tower
         [SerializeField] private GameObject pillar;
         [SerializeField] private GameObject arch;
         [SerializeField] private GameObject glassWaterFloor;
-        [SerializeField] private GameObject bush;
+        [SerializeField, FormerlySerializedAs("bush")] private GameObject vine;
+        [SerializeField] private GameObject vineDraped;
+        [SerializeField] private GameObject vineDense;
 
         public bool IsComplete => floor != null && stair != null && pillar != null && arch != null;
 
@@ -42,7 +48,9 @@ namespace TowerOfBabel.World.Tower
                 TowerAssetType.Pillar => pillar,
                 TowerAssetType.Arch => arch,
                 TowerAssetType.GlassWaterFloor => glassWaterFloor,
-                TowerAssetType.Bush => bush,
+                TowerAssetType.Vine => vine,
+                TowerAssetType.VineDraped => vineDraped,
+                TowerAssetType.VineDense => vineDense,
                 _ => null
             };
         }
@@ -66,8 +74,14 @@ namespace TowerOfBabel.World.Tower
                 case TowerAssetType.GlassWaterFloor:
                     glassWaterFloor = prefab;
                     break;
-                case TowerAssetType.Bush:
-                    bush = prefab;
+                case TowerAssetType.Vine:
+                    vine = prefab;
+                    break;
+                case TowerAssetType.VineDraped:
+                    vineDraped = prefab;
+                    break;
+                case TowerAssetType.VineDense:
+                    vineDense = prefab;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetType), assetType, null);
@@ -78,7 +92,8 @@ namespace TowerOfBabel.World.Tower
     public static class TowerAssetTypeExtensions
     {
         public static bool IsFloor(this TowerAssetType type) => type == TowerAssetType.Floor || type == TowerAssetType.GlassWaterFloor;
-        public static bool IsDetail(this TowerAssetType type) => type == TowerAssetType.Bush;
+        public static readonly TowerAssetType[] DetailTypes = { TowerAssetType.Vine, TowerAssetType.VineDraped, TowerAssetType.VineDense };
+        public static bool IsDetail(this TowerAssetType type) => type >= TowerAssetType.Vine && type <= TowerAssetType.VineDense;
         public static TowerConstructionPhase Phase(this TowerAssetType type) =>
             type.IsDetail() ? TowerConstructionPhase.Detail : TowerConstructionPhase.Structure;
     }

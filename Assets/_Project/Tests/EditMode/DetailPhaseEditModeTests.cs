@@ -9,11 +9,11 @@ using UnityEngine;
 
 namespace TowerOfBabel.World.Tests
 {
-    /// <summary>Each floor builds its structure first; the detail (bushes) unlocks after, then the next floor.</summary>
+    /// <summary>Each floor builds its structure first; the detail (vines) unlocks after, then the next floor.</summary>
     public sealed class DetailPhaseEditModeTests
     {
         private static readonly ChunkKey Ground = new(0, 0, 0);
-        private const int FloorIndex = 0, PillarIndex = 1, BushIndex = 2;
+        private const int FloorIndex = 0, PillarIndex = 1, VineIndex = 2;
 
         private GameObject root;
         private ChunkManager manager;
@@ -26,10 +26,10 @@ namespace TowerOfBabel.World.Tests
             manager = root.AddComponent<ChunkManager>();
             var tower = new GameObject("Authoring");
             tower.transform.SetParent(root.transform);
-            // Sorted by type inside the chunk: Floor 0, Pillar 1, Bush 2.
+            // Sorted by type inside the chunk: Floor 0, Pillar 1, Vine 2.
             AddAsset(tower.transform, Vector3.zero, TowerAssetType.Floor);
             AddAsset(tower.transform, new Vector3(1, 0, 0), TowerAssetType.Pillar);
-            AddAsset(tower.transform, new Vector3(2, .5f, 0), TowerAssetType.Bush);
+            AddAsset(tower.transform, new Vector3(2, .5f, 0), TowerAssetType.Vine);
             AddAsset(tower.transform, new Vector3(0, 6, 0), TowerAssetType.Stair);
             Field("towerRoot").SetValue(manager, tower);
             manager.CacheChunks();
@@ -39,33 +39,33 @@ namespace TowerOfBabel.World.Tests
         public void TearDown() => Object.DestroyImmediate(root);
 
         [Test]
-        public void Bush_IsADetailAssetAndEverythingElseIsStructure()
+        public void Vines_AreDetailAssetsAndEverythingElseIsStructure()
         {
-            Assert.That(TowerAssetType.Bush.Phase(), Is.EqualTo(TowerConstructionPhase.Detail));
+            Assert.That(TowerAssetType.Vine.Phase(), Is.EqualTo(TowerConstructionPhase.Detail));
             foreach (TowerAssetType type in System.Enum.GetValues(typeof(TowerAssetType)))
-                if (type != TowerAssetType.Bush) Assert.That(type.Phase(), Is.EqualTo(TowerConstructionPhase.Structure), type.ToString());
-            Assert.That(manager.TryGetAsset(Ground, BushIndex, out var bush) && bush.AssetType == TowerAssetType.Bush);
+                if (!type.IsDetail()) Assert.That(type.Phase(), Is.EqualTo(TowerConstructionPhase.Structure), type.ToString());
+            Assert.That(manager.TryGetAsset(Ground, VineIndex, out var vine) && vine.AssetType == TowerAssetType.Vine);
         }
 
         [Test]
         public void Detail_UnlocksAfterStructure_AndNextFloorAfterDetail()
         {
             Assert.That(manager.GetFloorPhase(0), Is.EqualTo(TowerConstructionPhase.Structure));
-            Assert.That(manager.CanConstructAsset(Ground, BushIndex), Is.False, "Detail is withheld while structure is unfinished.");
-            Assert.That(manager.TryAdvanceAssetStage(Ground, BushIndex, out _), Is.False);
+            Assert.That(manager.CanConstructAsset(Ground, VineIndex), Is.False, "Detail is withheld while structure is unfinished.");
+            Assert.That(manager.TryAdvanceAssetStage(Ground, VineIndex, out _), Is.False);
 
             manager.SetAssetStage(Ground, FloorIndex, 10);
-            Assert.That(manager.CanConstructAsset(Ground, BushIndex), Is.False);
+            Assert.That(manager.CanConstructAsset(Ground, VineIndex), Is.False);
             manager.SetAssetStage(Ground, PillarIndex, 10);
 
             Assert.That(manager.IsStructureComplete(0), Is.True);
             Assert.That(manager.GetFloorPhase(0), Is.EqualTo(TowerConstructionPhase.Detail));
-            Assert.That(manager.CanConstructAsset(Ground, BushIndex), Is.True);
+            Assert.That(manager.CanConstructAsset(Ground, VineIndex), Is.True);
             Assert.That(manager.IsFloorComplete(0), Is.False, "The floor is not done until its detail is.");
             Assert.That(manager.ActiveConstructionFloor, Is.Zero);
             Assert.That(manager.IsFloorVisible(1), Is.False);
 
-            for (int i = 0; i < 10; i++) Assert.That(manager.TryAdvanceAssetStage(Ground, BushIndex, out _), Is.True);
+            for (int i = 0; i < 10; i++) Assert.That(manager.TryAdvanceAssetStage(Ground, VineIndex, out _), Is.True);
             Assert.That(manager.IsFloorComplete(0), Is.True);
             Assert.That(manager.ActiveConstructionFloor, Is.EqualTo(1));
             Assert.That(manager.IsFloorVisible(1), Is.True);
@@ -81,10 +81,10 @@ namespace TowerOfBabel.World.Tests
             manager.SetAssetStage(Ground, PillarIndex, 10);
             Assert.That(releases, Is.EqualTo(new[] { 0 }));
 
-            manager.SetAssetStage(Ground, BushIndex, 4);
+            manager.SetAssetStage(Ground, VineIndex, 4);
             manager.SetAssetStage(Ground, PillarIndex, 9);
             Assert.That(releases, Is.EqualTo(new[] { 0, 0 }));
-            Assert.That(manager.CanConstructAsset(Ground, BushIndex), Is.False);
+            Assert.That(manager.CanConstructAsset(Ground, VineIndex), Is.False);
             Assert.That(manager.GetFloorPhase(0), Is.EqualTo(TowerConstructionPhase.Structure));
         }
 
@@ -98,7 +98,7 @@ namespace TowerOfBabel.World.Tests
             Assert.That(manager.IsFloorComplete(0), Is.True);
             manager.SetConstructionStage(0, 0);
             Assert.That(releases, Is.EqualTo(new[] { 0, 0 }));
-            Assert.That(manager.CanConstructAsset(Ground, BushIndex), Is.False);
+            Assert.That(manager.CanConstructAsset(Ground, VineIndex), Is.False);
         }
 
         [Test]
@@ -116,19 +116,19 @@ namespace TowerOfBabel.World.Tests
             Field("player").SetValue(manager, player.transform);
 
             manager.RefreshTowerVisibility();
-            Assert.That(pool.ActiveInstanceCount, Is.EqualTo(2), "Floor and pillar only; the bush is withheld.");
-            Assert.That(pool.GetCapacity(TowerAssetType.Bush), Is.Zero);
+            Assert.That(pool.ActiveInstanceCount, Is.EqualTo(2), "Floor and pillar only; the vine is withheld.");
+            Assert.That(pool.GetCapacity(TowerAssetType.Vine), Is.Zero);
 
             manager.SetAssetStage(Ground, FloorIndex, 10);
             manager.SetAssetStage(Ground, PillarIndex, 10);
-            Assert.That(pool.ActiveInstanceCount, Is.EqualTo(3), "Structure complete releases the bush.");
-            Assert.That(pool.ActiveAssets.Count(a => a.GetComponent<TowerAsset>().AssetType == TowerAssetType.Bush), Is.EqualTo(1));
+            Assert.That(pool.ActiveInstanceCount, Is.EqualTo(3), "Structure complete releases the vine.");
+            Assert.That(pool.ActiveAssets.Count(a => a.GetComponent<TowerAsset>().AssetType == TowerAssetType.Vine), Is.EqualTo(1));
 
             manager.SetAssetStage(Ground, PillarIndex, 9);
             Assert.That(pool.ActiveInstanceCount, Is.EqualTo(2));
 
             manager.SetAssetStage(Ground, PillarIndex, 10);
-            manager.SetAssetStage(Ground, BushIndex, 10);
+            manager.SetAssetStage(Ground, VineIndex, 10);
             Assert.That(pool.ActiveInstanceCount, Is.EqualTo(4), "Completing the detail unlocks the next floor.");
         }
 
@@ -142,21 +142,21 @@ namespace TowerOfBabel.World.Tests
             Field("player").SetValue(manager, player.transform);
             manager.RefreshTowerVisibility();
 
-            manager.SetAssetStage(Ground, BushIndex, 6);
-            Assert.That(far.Last[Ground].Any(a => a.AssetType == TowerAssetType.Bush), Is.False);
+            manager.SetAssetStage(Ground, VineIndex, 6);
+            Assert.That(far.Last[Ground].Any(a => a.AssetType == TowerAssetType.Vine), Is.False);
             manager.SetAssetStage(Ground, FloorIndex, 10);
             manager.SetAssetStage(Ground, PillarIndex, 10);
-            Assert.That(far.Last[Ground].Any(a => a.AssetType == TowerAssetType.Bush), Is.True);
+            Assert.That(far.Last[Ground].Any(a => a.AssetType == TowerAssetType.Vine), Is.True);
         }
 
         [Test]
-        public void BoundBush_RefreshesItsPromptWhenDetailIsReleased()
+        public void BoundVine_RefreshesItsPromptWhenDetailIsReleased()
         {
-            var model = new GameObject("Bush model");
+            var model = new GameObject("Vine model");
             var building = model.AddComponent<Building>();
             try
             {
-                building.Bind(manager, Ground, BushIndex, 0);
+                building.Bind(manager, Ground, VineIndex, 0);
                 Assert.That(building.ShouldShowInteraction, Is.False);
                 int changes = 0;
                 building.InteractionPresentationChanged += () => changes++;
@@ -169,78 +169,89 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
-        public void Generator_PlacesBushesBesidePillars_OnTheDeck_Deterministically()
+        public void Vines_AreTheOnlyDetailTypes()
+        {
+            Assert.That(TowerAssetTypeExtensions.DetailTypes, Is.EqualTo(new[] { TowerAssetType.Vine, TowerAssetType.VineDraped, TowerAssetType.VineDense }));
+            foreach (TowerAssetType type in System.Enum.GetValues(typeof(TowerAssetType)))
+                Assert.That(type.IsDetail(), Is.EqualTo(System.Array.IndexOf(TowerAssetTypeExtensions.DetailTypes, type) >= 0), type.ToString());
+        }
+
+        [Test]
+        public void Generator_PlacesVinesOnPillars_FacingInOrOut_Deterministically()
         {
             var setup = CreateGeneratorScene(out var assets, out var pillars);
             try
             {
                 var generator = setup.GetComponent<TowerGenerator>();
-                var bushes = generator.BuildDetailBushes(assets);
-                Assert.That(bushes.Count, Is.EqualTo(pillars.Length / generator.detailBushPillarInterval));
-                foreach (var bush in bushes)
+                var vines = generator.BuildDetailVines(assets);
+                Assert.That(vines.Count, Is.EqualTo(pillars.Length / generator.detailPillarInterval));
+                foreach (var vine in vines)
                 {
-                    Assert.That(bush.AssetType, Is.EqualTo(TowerAssetType.Bush));
-                    var point = new Vector2(bush.Position.x, bush.Position.z);
-                    float nearest = pillars.Min(p => Vector2.Distance(point, new Vector2(p.x, p.z)));
-                    Assert.That(nearest, Is.InRange(generator.PillarSupportRadius, 3f), "Next to a pillar, never inside it.");
-                    // Floor deck surface is y = 0.2 + 0.5 * 0.2; the cube's base sits on it.
-                    Assert.That(bush.Position.y - .5f * bush.Scale.y, Is.EqualTo(.3f - TowerBushScatter.RootEmbedDepth).Within(.001f));
-                    Assert.That(bush.Scale.x, Is.InRange(.85f, 1.15f));
+                    Assert.That(vine.AssetType.IsDetail(), vine.AssetType.ToString());
+                    Assert.That(pillars.Min(p => Vector3.Distance(p, vine.Position)), Is.LessThan(.001f), "Rooted on a pillar.");
+                    Vector3 outward = new Vector3(vine.Position.x, 0, vine.Position.z).normalized;
+                    Assert.That(Mathf.Abs(Vector3.Dot(vine.Rotation * Vector3.forward, outward)), Is.EqualTo(1).Within(.001f), "Faces the inside or the outside.");
+                    Assert.That(Mathf.Abs(vine.Scale.x), Is.EqualTo(1)); Assert.That(vine.Scale.y, Is.EqualTo(1));
                 }
-                Assert.That(bushes.Select(b => b.Position.x).Distinct().Count(), Is.EqualTo(bushes.Count));
-                var again = generator.BuildDetailBushes(assets);
-                Assert.That(again.Select(b => b.Position), Is.EqualTo(bushes.Select(b => b.Position)));
+                var again = generator.BuildDetailVines(assets);
+                Assert.That(again.Select(v => (v.AssetType, v.Position, v.Rotation, v.Scale)), Is.EqualTo(vines.Select(v => (v.AssetType, v.Position, v.Rotation, v.Scale))));
             }
             finally { Object.DestroyImmediate(setup); }
         }
 
         [Test]
-        public void Generator_KeepsBushesOffLowStairs()
+        public void Generator_UsesTheOtherSideOrSkipsWhenStairsCrossTheVine()
         {
-            var setup = CreateGeneratorScene(out var assets, out _);
+            var setup = CreateGeneratorScene(out var assets, out var pillars);
             try
             {
                 var generator = setup.GetComponent<TowerGenerator>();
                 var step = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 step.transform.SetParent(setup.transform);
                 generator.stairStepObject = step;
-                // Low steps all around the pillar ring block both sides of every pillar.
-                for (int i = 0; i < 360; i += 2)
-                for (float r = 12; r <= 18; r += .5f)
-                {
-                    float a = i * Mathf.Deg2Rad;
-                    assets.Add(new ChunkAssetData(0, TowerAssetType.Stair, new Vector3(Mathf.Cos(a) * r, .3f, Mathf.Sin(a) * r), Quaternion.identity, Vector3.one));
-                }
-                Assert.That(generator.BuildDetailBushes(assets), Is.Empty);
+                // Steps that only reach the vine's root level don't block it: the vine grows from the step edge.
+                var rootSteps = new List<ChunkAssetData>(assets);
+                foreach (var pillar in pillars)
+                    for (float side = -1; side <= 1; side += 2)
+                        rootSteps.Add(new ChunkAssetData(0, TowerAssetType.Stair, pillar + pillar.normalized * .6f * side + Vector3.up * .5f, Quaternion.LookRotation(pillar.normalized), new Vector3(1, .4f, 1)));
+                Assert.That(generator.BuildDetailVines(rootSteps).Count, Is.EqualTo(pillars.Length / generator.detailPillarInterval));
+                // A step just inside every pillar forces the vines outside.
+                var inner = new List<ChunkAssetData>(assets);
+                foreach (var pillar in pillars)
+                    inner.Add(new ChunkAssetData(0, TowerAssetType.Stair, pillar - pillar.normalized * .6f + Vector3.up * 2, Quaternion.LookRotation(pillar.normalized), Vector3.one));
+                foreach (var vine in generator.BuildDetailVines(inner))
+                    Assert.That(Vector3.Dot(vine.Rotation * Vector3.forward, new Vector3(vine.Position.x, 0, vine.Position.z)), Is.GreaterThan(0));
+                // Steps on both sides leave no room at all.
+                foreach (var pillar in pillars)
+                    inner.Add(new ChunkAssetData(0, TowerAssetType.Stair, pillar + pillar.normalized * .6f + Vector3.up * 2, Quaternion.LookRotation(pillar.normalized), Vector3.one));
+                Assert.That(generator.BuildDetailVines(inner), Is.Empty);
             }
             finally { Object.DestroyImmediate(setup); }
         }
 
-        // A full 360 degree deck from radius 10 to 20 at y 0.2 with twelve pillars on radius 15.
+        // Twelve pillars on a 15 m ring; each vine variant is a unit cube 0.7 m in front of its pillar, from 0.7 to 1.7 m up.
         private static GameObject CreateGeneratorScene(out List<ChunkAssetData> assets, out Vector3[] pillars)
         {
             var setup = new GameObject("Detail generator");
             var generator = setup.AddComponent<TowerGenerator>();
             generator.heighIncrease = 6;
             generator.center = Vector2.zero;
-            generator.detailBushPillarInterval = 3;
-            var bush = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bush.transform.SetParent(setup.transform);
-            Object.DestroyImmediate(bush.GetComponent<Collider>());
-            generator.detailBushObject = bush;
-            var tile = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            tile.transform.SetParent(setup.transform);
-            generator.floorTileObject = tile;
-
-            assets = new List<ChunkAssetData>();
-            const float outer = 20, depth = 10; const int tiles = 16;
-            float sweep = Mathf.PI * 2 / tiles;
-            for (int i = 0; i < tiles; i++)
+            generator.detailPillarInterval = 3;
+            generator.detailVineObjects = new GameObject[3];
+            for (int i = 0; i < 3; i++)
             {
-                float a = i * sweep;
-                assets.Add(new ChunkAssetData(0, TowerAssetType.Floor, new Vector3(Mathf.Cos(a) * outer, .2f, Mathf.Sin(a) * outer),
-                    Quaternion.identity, new Vector3(depth / TowerFloorLayout.TemplateSize, .2f, sweep * outer / TowerFloorLayout.TemplateSize)));
+                var vine = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                vine.transform.SetParent(setup.transform);
+                Object.DestroyImmediate(vine.GetComponent<Collider>());
+                // Like a real vine, the stand-in sits in front of the pillar face (local +Z).
+                var filter = vine.GetComponent<MeshFilter>();
+                var mesh = Object.Instantiate(filter.sharedMesh);
+                mesh.vertices = mesh.vertices.Select(v => v + new Vector3(0, 1.2f, .7f)).ToArray();
+                filter.sharedMesh = mesh;
+                generator.detailVineObjects[i] = vine;
             }
+            Assert.That(generator.GetModelPrefab(TowerAssetType.VineDense), Is.SameAs(generator.detailVineObjects[2]));
+            assets = new List<ChunkAssetData>();
             pillars = Enumerable.Range(0, 12).Select(i => new Vector3(Mathf.Cos(i * Mathf.PI / 6) * 15, 0, Mathf.Sin(i * Mathf.PI / 6) * 15)).ToArray();
             foreach (var pillar in pillars)
                 assets.Add(new ChunkAssetData(0, TowerAssetType.Pillar, pillar, Quaternion.identity, Vector3.one));

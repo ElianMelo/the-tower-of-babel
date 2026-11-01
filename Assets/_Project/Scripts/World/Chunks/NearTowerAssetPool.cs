@@ -95,7 +95,8 @@ namespace TowerOfBabel.World.Chunks
             CreateTypePool(TowerAssetType.Pillar);
             CreateTypePool(TowerAssetType.Arch);
             if (prefabs.GetPrefab(TowerAssetType.GlassWaterFloor) != null) CreateTypePool(TowerAssetType.GlassWaterFloor);
-            if (prefabs.GetPrefab(TowerAssetType.Bush) != null) CreateTypePool(TowerAssetType.Bush);
+            foreach (TowerAssetType detail in TowerAssetTypeExtensions.DetailTypes)
+                if (prefabs.GetPrefab(detail) != null) CreateTypePool(detail);
         }
 
         public void BeginUpdate()

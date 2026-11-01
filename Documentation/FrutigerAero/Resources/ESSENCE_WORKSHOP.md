@@ -9,6 +9,7 @@ Three new gather → process chains join stone and sand/glass. Every tower build
 | Water Essence | Water Block | Water press | Pillar |
 | Stone | Processed Stone | Stone processor | Floor tile (`Floor_Tile`) |
 | Sky Essence | Sky Block | Sky spinner | Arch |
+| Grass | Living Grass | Grass planter | Detail vines ([grass and living grass](GRASS_WORKSHOP.md)) |
 
 Each building still costs 1 material per construction stage, before upgrades. The interaction card and the "Need …" prompt show readable names ("River Block", "Processed Stone") and the material's icon.
 

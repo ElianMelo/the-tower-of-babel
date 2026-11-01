@@ -344,6 +344,45 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [UnityTest]
+        public IEnumerator HostGrass_GatherThenGrowIntoLivingGrassExactlyOnce()
+        {
+            var node = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == ResourceType.Grass);
+            var original = node.Definition; var definition = Object.Instantiate(original);
+            Set(definition, "interactionDuration", .3f); Set(definition, "respawnCooldown", .5f); Set(node, "definition", definition);
+            try
+            {
+                var feedback = node.GetComponent<ResourceHarvestFeedback>();
+                Seed(ResourceType.Grass, 0); Seed(ResourceType.LivingGrass, 0); player.transform.position = node.transform.position;
+                Invoke(raycaster, "SetTarget", node.GetComponent<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => Get<IDictionary>(service, "activeGathers").Count == 1, "Grass gathering did not start.");
+                raycaster.CancelCurrentInteraction();
+                yield return WaitFor(() => Get<IDictionary>(service, "activeGathers").Count == 0, "Grass gathering did not cancel.");
+                Assert.That(service.GetLocalAmount(ResourceType.Grass), Is.Zero);
+                Invoke(raycaster, "SetTarget", node.GetComponent<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => service.GetLocalAmount(ResourceType.Grass) == 2, "Grass did not reach the wallet.");
+                Assert.That(feedback.IsDepleted, Is.True); Assert.That(feedback.MarkerVisible, Is.True, "Stubble stays during cooldown.");
+                Assert.That(feedback.CompletionCount, Is.EqualTo(1));
+                yield return WaitFor(() => node.CanInteract, "Grass did not regrow.");
+                Assert.That(feedback.IsDepleted, Is.False); Assert.That(feedback.MarkerVisible, Is.False);
+            }
+            finally { Set(node, "definition", original); Object.Destroy(definition); }
+
+            Object.Destroy(processor.gameObject); yield return null;
+            processor = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/GrassPlanter.prefab")).GetComponent<ResourceProcessor>();
+            processor.transform.position = new Vector3(0, 1000, 0); player.transform.position = processor.transform.position;
+            Set(processor, "processorId", "test-GrassPlanter"); Set(processor, "interactionDuration", .35f);
+            Invoke(service, "RebuildNodeLookup"); Seed(ResourceType.Grass, 4); Seed(ResourceType.LivingGrass, 0);
+            var motion = processor.GetComponent<ProcessorMachineAnimation>();
+            int completed = 0; processor.ServerCompleted += () => completed++;
+            Begin(); yield return WaitFor(() => completed == 1, "The planter exchange did not complete through the host RPC flow.");
+            Assert.That(service.GetLocalAmount(ResourceType.Grass), Is.EqualTo(2)); Assert.That(service.GetLocalAmount(ResourceType.LivingGrass), Is.EqualTo(1));
+            Assert.That(store.GetAmount(connection.ClientId, ResourceType.LivingGrass), Is.EqualTo(1));
+            Assert.That(motion.IsOutputVisible, Is.True); Assert.That(motion.CompletionCount, Is.EqualTo(1));
+        }
+
+        [UnityTest]
         public IEnumerator RockCooldown_LeavesBricksEmitsMeshChipsAndRestoresTheNode()
         {
             var stone = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == ResourceType.Stone);

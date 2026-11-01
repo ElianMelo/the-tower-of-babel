@@ -12,7 +12,9 @@ namespace TowerOfBabel.Resources
         WaterEssence = 6,
         WaterBlock = 7,
         SkyEssence = 8,
-        SkyBlock = 9
+        SkyBlock = 9,
+        Grass = 10,
+        LivingGrass = 11
     }
 
     public static class ResourceTypeNames
@@ -27,6 +29,7 @@ namespace TowerOfBabel.Resources
             ResourceType.WaterBlock => "Water Block",
             ResourceType.SkyEssence => "Sky Essence",
             ResourceType.SkyBlock => "Sky Block",
+            ResourceType.LivingGrass => "Living Grass",
             _ => type.ToString()
         };
     }

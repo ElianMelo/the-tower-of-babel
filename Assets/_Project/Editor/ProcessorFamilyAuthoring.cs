@@ -213,19 +213,19 @@ public static class ProcessorFamilyAuthoring
     }
 
     // ------------------------------------------------------------------ channel helpers
-    private static SerializedProperty Append(SerializedObject so, string field)
+    internal static SerializedProperty Append(SerializedObject so, string field)
     {
         var list = so.FindProperty(field); list.arraySize++;
         return list.GetArrayElementAtIndex(list.arraySize - 1);
     }
 
-    private static void Refs(SerializedObject so, string field, System.Collections.Generic.IEnumerable<UnityEngine.Object> values)
+    internal static void Refs(SerializedObject so, string field, System.Collections.Generic.IEnumerable<UnityEngine.Object> values)
     {
         var items = values.ToArray(); var list = so.FindProperty(field); list.arraySize = items.Length;
         for (int i = 0; i < items.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = items[i];
     }
 
-    private static void Spin(SerializedObject so, Transform part, Vector3 axis, float speed)
+    internal static void Spin(SerializedObject so, Transform part, Vector3 axis, float speed)
     {
         var e = Append(so, "spins");
         e.FindPropertyRelative("part").objectReferenceValue = part; e.FindPropertyRelative("axis").vector3Value = axis;
@@ -240,14 +240,14 @@ public static class ProcessorFamilyAuthoring
         e.FindPropertyRelative("strokes").intValue = strokes; e.FindPropertyRelative("shake").floatValue = shake;
     }
 
-    private static void Pulse(SerializedObject so, Transform part, Vector3 axis, float amount, float rate)
+    internal static void Pulse(SerializedObject so, Transform part, Vector3 axis, float amount, float rate)
     {
         var e = Append(so, "pulses");
         e.FindPropertyRelative("part").objectReferenceValue = part; e.FindPropertyRelative("axis").vector3Value = axis;
         e.FindPropertyRelative("amount").floatValue = amount; e.FindPropertyRelative("rate").floatValue = rate;
     }
 
-    private static SerializedProperty FillLevel(SerializedObject so, Transform part, Vector3 axis, Vector2 window)
+    internal static SerializedProperty FillLevel(SerializedObject so, Transform part, Vector3 axis, Vector2 window)
     {
         var e = Append(so, "fills");
         e.FindPropertyRelative("part").objectReferenceValue = part; e.FindPropertyRelative("axis").vector3Value = axis;
@@ -256,7 +256,7 @@ public static class ProcessorFamilyAuthoring
         return e;
     }
 
-    private static void Feed(SerializedObject so, GameObject model, Vector3 entry, Vector3 via, float arc, Vector2 consume, Vector3 consumeOffset, float swirl)
+    internal static void Feed(SerializedObject so, GameObject model, Vector3 entry, Vector3 via, float arc, Vector2 consume, Vector3 consumeOffset, float swirl)
     {
         so.FindProperty("feed").objectReferenceValue = Find(model, "Feed");
         so.FindProperty("feedEntry").vector3Value = entry; so.FindProperty("feedVia").vector3Value = via;

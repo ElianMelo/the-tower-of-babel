@@ -157,7 +157,8 @@ public static class ResourceStationKit
         string path = Effects + name + ".wav"; if (File.Exists(path)) return;
         Directory.CreateDirectory(Effects);
         int rate = 22050;
-        float duration = name switch { "CondenserHum" => 1, "BlockChime" => .9f, "EssenceBurst" => .6f, "SkyStroke" => .35f, "RiverStroke" => .3f, _ => .2f };
+        float duration = name switch { "CondenserHum" => 1, "BlockChime" => .9f, "EssenceBurst" => .6f, "SkyStroke" => .35f, "RiverStroke" => .3f,
+            "GrassStroke" => .28f, "GrassBurst" => .5f, _ => .2f };
         int length = Mathf.RoundToInt(rate * duration); var random = new System.Random(311 + name.Length * 7); float low = 0, band = 0;
         using (var file = new BinaryWriter(File.Create(path)))
         {
@@ -174,6 +175,9 @@ public static class ResourceStationKit
                     case "RiverStroke": value = (Mathf.Sin(tau * (320 + 180 * t / duration) * t + Mathf.Sin(tau * 23 * t) * 2) * .35f + low * .5f) * Mathf.Sin(Mathf.PI * t / duration) * .55f; break;
                     case "WaterStroke": value = Mathf.Sin(tau * (240 * t + 1400 * t * t)) * Mathf.Exp(-t * 16) * .5f; break;
                     case "SkyStroke": value = band * Mathf.Sin(Mathf.PI * t / duration) * .9f + Mathf.Sin(tau * 1180 * t) * Mathf.Exp(-t * 9) * .05f; break;
+                    // A soft swish of blades being pulled, then a leafy rustle.
+                    case "GrassStroke": value = band * Mathf.Pow(Mathf.Sin(Mathf.PI * t / duration), 2) * 1.1f + low * .25f * Mathf.Exp(-t * 10); break;
+                    case "GrassBurst": value = (band * .8f + low * .4f) * Mathf.Exp(-t * 6) * (.7f + .3f * Mathf.Sin(tau * 31 * t)); break;
                     case "EssenceBurst": value = (low * .6f * Mathf.Exp(-t * 7) + (Mathf.Sin(tau * 990 * t) + .4f * Mathf.Sin(tau * 1485 * t)) * Mathf.Exp(-t * 6) * .18f) * .8f; break;
                     // Whole-hertz partials repeat exactly every second, so the one-second hum loops without a click.
                     case "CondenserHum": value = (Mathf.Sin(tau * 90 * t) * .16f + Mathf.Sin(tau * 180 * t) * .07f + Mathf.Sin(tau * 541 * t) * .02f) * (.85f + .15f * Mathf.Sin(tau * 3 * t)); break;
