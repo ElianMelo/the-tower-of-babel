@@ -181,7 +181,7 @@ namespace TowerOfBabel.Cheats
             if (jobLabel != null) jobLabel.text = $"{job}   Level {snapshot.Level}/50   XP {snapshot.Experience}/{UpgradeJobProgress.GetExperienceRequired(snapshot.Level)}   Points {snapshot.AvailablePoints}";
             if (jobLabel != null && allProfessions) jobLabel.text = "ALL classes  |  " + string.Join("   ", Enum.GetValues(typeof(UpgradeJob)).Cast<UpgradeJob>().Select(j => $"{j}: Lv {service?.GetLocalSnapshot(j).Level ?? 0}"));
             foreach (var item in professionOutlines) item.Value.enabled = item.Key == (allProfessions ? "ALL" : job.ToString());
-            foreach (var item in toggleValues) if (item.toggle != null) { bool value = item.read(); item.toggle.SetIsOnWithoutNotify(value); item.toggle.graphic.gameObject.SetActive(value); item.caption.text = value ? "On" : "Off"; }
+            foreach (var item in toggleValues) if (item.toggle != null) { bool value = item.read(); item.toggle.SetIsOnWithoutNotify(value); ShowMark(item.toggle.graphic, value); item.caption.text = value ? "On" : "Off"; }
             if (context != null) context.text = $"Target: {targetDescription}     |     Bag: {NetworkResourceService.Instance?.LocalCapacity ?? 50} per resource";
             foreach (var pair in statFields) if (pair.field != null && !pair.field.isFocused)
                 pair.field.SetTextWithoutNotify((service != null ? service.GetLocalCheatStat(pair.stat) : CheatProfile.Default(pair.stat)).ToString("0.##", CultureInfo.InvariantCulture));
@@ -252,10 +252,12 @@ namespace TowerOfBabel.Cheats
             var check = mark.gameObject.AddComponent<UnityEngine.UI.Image>(); check.color = new Color(.25f, .9f, .4f); toggle.graphic = check;
             var caption = Text(read() ? "On" : "Off", control, 17, true); Stretch(caption.rectTransform, 52, 8, 4, 4);
             toggle.SetIsOnWithoutNotify(read());
-            mark.gameObject.SetActive(read());
-            toggle.onValueChanged.AddListener(value => { if (value != read()) changed(value); bool state = read(); mark.gameObject.SetActive(state); caption.text = state ? "On" : "Off"; });
+            ShowMark(check, read());
+            toggle.onValueChanged.AddListener(value => { if (value != read()) changed(value); bool state = read(); ShowMark(check, state); caption.text = state ? "On" : "Off"; });
             toggleValues.Add((toggle, read, caption)); toggleControls[label] = toggle;
         }
+        // Toggle transitions only update alpha when the value changes, so set both explicitly.
+        private static void ShowMark(UnityEngine.UI.Graphic mark, bool on) { mark.canvasRenderer.SetAlpha(on ? 1 : 0); mark.gameObject.SetActive(on); }
         public void RebuildRows()
         {
             if (content == null) return;
@@ -265,34 +267,43 @@ namespace TowerOfBabel.Cheats
             var service = NetworkUpgradeService.Instance;
             UnityAction level = () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, Mathf.Min(50, service.GetLocalSnapshot(j).Level + 1))));
             UnityAction xp = () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatExperience(j, Amount)));
+            UnityAction maxLevel = () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, 50)));
+            UnityAction setDay = () => RequestWeather(weather => weather.RequestDay(), "Time of day: noon.");
+            UnityAction setNight = () => RequestWeather(weather => weather.RequestNight(), "Time of day: midnight.");
+            Func<bool> raining = () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.Raining;
+            UnityAction<bool> rain = value => RequestWeather(weather => weather.RequestRain(value), value ? "Rain started for everyone." : "Rain stopped; surfaces dry out.");
+            // Most used controls first; each one also stays in its own category.
+            foreach (string section in new[] { "Quick actions", "World" }) ToggleRow(section, "God mode", "Fly through walls with WASD, Space up, Ctrl down and Shift to accelerate", () => flying, SetGodMode);
             foreach (string section in new[] { "Quick actions", "Progression" })
             {
-                Action(section, "Level up", "Selected profession - gain one level and its upgrade point", level, "+1 level");
-                Action(section, "Gain XP", "Add the selected amount of experience to the selected profession", xp, "Grant XP");
+                Action(section, "Max level", "Set the selected classes to level 50", maxLevel, "Level 50");
+                Action(section, "Unlock all upgrades", "Max every profession and purchase every node", () => Command(CheatCommand.UnlockAllUpgrades), "Buy all");
             }
             foreach (string section in new[] { "Quick actions", "Construction" })
             {
-                ToggleRow(section, "Instantly build asset", "Fills your bag with every resource; while enabled, interact with any available asset to finish it for free", () => NetworkUpgradeService.Instance?.GetLocalCheatStat(CheatStat.InstantBuild) > .5f,
-                    value => Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(CheatStat.InstantBuild, value ? 1 : 0)));
                 Action(section, "Instantly build floor", "Complete the next unfinished floor, wherever you are standing; repeat to advance", () => Command(CheatCommand.BuildFloor), "Build next floor");
+                Action(section, "Instantly build tower", "Finish every floor in one batched operation", () => Command(CheatCommand.BuildTower), "Build tower");
             }
-            foreach (string section in new[] { "Quick actions", "World" }) ToggleRow(section, "God mode", "Fly through walls with WASD, Space up, Ctrl down and Shift to accelerate", () => flying, SetGodMode);
-            foreach (string section in new[] { "Quick actions", "Inventory" })
-                Action(section, "Increase bag capacity", "Add the amount to the capacity of each resource", () => Sent(service != null && service.RequestCheatStat(CheatStat.BagCapacity, (NetworkResourceService.Instance?.LocalCapacity ?? 50) + Amount)), "+ capacity");
+            foreach (string section in new[] { "Quick actions", "World" })
+            {
+                Action(section, "Set day", "Jump everyone to noon", setDay, "Day");
+                Action(section, "Set night", "Jump everyone to midnight", setNight, "Night");
+                ToggleRow(section, "Rain", "Falling rain, splashes and wet surfaces for every player; pauses automatic weather", raining, rain);
+            }
             Action("Quick actions", "Start local host", "Start a session here, then use all gameplay actions", () => { var bootstrap = FindFirstObjectByType<NetworkBootstrap>(); SetStatus(bootstrap != null && bootstrap.StartHost() ? "Starting host..." : "A session is already running or the network service is unavailable."); }, "Start host");
+            Action("Progression", "Level up", "Selected profession - gain one level and its upgrade point", level, "+1 level");
+            Action("Progression", "Gain XP", "Add the selected amount of experience to the selected profession", xp, "Grant XP");
             Action("Progression", "Gain 10 levels", "Selected classes, clamped to level 50", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, Mathf.Min(50, service.GetLocalSnapshot(j).Level + 10)))), "+10 levels");
-            Action("Progression", "Max level", "Set the selected classes to level 50", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatLevel(j, 50))), "Level 50");
             Action("Progression", "Grant upgrade points", "Add the selected amount of spendable points", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatPoints(j, Amount))), "Grant points");
-            Action("Progression", "Unlock all upgrades", "Max every profession and purchase every node", () => Command(CheatCommand.UnlockAllUpgrades), "Unlock all");
             Action("Progression", "Reset selected profession", "Reset the selected classes' level, XP, points and purchased nodes", () => ForSelectedProfessions(j => Sent(service != null && service.RequestCheatReset(j))), "Reset selected");
             Action("Progression", "Reset all progression", "Reset all three professions", () => Sent(service != null && service.RequestCheatResetAll()), "Reset all jobs");
-            if (service != null && service.Config != null && category == "Progression")
-                foreach (var upgrade in service.Config.GetUpgrades(job)) { string id = upgrade.Id; int row = upgrade.Row, column = upgrade.Column; Action("Progression", "Purchase " + upgrade.DisplayName + " [" + row + "," + column + "]", allProfessions ? "Matching node position in every class" : id, () => ForSelectedProfessions(j => Sent(service.RequestCheatPurchase(j, row, column))), "Purchase"); }
+            ToggleRow("Construction", "Instantly build asset", "Fills your bag with every resource; while enabled, interact with any available asset to finish it for free", () => NetworkUpgradeService.Instance?.GetLocalCheatStat(CheatStat.InstantBuild) > .5f,
+                value => Sent(NetworkUpgradeService.Instance != null && NetworkUpgradeService.Instance.RequestCheatStat(CheatStat.InstantBuild, value ? 1 : 0)));
+            Action("Inventory", "Increase bag capacity", "Add the amount to the capacity of each resource", () => Sent(service != null && service.RequestCheatStat(CheatStat.BagCapacity, (NetworkResourceService.Instance?.LocalCapacity ?? 50) + Amount)), "+ capacity");
             foreach (var entry in new[] {
                 ("Advance asset one stage", "Add one stage to the captured asset", CheatCommand.AdvanceAsset),
                 ("Reset asset", "Return the captured asset to its blueprint", CheatCommand.ResetAsset),
                 ("Reset floor", "Reset the selected floor and hide floors above it", CheatCommand.ResetFloor),
-                ("Instantly build tower", "Finish every floor in one batched operation", CheatCommand.BuildTower),
                 ("Reset tower", "Return the whole tower to the first-floor blueprint", CheatCommand.ResetTower) })
             { var cmd = entry.Item3; Action("Construction", entry.Item1, entry.Item2, () => Command(cmd)); }
             foreach (var entry in new[] {
@@ -318,14 +329,9 @@ namespace TowerOfBabel.Cheats
             Action("World", "Return to spawn", "Move back to the saved starting position", () => { ResolvePlayer(); if (hasSpawn) Teleport(spawn); }, "Return");
             foreach (float scale in new[] { 0f, .25f, 1f, 2f, 5f }) { float value = scale; Action("World", "Time scale " + scale.ToString("0.##", CultureInfo.InvariantCulture), "Local simulation speed; menu remains responsive while paused", () => { Time.timeScale = value; SetStatus("Time scale: " + value); }, "Apply"); }
             // Weather and time of day are server-authoritative and synced to every player.
-            ToggleRow("World", "Rain", "Falling rain, splashes and wet surfaces for every player; pauses automatic weather",
-                () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.Raining,
-                value => RequestWeather(service => service.RequestRain(value), value ? "Rain started for everyone." : "Rain stopped; surfaces dry out."));
             ToggleRow("World", "Automatic weather", "Let the server start and stop rain on its own, by day or night",
                 () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.AutomaticWeather,
                 value => RequestWeather(service => service.RequestAutomaticWeather(value), value ? "Automatic weather on." : "Automatic weather off; rain stays as set."));
-            Action("World", "Set day", "Jump everyone to noon", () => RequestWeather(service => service.RequestDay(), "Time of day: noon."), "Day");
-            Action("World", "Set night", "Jump everyone to midnight", () => RequestWeather(service => service.RequestNight(), "Time of day: midnight."), "Night");
             ToggleRow("World", "Freeze time of day", "Stop the day/night cycle for everyone to inspect assets",
                 () => NetworkWeatherService.Instance != null && NetworkWeatherService.Instance.TimeFrozen,
                 value => RequestWeather(service => service.RequestFreezeTime(value), value ? "Time of day frozen." : "Day/night cycle running."));
@@ -433,14 +439,8 @@ namespace TowerOfBabel.Cheats
             var le = root.GetComponent<UnityEngine.UI.LayoutElement>() ?? root.AddComponent<UnityEngine.UI.LayoutElement>(); le.preferredWidth = width; le.minWidth = width; le.preferredHeight = 40;
             return button;
         }
-        private TMP_InputField Input(Transform parent, string label, string value, float width, bool numeric)
-        {
-            var rect = Rect(label, parent); rect.gameObject.AddComponent<UnityEngine.UI.Image>().color = new Color(.95f, .99f, 1, .95f);
-            var le = rect.gameObject.AddComponent<UnityEngine.UI.LayoutElement>(); le.preferredWidth = width; le.minWidth = width; le.preferredHeight = 38;
-            var viewport = Rect("Text area", rect); Stretch(viewport, 9, 9, 4, 4); viewport.gameObject.AddComponent<UnityEngine.UI.RectMask2D>();
-            var text = Text(value, viewport, 17); Stretch(text.rectTransform); var placeholder = Text(label, viewport, 17); Stretch(placeholder.rectTransform); placeholder.color = new Color(.25f, .45f, .52f, .65f);
-            var input = rect.gameObject.AddComponent<TMP_InputField>(); input.textViewport = viewport; input.textComponent = text; input.placeholder = placeholder; input.contentType = numeric ? TMP_InputField.ContentType.DecimalNumber : TMP_InputField.ContentType.Standard; input.characterLimit = numeric ? 12 : 80; input.text = value; return input;
-        }
+        private TMP_InputField Input(Transform parent, string label, string value, float width, bool numeric) =>
+            AeroInputField.Create(parent, label, value, width, numeric, regularFont, glassMaterial);
         private TMP_Text Text(string value, Transform parent, float size, bool bold = false)
         {
             var text = Rect(value.Length > 30 ? value.Substring(0, 30) : value, parent).gameObject.AddComponent<TextMeshProUGUI>(); text.font = bold && boldFont != null ? boldFont : regularFont; text.fontSize = size; text.text = value; text.color = Ink; text.raycastTarget = false; text.textWrappingMode = TextWrappingModes.NoWrap; text.overflowMode = TextOverflowModes.Ellipsis;

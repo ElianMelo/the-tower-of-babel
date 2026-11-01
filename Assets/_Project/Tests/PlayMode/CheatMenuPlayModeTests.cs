@@ -149,12 +149,12 @@ namespace TowerOfBabel.Resources.Tests
         public IEnumerator MenuActions_UpdateServerProgressCapacityResourcesAndConstruction()
         {
             var chunks = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
-            menu.Show(); menu.SetAmount(1000);
+            menu.Show(); menu.SetAmount(1000); menu.SelectCategory("Progression");
             menu.ActionButtons["Level up"].onClick.Invoke();
             yield return Wait(() => upgrades.GetLocalSnapshot(UpgradeJob.Gather).Level == 1, "Level-up was not confirmed");
             menu.ActionButtons["Gain XP"].onClick.Invoke();
             yield return Wait(() => upgrades.GetLocalSnapshot(UpgradeJob.Gather).Level > 1, "XP was not confirmed");
-            menu.ActionButtons["Increase bag capacity"].onClick.Invoke();
+            menu.SelectCategory("Inventory"); menu.ActionButtons["Increase bag capacity"].onClick.Invoke();
             yield return Wait(() => resources.LocalCapacity == 1050, "Bag capacity was not confirmed");
             menu.SelectCategory("Inventory"); menu.ActionButtons["Fill bag"].onClick.Invoke();
             yield return Wait(() => resources.GetLocalAmount(ResourceType.Stone) == 1050 && resources.GetLocalAmount(ResourceType.ProcessedStone) == 1050, "Bag did not fill");
@@ -238,7 +238,7 @@ namespace TowerOfBabel.Resources.Tests
         [UnityTest]
         public IEnumerator AllClasses_AppliesProgressionAndProfessionStatsAndCanReturnToOneClass()
         {
-            menu.Show(); menu.SelectAllProfessions(); menu.SetAmount(10);
+            menu.Show(); menu.SelectCategory("Progression"); menu.SelectAllProfessions(); menu.SetAmount(10);
             menu.ActionButtons["Level up"].onClick.Invoke();
             yield return Wait(() => Enum.GetValues(typeof(UpgradeJob)).Cast<UpgradeJob>().All(j => upgrades.GetLocalSnapshot(j).Level == 1), "ALL did not level every class");
             menu.ActionButtons["Gain XP"].onClick.Invoke();
@@ -260,7 +260,7 @@ namespace TowerOfBabel.Resources.Tests
             var pool = UnityEngine.Object.FindFirstObjectByType<TowerOfBabel.World.Chunks.NearTowerAssetPool>();
             var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>();
             var raycaster = player.GetComponent<TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster>();
-            menu.Show(); menu.ToggleControls["Instantly build asset"].isOn = true;
+            menu.Show(); menu.SelectCategory("Construction"); menu.ToggleControls["Instantly build asset"].isOn = true;
             yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.InstantBuild) == 1, "Instant-build toggle did not reach the server");
             yield return Wait(() => Enum.GetValues(typeof(ResourceType)).Cast<ResourceType>().All(type => resources.GetLocalAmount(type) == resources.LocalCapacity), "Instant build did not fill every resource to bag capacity");
             Assert.That(chunks.CachedChunks.SelectMany(c => c.Assets).All(a => a.Stage == 0), Is.True, "Enabling the toggle must not build the captured target");
@@ -279,7 +279,7 @@ namespace TowerOfBabel.Resources.Tests
             yield return Wait(() => chunks.TryGetAsset(candidate.key, candidate.asset.LocalIndex, out var a) && a.Stage == 10, "Interacting did not finish the asset");
             Assert.That(resources.GetLocalAmount(building.ResourceType), Is.EqualTo(balance));
             Assert.That(chunks.CachedChunks.Where(c => c.Key.FloorIndex == 1).SelectMany(c => c.Assets).All(a => a.Stage == 0), Is.True);
-            menu.Show(); menu.ToggleControls["Instantly build asset"].isOn = false;
+            menu.Show(); menu.SelectCategory("Construction"); menu.ToggleControls["Instantly build asset"].isOn = false;
             yield return Wait(() => upgrades.GetLocalCheatStat(CheatStat.InstantBuild) == 0, "Toggle did not disable");
             foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
                 Assert.That(resources.GetLocalAmount(type), Is.EqualTo(resources.LocalCapacity), "Disabling instant build must retain granted resources");

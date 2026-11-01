@@ -84,10 +84,20 @@ namespace TowerOfBabel.Resources.Tests
             try
             {
                 var menu = root.GetComponent<CheatMenuUI>(); menu.BuildView(); menu.ShowPreview();
-                foreach (string action in new[] { "Level up", "Gain XP", "Instantly build floor", "Increase bag capacity" })
+                foreach (string action in new[] { "Max level", "Unlock all upgrades", "Instantly build floor", "Instantly build tower", "Set day", "Set night" })
                     Assert.That(menu.ActionButtons.ContainsKey(action), Is.True, action);
-                Assert.That(menu.ToggleControls.ContainsKey("Instantly build asset"), Is.True);
                 Assert.That(menu.ToggleControls.ContainsKey("God mode"), Is.True);
+                Assert.That(menu.ToggleControls.ContainsKey("Rain"), Is.True, "Rain is a quick action.");
+                var order = root.GetComponentInChildren<UnityEngine.UI.ScrollRect>(true).content.Cast<Transform>().Select(t => t.name).ToList();
+                string[] expected = { "God mode", "Max level", "Unlock all upgrades", "Instantly build floor", "Instantly build tower", "Set day", "Set night", "Rain" };
+                Assert.That(order.Take(expected.Length), Is.EqualTo(expected), "Most used quick actions come first, in order.");
+                Assert.That(menu.ActionButtons.ContainsKey("Level up"), Is.False, "Level up moved out of quick actions.");
+                menu.SelectCategory("Progression");
+                foreach (string action in new[] { "Level up", "Gain XP", "Max level", "Unlock all upgrades" }) Assert.That(menu.ActionButtons.ContainsKey(action), Is.True, action);
+                Assert.That(menu.ActionButtons.Keys.Any(k => k.StartsWith("Purchase ")), Is.False, "Per-node purchase rows were removed.");
+                menu.SelectCategory("Construction"); Assert.That(menu.ToggleControls.ContainsKey("Instantly build asset"), Is.True);
+                menu.SelectCategory("Inventory"); Assert.That(menu.ActionButtons.ContainsKey("Increase bag capacity"), Is.True);
+                menu.SelectCategory("Quick actions");
                 Assert.That(menu.ToggleControls["God mode"].graphic.canvasRenderer.GetAlpha(), Is.Zero, "An off toggle must not show the green on mark.");
                 Canvas.ForceUpdateCanvases();
                 Assert.That(menu.ToggleControls["God mode"].graphic.gameObject.activeSelf, Is.False, "Canvas rebuilds must keep the off indicator hidden.");
@@ -101,7 +111,9 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(menu.ActionButtons.ContainsKey("Post look"), Is.True);
                 menu.SelectAllProfessions(); Assert.That(menu.AllProfessions, Is.True);
                 menu.SelectCategory("Stats");
-                Assert.That(root.GetComponentsInChildren<TMPro.TMP_InputField>(true).Length, Is.GreaterThan(20));
+                var fields = root.GetComponentsInChildren<TMPro.TMP_InputField>(true);
+                Assert.That(fields.Length, Is.GreaterThan(20));
+                Assert.That(fields.All(f => f.GetComponent<TowerOfBabel.Interface.AeroInputField>() != null), Is.True, "Every field uses the Aero input style.");
                 var scroll = root.GetComponentInChildren<UnityEngine.UI.ScrollRect>(true);
                 Assert.That(scroll.content != null && scroll.viewport != null && !scroll.horizontal && scroll.vertical, Is.True);
                 menu.Search("build tower"); Assert.That(menu.ActionButtons.ContainsKey("Instantly build tower"), Is.True);
@@ -109,6 +121,28 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(menu.Amount, Is.EqualTo(10000)); Assert.That(menu.SelectedFloor, Is.EqualTo(2));
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test]
+        public void AeroInputField_BuildsAGlassWellWithCaretAccentAndPlaceholder()
+        {
+            var canvas = new GameObject("Canvas", typeof(Canvas));
+            try
+            {
+                var field = TowerOfBabel.Interface.AeroInputField.Create(canvas.transform, "Amount", "42", 120, true, null);
+                var aero = field.GetComponent<TowerOfBabel.Interface.AeroInputField>();
+                Assert.That(aero, Is.Not.Null); Assert.That(aero.Input, Is.SameAs(field));
+                Assert.That(field.GetComponent<TowerOfBabel.Interface.AeroGlassGeometry>(), Is.Not.Null, "Rounded glass well.");
+                Assert.That(field.GetComponent<TowerOfBabel.Interface.AeroHoverFeedback>(), Is.Not.Null, "Glass glow on hover/focus.");
+                Assert.That(field.text, Is.EqualTo("42")); Assert.That(((TMPro.TMP_Text)field.placeholder).text, Is.EqualTo("Amount"));
+                Assert.That(field.contentType, Is.EqualTo(TMPro.TMP_InputField.ContentType.DecimalNumber));
+                Assert.That(field.customCaretColor, Is.True); Assert.That(field.caretColor, Is.EqualTo(TowerOfBabel.Interface.AeroInputField.Accent));
+                Assert.That(field.textViewport.GetComponent<UnityEngine.UI.RectMask2D>(), Is.Not.Null);
+                Assert.That(aero.AccentBar.raycastTarget, Is.False);
+                Assert.That(aero.AccentStrength, Is.EqualTo(TowerOfBabel.Interface.AeroInputField.IdleAccent).Within(.001f), "Unfocused underline is dim.");
+                Assert.That(field.GetComponent<UnityEngine.UI.LayoutElement>().preferredWidth, Is.EqualTo(120));
+            }
+            finally { UnityEngine.Object.DestroyImmediate(canvas); }
         }
 
         [Test]
