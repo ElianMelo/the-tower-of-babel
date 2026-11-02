@@ -19,7 +19,7 @@ public static class AeroTowerTerrainAuthoring
             throw new InvalidOperationException("Open the saved Tower scene before generating terrain.");
         var terrain = UnityEngine.Object.FindObjectsByType<Terrain>(FindObjectsInactive.Include, FindObjectsSortMode.None)
             .Single(t => t.terrainData != null && t.gameObject.scene == scene);
-        var markers = Enumerable.Range(1, 4).Select(i => scene.GetRootGameObjects().Single(g => g.name == "Marker" + i).transform).ToArray();
+        var markers = Enumerable.Range(1, 4).Select(i => scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Transform>(true)).Single(t => t.name == "Marker" + i)).ToArray();
         var generator = UnityEngine.Object.FindFirstObjectByType<TowerGenerator>();
         var component = terrain.GetComponent<AeroTowerTerrain>();
         TerrainData source = component != null ? component.SourceTerrainData : terrain.terrainData;

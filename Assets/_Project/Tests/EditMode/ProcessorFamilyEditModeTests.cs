@@ -187,18 +187,19 @@ namespace TowerOfBabel.Resources.Tests
             var scene = opened ? EditorSceneManager.OpenScene("Assets/_Project/Scenes/Tower.unity", OpenSceneMode.Additive) : loaded;
             try
             {
-                var roots = scene.GetRootGameObjects();
+                // Machines live under hierarchy groups, so search every object in the scene.
+                var all = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Transform>(true)).Select(t => t.gameObject).ToArray();
                 foreach (var m in Machines)
                 {
-                    var instance = roots.Where(g => g.name == m.Name).ToArray();
+                    var instance = all.Where(g => g.name == m.Name && g.GetComponent<ResourceProcessor>() != null).ToArray();
                     Assert.That(instance.Length, Is.EqualTo(1), m.Name);
                     Assert.That(instance[0].GetComponent<ProcessorMachineAnimation>(), Is.Not.Null);
                     Assert.That(instance[0].transform.position.y, Is.LessThan(.4f), m.Name + " stands on the ground.");
                 }
                 foreach (string old in new[] { "RiverCondenser", "WaterCondenser", "SkyCondenser" })
-                    Assert.That(roots.Any(g => g.name == old), Is.False, old + " was renamed.");
+                    Assert.That(all.Any(g => g.name == old), Is.False, old + " was renamed.");
                 foreach (string node in new[] { "RiverEssence", "WaterEssence", "SkyEssence" })
-                    Assert.That(roots.Single(g => g.name == node).transform.position.y, Is.LessThan(.4f));
+                    Assert.That(all.Single(g => g.name == node && g.GetComponent<Resource>() != null).transform.position.y, Is.LessThan(.4f));
             }
             finally { if (opened) EditorSceneManager.CloseScene(scene, true); }
         }
