@@ -64,6 +64,7 @@ namespace TowerOfBabel.Networking.Upgrades
             if (sender == null || !Enum.IsDefined(typeof(CheatCommand), command)) return;
             value = Mathf.Clamp(value, 1, 1000000);
             bool success = false;
+            string failure = null;
             var resources = NetworkResourceService.Instance;
             switch (command)
             {
@@ -88,7 +89,8 @@ namespace TowerOfBabel.Networking.Upgrades
                 case CheatCommand.InstantProcess: success = resources != null && resources.ServerCheatProcess(sender, processor); break;
                 case CheatCommand.BuildAsset: case CheatCommand.AdvanceAsset: case CheatCommand.ResetAsset:
                 case CheatCommand.BuildFloor: case CheatCommand.ResetFloor: case CheatCommand.BuildTower: case CheatCommand.ResetTower:
-                    success = NetworkBuildingService.Instance != null && NetworkBuildingService.Instance.ServerCheatConstruction(command, floor, new ChunkKey(keyFloor, x, z), localIndex); break;
+                case CheatCommand.BuildFloorStructure: case CheatCommand.BuildFloorDetail:
+                    success = NetworkBuildingService.Instance != null && NetworkBuildingService.Instance.ServerCheatConstruction(command, floor, new ChunkKey(keyFloor, x, z), localIndex, out failure); break;
                 case CheatCommand.UnlockAllUpgrades:
                     if (config == null) break;
                     foreach (UpgradeJob job in Enum.GetValues(typeof(UpgradeJob)))
@@ -104,7 +106,7 @@ namespace TowerOfBabel.Networking.Upgrades
                     resources?.ServerCheatCapacity(sender, (int)CheatProfile.Default(CheatStat.BagCapacity));
                     CheatStatsTargetRpc(sender, serverCheats[sender.ClientId].Snapshot()); success = true; break;
             }
-            SendCheatResult(sender, success, success ? $"{command} completed." : $"{command}: select a valid target, check materials, or connect to a session.");
+            SendCheatResult(sender, success, success ? $"{command} completed." : failure ?? $"{command}: select a valid target, check materials, or connect to a session.");
         }
     }
 }

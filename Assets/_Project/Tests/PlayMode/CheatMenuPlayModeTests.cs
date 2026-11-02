@@ -94,7 +94,7 @@ namespace TowerOfBabel.Resources.Tests
             var player=UnityEngine.Object.FindFirstObjectByType<PlayerController>();
             var pool=UnityEngine.Object.FindFirstObjectByType<NearTowerAssetPool>();
             var raycaster=player.GetComponent<TowerOfBabel.Resources.Interaction.PlayerInteractionRaycaster>();
-            menu.Show();menu.SelectCategory("Construction");menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            menu.Show();menu.SelectCategory("Construction");menu.ActionButtons["Instantly build entire floor"].onClick.Invoke();
             yield return Wait(()=>chunks.IsFloorComplete(0),"The first-floor cheat did not complete");
             for(int i=0;i<5;i++)yield return null;
             Assert.That(chunks.ActiveConstructionFloor,Is.EqualTo(1));
@@ -183,7 +183,7 @@ namespace TowerOfBabel.Resources.Tests
             var first = chunks.CachedChunks.First(c => c.Key.FloorIndex == 0);
             upgrades.RequestCheatCommand(CheatCommand.BuildAsset, key: first.Key, localIndex: 0);
             yield return Wait(() => chunks.TryGetAsset(first.Key, 0, out var asset) && asset.Stage == 10, "Instant asset failed");
-            menu.SelectCategory("Construction"); menu.SetFloor(1); menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            menu.SelectCategory("Construction"); menu.SetFloor(1); menu.ActionButtons["Instantly build entire floor"].onClick.Invoke();
             yield return Wait(() => chunks.IsFloorComplete(0), "Instant floor failed");
             Assert.That(chunks.ActiveConstructionFloor, Is.EqualTo(1));
             menu.ActionButtons["Reset floor"].onClick.Invoke();
@@ -227,12 +227,29 @@ namespace TowerOfBabel.Resources.Tests
             var chunks = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
             var player = UnityEngine.Object.FindFirstObjectByType<PlayerController>(); var start = player.transform.position;
             menu.Show(); menu.SetFloor(45);
-            menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            menu.ActionButtons["Instantly build entire floor"].onClick.Invoke();
             yield return Wait(() => chunks.IsFloorComplete(0), "The first unfinished floor did not complete");
-            menu.ActionButtons["Instantly build floor"].onClick.Invoke();
+            menu.ActionButtons["Instantly build entire floor"].onClick.Invoke();
             yield return Wait(() => chunks.IsFloorComplete(1), "Repeated action rebuilt the standing floor instead of advancing");
             Assert.That(chunks.ActiveConstructionFloor, Is.EqualTo(2)); Assert.That(chunks.IsFloorComplete(44), Is.False);
             Assert.That(Mathf.Abs(player.transform.position.y - start.y), Is.LessThan(2));
+        }
+
+        [UnityTest]
+        public IEnumerator FloorStageBuilds_BuildStructureThenDetailOfTheNextFloor()
+        {
+            var chunks = UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
+            int floor = chunks.ActiveConstructionFloor.Value;
+            menu.Show(); menu.SelectCategory("Construction");
+            menu.ActionButtons["Instantly build floor detail"].onClick.Invoke();
+            yield return Wait(() => menu.StatusText.Contains("structure first"), "Detail did not ask for the structure first");
+            Assert.That(chunks.IsStructureComplete(floor), Is.False);
+            menu.ActionButtons["Instantly build floor structure"].onClick.Invoke();
+            yield return Wait(() => chunks.IsStructureComplete(floor), "Structure stage did not complete");
+            Assert.That(chunks.IsFloorComplete(floor), Is.False, "Structure must leave the detail unbuilt");
+            menu.ActionButtons["Instantly build floor detail"].onClick.Invoke();
+            yield return Wait(() => chunks.IsFloorComplete(floor), "Detail stage did not complete the floor");
+            Assert.That(chunks.ActiveConstructionFloor, Is.EqualTo(floor + 1));
         }
 
         [UnityTest]

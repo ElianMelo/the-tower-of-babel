@@ -406,7 +406,10 @@ namespace TowerOfBabel.World.Chunks
             return unfinishedAssetsByFloor.TryGetValue(floorIndex, out int unfinished) && unfinished == 0;
         }
 
-        public int SetConstructionStage(int? floorIndex, byte stage)
+        public int SetConstructionStage(int? floorIndex, byte stage) => SetConstructionStage(floorIndex, stage, null);
+
+        /// <summary>Sets every asset of one floor (or the whole tower) to a stage; a phase limits it to structure or detail.</summary>
+        public int SetConstructionStage(int? floorIndex, byte stage, TowerConstructionPhase? phase)
         {
             if (chunkLookup.Count == 0) RebuildChunkLookup();
             var releasedBefore = new Dictionary<int, bool>();
@@ -418,7 +421,8 @@ namespace TowerOfBabel.World.Chunks
                 if (floorIndex.HasValue && chunk.Key.FloorIndex != floorIndex.Value) continue;
                 bool dirty = false;
                 for (int i = 0; i < chunk.Assets.Count; i++)
-                    if (chunk.TrySetStage(i, stage, out byte applied, out bool changed) && changed)
+                    if ((!phase.HasValue || chunk.Assets[i].AssetType.Phase() == phase.Value) &&
+                        chunk.TrySetStage(i, stage, out byte applied, out bool changed) && changed)
                     { changes.Add((chunk.Key, i, applied)); dirty = true; }
                 if (dirty) changedChunks.Add(chunk);
             }

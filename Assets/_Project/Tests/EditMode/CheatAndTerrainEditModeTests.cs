@@ -76,6 +76,60 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [Test]
+        public void FloorBuildCheats_EntireFloorStructureOnlyAndDetailOnlyAfterStructure()
+        {
+            var root = new GameObject("Floor build cheat fixture"); root.SetActive(false);
+            var manager = root.AddComponent<ChunkManager>();
+            try
+            {
+                var chunks = new List<ChunkSceneCache>();
+                for (int floor = 0; floor < 2; floor++)
+                {
+                    var assets = new List<ChunkAssetData> {
+                        new(0, World.Tower.TowerAssetType.Floor, Vector3.up * floor * 6, Quaternion.identity, Vector3.one),
+                        new(1, World.Tower.TowerAssetType.Pillar, Vector3.up * floor * 6 + Vector3.right, Quaternion.identity, Vector3.one),
+                        new(2, World.Tower.TowerAssetType.Vine0, Vector3.up * floor * 6 + Vector3.forward, Quaternion.identity, Vector3.one) };
+                    chunks.Add((ChunkSceneCache)Activator.CreateInstance(typeof(ChunkSceneCache), BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { new ChunkKey(floor, 0, 0), assets }, null));
+                }
+                Set(manager, "cachedChunks", chunks);
+                byte Stage(int floor, int index) { manager.TryGetAsset(new ChunkKey(floor, 0, 0), index, out var a); return a.Stage; }
+                bool Run(CheatCommand command, out string failure)
+                {
+                    if (!Networking.Buildings.FloorBuildCheat.TryResolve(manager, command, out int floor, out failure)) return false;
+                    manager.SetConstructionStage(floor, ChunkAssetData.CompletedStage, Networking.Buildings.FloorBuildCheat.PhaseOf(command));
+                    return true;
+                }
+
+                // Detail is released only after structure, so it refuses and says which command to use.
+                Assert.That(Run(CheatCommand.BuildFloorDetail, out string failure), Is.False);
+                Assert.That(failure, Does.Contain("structure first"));
+                Assert.That(Stage(0, 2), Is.Zero);
+
+                Assert.That(Run(CheatCommand.BuildFloorStructure, out _), Is.True);
+                Assert.That(Stage(0, 0), Is.EqualTo(10)); Assert.That(Stage(0, 1), Is.EqualTo(10));
+                Assert.That(Stage(0, 2), Is.Zero, "Structure leaves the vines unbuilt.");
+                Assert.That(manager.IsStructureComplete(0), Is.True); Assert.That(manager.IsFloorComplete(0), Is.False);
+                Assert.That(manager.ActiveConstructionFloor, Is.Zero, "The floor stays active for its detail.");
+                Assert.That(Run(CheatCommand.BuildFloorStructure, out failure), Is.False);
+                Assert.That(failure, Does.Contain("already built"));
+
+                Assert.That(Run(CheatCommand.BuildFloorDetail, out _), Is.True);
+                Assert.That(Stage(0, 2), Is.EqualTo(10)); Assert.That(manager.IsFloorComplete(0), Is.True);
+                Assert.That(manager.ActiveConstructionFloor, Is.EqualTo(1), "Finishing the detail unlocks the next floor.");
+                Assert.That(Stage(1, 0), Is.Zero, "Phase builds never touch other floors.");
+
+                Assert.That(Run(CheatCommand.BuildFloor, out _), Is.True);
+                for (int i = 0; i < 3; i++) Assert.That(Stage(1, i), Is.EqualTo(10), "Entire floor builds every phase.");
+                Assert.That(manager.ActiveConstructionFloor, Is.Null);
+                Assert.That(Run(CheatCommand.BuildFloor, out failure), Is.False);
+                Assert.That(failure, Does.Contain("Every floor"));
+                Assert.That(Networking.Buildings.FloorBuildCheat.PhaseOf(CheatCommand.BuildFloor), Is.Null);
+                Assert.That(Networking.Buildings.FloorBuildCheat.IsFloorBuild(CheatCommand.BuildTower), Is.False);
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test]
         public void CheatPrefab_ContainsEveryQuickActionAndAScrollableStatsList()
         {
             var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/UI/FrutigerAero/Prefabs/Screens/CheatMenu.prefab");
@@ -84,18 +138,20 @@ namespace TowerOfBabel.Resources.Tests
             try
             {
                 var menu = root.GetComponent<CheatMenuUI>(); menu.BuildView(); menu.ShowPreview();
-                foreach (string action in new[] { "Max level", "Unlock all upgrades", "Instantly build floor", "Instantly build tower", "Set day", "Set night" })
+                foreach (string action in new[] { "Max level", "Unlock all upgrades", "Instantly build entire floor", "Instantly build floor structure", "Instantly build floor detail", "Instantly build tower", "Set day", "Set night" })
                     Assert.That(menu.ActionButtons.ContainsKey(action), Is.True, action);
                 Assert.That(menu.ToggleControls.ContainsKey("God mode"), Is.True);
                 Assert.That(menu.ToggleControls.ContainsKey("Rain"), Is.True, "Rain is a quick action.");
                 var order = root.GetComponentInChildren<UnityEngine.UI.ScrollRect>(true).content.Cast<Transform>().Select(t => t.name).ToList();
-                string[] expected = { "God mode", "Max level", "Unlock all upgrades", "Instantly build floor", "Instantly build tower", "Set day", "Set night", "Rain" };
+                string[] expected = { "God mode", "Max level", "Unlock all upgrades", "Instantly build entire floor", "Instantly build floor structure", "Instantly build floor detail", "Instantly build tower", "Set day", "Set night", "Rain" };
                 Assert.That(order.Take(expected.Length), Is.EqualTo(expected), "Most used quick actions come first, in order.");
                 Assert.That(menu.ActionButtons.ContainsKey("Level up"), Is.False, "Level up moved out of quick actions.");
                 menu.SelectCategory("Progression");
                 foreach (string action in new[] { "Level up", "Gain XP", "Max level", "Unlock all upgrades" }) Assert.That(menu.ActionButtons.ContainsKey(action), Is.True, action);
                 Assert.That(menu.ActionButtons.Keys.Any(k => k.StartsWith("Purchase ")), Is.False, "Per-node purchase rows were removed.");
                 menu.SelectCategory("Construction"); Assert.That(menu.ToggleControls.ContainsKey("Instantly build asset"), Is.True);
+                foreach (string action in new[] { "Instantly build entire floor", "Instantly build floor structure", "Instantly build floor detail" })
+                    Assert.That(menu.ActionButtons.ContainsKey(action), Is.True, "Floor builds also stay under Construction: " + action);
                 menu.SelectCategory("Inventory"); Assert.That(menu.ActionButtons.ContainsKey("Increase bag capacity"), Is.True);
                 menu.SelectCategory("Quick actions");
                 Assert.That(menu.ToggleControls["God mode"].graphic.canvasRenderer.GetAlpha(), Is.Zero, "An off toggle must not show the green on mark.");

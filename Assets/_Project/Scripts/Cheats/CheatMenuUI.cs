@@ -68,6 +68,7 @@ namespace TowerOfBabel.Cheats
         public bool AllProfessions => allProfessions;
         public IReadOnlyDictionary<string, UnityEngine.UI.Toggle> ToggleControls => toggleControls;
         public IReadOnlyDictionary<string, UnityEngine.UI.Button> ActionButtons => actionButtons;
+        public string StatusText => status != null ? status.text : string.Empty;
         public int SelectedFloor => Mathf.Max(0, Number(floorInput, 1) - 1);
         public int Amount => Mathf.Clamp(Number(amountInput, 1000), 1, 1000000);
 
@@ -281,7 +282,9 @@ namespace TowerOfBabel.Cheats
             }
             foreach (string section in new[] { "Quick actions", "Construction" })
             {
-                Action(section, "Instantly build floor", "Complete the next unfinished floor, wherever you are standing; repeat to advance", () => Command(CheatCommand.BuildFloor), "Build next floor");
+                Action(section, "Instantly build entire floor", "Complete every stage of the next unfinished floor, wherever you are standing; repeat to advance", () => Command(CheatCommand.BuildFloor), "Build next floor");
+                Action(section, "Instantly build floor structure", "Complete only the structure stage of the next unfinished floor; its detail stays to build", () => Command(CheatCommand.BuildFloorStructure), "Build structure");
+                Action(section, "Instantly build floor detail", "Complete only the detail stage (vines) of the next unfinished floor; needs its structure built first", () => Command(CheatCommand.BuildFloorDetail), "Build detail");
                 Action(section, "Instantly build tower", "Finish every floor in one batched operation", () => Command(CheatCommand.BuildTower), "Build tower");
             }
             foreach (string section in new[] { "Quick actions", "World" })
