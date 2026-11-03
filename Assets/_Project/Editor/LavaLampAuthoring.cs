@@ -33,6 +33,8 @@ public static class LavaLampAuthoring
     public const float GlassBottom = .245f, GlassHeight = .455f, GlassRadiusBottom = .095f, GlassRadiusTop = .055f;
     public const float CradleRadius = .15f, CradleHeight = .26f;
     public const float MountHeight = 3.6f;
+    public const float ExteriorChance = .5f, LightReach = 90;
+    public const int MaxLights = 24;
     public static Vector3 LampOrigin => new(0, -LampDrop, ArmReach);
     public static Vector3 LightPosition => LampOrigin + Vector3.up * (LampHeight + .045f);
     public static Vector3 GlowPosition => LampOrigin + Vector3.up * (GlassBottom + GlassHeight * .4f);
@@ -56,6 +58,10 @@ public static class LavaLampAuthoring
         var settings = new SerializedObject(lamps);
         settings.FindProperty("interior").boolValue = true;
         settings.FindProperty("stairHeadroom").floatValue = 0;
+        // Random lamps on the outside of free pillars; every lamp in view, up to 24, carries its spotlight.
+        settings.FindProperty("exteriorChance").floatValue = ExteriorChance;
+        settings.FindProperty("maxLights").intValue = MaxLights;
+        settings.FindProperty("lightReach").floatValue = LightReach;
         settings.ApplyModifiedPropertiesWithoutUndo();
         lamps.Configure(chunks, prefab, MountHeight, ShaftRadius(generator.pillarObject, MountHeight));
         EditorUtility.SetDirty(lamps);

@@ -50,14 +50,15 @@ public static class AeroIslandAtmosphereAuthoring
         // Reuse the installed vendor's animation sampling on the lake, bounded projections and lamps.
         var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(AeroWaterLightAuthoring.RendererPath);
         var aquatic = renderer.rendererFeatures.OfType<AeroLightRendererFeature>().Single();
-        aquatic.caustics = caustics; aquatic.settings.scale = .42f; aquatic.settings.speed = .045f;
-        aquatic.settings.causticIntensity = 1.2f; aquatic.Create(); EditorUtility.SetDirty(aquatic);
+        // The nearby water light and the lamp cookie use the caustics flipbooks (AeroCausticsAuthoring).
+        aquatic.settings.causticIntensity = 1.2f;
+        AeroCausticsAuthoring.ConfigureWaterLight(aquatic, AeroCausticsAuthoring.PoolFlipbook);
         var water = AssetDatabase.LoadAssetAtPath<Material>(AeroWaterLightAuthoring.WaterPath);
         water.SetTexture("_CausticsTex", caustics); water.SetFloat("_CausticsBrightness", 1.7f); water.SetFloat("_CausticsTiling", .42f);
         water.SetFloat("_CausticsSpeed", .1f); water.EnableKeyword("_CAUSTICS"); EditorUtility.SetDirty(water);
         water.SetFloat("_DepthHorizontal",1.2f); water.SetFloat("_DepthVertical",4); water.SetFloat("_ColorAbsorption",.2f);
         var cookie = AssetDatabase.LoadAssetAtPath<Material>(AeroAtmosphereAuthoring.CookiePath);
-        cookie.SetTexture("_CausticsTex", caustics); EditorUtility.SetDirty(cookie);
+        AeroCausticsAuthoring.ConfigureCookie(cookie, AeroCausticsAuthoring.LampFlipbook);
         foreach (var lamp in UnityEngine.Object.FindObjectsByType<AeroProjectionLamp>(FindObjectsSortMode.None))
         { lamp.enabled = false; lamp.cookieMaterial = cookie; lamp.enabled = true; }
 

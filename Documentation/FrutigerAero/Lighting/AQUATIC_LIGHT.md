@@ -14,9 +14,13 @@ This is an art-directed lighting treatment. The shared HDR environment supplies 
 
 The later [sun rays and projection lamps](SUN_RAYS_AND_PROJECTION_LAMPS.md) are separate systems with their own bounded rendering costs and validation. The one-pass/no-extra-target budget below describes this nearby surface-light feature.
 
+## Pattern (2026-11-03)
+
+The white light near water was too big. It now samples `Environment/Lighting/Caustics/PoolCausticsFlipbook.png`, the CC0 16-frame looping caustics animation by leeor_net (OpenGameArt), as a Texture2DArray, instead of the Crest still used by the lamp before. Two layers at unrelated angles and scales are combined with `min`, which keeps thin crossings instead of broad white patches. The tile is about 1.2 m (`scale` 0.85, was 0.42) and the mip level follows distance so far tiles blur rather than shimmer. The lake surface and river glass keep the Crest net. `AeroCausticsAuthoring.Apply()` (menu **Tower of Babel/Environment/Apply caustics flipbooks**) imports both flipbooks and assigns them.
+
 ## Cost and settings
 
-`Assets/Settings/PC_Renderer.asset` contains **Aero nearby water light**. Its settings control distance, fade start, caustic intensity, reflected light, scale, speed and tint. Setting both strengths to zero skips the pass. The material uses the existing `Aero_WaterCaustics.png` and `Review_AquaticReflection.exr`; no generated texture is updated per frame.
+`Assets/Settings/PC_Renderer.asset` contains **Aero nearby water light**. Its settings control distance, fade start, caustic intensity, reflected light, scale, speed and tint. Setting both strengths to zero skips the pass. The material uses `PoolCausticsFlipbook.png` and `Review_AquaticReflection.exr`; no generated texture is updated per frame.
 
 One native Render Graph raster pass samples existing depth and blends into the opaque color attachment. There is no extra color copy, light render target or reflection camera. A bounded registry supplies up to eight source footprints; the scene currently uses three. Source, sky and distance rejection happen before caustic texture work. A five-tap surface-normal reconstruction chooses same-surface neighbours, and finite/nonnegative output guards prevent the old black/white silhouette artifacts from entering bloom. The pass runs before skybox/opaque-color copying so water reflections can include local lighting.
 
@@ -28,7 +32,7 @@ Water tuning lives in `Assets/_Project/Environment/AeroLakeWater.mat`, a project
 
 `AeroLightEditModeTests` render the actual URP pass to check source exclusion, upper-floor exclusion, nonnegative silhouette pixels, unchanged interface pixels, ordinary materials, reflections, animation, world anchoring, range/sky filtering and build references. Runtime checks cover game-time animation, distance fade, source disabling and camera counts. Play Mode is entered only by the final test runner.
 
-`AeroWaterLightPreview.Capture()` captures the current building kit and workshop in a disposable Edit Mode review scene, plus the actual Tower lake using its main camera. It restores the camera, feature state and preview clock. `Capture(true)` also samples 60 motion frames; these are an Edit Mode animation preview, not gameplay footage. Preview output is in `Previews/`.
+`AeroWaterLightPreview.Capture()` captures the current building kit and workshop in a disposable Edit Mode review scene, plus the actual Tower lake using its main camera. It restores the camera, feature state and preview clock. `Capture(true)` also samples 60 motion frames; these are an Edit Mode animation preview, not gameplay footage. Preview output is in `_Screenshots-and-previews-to-delete/WaterLight/` (earlier captures remain in `Previews/`).
 
 Render Graph review: material and immutable pattern/environment assets are explicitly assigned; Blitter binds the tracked depth input as `_BlitTexture`. The depth resource is read-only and the existing color attachment is declared read/write because blending preserves its contents. No new descriptor or texture is created, no graph resource is published globally, every pass-data field is assigned per recording, and the render callback is static. A native raster pass is intentional here: the generic material blit helper declares its destination write-only, whereas this overlay needs the destination loaded for blending. Only the required depth input is requested. Missing shader/pattern inputs skip the effect; a missing environment uses a black cubemap.
 

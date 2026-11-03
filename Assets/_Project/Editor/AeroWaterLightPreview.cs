@@ -15,7 +15,7 @@ public static class AeroWaterLightPreview
     {
         if (Application.dataPath.Replace('\\','/') != "D:/PersonalProjects/the-tower-of-babel/Assets" || EditorApplication.isPlayingOrWillChangePlaymode)
             throw new InvalidOperationException("Use this project in Edit Mode.");
-        const string output = "Documentation/FrutigerAero/Lighting/Previews/";
+        const string output = "_Screenshots-and-previews-to-delete/WaterLight/";
         System.IO.Directory.CreateDirectory(output); System.IO.Directory.CreateDirectory("Temp/AeroWaterLight");
         var original = SceneManager.GetActiveScene(); var scene = EditorSceneManager.NewPreviewScene();
         var feature = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(AeroWaterLightAuthoring.RendererPath).rendererFeatures.OfType<AeroLightRendererFeature>().Single();

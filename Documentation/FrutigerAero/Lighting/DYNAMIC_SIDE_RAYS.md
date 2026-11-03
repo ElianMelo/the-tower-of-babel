@@ -13,7 +13,7 @@ Select `Assets/_Project/Environment/Lighting/TowerInteriorRays.asset` to adjust 
 | Balanced PC | Half | 16 steps | 32 m | 2 |
 | Low | Quarter | 12 steps | 32 m | 1 |
 
-Native shadow distance remains 50 m. Fill sources request the existing medium shadow tier: 512 px, inside the shared 2048 px additional-light atlas. Other scene lights can still cause URP to reduce atlas allocations under pressure; 512 px is a request, not a separate reserved atlas.
+Native sun shadow distance was 50 m; since 2026-11-03 it is 150 m with a 4096 shadow map and cascades ending at 9, 27, 66 and 150 m (`ShadowDistanceAuthoring`, menu **Tower of Babel/Environment/Apply shadow distance**). Fill sources request the existing medium shadow tier: 512 px, inside the shared 2048 px additional-light atlas. Other scene lights can still cause URP to reduce atlas allocations under pressure; 512 px is a request, not a separate reserved atlas.
 
 ## Architecture and transitions
 

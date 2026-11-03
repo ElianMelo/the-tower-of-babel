@@ -90,7 +90,7 @@ public static class AeroAtmosphereAuthoring
         core.SetTextureScale("_BaseMap",new Vector2(.25f,.25f));
         var cookie=AssetDatabase.LoadAssetAtPath<Material>(CookiePath);
         if(cookie==null) {cookie=new Material(Shader.Find("Hidden/TowerOfBabel/Water Projection Cookie")); AssetDatabase.CreateAsset(cookie,CookiePath);}
-        cookie.SetTexture("_Caustics",AssetDatabase.LoadAssetAtPath<Texture2D>(AeroWaterLightAuthoring.PatternPath)); EditorUtility.SetDirty(cookie);
+        AeroCausticsAuthoring.ConfigureCookie(cookie,AeroCausticsAuthoring.LampFlipbook);
         var preview=EditorSceneManager.NewPreviewScene();
         GameObject root=null;
         try

@@ -17,10 +17,10 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #define USE_FULL_PRECISION_BLIT_TEXTURE
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
-            #define _CausticsTex _AeroCaustics
-            #define sampler_CausticsTex sampler_AeroCaustics
-            #include "Assets/Stylized Water 3/Shaders/Libraries/Caustics.hlsl"
+            // 16-frame CC0 caustics flipbook (Environment/Lighting/Caustics/PoolCausticsFlipbook.png).
+            TEXTURE2D_ARRAY(_AeroCaustics); SAMPLER(sampler_AeroCaustics);
             #include "Aero/AeroCaustics.hlsl"
+            #define AERO_POOL_FRAMES 16
             TEXTURECUBE(_AeroEnvironment); SAMPLER(sampler_AeroEnvironment);
             float4 _AeroRange, _AeroMotion;
             half4 _AeroTint;
@@ -52,10 +52,13 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
                 return weight;
             }
 
-            half WaterLight(float2 uv, float clock)
+            // Two layers of the animated flipbook at unrelated angles and scales; their minimum keeps fine,
+            // sharp crossings instead of broad white blobs. lod blurs distant tiles so they do not shimmer.
+            half WaterLight(float2 uv, float clock, float lod)
             {
-                // Crest-style averaged net (Aero/AeroCaustics.hlsl) instead of the sparse min of two layers.
-                return AeroCausticBrightness(AeroCrestCaustics(TEXTURE2D_ARGS(_CausticsTex, sampler_CausticsTex), uv, clock * 4, 1, 0));
+                float frame = clock * 80;
+                float2 b = float2(.766 * uv.x - .643 * uv.y, .643 * uv.x + .766 * uv.y) * 1.37 + float2(.41, .23) + clock * float2(.9, -.6);
+                return AeroLayeredFlipbook(TEXTURE2D_ARRAY_ARGS(_AeroCaustics, sampler_AeroCaustics), uv + clock * float2(-.5, .8), b, frame, AERO_POOL_FRAMES, lod);
             }
 
             half4 Frag(Varyings input) : SV_Target
@@ -94,7 +97,8 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
                 float3 weights = pow(abs(normal), 4);
                 weights /= max(dot(weights, 1), .0001);
                 float3 p = position * _AeroMotion.x;
-                half pattern = WaterLight(p.zy, clock) * weights.x + WaterLight(p.xz, clock) * weights.y + WaterLight(p.xy, clock) * weights.z;
+                float lod = max(0, log2(max(metres * _AeroMotion.x * .27, 1e-4)));
+                half pattern = WaterLight(p.zy, clock, lod) * weights.x + WaterLight(p.xz, clock, lod) * weights.y + WaterLight(p.xy, clock, lod) * weights.z;
                 // Broad drifting reflected light accompanies the narrow focused caustic strands.
                 half swell = pow(saturate(.5 + .5 * sin(dot(p, float3(.9,.45,.75)) * 2 - clock * 1.7)), 6);
                 Light sun = GetMainLight();

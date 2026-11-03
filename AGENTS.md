@@ -21,6 +21,16 @@ These instructions apply to the entire `the-tower-of-babel` repository.
 - Always create or update automated tests for feature implementations and bug fixes, including small or reversible code changes.
 - Always run the relevant automated tests after completing a feature or fix and after completing subsequent implementation changes.
 - Use Unity EditMode tests or other checks that do not enter Play Mode during implementation. Run relevant PlayMode tests through the automated test runner only after implementation is complete.
+- Run only the tests related to the change, never the whole list. With the Unity CLI, always pass a filter:
+  `unity command test run --mode editor --filter <TestClassName>` (one run per related class, or
+  `--filter_type assembly --filter <AssemblyName>` when a whole area changed). `test run` with no filter runs every test; do not use it.
+  PlayMode runs must add `--async_tests true` and then poll `unity command test status`; without it the domain reload on
+  entering Play Mode makes the run report 0 tests.
+  Related tests are the ones for the changed scripts, shaders, assets and their authoring tools, plus tests that already
+  assert on the changed values.
+- The full project suite runs only right before a player build. `FullTestBuildGate` (`Assets/_Project/Editor/FullTestBuildGate.cs`)
+  does this automatically when a build starts in the Editor (or via **Tower of Babel/Build/Run full test suite, then build**) and
+  builds only when every EditMode and PlayMode test passes. Batch builds skip the gate; run `unity test` before them.
 - If tests cannot run, report the blocker and the tests that remain unexecuted. Do not claim validation succeeded.
 - Documentation-only or project-context changes do not require artificial code tests; verify the resulting instructions directly.
 

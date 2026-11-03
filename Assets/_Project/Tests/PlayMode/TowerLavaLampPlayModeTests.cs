@@ -52,6 +52,7 @@ namespace TowerOfBabel.World.Tests
 
             var lamps = Create("Tower lava lamps").AddComponent<TowerLavaLamps>();
             lamps.Configure(manager, prefab, 3.3f, .38f);
+            lamps.SetExterior(0);
             Assert.That(lamps.Placements.Count, Is.EqualTo(2));
 
             var camera = Create("Lava lamp camera").AddComponent<Camera>();
@@ -70,7 +71,10 @@ namespace TowerOfBabel.World.Tests
             var spots = lamps.Lights.Where(l => l.type == LightType.Spot && l.gameObject.activeInHierarchy).ToArray();
             Assert.That(spots.Length, Is.EqualTo(2));
             Assert.That(spots.All(s => s.enabled && s.transform.forward.y > .9f), "The projection budget switched them on, pointing up.");
-            Assert.That(spots.All(s => s.cookie != null), "The animated water cookie is projected.");
+            Assert.That(spots.All(s => s.cookie != null && s.cookie == lamps.SharedCookie), "The shared animated caustics cookie is projected.");
+            uint updates = lamps.SharedCookie.updateCount;
+            yield return new WaitForSeconds(.2f);
+            Assert.That(lamps.SharedCookie.updateCount, Is.GreaterThan(updates + 2), "The cookie animates many times a second.");
             float night = spots[0].intensity;
 
             Shader.SetGlobalFloat("_AeroDaylight", 1);

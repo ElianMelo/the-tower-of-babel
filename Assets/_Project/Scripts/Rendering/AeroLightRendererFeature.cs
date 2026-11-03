@@ -25,7 +25,8 @@ namespace TowerOfBabel.Rendering
         }
 
         public Shader lightShader;
-        public Texture2D caustics;
+        [Tooltip("Caustics flipbook: a Texture2DArray, one looping animation frame per slice.")]
+        public Texture2DArray caustics;
         public Cubemap environment;
         public LightSettings settings = new();
         [NonSerialized] public float previewTime = -1;
@@ -67,7 +68,7 @@ namespace TowerOfBabel.Rendering
             {
                 public TextureHandle depth;
                 public Material material;
-                public Texture2D pattern;
+                public Texture2DArray pattern;
                 public Cubemap environment;
                 public Vector4 range, motion;
                 public Color tint;

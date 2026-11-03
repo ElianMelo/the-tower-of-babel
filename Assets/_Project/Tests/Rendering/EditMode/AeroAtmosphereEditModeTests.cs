@@ -43,7 +43,7 @@ namespace TowerOfBabel.Rendering.Tests
                 var lamp=go.GetComponent<AeroProjectionLamp>(); var native=lamp.projection;
                 Assert.That(native.type,Is.EqualTo(LightType.Spot)); Assert.That(native.range,Is.LessThanOrEqualTo(12));
                 lamp.Sample(0); var texture=lamp.Cookie;
-                Assert.That(texture.width,Is.EqualTo(128)); Assert.That(native.cookie,Is.SameAs(texture));
+                Assert.That(texture.width,Is.EqualTo(AeroProjectionLamp.CookieResolution)); Assert.That(texture.width,Is.GreaterThanOrEqualTo(256)); Assert.That(native.cookie,Is.SameAs(texture));
                 var before=Read(texture); lamp.Sample(4); var after=Read(texture);
                 Assert.That(Difference(before,after),Is.GreaterThan(.002));
                 lamp.enabled=false; Assert.That(lamp.Cookie==null,Is.True); Assert.That(texture==null,Is.True); Assert.That(native.cookie,Is.Null);

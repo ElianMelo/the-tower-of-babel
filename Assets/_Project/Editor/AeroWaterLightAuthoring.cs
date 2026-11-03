@@ -30,9 +30,9 @@ public static class AeroWaterLightAuthoring
             renderer.rendererFeatures.Add(feature);
         }
         feature.lightShader = Shader.Find("Hidden/TowerOfBabel/Nearby Water Light");
-        feature.caustics = AssetDatabase.LoadAssetAtPath<Texture2D>(PatternPath);
         feature.environment = AssetDatabase.LoadAssetAtPath<Cubemap>(CubePath);
         feature.settings = new AeroLightRendererFeature.LightSettings();
+        AeroCausticsAuthoring.ConfigureWaterLight(feature, AeroCausticsAuthoring.PoolFlipbook);
         feature.SetActive(true); feature.Create();
         // Keep URP's recovery map in step with the renderer's new feature subasset.
         var serializedRenderer = new SerializedObject(renderer);

@@ -69,7 +69,9 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(river.GetTexture("_Environment"),Is.Not.Null);
             var native=AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Project/Environment/Lighting/Caustics/CrestCaustics.png");
             Assert.That(river.GetTexture("_CausticsTex"),Is.SameAs(native));
-            Assert.That(AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Environment/Lighting/AquaProjectionCookie.mat").GetTexture("_CausticsTex"),Is.SameAs(native));
+            // The lamp cookie moved to its own caustics flipbook on 2026-11-03 (AeroCausticsFlipbookEditModeTests).
+            Assert.That(AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Environment/Lighting/AquaProjectionCookie.mat").GetTexture("_CausticsArray"),
+                Is.SameAs(AssetDatabase.LoadAssetAtPath<Texture2DArray>("Assets/_Project/Environment/Lighting/Caustics/LavaLampCaustics.png")));
         }
 
         [Test]

@@ -37,4 +37,24 @@ half AeroCausticBrightness(half3 caustic)
 {
     return saturate((dot(caustic, half3(.2126, .7152, .0722)) - AERO_CAUSTICS_GREY) * 2.4);
 }
+
+// Flipbook caustics (2026-11-03): each slice of a Texture2DArray is one frame of a looping caustics
+// animation. Neighbouring frames are blended with a smoothstep so the net evolves instead of scrolling.
+half AeroFlipbookCaustics(TEXTURE2D_ARRAY_PARAM(tex, samp), float2 uv, float frame, float frameCount, float lod)
+{
+    float f = frac(frame / max(frameCount, 1)) * frameCount;
+    float a = floor(f);
+    float b = a + 1 >= frameCount ? 0 : a + 1;
+    float t = smoothstep(0, 1, f - a);
+    return lerp(SAMPLE_TEXTURE2D_ARRAY_LOD(tex, samp, uv, a, lod).r, SAMPLE_TEXTURE2D_ARRAY_LOD(tex, samp, uv, b, lod).r, t);
+}
+
+// Two flipbook layers at unrelated scales, angles and phases: the minimum keeps the sharp crossings of the
+// two nets (after Alexander Ameye's realtime caustics notes) and a little of their sum fills the cells.
+half AeroLayeredFlipbook(TEXTURE2D_ARRAY_PARAM(tex, samp), float2 uvA, float2 uvB, float frame, float frameCount, float lod)
+{
+    half a = AeroFlipbookCaustics(TEXTURE2D_ARRAY_ARGS(tex, samp), uvA, frame, frameCount, lod);
+    half b = AeroFlipbookCaustics(TEXTURE2D_ARRAY_ARGS(tex, samp), uvB, frame + frameCount * .5, frameCount, lod);
+    return saturate(min(a, b) * 1.5 + (a + b) * .2);
+}
 #endif

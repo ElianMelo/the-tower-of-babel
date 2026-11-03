@@ -50,6 +50,7 @@ public static class LavaLampPreview
         var fluid = AssetDatabase.LoadAssetAtPath<Material>(LavaLampAuthoring.FluidPath);
         GameObject Create(string name) { var go = new GameObject(name); go.layer = Layer; SceneManager.MoveGameObjectToScene(go, scene); return go; }
         var shots = new List<string>();
+        RenderTexture cookie = null; Material cookieAnimation = null;
         try
         {
             SceneManager.SetActiveScene(scene);
@@ -83,14 +84,23 @@ public static class LavaLampPreview
                 go.AddComponent<MeshFilter>().sharedMesh = mesh; go.AddComponent<MeshRenderer>().sharedMaterial = material;
                 pieces++;
             }
-            var placed = new List<AeroProjectionLamp>();
+            // Like the game: every nearby lamp is lit and projects one shared caustics cookie, turned per lamp.
+            cookieAnimation = new Material(AssetDatabase.LoadAssetAtPath<Material>(AeroAtmosphereAuthoring.CookiePath));
+            cookie = new RenderTexture(TowerLavaLamps.CookieResolution, TowerLavaLamps.CookieResolution, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+            var placed = new List<Light>();
             foreach (var p in lamps.Placements.Where(p => Mathf.Abs(p.floor - floor) <= 1 && (p.Position - focus.Position).sqrMagnitude < 26 * 26))
             {
                 var go = (GameObject)PrefabUtility.InstantiatePrefab(lamps.LampPrefab, scene);
                 go.transform.SetPositionAndRotation(p.Position, p.mount.rotation);
                 foreach (var t in go.GetComponentsInChildren<Transform>(true)) t.gameObject.layer = Layer;
-                foreach (var l in go.GetComponentsInChildren<Light>(true)) l.cullingMask = 1 << Layer;
-                var lamp = go.GetComponent<AeroProjectionLamp>(); lamp.phase = placed.Count * 1.7f; placed.Add(lamp);
+                foreach (var l in go.GetComponentsInChildren<Light>(true)) { l.cullingMask = 1 << Layer; l.enabled = true; }
+                var lamp = go.GetComponent<AeroProjectionLamp>();
+                var spot = lamp.projection;
+                UnityEngine.Object.DestroyImmediate(lamp);
+                spot.enabled = true; spot.cookie = cookie;
+                spot.shadows = placed.Count == 0 ? LightShadows.Hard : LightShadows.None;
+                spot.transform.localRotation *= Quaternion.AngleAxis(TowerLavaLamps.Hash01(p.floor, p.ringIndex, lamps.PlacementSeed + 7) * 360, Vector3.forward);
+                placed.Add(spot);
             }
 
             // Shots follow the side of the pillar the sconce hangs on (the tower interior by default).
@@ -108,8 +118,8 @@ public static class LavaLampPreview
                 sun.transform.rotation = night ? Quaternion.Euler(35, 120, 0) : Quaternion.Euler(28, 330, 0); sun.enabled = true;
                 camera.backgroundColor = night ? new Color(.012f, .02f, .055f) : new Color(.55f, .74f, .9f);
                 fluid.SetFloat("_FlowTime", clock);
-                AeroProjectionLamp.RefreshBudget(camera.transform.position);
-                foreach (var lamp in placed) lamp.Sample(clock);
+                cookieAnimation.SetFloat("_AeroCookieClock", clock);
+                Graphics.Blit(null, cookie, cookieAnimation, 0); cookie.IncrementUpdateCount();
             }
             void Save(string name)
             {
@@ -133,6 +143,16 @@ public static class LavaLampPreview
             Shot("Arcade-Night.png", facade, focus.Position + Vector3.up * 3.6f, 55, true);
             Vector3 under = focus.Position + outward * 2.2f + tangent * 1.6f + Vector3.up * 1.4f;
             Shot("Projection-Night.png", under, focus.Position + Vector3.up * 5.4f, 70, true);
+            Shot("Projection-Night-Later.png", under, focus.Position + Vector3.up * 5.4f, 70, true, 7.5f);
+            // A lamp on the other face of a pillar (outside by default), seen from out in the open.
+            var other = lamps.Placements.Where(p => p.exterior != focus.exterior && p.floor == floor)
+                .OrderBy(p => (p.Position - focus.Position).sqrMagnitude).FirstOrDefault();
+            if (other.mount != default)
+            {
+                var face = other.mount.rotation * Vector3.forward;
+                Shot("OtherFace-Night.png", other.Position + face * 9 + Vector3.up * .8f, other.Position + Vector3.up * 2, 60, true);
+                Shot("OtherFace-Day.png", other.Position + face * 9 + Vector3.up * .8f, other.Position + Vector3.up * 2, 60, false);
+            }
             return new { floor, pieces, lamps = placed.Count, shots };
         }
         finally
@@ -145,6 +165,8 @@ public static class LavaLampPreview
             RenderTexture.active = previous; ShaderUtil.allowAsyncCompilation = asynchronous;
             floorMeshes.Dispose();
             UnityEngine.Object.DestroyImmediate(floorMaterial); UnityEngine.Object.DestroyImmediate(target); UnityEngine.Object.DestroyImmediate(pixels);
+            if (cookie != null) { cookie.Release(); UnityEngine.Object.DestroyImmediate(cookie); }
+            if (cookieAnimation != null) UnityEngine.Object.DestroyImmediate(cookieAnimation);
             AeroProjectionLamp.RefreshBudget(Camera.main != null ? Camera.main.transform.position : Vector3.zero);
         }
     }

@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace TowerOfBabel.Rendering
 {
-    /// <summary>Real URP spotlight cookie, refreshed at 8 Hz. Only four nearby lamps allocate cookies.</summary>
+    /// <summary>Real URP spotlight cookie, refreshed at 24 Hz. Only four nearby lamps allocate cookies.</summary>
     [ExecuteAlways, DisallowMultipleComponent]
     public sealed class AeroProjectionLamp : MonoBehaviour
     {
         public const int MaximumActiveLamps = 4;
-        public const int CookieResolution = 128;
-        public const float CookieInterval = .125f;
+        public const int CookieResolution = 256;
+        public const float CookieInterval = 1 / 24f;
         private static readonly List<AeroProjectionLamp> lamps = new();
         private static readonly AeroProjectionLamp[] nearest = new AeroProjectionLamp[MaximumActiveLamps];
         private static readonly float[] distances = new float[MaximumActiveLamps];

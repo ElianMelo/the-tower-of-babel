@@ -27,12 +27,20 @@ Material:
         m_Texture: {fileID: 2800000, guid: 553a5cb7f0b7e2141b85a9f589e2203e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _CausticsArray:
+        m_Texture: {fileID: 18700000, guid: 961ff082a1013014bbe79fd6c1695f5c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _CausticsTex:
         m_Texture: {fileID: 2800000, guid: ab22e5b5339fb0d4cbc31dba61b74e85, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _Dispersion: 0.018
+    - _FrameCount: 32
+    - _LoopSeconds: 9
+    - _Tiling: 1.5
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1
