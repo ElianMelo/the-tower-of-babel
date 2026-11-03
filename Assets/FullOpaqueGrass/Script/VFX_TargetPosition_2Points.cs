@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.Collections.Generic;
 
 namespace VFX
@@ -38,7 +40,8 @@ namespace VFX
         {
             if (Application.isPlaying)
             {
-                UpdateShader((float)EditorApplication.timeSinceStartup);
+                // Players have no editor clock; play mode uses game time.
+                UpdateShader((float)Time.timeAsDouble);
             }
         }
 
