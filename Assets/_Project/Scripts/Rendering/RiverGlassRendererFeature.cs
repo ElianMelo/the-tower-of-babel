@@ -60,6 +60,9 @@ namespace TowerOfBabel.Rendering
             private readonly RiverGlassRendererFeature owner;
             private readonly List<RiverGlassDraw> draws = new();
             private readonly List<FloorGroup> floors = new();
+            // Floors that refract nothing share one pass (performance pass 2026-11-03: one pass per floor cost ~5 ms
+            // of CPU with the whole tower in view). Draw order stays far to near, so the image is unchanged.
+            private readonly List<RiverGlassDraw> plainDraws = new();
             private readonly Dictionary<int,FloorGroup> floorPool = new();
             private readonly Plane[] planes = new Plane[6];
             private static readonly int Background = Shader.PropertyToID("_RiverBackground");
@@ -108,15 +111,25 @@ namespace TowerOfBabel.Rendering
                 }
                 floors.Sort(static (a, b) => a.distance.CompareTo(b.distance));
                 owner.profile.Apply(owner.material);
+                plainDraws.Clear();
+                int detailedLimit = owner.reducedRefraction ? 1 : Mathf.Clamp(owner.profile.detailedFloorLimit, 1, 3);
                 for (int i = floors.Count - 1; i >= 0; i--)
                 {
                     FloorGroup floor = floors[i];
-                    bool detailed=i<(owner.reducedRefraction?1:Mathf.Clamp(owner.profile.detailedFloorLimit,1,3));
+                    bool detailed=i<detailedLimit;
                     if(detailed)owner.LastDetailedFloors++;
+                    if (!detailed)
+                    {
+                        // Farther floors: the cheap tint, no background copy. Collected and drawn together below.
+                        plainDraws.AddRange(floor.draws);
+                        if (i > 0 && i - 1 >= detailedLimit) continue;
+                        RecordComposition(graph, resources, plainDraws, default, 0, false);
+                        continue;
+                    }
                     // Every detailed floor refracts its own copy of what lies behind it, so
                     // stacked pools see the water already composited on farther floors.
-                    float weight = detailed ? 1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(owner.profile.refractionDistance*.5f,
-                        owner.profile.refractionDistance,floor.distance)) : 0;
+                    float weight = 1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(owner.profile.refractionDistance*.5f,
+                        owner.profile.refractionDistance,floor.distance));
                     if (owner.reducedRefraction) weight *= .35f;
                     TextureHandle background = default;
                     if (weight > .001f)
@@ -136,9 +149,17 @@ namespace TowerOfBabel.Rendering
                         owner.LastRefractedLayers++;
                         owner.LastBackgroundWidth=description.width; owner.LastBackgroundHeight=description.height;
                     }
+                    RecordComposition(graph, resources, floor.draws, background, weight, true);
+                }
+            }
+
+            private void RecordComposition(RenderGraph graph, UniversalResourceData resources, List<RiverGlassDraw> floorDraws,
+                TextureHandle background, float weight, bool detailed)
+            {
+                {
                     using var builder = graph.AddRasterRenderPass<PassData>("River glass floor composition", out var data);
                     data.background = background; data.depth = resources.cameraDepthTexture;
-                    data.material = owner.material; data.draws = floor.draws; data.weight = weight;
+                    data.material = owner.material; data.draws = floorDraws; data.weight = weight;
                     data.detailed=detailed;
                     data.steps=owner.profile.Steps(owner.reducedRefraction);
                     data.clock = owner.previewTime >= 0 ? owner.previewTime : Time.time;

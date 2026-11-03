@@ -172,7 +172,11 @@ namespace TowerOfBabel.Rendering
                 }
                 light.type = LightType.Spot; light.range = raySettings.fillRange;
                 light.spotAngle = raySettings.fillAngle; light.innerSpotAngle = raySettings.fillAngle * .65f;
-                light.shadows = LightShadows.Soft; light.shadowCustomResolution = 512;
+                light.shadows = LightShadows.Soft; light.shadowCustomResolution = 256;
+                // Low tier (256 px): soft fill shadows need little detail, and every shadowed light must fit the 1024 atlas.
+                var shadowData = light.GetUniversalAdditionalLightData();
+                if (shadowData.additionalLightsShadowResolutionTier != UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierLow)
+                    JsonUtility.FromJsonOverwrite("{\"m_AdditionalLightsShadowResolutionTier\":0}", shadowData);
                 light.shadowBias = .04f; light.shadowNormalBias = .15f;
                 light.color = tint;
                 light.intensity = raySettings.fillStrength * Mathf.Lerp(.12f, 1, day) * sourceWeights[i] * InteriorWeight;

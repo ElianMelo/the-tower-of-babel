@@ -22,19 +22,15 @@ namespace TowerOfBabel.Rendering.Tests
         public void Flipbooks_AreLoopingTiledTextureArrays()
         {
             var lamp = Load("LavaLampCaustics.png");
-            var pool = Load("PoolCausticsFlipbook.png");
             Assert.That(lamp, Is.Not.Null, "Run Tower of Babel/Environment/Apply caustics flipbooks.");
-            Assert.That(pool, Is.Not.Null);
             Assert.That((lamp.width, lamp.height, lamp.depth), Is.EqualTo((512, 512, 32)));
-            Assert.That((pool.width, pool.height, pool.depth), Is.EqualTo((256, 256, 16)));
-            foreach (var t in new[] { lamp, pool })
+            Assert.That(System.IO.File.Exists(Folder + "PoolCausticsFlipbook.png"), Is.False, "The water light now plays the lamp flipbook.");
+            foreach (var t in new[] { lamp })
             {
                 Assert.That(t.wrapMode, Is.EqualTo(TextureWrapMode.Repeat));
                 Assert.That(t.mipmapCount, Is.GreaterThan(1), "Distant tiles blur instead of shimmering.");
             }
             string notice = System.IO.File.ReadAllText(Folder + "THIRD_PARTY_NOTICE.md");
-            StringAssert.Contains("PoolCausticsFlipbook.png", notice);
-            StringAssert.Contains("CC0", notice);
             StringAssert.Contains("LavaLampCaustics.png", notice);
         }
 
@@ -83,12 +79,14 @@ namespace TowerOfBabel.Rendering.Tests
         }
 
         [Test]
-        public void WaterLight_UsesTheFinerFlipbook_AtHalfTheTileSize()
+        public void WaterLight_IsTheLampCaustics_InWhite()
         {
             var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset");
             var feature = renderer.rendererFeatures.OfType<AeroLightRendererFeature>().Single();
-            Assert.That(feature.caustics, Is.SameAs(Load("PoolCausticsFlipbook.png")), "A different pattern from the lamp and the old Crest net.");
-            Assert.That(feature.settings.scale, Is.GreaterThanOrEqualTo(.8f), "One tile is about 1.2 m instead of 2.4 m.");
+            Assert.That(feature.caustics, Is.SameAs(Load("LavaLampCaustics.png")), "The same caustics as the lava lamp.");
+            Assert.That(feature.settings.scale, Is.GreaterThan(.42f), "Smaller than the old 2.4 m Crest tiles.");
+            var tint = feature.settings.tint;
+            Assert.That(Mathf.Min(tint.r, tint.g, tint.b), Is.GreaterThan(.9f), "White, not blue.");
             Assert.That(ShaderUtil.GetShaderMessages(feature.lightShader).Where(m => m.severity == UnityEditor.Rendering.ShaderCompilerMessageSeverity.Error), Is.Empty);
         }
 
@@ -96,10 +94,11 @@ namespace TowerOfBabel.Rendering.Tests
         public void SunShadows_ReachFarIntoTheTower()
         {
             var pipeline = AssetDatabase.LoadAssetAtPath<UniversalRenderPipelineAsset>("Assets/Settings/PC_RPAsset.asset");
-            Assert.That(pipeline.shadowDistance, Is.GreaterThanOrEqualTo(150));
-            Assert.That(pipeline.shadowCascadeCount, Is.EqualTo(4));
-            Assert.That(pipeline.cascade4Split.x * pipeline.shadowDistance, Is.LessThan(12), "The nearest cascade stays tight and sharp.");
-            Assert.That(pipeline.mainLightShadowmapResolution, Is.GreaterThanOrEqualTo(4096));
+            Assert.That(pipeline.shadowDistance, Is.InRange(100, 150), "Well past the old 50 m cut-off, within the frame budget.");
+            Assert.That(pipeline.shadowCascadeCount, Is.EqualTo(3));
+            Assert.That(pipeline.cascade3Split.x * pipeline.shadowDistance, Is.LessThan(12), "The nearest cascade stays tight and sharp.");
+            Assert.That(pipeline.mainLightShadowmapResolution, Is.EqualTo(2048), "Performance pass: 4096 cost more than it showed.");
+            Assert.That(pipeline.additionalLightsShadowmapResolution, Is.EqualTo(1024), "Spot shadows are all 256 px; a 1024 atlas holds 16.");
         }
     }
 }

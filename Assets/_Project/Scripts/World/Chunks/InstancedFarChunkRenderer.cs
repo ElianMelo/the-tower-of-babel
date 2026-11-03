@@ -21,7 +21,10 @@ namespace TowerOfBabel.World.Chunks
 
     /// <summary>
     /// Renders every construction stage in spatially-cullable instance pages.
-    /// Pages are rebuilt only when their member chunks change.
+    /// Pages are rebuilt only when their member chunks change. Each cell's transforms live in GPU buffers, uploaded
+    /// only when the cell rebuilds, and pages draw with Graphics.RenderMeshIndirect (procedural:AeroFarSetup in the
+    /// tower shaders): nothing per instance is copied per frame. With the whole tower in view, re-uploading ~64k
+    /// instances every frame through RenderMeshInstanced cost ~20 ms of CPU (performance pass 2026-11-03).
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer, IRiverGlassDrawSource, IAeroReflectionDrawSource
@@ -51,6 +54,14 @@ namespace TowerOfBabel.World.Chunks
         [Tooltip("Detail vines are small and numerous; their pages stop drawing beyond this distance. Zero disables the limit.")]
         [SerializeField, Min(0f)] private float detailDrawDistance = 140f;
 
+        [Header("Mesh LOD (same material)")]
+        [Tooltip("Simplified copies of the finished Floor, Stair, Pillar, Arch and GlassWaterFloor (TowerMeshLodAuthoring), " +
+                 "two per type: LOD1 (~50% of the triangles) then LOD2 (~30%). Same material and shader as up close.")]
+        [SerializeField] private Mesh[] meshLods = new Mesh[LodSlots];
+        [Tooltip("Pages whose nearest point is farther than this draw LOD1 (sub-pixel change at 1080p).")]
+        [SerializeField, Min(0f)] private float lod1Distance = 70f;
+        [SerializeField, Min(0f)] private float lod2Distance = 140f;
+
         private readonly Dictionary<RenderBatchKey, TypeBatch> batches = new();
         private readonly HashSet<ChunkKey> loadedChunks = new();
         private readonly Dictionary<ChunkKey, PreparedChunk> preparedChunks = new();
@@ -65,6 +76,64 @@ namespace TowerOfBabel.World.Chunks
 
         private static MaterialPropertyBlock ambientProbeProperties;
         private static SphericalHarmonicsL2 ambientProbeSource;
+
+        /// <summary>
+        /// GPU-resident far instancing on (default) or the per-frame RenderMeshInstanced path (fallback, tests and the
+        /// benchmark). The resident path is used only where the hardware and the material's shader support it.
+        /// </summary>
+        public static bool GpuResidentInstancing = true;
+        /// <summary>Mesh LOD on (default) or full meshes everywhere (tests and the benchmark).</summary>
+        public static bool MeshLodEnabled = true;
+        public const int LodSlots = 10;
+        public static int LodSlot(TowerAssetType type, int level) => (int)type * 2 + level - 1;
+        /// <summary>Pages drawn with a simplified mesh in the last frame.</summary>
+        public int LodPageCount { get; private set; }
+        public float Lod1Distance => lod1Distance;
+        public float Lod2Distance => lod2Distance;
+
+        /// <summary>Assigns the simplified meshes and switch distances (authoring and tests), rebuilding loaded batches.</summary>
+        public void ConfigureMeshLod(Mesh[] meshes, float lod1, float lod2)
+        {
+            meshLods = meshes ?? new Mesh[LodSlots];
+            lod1Distance = lod1; lod2Distance = lod2;
+            foreach (var pair in batches)
+                if (pair.Key.Stage == ChunkAssetData.CompletedStage && (int)pair.Key.AssetType * 2 + 1 < meshLods.Length)
+                    pair.Value.SetLods(meshLods[LodSlot(pair.Key.AssetType, 1)], meshLods[LodSlot(pair.Key.AssetType, 2)], lod1Distance, lod2Distance);
+        }
+        public static bool GpuResidentSupported => SystemInfo.supportsComputeShaders && SystemInfo.supportsIndirectArgumentsBuffer;
+        /// <summary>Pages drawn through the resident indirect path in the last frame.</summary>
+        public int ResidentDrawCount { get; private set; }
+
+        private static readonly int FarObjectToWorld = Shader.PropertyToID("_AeroFarObjectToWorld");
+        private static readonly int FarWorldToObject = Shader.PropertyToID("_AeroFarWorldToObject");
+        private static readonly int FarBase = Shader.PropertyToID("_AeroFarBase");
+        private static readonly int FarFloor = Shader.PropertyToID("_AeroFarFloor");
+        private static readonly int[] ShIds =
+        {
+            Shader.PropertyToID("unity_SHAr"), Shader.PropertyToID("unity_SHAg"), Shader.PropertyToID("unity_SHAb"),
+            Shader.PropertyToID("unity_SHBr"), Shader.PropertyToID("unity_SHBg"), Shader.PropertyToID("unity_SHBb"),
+            Shader.PropertyToID("unity_SHC")
+        };
+        private static readonly Vector4[] ambientSh = new Vector4[7];
+        private static int ambientShVersion;
+
+        /// <summary>
+        /// The scene's ambient probe as the seven per-draw SH constants, for vine pages on the resident path (one draw,
+        /// one probe: the same values the instanced path copies to every instance). Version bumps when it changes.
+        /// </summary>
+        private static int AmbientShVersion()
+        {
+            SphericalHarmonicsL2 probe = RenderSettings.ambientProbe;
+            if (ambientShVersion != 0 && probe == ambientProbeSource && ambientProbeProperties != null) return ambientShVersion;
+            AmbientProbeProperties();
+            for (int c = 0; c < 3; c++)
+            {
+                ambientSh[c] = new Vector4(probe[c, 3], probe[c, 1], probe[c, 2], probe[c, 0] - probe[c, 6]);
+                ambientSh[c + 3] = new Vector4(probe[c, 4], probe[c, 5], probe[c, 6] * 3, probe[c, 7]);
+            }
+            ambientSh[6] = new Vector4(probe[0, 8], probe[1, 8], probe[2, 8], 1);
+            return ++ambientShVersion;
+        }
 
         /// <summary>
         /// The scene's ambient probe, replicated for a full instanced draw. Detail foliage uses it when the scene has
@@ -121,6 +190,8 @@ namespace TowerOfBabel.World.Chunks
                 VisiblePageCount = 0;
                 CulledPageCount = 0;
                 DrawCallCount = 0;
+                ResidentDrawCount = 0;
+                LodPageCount = 0;
                 Vector3 cameraPosition = renderCamera != null ? renderCamera.transform.position : Vector3.zero;
                 float maximumDistanceSquared = maximumDrawDistance > 0f
                     ? maximumDrawDistance * maximumDrawDistance
@@ -142,6 +213,8 @@ namespace TowerOfBabel.World.Chunks
                     VisiblePageCount += stats.VisiblePages;
                     CulledPageCount += stats.CulledPages;
                     DrawCallCount += stats.DrawCalls;
+                    ResidentDrawCount += stats.ResidentDraws;
+                    LodPageCount += stats.LodPages;
                 }
             }
         }
@@ -289,9 +362,13 @@ namespace TowerOfBabel.World.Chunks
                 }
 
                 Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
-                if (mesh != null)
-                    batches.Add(key, new TypeBatch(mesh, meshRenderer, assetType.IsDetail(), assetType.IsFloor() ? chunkManager : null,
-                        assetType == TowerAssetType.GlassWaterFloor, stage));
+                if (mesh == null) continue;
+                var batch = new TypeBatch(mesh, meshRenderer, assetType.IsDetail(), assetType.IsFloor() ? chunkManager : null,
+                    assetType == TowerAssetType.GlassWaterFloor, stage);
+                // Simplified meshes match the finished piece; part-built stages keep their own mesh.
+                if (stage == ChunkAssetData.CompletedStage && (int)assetType * 2 + 1 < (meshLods?.Length ?? 0))
+                    batch.SetLods(meshLods[LodSlot(assetType, 1)], meshLods[LodSlot(assetType, 2)], lod1Distance, lod2Distance);
+                batches.Add(key, batch);
             }
         }
 
@@ -354,12 +431,16 @@ namespace TowerOfBabel.World.Chunks
             public int VisiblePages { get; }
             public int CulledPages { get; }
             public int DrawCalls { get; }
+            public int ResidentDraws { get; }
+            public int LodPages { get; }
 
-            public BatchRenderStats(int visiblePages, int culledPages, int drawCalls)
+            public BatchRenderStats(int visiblePages, int culledPages, int drawCalls, int residentDraws, int lodPages)
             {
                 VisiblePages = visiblePages;
                 CulledPages = culledPages;
                 DrawCalls = drawCalls;
+                ResidentDraws = residentDraws;
+                LodPages = lodPages;
             }
         }
 
@@ -383,6 +464,8 @@ namespace TowerOfBabel.World.Chunks
             private readonly TowerAssetType assetType;
             private readonly byte stage;
             public bool IsRiver => assetType == TowerAssetType.GlassWaterFloor;
+            public TowerAssetType AssetType => assetType;
+            public byte Stage => stage;
             public bool IsCompletedRiver => IsRiver && stage == ChunkAssetData.CompletedStage;
 
             public RenderBatchKey(TowerAssetType assetType, byte stage)
@@ -537,7 +620,26 @@ namespace TowerOfBabel.World.Chunks
                     if (floorOwner.RadialFloors)
                         meshBounds = TowerFloorLayout.ConservativeBounds(mesh.bounds, floorOwner.FloorRadialDepth, floorOwner.FloorArcLength);
                 }
+                // The resident path needs the shader's procedural:AeroFarSetup variant (and a readable index range).
+                residentCapable = material.shader.keywordSpace.FindKeyword("PROCEDURAL_INSTANCING_ON").isValid && mesh.subMeshCount > 0;
             }
+
+            private readonly bool residentCapable;
+            public bool UsesResidentPath => residentCapable && GpuResidentInstancing && GpuResidentSupported;
+            // Full mesh, LOD1, LOD2 (null when absent) and the squared switch distances.
+            private readonly Mesh[] levels = new Mesh[3];
+            private float lod1Sq = float.PositiveInfinity, lod2Sq = float.PositiveInfinity;
+
+            public void SetLods(Mesh lod1, Mesh lod2, float lod1Distance, float lod2Distance)
+            {
+                levels[1] = lod1; levels[2] = lod2;
+                lod1Sq = lod1 != null && lod1Distance > 0 ? lod1Distance * lod1Distance : float.PositiveInfinity;
+                lod2Sq = lod2 != null && lod2Distance > 0 ? lod2Distance * lod2Distance : float.PositiveInfinity;
+                foreach (var cell in cells.Values) cell.ReleaseGpu();
+            }
+
+            private int LevelFor(float distanceSq) =>
+                !MeshLodEnabled ? 0 : distanceSq > lod2Sq ? 2 : distanceSq > lod1Sq ? 1 : 0;
 
             public void SetChunk(ChunkKey owner, RenderCellKey cellKey, List<Matrix4x4> matrices)
             {
@@ -561,7 +663,10 @@ namespace TowerOfBabel.World.Chunks
 
                 Count -= cell.RemoveChunk(owner);
                 if (cell.IsEmpty)
+                {
+                    cell.ReleaseGpu();
                     cells.Remove(cellKey);
+                }
             }
 
             public BatchRenderStats Render(int layer, Camera camera, Plane[] planes,
@@ -570,6 +675,11 @@ namespace TowerOfBabel.World.Chunks
                 int visiblePages = 0;
                 int culledPages = 0;
                 int drawCalls = 0;
+                int residentDraws = 0;
+                int lodPages = 0;
+                levels[0] = mesh;
+                bool resident = UsesResidentPath;
+                int shVersion = resident && Detail ? AmbientShVersion() : 0;
 
                 RenderParams baseParams = new(material)
                 {
@@ -606,14 +716,33 @@ namespace TowerOfBabel.World.Chunks
                         if (floor && RiverGlassRenderRegistry.NeedsProjectionShadows(page.Bounds,camera,layer))
                             renderParams.shadowCastingMode=ShadowCastingMode.On;
                         renderParams.worldBounds = page.Bounds;
+                        // Same material and shader at every level; only distant pages use the lighter mesh.
+                        int level = LevelFor(page.Bounds.SqrDistance(cameraPosition));
+                        Mesh drawMesh = levels[level];
+                        if (level > 0) lodPages++;
+                        if (resident && page.LightProbeProperties == null)
+                        {
+                            // Same draw, transforms already on the GPU: one indirect draw, no per-instance copy.
+                            cell.EnsureGpu(levels);
+                            renderParams.matProps = cell.PageProperties(i, cell.Floor, Detail, shVersion);
+                            renderParams.lightProbeUsage = Detail ? LightProbeUsage.CustomProvided : LightProbeUsage.Off;
+                            Graphics.RenderMeshIndirect(renderParams, drawMesh, cell.Arguments, 1, level * pages.Count + i);
+                            visiblePages++;
+                            drawCalls++;
+                            residentDraws++;
+                            continue;
+                        }
                         renderParams.matProps = page.LightProbeProperties;
                         if (river)
                         {
-                            page.RiverProperties ??= new MaterialPropertyBlock();
-                            if (page.LightProbeProperties != null) page.RiverProperties = page.LightProbeProperties;
-                            page.FloorIdentities ??= new float[page.Count];
-                            System.Array.Fill(page.FloorIdentities, cell.Floor);
-                            page.RiverProperties.SetFloatArray("_RiverFloorIndex", page.FloorIdentities);
+                            // A page never changes floor; set its floor identity once, not every frame.
+                            if (page.FloorIdentities == null)
+                            {
+                                page.RiverProperties = page.LightProbeProperties ?? new MaterialPropertyBlock();
+                                page.FloorIdentities = new float[page.Count];
+                                System.Array.Fill(page.FloorIdentities, cell.Floor);
+                                page.RiverProperties.SetFloatArray("_RiverFloorIndex", page.FloorIdentities);
+                            }
                             renderParams.matProps = page.RiverProperties;
                         }
                         renderParams.lightProbeUsage = page.LightProbeProperties != null
@@ -624,14 +753,14 @@ namespace TowerOfBabel.World.Chunks
                             renderParams.matProps = AmbientProbeProperties();
                             renderParams.lightProbeUsage = LightProbeUsage.CustomProvided;
                         }
-                        Graphics.RenderMeshInstanced(renderParams, mesh, 0,
+                        Graphics.RenderMeshInstanced(renderParams, drawMesh, 0,
                             cell.Matrices, page.Count, page.StartIndex);
                         visiblePages++;
                         drawCalls++;
                     }
                 }
 
-                return new BatchRenderStats(visiblePages, culledPages, drawCalls);
+                return new BatchRenderStats(visiblePages, culledPages, drawCalls, residentDraws, lodPages);
             }
 
             public void CollectRiverGlass(Camera camera, Plane[] planes, List<RiverGlassDraw> draws, float maxDistance)
@@ -659,6 +788,7 @@ namespace TowerOfBabel.World.Chunks
 
             public void Dispose()
             {
+                foreach (var cell in cells.Values) cell.ReleaseGpu();
                 cells.Clear();
                 cellByChunk.Clear();
                 if (material == null)
@@ -705,10 +835,92 @@ namespace TowerOfBabel.World.Chunks
                 return removed.Count;
             }
 
+            // GPU-resident copies of this cell: transforms, their inverses and one indirect command per page.
+            private GraphicsBuffer gpuObjectToWorld, gpuWorldToObject, gpuArguments;
+            private MaterialPropertyBlock[] pageProperties = Array.Empty<MaterialPropertyBlock>();
+            private int[] pageShVersions = Array.Empty<int>();
+            private bool gpuDirty = true;
+            public GraphicsBuffer Arguments => gpuArguments;
+
+            /// <summary>Uploads the cell's transforms and page commands once per rebuild (not per frame).</summary>
+            public void EnsureGpu(Mesh[] levels)
+            {
+                if (!gpuDirty && gpuObjectToWorld != null) return;
+                int count = Mathf.Max(1, matrices.Count);
+                if (gpuObjectToWorld == null || gpuObjectToWorld.count < count)
+                {
+                    ReleaseBuffers();
+                    gpuObjectToWorld = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, 64) { name = "Far cell object to world" };
+                    gpuWorldToObject = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, 64) { name = "Far cell world to object" };
+                }
+                var inverse = new Matrix4x4[matrices.Count];
+                for (int i = 0; i < inverse.Length; i++) inverse[i] = matrices[i].inverse;
+                gpuObjectToWorld.SetData(matrices);
+                gpuWorldToObject.SetData(inverse);
+                // One block of page commands per mesh level (full, LOD1, LOD2), each with that mesh's index range.
+                int commandCount = Mathf.Max(1, pages.Count * levels.Length);
+                if (gpuArguments == null || gpuArguments.count < commandCount)
+                {
+                    gpuArguments?.Release();
+                    gpuArguments = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, commandCount,
+                        GraphicsBuffer.IndirectDrawIndexedArgs.size) { name = "Far cell page commands" };
+                }
+                var commands = new GraphicsBuffer.IndirectDrawIndexedArgs[commandCount];
+                for (int level = 0; level < levels.Length; level++)
+                {
+                    Mesh mesh = levels[level] != null ? levels[level] : levels[0];
+                    for (int i = 0; i < pages.Count; i++)
+                        commands[level * pages.Count + i] = new GraphicsBuffer.IndirectDrawIndexedArgs
+                        {
+                            indexCountPerInstance = mesh.GetIndexCount(0), instanceCount = (uint)pages[i].Count,
+                            startIndex = mesh.GetIndexStart(0), baseVertexIndex = mesh.GetBaseVertex(0), startInstance = 0
+                        };
+                }
+                gpuArguments.SetData(commands);
+                pageProperties = new MaterialPropertyBlock[pages.Count];
+                pageShVersions = new int[pages.Count];
+                gpuDirty = false;
+            }
+
+            /// <summary>Per-page draw properties: the cell buffers, the page's first instance and its floor.</summary>
+            public MaterialPropertyBlock PageProperties(int page, int floor, bool ambient, int shVersion)
+            {
+                var block = pageProperties[page];
+                if (block == null)
+                {
+                    block = pageProperties[page] = new MaterialPropertyBlock();
+                    block.SetBuffer(FarObjectToWorld, gpuObjectToWorld);
+                    block.SetBuffer(FarWorldToObject, gpuWorldToObject);
+                    block.SetFloat(FarBase, pages[page].StartIndex);
+                    block.SetFloat(FarFloor, floor);
+                }
+                if (ambient && pageShVersions[page] != shVersion)
+                {
+                    for (int i = 0; i < ShIds.Length; i++) block.SetVector(ShIds[i], ambientSh[i]);
+                    pageShVersions[page] = shVersion;
+                }
+                return block;
+            }
+
+            private void ReleaseBuffers()
+            {
+                gpuObjectToWorld?.Release(); gpuObjectToWorld = null;
+                gpuWorldToObject?.Release(); gpuWorldToObject = null;
+            }
+
+            public void ReleaseGpu()
+            {
+                ReleaseBuffers();
+                gpuArguments?.Release(); gpuArguments = null;
+                pageProperties = Array.Empty<MaterialPropertyBlock>();
+                gpuDirty = true;
+            }
+
             public void RebuildIfDirty(Bounds meshBounds, bool useLightProbes)
             {
                 if (!dirty)
                     return;
+                gpuDirty = true;
 
                 matrices.Clear();
                 floorIndices.Clear(); instanceBounds.Clear();

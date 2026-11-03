@@ -18,14 +18,23 @@ namespace TowerOfBabel.Rendering
         private void OnEnable() { if (!regions.Contains(this)) regions.Add(this); }
         private void OnDisable() => regions.Remove(this);
 
+        private static readonly Plane[] frustum = new Plane[6];
+
+        /// <summary>
+        /// True when a lake region is within view distance and inside the camera's view. The full-screen water light
+        /// pass is skipped otherwise (performance pass 2026-11-03: looking away from the lakes costs nothing).
+        /// </summary>
         public static bool HasNearbyRegion(Camera camera, float viewDistance)
         {
+            bool planes = false;
             foreach (var region in regions)
             {
                 if (region == null || !region.isActiveAndEnabled ||
                     (camera.scene.IsValid() && region.gameObject.scene != camera.scene)) continue;
                 float radius = Mathf.Max(region.radii.x,region.radii.y) + region.shoreFade + Mathf.Max(region.height,region.depth);
-                if ((region.transform.position-camera.transform.position).sqrMagnitude < Mathf.Pow(radius+viewDistance,2)) return true;
+                if ((region.transform.position-camera.transform.position).sqrMagnitude >= Mathf.Pow(radius+viewDistance,2)) continue;
+                if (!planes) { GeometryUtility.CalculateFrustumPlanes(camera, frustum); planes = true; }
+                if (GeometryUtility.TestPlanesAABB(frustum, new Bounds(region.transform.position, Vector3.one * (radius * 2)))) return true;
             }
             return false;
         }

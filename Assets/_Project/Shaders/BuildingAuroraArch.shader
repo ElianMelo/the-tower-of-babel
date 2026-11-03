@@ -66,6 +66,7 @@ Shader "TowerOfBabel/Buildings/Aurora Arch"
             UNITY_DEFINE_INSTANCED_PROP(float,_BuildReveal)
             UNITY_DEFINE_INSTANCED_PROP(float,_BuildClock)
         UNITY_INSTANCING_BUFFER_END(Construction)
+        #include "Aero/AeroFarInstancing.hlsl"
         #include "BuildingAuroraCurtain.hlsl"
         struct Attributes
         {
@@ -152,6 +153,7 @@ Shader "TowerOfBabel/Buildings/Aurora Arch"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma shader_feature_local_fragment _AERO_WETNESS
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
@@ -230,6 +232,7 @@ Shader "TowerOfBabel/Buildings/Aurora Arch"
             #pragma vertex ShadowVert
             #pragma fragment DepthFrag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             float3 _LightDirection;
             float3 _LightPosition;
@@ -261,6 +264,7 @@ Shader "TowerOfBabel/Buildings/Aurora Arch"
             #pragma vertex Vert
             #pragma fragment DepthFrag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             half4 DepthFrag(Varyings input):SV_Target { UNITY_SETUP_INSTANCE_ID(input);ClipConstruction(input);return input.positionCS.z; }
             ENDHLSL
         }
@@ -274,6 +278,7 @@ Shader "TowerOfBabel/Buildings/Aurora Arch"
             #pragma vertex Vert
             #pragma fragment NormalFrag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
             half4 NormalFrag(Varyings input):SV_Target
             {

@@ -49,6 +49,7 @@ Shader "TowerOfBabel/Buildings/Glass Step"
             UNITY_DEFINE_INSTANCED_PROP(float,_BuildReveal)
             UNITY_DEFINE_INSTANCED_PROP(float,_BuildClock)
         UNITY_INSTANCING_BUFFER_END(Construction)
+        #include "Aero/AeroFarInstancing.hlsl"
         struct Attributes
         {
             float4 positionOS:POSITION;
@@ -115,6 +116,7 @@ Shader "TowerOfBabel/Buildings/Glass Step"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
@@ -259,6 +261,7 @@ Shader "TowerOfBabel/Buildings/Glass Step"
             #pragma vertex ShadowVert
             #pragma fragment ShadowFrag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             float3 _LightDirection;
             float3 _LightPosition;

@@ -553811,6 +553811,19 @@ MonoBehaviour:
   maximumDrawDistance: 0
   useLightProbes: 1
   detailDrawDistance: 140
+  meshLods:
+  - {fileID: 4300000, guid: 820ffe8f712c3e243baa0bd6eba63568, type: 2}
+  - {fileID: 4300000, guid: dc700cd800dc32f4b8e03e326b95d864, type: 2}
+  - {fileID: 4300000, guid: 58693d0408c0b484498029297beaf24b, type: 2}
+  - {fileID: 4300000, guid: ce4a2bb382d91fc4ab41e0096a1c66d4, type: 2}
+  - {fileID: 4300000, guid: 0f31088e29cd37e47930fa4b4117e230, type: 2}
+  - {fileID: 4300000, guid: cbaeb0c283d584f458341b800b395310, type: 2}
+  - {fileID: 4300000, guid: 393d20a203f7297489c73246090fd253, type: 2}
+  - {fileID: 4300000, guid: 9accc232d778700438df5a8b3915f58d, type: 2}
+  - {fileID: 4300000, guid: 0831c082c33cfb84b9da8ed467c1b5d5, type: 2}
+  - {fileID: 4300000, guid: 54fba601bf27bde44985e2f59123714f, type: 2}
+  lod1Distance: 70
+  lod2Distance: 140
 --- !u!114 &1114320932
 MonoBehaviour:
   m_ObjectHideFlags: 0

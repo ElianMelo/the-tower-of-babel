@@ -13,8 +13,11 @@ namespace TowerOfBabel.Rendering
         public const int MaximumPatches = 4;
         public const int MaximumLights = MaximumPatches * 2;
         public const int MaximumActivePatches = 2;
-        public const int CookieResolution = 2048;
-        public const int ShadowResolution = 512;
+        // 2026-11-03: 2048 px was far more than the soft projected pattern needs and overflowed the light budgets.
+        public const int CookieResolution = 1024;
+        public const int ShadowResolution = 256;
+        /// <summary>Projection lights farther than this from the camera drop their shadows (shadow atlas budget).</summary>
+        public const float ShadowDistance = 20;
         public const float CookieInterval = .125f;
         // This project's Water layer contains the ocean/lake renderers. The custom river
         // surface samples sunlight/environment only and never receives these extra lights.
@@ -297,6 +300,7 @@ namespace TowerOfBabel.Rendering
                     light.color = profile.projectionTint; light.intensity = intensity; light.range = profile.projectionRange;
                     light.spotAngle=profile.projectionAngle*Mathf.Max(.9f,patch.angleScale); light.innerSpotAngle=light.spotAngle*.95f;
                     light.cullingMask = camera.cullingMask & ~WaterLayerMask; light.enabled = intensity > .001f;
+                    light.shadows = distance <= ShadowDistance ? LightShadows.Hard : LightShadows.None;
                     if (light.enabled) ActiveLightCount++;
                 }
             }

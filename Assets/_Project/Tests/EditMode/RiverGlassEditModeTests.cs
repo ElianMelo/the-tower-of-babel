@@ -135,13 +135,17 @@ namespace TowerOfBabel.World.Tests
                 {sampleTime+=1f/30;lighting.Sample(camera,sampleTime,1f/30);}
                 Assert.That(lighting.ActiveLightCount,Is.InRange(2,RiverGlassLighting.MaximumActivePatches*2)); Assert.That(lighting.AllocatedCookieCount,Is.EqualTo(1));
                 var lights=root.GetComponentsInChildren<Light>();
-                Assert.That(lights.All(l=>l.shadows==LightShadows.Hard&&l.shadowCustomResolution==512),Is.True);
+                Assert.That(lights.All(l=>l.shadowCustomResolution==RiverGlassLighting.ShadowResolution),Is.True);
+                // Shadow atlas budget: only projection lights near the camera cast shadows.
+                Assert.That(lights.Where(l=>l.enabled&&Vector3.Distance(l.transform.position,camera.transform.position)<RiverGlassLighting.ShadowDistance-1).All(l=>l.shadows==LightShadows.Hard),Is.True);
+                Assert.That(lights.Where(l=>l.enabled&&Vector3.Distance(l.transform.position,camera.transform.position)>RiverGlassLighting.ShadowDistance+1).All(l=>l.shadows==LightShadows.None),Is.True);
+                Assert.That(RiverGlassLighting.ShadowResolution,Is.EqualTo(256),"Small shadows keep every light inside the 1024 px additional shadow atlas.");
                 Assert.That(lights.All(l=>l.GetUniversalAdditionalLightData().additionalLightsShadowResolutionTier==UniversalAdditionalLightData.AdditionalLightsShadowResolutionTierCustom),Is.True,
                     "URP must honor the custom resolution instead of silently using its 256px low tier.");
                 Assert.That(lights.Length,Is.EqualTo(RiverGlassLighting.MaximumLights));
                 Assert.That(lights.All(l=>l.spotAngle>=80&&l.spotAngle<=90&&l.range==14&&(l.cullingMask&RiverGlassLighting.WaterLayerMask)==0),Is.True);
                 var cookie=lights[0].cookie as RenderTexture; var before=CookiePixels(cookie);
-                Assert.That(cookie.width,Is.EqualTo(2048));Assert.That(cookie.height,Is.EqualTo(2048));Assert.That(lights.All(l=>l.cookie==cookie),Is.True);
+                Assert.That(cookie.width,Is.EqualTo(RiverGlassLighting.CookieResolution));Assert.That(cookie.height,Is.EqualTo(RiverGlassLighting.CookieResolution));Assert.That(lights.All(l=>l.cookie==cookie),Is.True);
                 uint version=cookie.updateCount;lighting.Sample(camera,sampleTime+.001f,0);
                 Assert.That(cookie.updateCount,Is.EqualTo(version),"Higher resolution must retain the 8Hz refresh budget.");
                 var rotations=lights.Select(l=>l.transform.rotation).ToArray();

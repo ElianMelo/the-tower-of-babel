@@ -122,7 +122,7 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(profile.daylightIntensity, Is.EqualTo(96));
             Assert.That(profile.nightIntensity, Is.EqualTo(64));
             Assert.That(profile.projectionMaxActivePatches, Is.EqualTo(2));
-            Assert.That(RiverGlassLighting.CookieResolution, Is.EqualTo(2048));
+            Assert.That(RiverGlassLighting.CookieResolution, Is.EqualTo(1024), "2026-11-03: 2048 px was oversized for the soft projected pattern.");
         }
     }
 }

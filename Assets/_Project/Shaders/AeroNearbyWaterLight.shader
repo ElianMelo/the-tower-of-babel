@@ -17,10 +17,11 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #define USE_FULL_PRECISION_BLIT_TEXTURE
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
-            // 16-frame CC0 caustics flipbook (Environment/Lighting/Caustics/PoolCausticsFlipbook.png).
+            // The lava lamp's 32-frame refraction-baked caustics (Environment/Lighting/Caustics/LavaLampCaustics.png),
+            // white instead of blue (user feedback 2026-11-03: "that effect is pretty good").
             TEXTURE2D_ARRAY(_AeroCaustics); SAMPLER(sampler_AeroCaustics);
             #include "Aero/AeroCaustics.hlsl"
-            #define AERO_POOL_FRAMES 16
+            #define AERO_CAUSTIC_FRAMES 32
             TEXTURECUBE(_AeroEnvironment); SAMPLER(sampler_AeroEnvironment);
             float4 _AeroRange, _AeroMotion;
             half4 _AeroTint;
@@ -52,13 +53,19 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
                 return weight;
             }
 
-            // Two layers of the animated flipbook at unrelated angles and scales; their minimum keeps fine,
-            // sharp crossings instead of broad white blobs. lod blurs distant tiles so they do not shimmer.
-            half WaterLight(float2 uv, float clock, float lod)
+            // Same look as the lamp cookie: two layers of the flipbook at unrelated angles, scales and phases (their
+            // minimum keeps sharp crossings) with red and blue sampled at slightly different scales for coloured edges.
+            // lod blurs distant tiles so they do not shimmer. One 9 s loop at the default speed.
+            half3 WaterLight(float2 uv, float clock, float lod)
             {
-                float frame = clock * 80;
-                float2 b = float2(.766 * uv.x - .643 * uv.y, .643 * uv.x + .766 * uv.y) * 1.37 + float2(.41, .23) + clock * float2(.9, -.6);
-                return AeroLayeredFlipbook(TEXTURE2D_ARRAY_ARGS(_AeroCaustics, sampler_AeroCaustics), uv + clock * float2(-.5, .8), b, frame, AERO_POOL_FRAMES, lod);
+                float frame = clock * 88.9;
+                float2 a = uv + clock * float2(1.3, -.9);
+                float2 b = float2(.799 * uv.x - .602 * uv.y, .602 * uv.x + .799 * uv.y) * 1.27 + float2(.31, .17) + clock * float2(-.7, 1.1);
+                half3 c;
+                c.r = AeroLayeredFlipbook(TEXTURE2D_ARRAY_ARGS(_AeroCaustics, sampler_AeroCaustics), a * 1.018, b * 1.018, frame, AERO_CAUSTIC_FRAMES, lod);
+                c.g = AeroLayeredFlipbook(TEXTURE2D_ARRAY_ARGS(_AeroCaustics, sampler_AeroCaustics), a, b, frame, AERO_CAUSTIC_FRAMES, lod);
+                c.b = AeroLayeredFlipbook(TEXTURE2D_ARRAY_ARGS(_AeroCaustics, sampler_AeroCaustics), a * .982, b * .982, frame, AERO_CAUSTIC_FRAMES, lod);
+                return c;
             }
 
             half4 Frag(Varyings input) : SV_Target
@@ -93,18 +100,20 @@ Shader "Hidden/TowerOfBabel/Nearby Water Light"
                 if (metres >= _AeroRange.x) return 0;
                 float fade = 1 - smoothstep(_AeroRange.y, _AeroRange.x, metres);
                 float clock = (_AeroMotion.z >= 0 ? _AeroMotion.z : _Time.y) * _AeroMotion.y;
-                // World-space triplanar projection stays attached to surfaces as the camera moves.
-                float3 weights = pow(abs(normal), 4);
-                weights /= max(dot(weights, 1), .0001);
+                // World-space projection along the surface's dominant axis stays attached to surfaces as the camera
+                // moves. One projection instead of a three-way triplanar blend: a third of the texture work.
+                float3 an = abs(normal);
                 float3 p = position * _AeroMotion.x;
-                float lod = max(0, log2(max(metres * _AeroMotion.x * .27, 1e-4)));
-                half pattern = WaterLight(p.zy, clock, lod) * weights.x + WaterLight(p.xz, clock, lod) * weights.y + WaterLight(p.xy, clock, lod) * weights.z;
+                float2 planeUV = an.y >= an.x && an.y >= an.z ? p.xz : (an.x >= an.z ? p.zy : p.xy);
+                float lod = max(0, log2(max(metres * _AeroMotion.x * .54, 1e-4)));
+                half3 pattern3 = WaterLight(planeUV, clock, lod);
+                half pattern = pattern3.g;
                 // Broad drifting reflected light accompanies the narrow focused caustic strands.
                 half swell = pow(saturate(.5 + .5 * sin(dot(p, float3(.9,.45,.75)) * 2 - clock * 1.7)), 6);
                 Light sun = GetMainLight();
                 half facing = .5 + .5 * saturate(dot(normal, sun.direction));
                 half glint = pow(saturate(dot(reflect(-sun.direction, normal), view)), 64);
-                half3 light = _AeroTint.rgb * (pattern * _AeroRange.z * facing + swell * _AeroRange.w * .2);
+                half3 light = _AeroTint.rgb * (pattern3 * _AeroRange.z * facing + swell * _AeroRange.w * .2);
                 light += sun.color * glint * _AeroRange.w * (.4 + pattern);
                 float3 reflected = reflect(-view, normal);
                 reflected += sin(p.yzx * 1.3 + clock * 2) * .018;

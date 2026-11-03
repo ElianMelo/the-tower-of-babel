@@ -52,7 +52,7 @@ public static class AeroIslandAtmosphereAuthoring
         var aquatic = renderer.rendererFeatures.OfType<AeroLightRendererFeature>().Single();
         // The nearby water light and the lamp cookie use the caustics flipbooks (AeroCausticsAuthoring).
         aquatic.settings.causticIntensity = 1.2f;
-        AeroCausticsAuthoring.ConfigureWaterLight(aquatic, AeroCausticsAuthoring.PoolFlipbook);
+        AeroCausticsAuthoring.ConfigureWaterLight(aquatic, AeroCausticsAuthoring.LampFlipbook);
         var water = AssetDatabase.LoadAssetAtPath<Material>(AeroWaterLightAuthoring.WaterPath);
         water.SetTexture("_CausticsTex", caustics); water.SetFloat("_CausticsBrightness", 1.7f); water.SetFloat("_CausticsTiling", .42f);
         water.SetFloat("_CausticsSpeed", .1f); water.EnableKeyword("_CAUSTICS"); EditorUtility.SetDirty(water);

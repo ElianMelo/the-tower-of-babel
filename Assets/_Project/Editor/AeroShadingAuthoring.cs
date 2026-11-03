@@ -87,7 +87,7 @@ public static class AeroShadingAuthoring
             var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>($"Assets/Settings/{name}.asset");
             foreach (var feature in renderer.rendererFeatures.OfType<AeroLightRendererFeature>())
             {
-                AeroCausticsAuthoring.ConfigureWaterLight(feature, AeroCausticsAuthoring.PoolFlipbook);
+                AeroCausticsAuthoring.ConfigureWaterLight(feature, AeroCausticsAuthoring.LampFlipbook);
             }
         }
         return caustics;

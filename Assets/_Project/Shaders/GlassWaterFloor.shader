@@ -60,6 +60,9 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         UNITY_DEFINE_INSTANCED_PROP(float,_BuildClock)
         UNITY_DEFINE_INSTANCED_PROP(float,_RiverFloorIndex)
         UNITY_INSTANCING_BUFFER_END(Construction)
+        // Far pages carry their floor identity per draw (GPU-resident far instancing).
+        #define AERO_FAR_SETUP_EXTRA _RiverFloorIndex = _AeroFarFloor;
+        #include "Aero/AeroFarInstancing.hlsl"
         struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float4 tangentOS:TANGENT; float2 uv:TEXCOORD0; float3 floorPatch:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
         struct Varyings { float4 positionCS:SV_POSITION; float3 ws:TEXCOORD0; float3 normal:TEXCOORD1; float3 local:TEXCOORD2; float fog:TEXCOORD3; nointerpolation float floorIndex:TEXCOORD4; UNITY_VERTEX_INPUT_INSTANCE_ID UNITY_VERTEX_OUTPUT_STEREO };
         #include "BuildingRadialFloor.hlsl"
@@ -100,6 +103,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma vertex Vert
             #pragma fragment Frag
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -204,6 +208,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma vertex Vert
             #pragma fragment Depth
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             half4 Depth(Varyings i):SV_Target { UNITY_SETUP_INSTANCE_ID(i); Aperture(i); Reveal(i); return i.positionCS.z; }
             ENDHLSL
         }
@@ -215,6 +220,7 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
             #pragma vertex Vert
             #pragma fragment Depth
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             half4 Depth(Varyings i):SV_Target { UNITY_SETUP_INSTANCE_ID(i); Aperture(i); Reveal(i); return 0; }
             ENDHLSL
         }

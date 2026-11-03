@@ -26,15 +26,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-# PoolCausticsFlipbook.png
-
-`caustics_atlas_noalpha.png` from "Water Caustics Effect (Small)" by leeor_net on OpenGameArt
-(https://opengameart.org/content/water-caustics-effect-small), downloaded 2026-11-03. License: CC0 1.0
-(public domain dedication); credit given as a courtesy. A 4 x 4 atlas of a 16-frame looping caustics animation,
-256 px per frame. Imported as a 16-slice Texture2DArray and used by the nearby water light (the white light near lakes).
-
 # LavaLampCaustics.png
 
 Made for this project on 2026-11-03 with `Tools/Caustics/bake_caustics.py`: light rays refracted through a
 tileable, looping wave surface and splatted where they land. 8 x 4 atlas, 32 frames of 512 px. No third-party
-content. Used by the lava lamp and aqua lamp spotlight cookie.
+content. Used by the lava lamp and aqua lamp spotlight cookie and, white, by the nearby water light.

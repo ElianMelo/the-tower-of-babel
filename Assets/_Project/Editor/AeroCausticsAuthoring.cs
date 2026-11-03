@@ -8,18 +8,18 @@ using UnityEngine.Rendering.Universal;
 /// <summary>
 /// Caustics upgrade (2026-11-03): the lamp spotlight cookie and the nearby water light sample looping caustics
 /// flipbooks (Texture2DArrays) instead of one scrolling Crest still. The lamp gets a 512 px, 32-frame
-/// refraction-baked loop; the water light gets a different, finer CC0 16-frame net at a smaller tile size.
+/// refraction-baked loop. Since the performance pass the white water light near lakes plays the same flipbook, white.
 /// </summary>
 public static class AeroCausticsAuthoring
 {
     public const string Folder = "Assets/_Project/Environment/Lighting/Caustics";
     public const string LampFlipbookPath = Folder + "/LavaLampCaustics.png";
-    public const string PoolFlipbookPath = Folder + "/PoolCausticsFlipbook.png";
     public const int LampFrames = 32, LampColumns = 8, LampRows = 4;
-    public const int PoolFrames = 16, PoolColumns = 4, PoolRows = 4;
-    /// <summary>World tiles per metre of the water light: one tile is about 1.2 m (was 2.4 m).</summary>
-    public const float WaterLightScale = .85f;
+    /// <summary>World tiles per metre of the water light: one tile of the lamp pattern is about 1.7 m.</summary>
+    public const float WaterLightScale = .6f;
     public const float WaterLightSpeed = .04f;
+    /// <summary>The white light near water is the lamp's caustics, white instead of blue.</summary>
+    public static readonly Color WaterLightTint = new(.94f, .98f, 1f);
 
     [MenuItem("Tower of Babel/Environment/Apply caustics flipbooks")]
     public static object Apply()
@@ -27,7 +27,6 @@ public static class AeroCausticsAuthoring
         if (Application.dataPath.Replace('\\', '/') != "D:/PersonalProjects/the-tower-of-babel/Assets" || EditorApplication.isPlayingOrWillChangePlaymode)
             throw new InvalidOperationException("Run in this project's Editor, in Edit Mode.");
         var lamp = ImportFlipbook(LampFlipbookPath, LampColumns, LampRows);
-        var pool = ImportFlipbook(PoolFlipbookPath, PoolColumns, PoolRows);
 
         var cookie = AssetDatabase.LoadAssetAtPath<Material>(AeroAtmosphereAuthoring.CookiePath);
         ConfigureCookie(cookie, lamp);
@@ -36,14 +35,13 @@ public static class AeroCausticsAuthoring
         {
             var renderer = AssetDatabase.LoadAssetAtPath<UniversalRendererData>($"Assets/Settings/{name}.asset");
             if (renderer == null) continue;
-            foreach (var feature in renderer.rendererFeatures.OfType<AeroLightRendererFeature>()) ConfigureWaterLight(feature, pool);
+            foreach (var feature in renderer.rendererFeatures.OfType<AeroLightRendererFeature>()) ConfigureWaterLight(feature, lamp);
         }
         AssetDatabase.SaveAssets();
-        return new { lamp = $"{lamp.width}x{lamp.height}x{lamp.depth} {lamp.format}", pool = $"{pool.width}x{pool.height}x{pool.depth} {pool.format}" };
+        return new { lamp = $"{lamp.width}x{lamp.height}x{lamp.depth} {lamp.format}" };
     }
 
     public static Texture2DArray LampFlipbook => AssetDatabase.LoadAssetAtPath<Texture2DArray>(LampFlipbookPath);
-    public static Texture2DArray PoolFlipbook => AssetDatabase.LoadAssetAtPath<Texture2DArray>(PoolFlipbookPath);
 
     public static void ConfigureCookie(Material cookie, Texture2DArray flipbook)
     {
@@ -59,7 +57,7 @@ public static class AeroCausticsAuthoring
     {
         if (feature == null || flipbook == null) throw new InvalidOperationException("Water light feature and pool flipbook are required.");
         feature.caustics = flipbook;
-        feature.settings.scale = WaterLightScale; feature.settings.speed = WaterLightSpeed;
+        feature.settings.scale = WaterLightScale; feature.settings.speed = WaterLightSpeed; feature.settings.tint = WaterLightTint;
         feature.Create(); EditorUtility.SetDirty(feature);
     }
 

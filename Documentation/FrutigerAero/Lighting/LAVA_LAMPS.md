@@ -36,7 +36,7 @@ Since 2026-11-03 the projection is no longer one scrolling 128 px still refreshe
 - Soft round aperture; a faint 4 % floor keeps the cone readable between filaments.
 - On the tower all lit lamps share one 512 px cookie rendered 30 times a second; each lamp turns it by its own angle (hashed from its pillar), so neighbouring washes never repeat. The aqua workshop lamps keep their own cookies, now 256 px at 24 Hz.
 
-Free downloads were reviewed first (OpenGameArt CC0 sets by Calinou, mads and leeor_net). They are 256 px or soft blurred blobs, so the lamp uses the baked set; the finest download, leeor_net's 16-frame loop, now drives the [nearby water light](AQUATIC_LIGHT.md). Attribution: `Environment/Lighting/Caustics/THIRD_PARTY_NOTICE.md`.
+Free downloads were reviewed first (OpenGameArt CC0 sets by Calinou, mads and leeor_net). They are 256 px or soft blurred blobs, so the lamp uses the baked set. The [nearby water light](AQUATIC_LIGHT.md) now plays the same baked set in white. Attribution: `Environment/Lighting/Caustics/THIRD_PARTY_NOTICE.md`.
 
 ## Placement and runtime
 

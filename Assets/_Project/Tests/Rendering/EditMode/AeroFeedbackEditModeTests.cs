@@ -64,7 +64,7 @@ namespace TowerOfBabel.Rendering.Tests
             foreach (var path in new[] { "Assets/_Project/Environment/AeroLakeWater.mat", "Assets/_Project/Environment/Lighting/GlassWaterFloor.mat" })
                 Assert.That(AssetDatabase.LoadAssetAtPath<Material>(path).GetTexture("_CausticsTex"), Is.SameAs(crest), path);
             var feature = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<AeroLightRendererFeature>().Single();
-            Assert.That(feature.caustics, Is.SameAs(AssetDatabase.LoadAssetAtPath<Texture2DArray>("Assets/_Project/Environment/Lighting/Caustics/PoolCausticsFlipbook.png")));
+            Assert.That(feature.caustics, Is.SameAs(AssetDatabase.LoadAssetAtPath<Texture2DArray>("Assets/_Project/Environment/Lighting/Caustics/LavaLampCaustics.png")));
         }
 
         [Test]

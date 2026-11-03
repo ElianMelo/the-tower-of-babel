@@ -29,6 +29,7 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             half _Smoothness,_SubsurfaceWrap,_TranslucencyStrength,_WetnessOn,_WetExposure,_DistanceLift,_DistanceGlow;
             float _WindStrength,_WindSpeed,_WindTime,_DistanceLiftStart,_DistanceLiftRange;
         CBUFFER_END
+        #include "Aero/AeroFarInstancing.hlsl"
         struct Attributes
         {
             float4 positionOS:POSITION;
@@ -149,6 +150,7 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             #pragma fragment Frag
             #pragma target 3.5
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma shader_feature_local_fragment _AERO_WETNESS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
@@ -167,6 +169,7 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             #pragma fragment DepthFrag
             #pragma target 3.5
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             float3 _LightDirection;
             float3 _LightPosition;
@@ -198,6 +201,7 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             #pragma fragment DepthFrag
             #pragma target 3.5
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             half4 DepthFrag(Varyings input):SV_Target { return input.positionCS.z; }
             ENDHLSL
         }
@@ -211,6 +215,7 @@ Shader "TowerOfBabel/Foliage/Clinging Vine"
             #pragma fragment NormalFrag
             #pragma target 3.5
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
             half4 NormalFrag(Varyings input):SV_Target
             {
