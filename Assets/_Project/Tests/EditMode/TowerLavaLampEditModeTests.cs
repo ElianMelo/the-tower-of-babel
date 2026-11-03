@@ -12,14 +12,14 @@ using UnityEngine.SceneManagement;
 
 namespace TowerOfBabel.World.Tests
 {
-    /// <summary>Lava lamps hang on one pillar, skip three, around every ring, and show once their pillar is built.</summary>
+    /// <summary>Lava lamps hang inside the tower on one pillar, skip three, around every ring, and show once their pillar is built.</summary>
     public sealed class TowerLavaLampEditModeTests
     {
         private const string PrefabPath = "Assets/_Project/Prefabs/Lighting/LavaProjectionLamp.prefab";
         private const string CookiePath = "Assets/_Project/Environment/Lighting/AquaProjectionCookie.mat";
         private const string ScenePath = "Assets/_Project/Scenes/Tower.unity";
         private const int RingPillars = 10;
-        private const float RingRadius = 10, MountHeight = 3.3f, PillarRadius = .38f;
+        private const float RingRadius = 10, MountHeight = 3.6f, PillarRadius = .38f;
 
         private GameObject root, lampObject, stairPrefab;
         private ChunkManager manager;
@@ -85,9 +85,10 @@ namespace TowerOfBabel.World.Tests
             for (int n = 0; n < ground.Length; n++)
             {
                 var pillar = PillarAt(n * TowerLavaLamps.PillarInterval);
-                var outward = new Vector3(pillar.x, 0, pillar.z).normalized;
-                Assert.That(Vector3.Distance(ground[n].Position, pillar + Vector3.up * MountHeight + outward * PillarRadius), Is.LessThan(.001f));
-                Assert.That(Vector3.Dot(ground[n].mount.rotation * Vector3.forward, outward), Is.GreaterThan(.999f), "The sconce reaches out of the tower.");
+                var inward = -new Vector3(pillar.x, 0, pillar.z).normalized;
+                Assert.That(lamps.Interior, Is.True);
+                Assert.That(Vector3.Distance(ground[n].Position, pillar + Vector3.up * MountHeight + inward * PillarRadius), Is.LessThan(.001f));
+                Assert.That(Vector3.Dot(ground[n].mount.rotation * Vector3.forward, inward), Is.GreaterThan(.999f), "The sconce reaches into the tower.");
                 Assert.That(manager.TryGetAsset(ground[n].key, ground[n].pillar, out var asset) && asset.AssetType == TowerAssetType.Pillar);
                 Assert.That(Vector3.Distance(asset.Position, pillar), Is.LessThan(.001f));
             }
@@ -123,12 +124,27 @@ namespace TowerOfBabel.World.Tests
             var set = new TowerAssetPrefabSet(); set.SetPrefab(TowerAssetType.Stair, stairPrefab);
             Field("assetPrefabs").SetValue(manager, set);
             var pillar = PillarAt(4);
-            var outward = new Vector3(pillar.x, 0, pillar.z).normalized;
-            Build(t => AddAsset(t, pillar + outward * .9f + Vector3.up * 2.6f, TowerAssetType.Stair));
+            var inward = -new Vector3(pillar.x, 0, pillar.z).normalized;
+            Build(t => AddAsset(t, pillar + inward * .9f + Vector3.up * 2.9f, TowerAssetType.Stair));
             var ground = lamps.Placements.Where(p => p.floor == 0).Select(p => p.Position).ToArray();
             Assert.That(ground.Length, Is.EqualTo(2));
             Assert.That(ground.All(p => Vector3.Distance(new Vector3(p.x, 0, p.z), pillar) > 2), "The lamp that would hang in the stair is left out.");
             Assert.That(ground.Any(p => Vector3.Distance(new Vector3(p.x, 0, p.z), PillarAt(8)) < 1), "The next lamp still hangs four pillars on.");
+        }
+
+        [Test]
+        public void StairBelowALamp_KeepsIt_UnlessHeadroomIsRequested()
+        {
+            stairPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var set = new TowerAssetPrefabSet(); set.SetPrefab(TowerAssetType.Stair, stairPrefab);
+            Field("assetPrefabs").SetValue(manager, set);
+            var pillar = PillarAt(4);
+            var inward = -new Vector3(pillar.x, 0, pillar.z).normalized;
+            Build(t => AddAsset(t, pillar + inward * .9f + Vector3.up * 1f, TowerAssetType.Stair));
+            Assert.That(lamps.Placements.Count(p => p.floor == 0), Is.EqualTo(3), "The step passes under the lamp without touching it.");
+            typeof(TowerLavaLamps).GetField("stairHeadroom", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(lamps, 2.05f);
+            lamps.Rebuild();
+            Assert.That(lamps.Placements.Count(p => p.floor == 0), Is.EqualTo(2), "With headroom, someone climbing would walk into it.");
         }
 
         [Test]
@@ -187,7 +203,7 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
-        public void TowerScene_HangsALampOnEveryFourthPillar()
+        public void TowerScene_HangsALampInsideOnEveryFourthPillar()
         {
             var scene = SceneManager.GetSceneByPath(ScenePath);
             bool opened = !scene.IsValid() || !scene.isLoaded;
@@ -200,17 +216,28 @@ namespace TowerOfBabel.World.Tests
                 Assert.That(tower.Chunks, Is.Not.Null);
                 Assert.That(tower.Chunks.gameObject.scene, Is.EqualTo(scene));
                 int pillars = tower.Chunks.CachedChunks.Sum(c => c.Assets.Count(a => a.AssetType == TowerAssetType.Pillar));
-                Assert.That(tower.Placements.Count, Is.InRange(pillars / 4 - 60, pillars / 4 + 50));
-                // Lamps along a ring are four pillar bays apart.
+                Assert.That(tower.Interior, Is.True);
+                // Every fourth pillar, less the ones where the winding stair ramp runs through the lamp.
+                Assert.That(tower.Placements.Count, Is.InRange(pillars / 6, pillars / 4 + 50));
                 var center = tower.Chunks.FloorCenter;
+                foreach (var p in tower.Placements.Take(200))
+                {
+                    var outward = new Vector3(p.Position.x - center.x, 0, p.Position.z - center.y).normalized;
+                    Assert.That(Vector3.Dot(p.mount.rotation * Vector3.forward, outward), Is.LessThan(-.999f), "Sconces face the tower's interior.");
+                }
                 foreach (var floor in tower.Placements.GroupBy(p => p.floor).Take(6))
                 {
                     // Ordered from angle zero like the placement, so the one seam where the ring closes is not compared.
                     var angles = floor.Select(p => Mathf.Repeat(Mathf.Atan2(p.Position.z - center.y, p.Position.x - center.x), Mathf.PI * 2)).OrderBy(a => a).ToArray();
                     int bays = tower.Chunks.CachedChunks.Where(c => c.Key.FloorIndex == floor.Key).Sum(c => c.Assets.Count(a => a.AssetType == TowerAssetType.Pillar));
                     float bay = Mathf.PI * 2 / bays;
+                    // Lamps are a whole number of four-pillar steps apart; a gap is a pillar left bare for the stairs.
                     for (int i = 1; i < angles.Length; i++)
-                        Assert.That((angles[i] - angles[i - 1]) / bay, Is.EqualTo(4).Within(.05f).Or.EqualTo(8).Within(.05f), $"Floor {floor.Key}");
+                    {
+                        float steps = (angles[i] - angles[i - 1]) / bay / 4;
+                        Assert.That(steps, Is.GreaterThan(.98f), $"Floor {floor.Key}");
+                        Assert.That(Mathf.Abs(steps - Mathf.Round(steps)), Is.LessThan(.02f), $"Floor {floor.Key}");
+                    }
                 }
             }
             finally { if (opened) EditorSceneManager.CloseScene(scene, true); }

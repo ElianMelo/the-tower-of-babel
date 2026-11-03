@@ -32,7 +32,7 @@ public static class LavaLampAuthoring
     public const float LampHeight = .80f;
     public const float GlassBottom = .245f, GlassHeight = .455f, GlassRadiusBottom = .095f, GlassRadiusTop = .055f;
     public const float CradleRadius = .15f, CradleHeight = .26f;
-    public const float MountHeight = 3.3f;
+    public const float MountHeight = 3.6f;
     public static Vector3 LampOrigin => new(0, -LampDrop, ArmReach);
     public static Vector3 LightPosition => LampOrigin + Vector3.up * (LampHeight + .045f);
     public static Vector3 GlowPosition => LampOrigin + Vector3.up * (GlassBottom + GlassHeight * .4f);
@@ -52,6 +52,11 @@ public static class LavaLampAuthoring
         var holder = folder.Find(SceneObjectName)?.gameObject;
         if (holder == null) { holder = new GameObject(SceneObjectName); holder.transform.SetParent(folder, false); }
         var lamps = holder.GetComponent<TowerLavaLamps>() ?? holder.AddComponent<TowerLavaLamps>();
+        // Inside the tower, over the deck and stair ramp; skip only lamps that would touch the steps.
+        var settings = new SerializedObject(lamps);
+        settings.FindProperty("interior").boolValue = true;
+        settings.FindProperty("stairHeadroom").floatValue = 0;
+        settings.ApplyModifiedPropertiesWithoutUndo();
         lamps.Configure(chunks, prefab, MountHeight, ShaftRadius(generator.pillarObject, MountHeight));
         EditorUtility.SetDirty(lamps);
         EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);

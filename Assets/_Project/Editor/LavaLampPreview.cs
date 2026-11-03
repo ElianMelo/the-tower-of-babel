@@ -64,7 +64,6 @@ public static class LavaLampPreview
             sun.cullingMask = 1 << Layer; RenderSettings.sun = sun;
 
             int pieces = 0;
-            Vector3 center3 = new(generator.center.x, focus.Position.y, generator.center.y);
             foreach (var asset in chunks.CachedChunks.SelectMany(c => c.Assets))
             {
                 if (new Vector2(asset.Position.x - focus.Position.x, asset.Position.z - focus.Position.z).sqrMagnitude > 24 * 24) continue;
@@ -94,7 +93,8 @@ public static class LavaLampPreview
                 var lamp = go.GetComponent<AeroProjectionLamp>(); lamp.phase = placed.Count * 1.7f; placed.Add(lamp);
             }
 
-            var outward = (focus.Position - center3).normalized;
+            // Shots follow the side of the pillar the sconce hangs on (the tower interior by default).
+            var outward = focus.mount.rotation * Vector3.forward;
             var tangent = Vector3.Cross(Vector3.up, outward);
             var lampCenter = focus.mount.MultiplyPoint3x4(LavaLampAuthoring.LampOrigin + Vector3.up * .5f);
 
@@ -128,9 +128,9 @@ public static class LavaLampPreview
             Shot("Sconce-Night.png", close, lampCenter + Vector3.up * .12f, 42, true);
             Vector3 glass = lampCenter + outward * .62f + tangent * .2f;
             for (int i = 0; i < 3; i++) Shot($"Fluid-Night-{i}.png", glass, lampCenter - Vector3.up * .05f, 38, true, 4 + i * 5);
-            Vector3 facade = focus.Position + outward * 15 + Vector3.up * 3.2f;
-            Shot("Facade-Day.png", facade, focus.Position + Vector3.up * 3.6f, 55, false);
-            Shot("Facade-Night.png", facade, focus.Position + Vector3.up * 3.6f, 55, true);
+            Vector3 facade = focus.Position + outward * 13 + Vector3.up * 2.4f;
+            Shot("Arcade-Day.png", facade, focus.Position + Vector3.up * 3.6f, 55, false);
+            Shot("Arcade-Night.png", facade, focus.Position + Vector3.up * 3.6f, 55, true);
             Vector3 under = focus.Position + outward * 2.2f + tangent * 1.6f + Vector3.up * 1.4f;
             Shot("Projection-Night.png", under, focus.Position + Vector3.up * 5.4f, 70, true);
             return new { floor, pieces, lamps = placed.Count, shots };

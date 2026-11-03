@@ -103,7 +103,7 @@ Supplied for the buildable detail vines that climb a pillar from the deck and sp
 
 ### Tower lava lamps — 2026-11-02
 
-Supplied for the lava lamp sconces hung on every fourth pillar; the tower uses blue fluid with green wax. See [implementation](../Documentation/FrutigerAero/Lighting/LAVA_LAMPS.md).
+Supplied for the lava lamp sconces hung inside the tower on every fourth pillar; the tower uses blue fluid with green wax. See [implementation](../Documentation/FrutigerAero/Lighting/LAVA_LAMPS.md).
 
 - `Asset/Lava-Lamp-Shelf-Row-User.webp`, `Lava-Lamp-Four-Styles-User.png` — the classic shape range: tapered glass, conical cap, hourglass base in chrome or black; wax merges and stretches into teardrops.
 - `Asset/Lava-Lamp-Blue-Silver-User.png` — blue fluid in a silver bullet lamp: bright vertical glass highlights, glow pooled at the base.

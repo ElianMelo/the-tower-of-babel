@@ -1,6 +1,6 @@
 # Tower lava lamps
 
-Lava lamp sconces hang like torches on the outside of the tower's pillars: **one lamp, then three bare pillars**, around every ring. References: [lava lamp set](../../../Frutiger%20Reference/INDEX.md#tower-lava-lamps--2026-11-02).
+Lava lamp sconces hang like torches on the **inside** of the tower's pillars, over the deck and the winding stair ramp: **one lamp, then three bare pillars**, around every ring. (They first hung on the facade; moved inside on 2026-11-02.) References: [lava lamp set](../../../Frutiger%20Reference/INDEX.md#tower-lava-lamps--2026-11-02).
 
 ## Model
 
@@ -11,7 +11,7 @@ Lava lamp sconces hang like torches on the outside of the tower's pillars: **one
 - **Water projection spotlight**: the same animated water cookie material as the aqua lamp (`AquaProjectionCookie.mat`) and the same `AeroProjectionLamp` budget. It sits just over the cap and points up, leaning 18° toward the wall so the pattern washes the arch and pillar above. Range 9 m, 110° cone.
 - **Lava glow**: a small shadowless blue point light (2.6 m) in the glass that lights the lamp's chrome, its chains and the pillar behind.
 
-The sconce origin is where the wall plate meets the pillar. The lamp hangs 1.15 m below the arm; no colliders.
+The sconce origin is where the wall plate meets the pillar. The lamp hangs 1.15 m below the arm; no colliders. Inside, the spotlight washes the arch spandrels above the pillar and the underside of the glass ramp.
 
 ## Fluid shader
 
@@ -28,7 +28,9 @@ The sconce origin is where the wall plate meets the pillar. The lamp hangs 1.15 
 
 ## Placement and runtime
 
-`TowerLavaLamps` (scene object **Lighting & Atmosphere / Tower lava lamps**) reads pillars from the chunk cache, sorts each ring by angle and takes every fourth (2,067 lamps on 8,199 pillars). A ring with a bay count that is not a multiple of four closes with one shorter gap. The sconce sits at 3.3 m on the pillar shaft (radius read from the pillar mesh, 0.381 m), just under the capital where the arches spring, facing out. A pillar whose lamp would touch a stair is left bare and the pattern carries on.
+`TowerLavaLamps` (scene object **Lighting & Atmosphere / Tower lava lamps**) reads pillars from the chunk cache, sorts each ring by angle and takes every fourth. A ring with a bay count that is not a multiple of four closes with one shorter gap. The sconce sits at 3.6 m on the inner face of the pillar shaft (radius read from the pillar mesh, 0.381 m), just under the capital band, so the lamp's base is about 2.25 m above the deck. `interior` switches back to the facade.
+
+The stair ramp is 4 m wide, runs against the inside of the pillar ring all the way round and climbs a full floor per ring, so it passes every interior lamp at some height. A lamp that would touch the steps is left out and the pattern carries on: **1,499 of 2,067** pattern slots keep a lamp. Where the ramp runs just below a lamp, someone climbing along the pillar edge can pass through it (lamps have no colliders). This was the chosen trade-off: `stairHeadroom` (default 0) also keeps a climber's head clear — 1 m leaves 1,165 lamps, 2.05 m leaves 823 with long bare stretches.
 
 - A lamp shows once **its pillar is complete**, on floors the player can see; stage changes and floor unlocks refresh only the affected floor.
 - Lamps draw with `Graphics.RenderMeshInstanced` per floor, culled by frustum and a 260 m distance; the tower carries no lamp GameObjects.
@@ -39,8 +41,8 @@ Runtime lighting is local presentation; it changes no construction state.
 
 ## Review and validation
 
-`LavaLampPreview.Capture()` rebuilds a real section of the cached tower (floor 4) around one lamp in a disposable additive scene with the Tower sky and reflections, and writes sconce, fluid, facade and projection shots for day and night to `_Screenshots-and-previews-to-delete/LavaLamps/`.
+`LavaLampPreview.Capture()` rebuilds a real section of the cached tower (floor 4), stairs included, around one lamp in a disposable additive scene with the Tower sky and reflections, and writes sconce, fluid, interior arcade and projection shots for day and night to `_Screenshots-and-previews-to-delete/LavaLamps/`.
 
-- EditMode `TowerLavaLampEditModeTests`: one-in-four pattern and mount transform, pillar-built visibility and rollback, hidden upper floors, stair rejection keeping the pattern, nearest-light selection and release, day dimming, prefab wiring (cookie reuse, upward spot, instancing, mesh/shader dimensions), and the Tower scene placement.
+- EditMode `TowerLavaLampEditModeTests`: one-in-four pattern and inward mount transform, pillar-built visibility and rollback, hidden upper floors, stair rejection keeping the pattern, the headroom option, nearest-light selection and release, day dimming, prefab wiring (cookie reuse, upward spot, instancing, mesh/shader dimensions), and the Tower scene placement.
 - EditMode `LavaLampShaderEditModeTests`: blue fluid with green wax, wax motion over time, night glow much brighter than day and over the bloom threshold.
 - PlayMode `TowerLavaLampPlayModeTests` (automated runner only): instanced drawing, live upward projections with the animated cookie on the nearest lamps, day dimming and release at distance.

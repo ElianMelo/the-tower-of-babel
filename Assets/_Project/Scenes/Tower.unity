@@ -463,7 +463,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 22400762, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0000038146973
+      value: -0.000011444092
       objectReference: {fileID: 0}
     - target: {fileID: 22426080, guid: 67117722a812a2e46ab8cb8eafbf5f5e, type: 3}
       propertyPath: m_AnchorMax.x
@@ -7680,13 +7680,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerLavaLamps
   chunks: {fileID: 1114320928}
   lampPrefab: {fileID: 4190528413098858048, guid: e42ced4845c070440b4e3c54f6eb475b, type: 3}
-  mountHeight: 3.3
+  mountHeight: 3.6
+  interior: 1
   pillarRadius: 0.381
   visibleDistance: 260
   lightDistance: 42
   lightRigs: 4
   daytimeLight: 0.3
   stairClearance: 0.08
+  stairHeadroom: 0
 --- !u!4 &805851541 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8829362263768159680, guid: 63ca0b83805442e49b0d5c385781aa14, type: 3}

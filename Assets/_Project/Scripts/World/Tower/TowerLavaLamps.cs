@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 namespace TowerOfBabel.World.Tower
 {
     /// <summary>
-    /// Lava lamps hung like torches on the outside of the tower's pillars: one lamp, then three bare pillars, around
+    /// Lava lamps hung like torches on the inside of the tower's pillars: one lamp, then three bare pillars, around
     /// every ring. Lamps are placed from the chunk cache and drawn instanced, so the tower carries no lamp objects.
     /// A lamp shows once its pillar is built. Only the few nearest lamps carry the real projection spotlight.
     /// </summary>
@@ -24,7 +24,9 @@ namespace TowerOfBabel.World.Tower
         [Tooltip("The lava lamp sconce. Its origin is the point where the wall plate meets the pillar.")]
         [SerializeField] private GameObject lampPrefab;
         [Tooltip("Height of the sconce arm above the pillar base, just under the capital where the arches spring.")]
-        [SerializeField, Min(0)] private float mountHeight = 3.3f;
+        [SerializeField, Min(0)] private float mountHeight = 3.6f;
+        [Tooltip("Hang the sconces on the inner face of the pillars, over the deck and stair ramp, instead of the facade.")]
+        [SerializeField] private bool interior = true;
         [Tooltip("Pillar shaft radius at the sconce. The wall plate sits on this surface.")]
         [SerializeField, Min(0)] private float pillarRadius = .38f;
         [SerializeField, Min(10)] private float visibleDistance = 260;
@@ -33,6 +35,9 @@ namespace TowerOfBabel.World.Tower
         [Tooltip("Spotlight strength during the day, relative to night.")]
         [SerializeField, Range(0, 1)] private float daytimeLight = .3f;
         [SerializeField, Min(0)] private float stairClearance = .08f;
+        [Tooltip("Free height kept above a stair under a lamp. 0 only skips lamps that touch the steps; 2 also keeps a " +
+                 "climber's head clear, but leaves long bare stretches where the ramp winds past the pillars.")]
+        [SerializeField, Min(0)] private float stairHeadroom;
 
         [Serializable]
         public struct Placement
@@ -82,6 +87,7 @@ namespace TowerOfBabel.World.Tower
         public ChunkManager Chunks => chunks;
         public float MountHeight => mountHeight;
         public float PillarRadius => pillarRadius;
+        public bool Interior => interior;
         public int DrawnBatchCount { get; private set; }
         public int VisibleLampCount { get { int n = 0; foreach (var b in batchList) { Refresh(b); n += b.visible; } return n; } }
         public int ActiveLightCount { get { int n = 0; foreach (var r in rigs) if (r.root != null && r.root.activeSelf) n++; return n; } }
@@ -159,8 +165,9 @@ namespace TowerOfBabel.World.Tower
                     var outward = new Vector3(pillar.Position.x - center.x, 0, pillar.Position.z - center.y);
                     if (outward.sqrMagnitude < 1e-6f) continue;
                     outward.Normalize();
-                    var mount = Matrix4x4.TRS(pillar.Position + Vector3.up * mountHeight + outward * pillarRadius,
-                        Quaternion.LookRotation(outward, Vector3.up), Vector3.one);
+                    var facing = interior ? -outward : outward;
+                    var mount = Matrix4x4.TRS(pillar.Position + Vector3.up * mountHeight + facing * pillarRadius,
+                        Quaternion.LookRotation(facing, Vector3.up), Vector3.one);
                     if (TouchesStairs(mount, pair.Key, stairs, stairMesh)) continue;
                     AddPlacement(new Placement { key = key, pillar = pillar.LocalIndex, floor = pair.Key, mount = mount });
                 }
@@ -209,7 +216,7 @@ namespace TowerOfBabel.World.Tower
             return mesh != null ? mesh.bounds : new Bounds(Vector3.zero, Vector3.zero);
         }
 
-        // A stair flight passing the pillar would run straight through a hanging lamp: leave that pillar bare.
+        // A stair passing the pillar would run through a hanging lamp, or someone climbing it would: leave that pillar bare.
         private bool TouchesStairs(Matrix4x4 mount, int floor, Dictionary<int, List<ChunkAssetData>> stairs, Bounds stairMesh)
         {
             if (stairMesh.size == Vector3.zero) return false;
@@ -222,6 +229,8 @@ namespace TowerOfBabel.World.Tower
                     if ((stair.Position - origin).sqrMagnitude > 64) continue;
                     var inverse = Quaternion.Inverse(stair.Rotation);
                     Vector3 c = Vector3.Scale(stairMesh.center, stair.Scale), e = Vector3.Scale(stairMesh.extents, stair.Scale) + Vector3.one * stairClearance;
+                    // Stairs only turn about Y, so the walking space is the step box raised by the headroom.
+                    c.y += stairHeadroom * .5f; e.y += stairHeadroom * .5f;
                     for (int x = 0; x <= 2; x++) for (int y = 0; y <= 4; y++) for (int z = 0; z <= 2; z++)
                     {
                         var local = lampBounds.min + Vector3.Scale(lampBounds.size, new Vector3(x * .5f, y * .25f, z * .5f));
