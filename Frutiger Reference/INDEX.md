@@ -101,6 +101,15 @@ Supplied for the buildable detail vines that climb a pillar from the deck and sp
 - `Asset/Vine-Strands-White-Wall-User.webp`, `Vine-Hanging-Leaves-User.webp`, `Vine-Blue-Doors-Drape-User.png`, `Vine-Balcony-Drape-User.png` — loose strands and curtains hanging down from a ledge.
 - `Asset/Vine-Ivy-Facade-Windows-User.webp`, `Vine-House-Gable-User.png`, `Vine-Stone-Wall-Creeper-User.webp`, `Vine-Balcony-Overgrown-User.webp` — leaf colour range from yellow-green to deep green, with occasional red leaves.
 
+### Tower lava lamps — 2026-11-02
+
+Supplied for the lava lamp sconces hung on every fourth pillar; the tower uses blue fluid with green wax. See [implementation](../Documentation/FrutigerAero/Lighting/LAVA_LAMPS.md).
+
+- `Asset/Lava-Lamp-Shelf-Row-User.webp`, `Lava-Lamp-Four-Styles-User.png` — the classic shape range: tapered glass, conical cap, hourglass base in chrome or black; wax merges and stretches into teardrops.
+- `Asset/Lava-Lamp-Blue-Silver-User.png` — blue fluid in a silver bullet lamp: bright vertical glass highlights, glow pooled at the base.
+- `Asset/Lava-Lamp-Hourglass-Red-User.webp`, `Lava-Lamp-Chrome-Green-User.png` — the hourglass chrome base and single green wax column rising off the bottom pool; the chosen silhouette.
+- `Asset/Lava-Lamp-Water-Cube-Projector-User.png` — the water-pattern projection the lamps share with the aqua projection lamp.
+
 ### Tower terrain landscape
 
 - `../Documentation/FrutigerAero/Previews/Terrain-Overview-Lightweight.png` and `Terrain-Lake-1-Lightweight.png` — reduced terrain and grass cost, with the rolling landscape and lakes preserved. Current settings and validation are in [landscape notes](../Documentation/FrutigerAero/TERRAIN_LANDSCAPE.md).
