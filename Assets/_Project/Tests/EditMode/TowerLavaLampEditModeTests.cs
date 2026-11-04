@@ -14,14 +14,16 @@ namespace TowerOfBabel.World.Tests
 {
     /// <summary>
     /// Lava lamps hang inside the tower on one pillar, skip three, around every ring, with random lamps outside free
-    /// pillars; never two on one pillar or on neighbouring pillars. They show once their pillar is built, and every
-    /// lamp in view (up to the budget) lights its wall with one shared caustics cookie.
+    /// pillars; never two on one pillar or on neighbouring pillars. Each lamp is a buildable detail asset made from iron
+    /// ingots: it lights up once fully built (without lamp assets, a lamp shows with its pillar), and every lamp in view
+    /// (up to the budget) lights its wall with one shared caustics cookie.
     /// </summary>
     public sealed class TowerLavaLampEditModeTests
     {
         private const string PrefabPath = "Assets/_Project/Prefabs/Lighting/LavaProjectionLamp.prefab";
         private const string CookiePath = "Assets/_Project/Environment/Lighting/AquaProjectionCookie.mat";
         private const string ScenePath = "Assets/_Project/Scenes/Tower.unity";
+        private const string BuildablePath = "Assets/_Project/Prefabs/Buildings/Detail_LavaLamp.prefab";
         private const int RingPillars = 10;
         private const float RingRadius = 10, MountHeight = 3.6f, PillarRadius = .38f;
 
@@ -89,11 +91,111 @@ namespace TowerOfBabel.World.Tests
             return new Vector3(Mathf.Cos(a) * RingRadius, floor * 6, Mathf.Sin(a) * RingRadius);
         }
 
+        /// <summary>Completes the floor's structure; buildable lamps (detail) stay as they are.</summary>
         private void CompletePillars(int floor)
         {
             var pending = manager.CachedChunks.Where(c => c.Key.FloorIndex == floor)
-                .SelectMany(c => c.Assets.Select(a => (c.Key, a.LocalIndex))).ToArray();
+                .SelectMany(c => c.Assets.Where(a => !a.AssetType.IsDetail()).Select(a => (c.Key, a.LocalIndex))).ToArray();
             foreach (var (key, index) in pending) manager.SetAssetStage(key, index, ChunkAssetData.CompletedStage);
+        }
+
+        /// <summary>Adds a buildable lamp asset at every spot, as LavaLampAuthoring does for the Tower scene.</summary>
+        private List<ChunkAssetData> AddLampAssets()
+        {
+            if (manager.AssetPrefabs == null) Field("assetPrefabs").SetValue(manager, new TowerAssetPrefabSet());
+            manager.AssetPrefabs.SetPrefab(TowerAssetType.LavaLamp, AssetDatabase.LoadAssetAtPath<GameObject>(BuildablePath));
+            var assets = lamps.BuildLampAssets();
+            manager.ReplaceCachedAssets(type => type == TowerAssetType.LavaLamp, assets);
+            lamps.Rebuild();
+            return assets;
+        }
+
+        [Test]
+        public void LampAssets_TakeOverThePlacements_OneAtEverySpot()
+        {
+            Build(exterior: 1);
+            var spots = lamps.Placements.ToArray();
+            Assert.That(lamps.UsesLampAssets, Is.False);
+            var assets = AddLampAssets();
+            Assert.That(assets.Count, Is.EqualTo(spots.Length));
+            Assert.That(assets.All(a => a.AssetType == TowerAssetType.LavaLamp && a.Scale == Vector3.one));
+            Assert.That(lamps.UsesLampAssets, Is.True);
+            Assert.That(lamps.Placements.Count, Is.EqualTo(spots.Length));
+            foreach (var placement in lamps.Placements)
+            {
+                Assert.That(placement.lamp, Is.GreaterThanOrEqualTo(0));
+                Assert.That(manager.TryGetAsset(placement.lampKey, placement.lamp, out var lamp) && lamp.AssetType == TowerAssetType.LavaLamp);
+                var spot = spots.Single(s => Vector3.Distance(s.Position, placement.Position) < .001f);
+                Assert.That(Quaternion.Angle(spot.mount.rotation, placement.mount.rotation), Is.LessThan(.01f));
+                Assert.That((placement.ringIndex, placement.exterior, placement.floor), Is.EqualTo((spot.ringIndex, spot.exterior, spot.floor)),
+                    "Each lamp keeps its pillar's ring position and face.");
+                Assert.That(lamp.AssetType.Phase(), Is.EqualTo(TowerConstructionPhase.Detail));
+            }
+            AssertSpacing(lamps.Placements, _ => RingPillars);
+        }
+
+        [Test]
+        public void BuildableLamp_LightsUpOnlyOnceBuilt_AfterItsFloorStructure()
+        {
+            Build();
+            AddLampAssets();
+            var first = lamps.Placements[0];
+            Assert.That(manager.CanConstructAsset(first.lampKey, first.lamp), Is.False, "Lamps are detail: they wait for the floor's structure.");
+            CompletePillars(0);
+            Assert.That(manager.CanConstructAsset(first.lampKey, first.lamp), Is.True);
+            Assert.That(lamps.IsShown(0), Is.False, "A finished pillar no longer lights an unbuilt lamp.");
+            Assert.That(lamps.VisibleLampCount, Is.Zero);
+            manager.SetAssetStage(first.lampKey, first.lamp, 6);
+            Assert.That(lamps.IsShown(0), Is.False, "A half-built sconce has no glass or light yet.");
+            manager.SetAssetStage(first.lampKey, first.lamp, ChunkAssetData.CompletedStage);
+            Assert.That(lamps.IsShown(0), Is.True);
+            Assert.That(lamps.VisibleLampCount, Is.EqualTo(1));
+            lamps.SelectLights(first.Position + Vector3.up);
+            Assert.That(lamps.ActiveLightCount, Is.EqualTo(1), "Only the built lamp carries a light.");
+
+            manager.SetAssetStage(first.key, first.pillar, 4);
+            Assert.That(lamps.IsShown(0), Is.False, "Rolling the structure back withdraws the floor's detail, lamps included.");
+            Assert.That(lamps.VisibleLampCount, Is.Zero);
+            manager.SetAssetStage(first.key, first.pillar, ChunkAssetData.CompletedStage);
+            Assert.That(lamps.IsShown(0), Is.True, "The built lamp returns with its floor's detail.");
+        }
+
+        [Test]
+        public void GeneratorPlacement_MatchesTheCachedPlacement()
+        {
+            Build(exterior: .5f, ringPillars: 24, seed: 2);
+            var assets = new List<ChunkAssetData>();
+            foreach (var chunk in manager.CachedChunks) assets.AddRange(chunk.Assets);
+            // The generator has no chunks yet: it groups floors by height, as for the vines.
+            var generated = lamps.BuildLampAssets(assets, a => Mathf.FloorToInt((a.Position.y + .001f) / 6), manager.FloorCenter, new Bounds(Vector3.zero, Vector3.zero));
+            Assert.That(generated.Select(a => a.Position), Is.EquivalentTo(lamps.Placements.Select(p => p.Position)));
+        }
+
+        [Test]
+        public void BuildablePrefab_AssemblesTheChromeSconceFromIronIngots()
+        {
+            var buildable = AssetDatabase.LoadAssetAtPath<GameObject>(BuildablePath);
+            Assert.That(buildable, Is.Not.Null, "Run Tower of Babel/Environment/Apply tower lava lamps.");
+            Assert.That(buildable.GetComponent<TowerAsset>().AssetType, Is.EqualTo(TowerAssetType.LavaLamp));
+            var building = buildable.GetComponent<TowerOfBabel.Buildings.Building>();
+            Assert.That(building.ResourceType, Is.EqualTo(TowerOfBabel.Resources.ResourceType.IronIngot));
+            Assert.That(building.ResourceCostPerStage, Is.EqualTo(1));
+            Assert.That(buildable.GetComponentsInChildren<Collider>(true).Length, Is.EqualTo(1));
+            Assert.That(buildable.GetComponent<TowerOfBabel.Outline>(), Is.Not.Null, "Highlighted when aimed at or scanned.");
+            var chrome = prefab.GetComponentsInChildren<MeshRenderer>(true).Single(r => r.sharedMaterial.shader.name != "TowerOfBabel/Lighting/Lava Lamp Fluid");
+            Assert.That(building.GetStageMesh(10), Is.SameAs(chrome.GetComponent<MeshFilter>().sharedMesh), "The finished stage is the lamp's own sconce.");
+            Assert.That(buildable.GetComponent<MeshRenderer>().sharedMaterial, Is.SameAs(chrome.sharedMaterial));
+            int previous = 0;
+            for (byte stage = 0; stage <= 10; stage++)
+            {
+                int triangles = building.GetStageMesh(stage).triangles.Length / 3;
+                Assert.That(triangles, Is.GreaterThan(previous), $"Stage {stage} adds a part.");
+                previous = triangles;
+            }
+            var box = buildable.GetComponent<BoxCollider>();
+            var lamp = building.GetStageMesh(10).bounds;
+            var area = new Bounds(box.center, box.size);
+            Assert.That(area.Contains(lamp.min) && area.Contains(lamp.max), "Aimable over the whole hanging lamp.");
         }
 
         [Test]
@@ -338,6 +440,15 @@ namespace TowerOfBabel.World.Tests
                 Assert.That(tower.LampPrefab, Is.EqualTo(prefab));
                 Assert.That(tower.Chunks, Is.Not.Null);
                 Assert.That(tower.Chunks.gameObject.scene, Is.EqualTo(scene));
+                // Every lamp is a buildable detail asset of the tower.
+                var buildable = AssetDatabase.LoadAssetAtPath<GameObject>(BuildablePath);
+                Assert.That(tower.Chunks.AssetPrefabs.GetPrefab(TowerAssetType.LavaLamp), Is.EqualTo(buildable));
+                var generator = scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<TowerGenerator>(true)).Single();
+                Assert.That(generator.detailLavaLampObject, Is.EqualTo(buildable), "Regenerating the tower keeps the lamps.");
+                int lampAssets = tower.Chunks.CachedChunks.Sum(c => c.Assets.Count(a => a.AssetType == TowerAssetType.LavaLamp));
+                Assert.That(tower.Placements.Count, Is.EqualTo(lampAssets));
+                Assert.That(tower.UsesLampAssets, Is.True);
+                Assert.That(tower.Placements.All(p => p.lamp >= 0 && p.ringIndex >= 0), "Every lamp asset sits on a placement spot.");
                 int pillars = tower.Chunks.CachedChunks.Sum(c => c.Assets.Count(a => a.AssetType == TowerAssetType.Pillar));
                 Assert.That(tower.Interior, Is.True);
                 // Every fourth pillar, less the ones where the winding stair ramp runs through the lamp.

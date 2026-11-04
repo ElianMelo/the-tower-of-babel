@@ -80,6 +80,8 @@ namespace TowerOfBabel.Networking.Upgrades
                 case CheatCommand.AddSkyBlock: success = resources != null && resources.ServerCheatResource(sender, ResourceType.SkyBlock, value); break;
                 case CheatCommand.AddGrass: success = resources != null && resources.ServerCheatResource(sender, ResourceType.Grass, value); break;
                 case CheatCommand.AddLivingGrass: success = resources != null && resources.ServerCheatResource(sender, ResourceType.LivingGrass, value); break;
+                case CheatCommand.AddIronStone: success = resources != null && resources.ServerCheatResource(sender, ResourceType.IronStone, value); break;
+                case CheatCommand.AddIronIngot: success = resources != null && resources.ServerCheatResource(sender, ResourceType.IronIngot, value); break;
                 case CheatCommand.FillBag: case CheatCommand.ClearBag:
                     if (resources == null) break;
                     foreach (ResourceType type in Enum.GetValues(typeof(ResourceType))) resources.ServerCheatSetResource(sender, type, command == CheatCommand.FillBag ? resources.ServerCapacity(sender) : 0);

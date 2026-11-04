@@ -25,6 +25,10 @@ public static class LavaLampAuthoring
     public const string FluidPath = AeroAtmosphereAuthoring.Folder + "/LavaLampFluid.mat";
     public const string FluidShader = "TowerOfBabel/Lighting/Lava Lamp Fluid";
     public const string SceneObjectName = "Tower lava lamps";
+    public const string BuildablePrefabPath = "Assets/_Project/Prefabs/Buildings/Detail_LavaLamp.prefab";
+    public const string StageMeshPath = ModelFolder + "/LavaLamp_Stages.asset";
+    private const string OutlineSettingsPath = "Assets/_Project/Scripts/Buildings/OutlineSettings.asset";
+    public const int IngotsPerStage = 1;
 
     // Sconce space: origin where the wall plate meets the pillar, +Z out from the wall, Y up, arm at y = 0.
     public const float ArmReach = .52f;
@@ -65,9 +69,82 @@ public static class LavaLampAuthoring
         settings.ApplyModifiedPropertiesWithoutUndo();
         lamps.Configure(chunks, prefab, MountHeight, ShaftRadius(generator.pillarObject, MountHeight));
         EditorUtility.SetDirty(lamps);
+
+        // Each lamp is a buildable detail asset: the tower builds its sconce from iron ingots, then it lights up.
+        var buildable = BuildBuildablePrefab();
+        generator.detailLavaLampObject = buildable;
+        chunks.AssetPrefabs.SetPrefab(TowerAssetType.LavaLamp, buildable);
+        EditorUtility.SetDirty(generator); EditorUtility.SetDirty(chunks);
+        var lampAssets = lamps.BuildLampAssets();
+        chunks.ReplaceCachedAssets(type => type == TowerAssetType.LavaLamp, lampAssets);
+        lamps.Rebuild();
         EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
         int pillars = chunks.CachedChunks.Sum(c => c.Assets.Count(a => a.AssetType == TowerAssetType.Pillar));
-        return new { prefab = PrefabPath, lamps = lamps.Placements.Count, pillars, pillarRadius = lamps.PillarRadius };
+        return new
+        {
+            prefab = PrefabPath, buildable = BuildablePrefabPath, lamps = lamps.Placements.Count, lampAssets = lampAssets.Count,
+            usesLampAssets = lamps.UsesLampAssets, pillars, pillarRadius = lamps.PillarRadius, cachedAssets = chunks.CachedAssetCount
+        };
+    }
+
+    /// <summary>
+    /// The buildable lamp: a detail-phase Building whose stage meshes assemble the chrome sconce (stage 10 is the
+    /// finished sconce mesh itself), costing one iron ingot per stage.
+    /// </summary>
+    public static GameObject BuildBuildablePrefab()
+    {
+        EnsureFolder(ModelFolder); EnsureFolder("Assets/_Project/Prefabs/Buildings");
+        var finished = AssetDatabase.LoadAssetAtPath<Mesh>(SconceMeshPath) ?? throw new InvalidOperationException("Build the lava lamp prefab first.");
+        var stages = new Mesh[TowerOfBabel.Buildings.Building.StageCount];
+        var container = AssetDatabase.LoadMainAssetAtPath(StageMeshPath) as Mesh;
+        var existing = AssetDatabase.LoadAllAssetsAtPath(StageMeshPath).OfType<Mesh>().ToDictionary(m => m.name);
+        for (int stage = 0; stage < stages.Length - 1; stage++)
+        {
+            var built = BuildSconceStage(stage);
+            if (!existing.TryGetValue(built.name, out var mesh))
+            {
+                mesh = new Mesh { name = built.name };
+                if (container == null) { AssetDatabase.CreateAsset(mesh, StageMeshPath); container = mesh; }
+                else AssetDatabase.AddObjectToAsset(mesh, container);
+            }
+            mesh.Clear(); mesh.indexFormat = built.indexFormat;
+            mesh.SetVertices(built.vertices); mesh.SetNormals(built.normals); mesh.SetUVs(0, built.uv);
+            mesh.SetTriangles(built.triangles, 0); mesh.RecalculateBounds(); mesh.RecalculateTangents();
+            UnityEngine.Object.DestroyImmediate(built); EditorUtility.SetDirty(mesh);
+            stages[stage] = mesh;
+        }
+        stages[^1] = finished;
+        AssetDatabase.SaveAssets();
+
+        var root = new GameObject("Detail_LavaLamp", typeof(MeshFilter), typeof(MeshRenderer));
+        try
+        {
+            root.GetComponent<MeshFilter>().sharedMesh = stages[0];
+            var renderer = root.GetComponent<MeshRenderer>();
+            renderer.sharedMaterial = Chrome(); renderer.shadowCastingMode = ShadowCastingMode.On; renderer.lightProbeUsage = LightProbeUsage.Off;
+            // Covers the whole hanging lamp, so it can be aimed at from the deck below.
+            var collider = root.AddComponent<BoxCollider>();
+            var bounds = finished.bounds;
+            collider.center = bounds.center; collider.size = bounds.size + new Vector3(.12f, .06f, .06f);
+            root.AddComponent<TowerAsset>().SetAssetType(TowerAssetType.LavaLamp);
+            var outline = root.AddComponent<TowerOfBabel.Outline>();
+            var outlineData = new SerializedObject(outline);
+            outlineData.FindProperty("settings").objectReferenceValue = AssetDatabase.LoadMainAssetAtPath(OutlineSettingsPath);
+            outlineData.ApplyModifiedPropertiesWithoutUndo();
+            var building = new SerializedObject(root.AddComponent<TowerOfBabel.Buildings.Building>());
+            building.FindProperty("resourceType").intValue = (int)TowerOfBabel.Resources.ResourceType.IronIngot;
+            building.FindProperty("resourceCostPerStage").intValue = IngotsPerStage;
+            building.FindProperty("interactionDuration").floatValue = 2.5f;
+            building.FindProperty("shakeStrength").floatValue = .01f;
+            building.FindProperty("meshFilter").objectReferenceValue = root.GetComponent<MeshFilter>();
+            building.FindProperty("outline").objectReferenceValue = outline;
+            var meshes = building.FindProperty("stageMeshes");
+            meshes.arraySize = stages.Length;
+            for (int i = 0; i < stages.Length; i++) meshes.GetArrayElementAtIndex(i).objectReferenceValue = stages[i];
+            building.ApplyModifiedPropertiesWithoutUndo();
+            return PrefabUtility.SaveAsPrefabAsset(root, BuildablePrefabPath);
+        }
+        finally { UnityEngine.Object.DestroyImmediate(root); }
     }
 
     /// <summary>Pillar shaft radius below the capital, from the finished pillar mesh.</summary>
@@ -186,50 +263,81 @@ public static class LavaLampAuthoring
     }
 
     /// <summary>Everything chrome: wall rosette, torch arm and brace, hook, three chains, lamp base, collar and cap.</summary>
-    public static Mesh BuildSconceMesh()
+    public static Mesh BuildSconceMesh() => BuildSconceStage(TowerOfBabel.Buildings.Building.StageCount - 1, "Lava lamp sconce");
+
+    /// <summary>
+    /// The sconce as it is assembled: stage 0 is the wall rosette, and each stage adds the next part (arm, brace, hook,
+    /// one chain at a time, collar, the two halves of the base) until stage 10 caps the lamp. The lava glass is not
+    /// part of it; it appears with the light once the lamp is finished.
+    /// </summary>
+    public static Mesh BuildSconceStage(int stage, string name = null)
     {
         var b = new MeshBuilder();
-        var toWall = Matrix4x4.TRS(new Vector3(0, 0, -.012f), Quaternion.Euler(90, 0, 0), Vector3.one);
-        // Wall rosette: a stepped disk facing out from the pillar.
-        b.Lathe(new List<Vector2> { new(0, 0), new(.075f, 0), new(.075f, 0), new(.078f, .008f), new(.07f, .018f), new(.05f, .022f), new(.045f, .03f), new(0, .03f) }, 28, toWall);
-        var footWall = Matrix4x4.TRS(new Vector3(0, -.17f, -.012f), Quaternion.Euler(90, 0, 0), Vector3.one);
-        b.Lathe(new List<Vector2> { new(0, 0), new(.034f, 0), new(.034f, 0), new(.036f, .008f), new(.022f, .02f), new(0, .022f) }, 18, footWall);
-        // Torch arm: rises gently out of the rosette and ends in a drop to the hook.
-        b.Tube(Bezier(new Vector3(0, 0, 0), new Vector3(0, .07f, .3f), new Vector3(0, .015f, ArmReach), 18), .016f, 10, true);
-        b.Tube(new List<Vector3> { new(0, .02f, ArmReach - .005f), new(0, -.03f, ArmReach) }, .011f, 8, true);
-        // Brace from the lower rosette sweeping up under the arm, with a small scroll finial past the arm.
-        b.Tube(Bezier(new Vector3(0, -.17f, 0), new Vector3(0, -.15f, .26f), new Vector3(0, .04f, .33f), 16), .009f, 8, true);
-        b.Sphere(new Vector3(0, .018f, ArmReach + .014f), .02f, 12, 8);
-        // Hook and the hanging ring the cradle chains share.
-        b.Link(new Vector3(0, -.047f, ArmReach), Vector3.down, Vector3.right, .017f, .017f, .0045f);
-        b.Link(new Vector3(0, -.075f, ArmReach), Vector3.down, Vector3.forward, .016f, .016f, .0045f);
         var lamp = Matrix4x4.Translate(LampOrigin);
-        // Hourglass base: two cones meeting at a waist, the upper one holding the glass.
-        b.Lathe(new List<Vector2> {
-            new(0, 0), new(.118f, 0), new(.118f, 0), new(.123f, .008f), new(.118f, .017f), new(.118f, .017f),
-            new(.071f, .125f), new(.068f, .13f), new(.071f, .135f), new(.071f, .135f),
-            new(.104f, .243f), new(.104f, .243f), new(.109f, .25f), new(.107f, .258f), new(.107f, .258f), new(.093f, .258f), new(.093f, .258f), new(.093f, .25f)
-        }, 36, lamp);
-        // Cap: a cone over the top of the glass with a small finial.
-        b.Lathe(new List<Vector2> {
-            new(.05f, GlassBottom + GlassHeight - .012f), new(.062f, GlassBottom + GlassHeight - .006f), new(.062f, GlassBottom + GlassHeight - .006f),
-            new(.062f, GlassBottom + GlassHeight + .004f), new(.062f, GlassBottom + GlassHeight + .004f), new(.043f, LampHeight - .006f),
-            new(.043f, LampHeight - .006f), new(.04f, LampHeight), new(.04f, LampHeight), new(.012f, LampHeight + .006f), new(0, LampHeight + .006f)
-        }, 30, lamp);
-        // Cradle collar around the base rim with three lugs and eyelets for the chains.
-        b.Ring(LampOrigin + Vector3.up * .25f, .112f, .0055f, 36, 6);
         Vector3 apex = new(0, -.09f, ArmReach);
-        for (int i = 0; i < 3; i++)
+        var lug = LampOrigin + Vector3.up * .25f;
+        Vector3 Direction(int i) { float angle = (i * 120 + 90) * Mathf.Deg2Rad; return new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)); }
+        Vector3 Eye(int i) => lug + Direction(i) * CradleRadius + Vector3.up * .01f;
+        var parts = new List<Action>
         {
-            float angle = (i * 120 + 90) * Mathf.Deg2Rad;
-            var dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
-            var lug = LampOrigin + Vector3.up * .25f;
-            b.Tube(new List<Vector3> { lug + dir * .105f, lug + dir * (CradleRadius - .008f) }, .0055f, 6, true);
-            var eye = lug + dir * CradleRadius + Vector3.up * .01f;
-            b.Link(eye, Vector3.up, dir, .011f, .011f, .0035f);
-            Chain(b, apex, eye + Vector3.up * .01f);
-        }
-        return b.ToMesh("Lava lamp sconce");
+            () =>
+            {
+                // Wall rosette: a stepped disk facing out from the pillar, and the small foot rosette for the brace.
+                var toWall = Matrix4x4.TRS(new Vector3(0, 0, -.012f), Quaternion.Euler(90, 0, 0), Vector3.one);
+                b.Lathe(new List<Vector2> { new(0, 0), new(.075f, 0), new(.075f, 0), new(.078f, .008f), new(.07f, .018f), new(.05f, .022f), new(.045f, .03f), new(0, .03f) }, 28, toWall);
+                var footWall = Matrix4x4.TRS(new Vector3(0, -.17f, -.012f), Quaternion.Euler(90, 0, 0), Vector3.one);
+                b.Lathe(new List<Vector2> { new(0, 0), new(.034f, 0), new(.034f, 0), new(.036f, .008f), new(.022f, .02f), new(0, .022f) }, 18, footWall);
+            },
+            () =>
+            {
+                // Torch arm: rises gently out of the rosette and ends in a drop to the hook.
+                b.Tube(Bezier(new Vector3(0, 0, 0), new Vector3(0, .07f, .3f), new Vector3(0, .015f, ArmReach), 18), .016f, 10, true);
+                b.Tube(new List<Vector3> { new(0, .02f, ArmReach - .005f), new(0, -.03f, ArmReach) }, .011f, 8, true);
+            },
+            () =>
+            {
+                // Brace from the lower rosette sweeping up under the arm, with a small scroll finial past the arm.
+                b.Tube(Bezier(new Vector3(0, -.17f, 0), new Vector3(0, -.15f, .26f), new Vector3(0, .04f, .33f), 16), .009f, 8, true);
+                b.Sphere(new Vector3(0, .018f, ArmReach + .014f), .02f, 12, 8);
+            },
+            () =>
+            {
+                // Hook and the hanging ring the cradle chains share.
+                b.Link(new Vector3(0, -.047f, ArmReach), Vector3.down, Vector3.right, .017f, .017f, .0045f);
+                b.Link(new Vector3(0, -.075f, ArmReach), Vector3.down, Vector3.forward, .016f, .016f, .0045f);
+            },
+            () => Chain(b, apex, Eye(0) + Vector3.up * .01f),
+            () => Chain(b, apex, Eye(1) + Vector3.up * .01f),
+            () => Chain(b, apex, Eye(2) + Vector3.up * .01f),
+            () =>
+            {
+                // Cradle collar around the base rim with three lugs and eyelets for the chains.
+                b.Ring(lug, .112f, .0055f, 36, 6);
+                for (int i = 0; i < 3; i++)
+                {
+                    b.Tube(new List<Vector3> { lug + Direction(i) * .105f, lug + Direction(i) * (CradleRadius - .008f) }, .0055f, 6, true);
+                    b.Link(Eye(i), Vector3.up, Direction(i), .011f, .011f, .0035f);
+                }
+            },
+            // Hourglass base: two cones meeting at a waist, the upper one holding the glass. The lower cone is closed at
+            // the waist so the half-built base never shows a hole.
+            () => b.Lathe(new List<Vector2> {
+                new(0, 0), new(.118f, 0), new(.118f, 0), new(.123f, .008f), new(.118f, .017f), new(.118f, .017f),
+                new(.071f, .125f), new(.068f, .13f), new(.071f, .135f), new(.071f, .135f), new(0, .135f)
+            }, 36, lamp),
+            () => b.Lathe(new List<Vector2> {
+                new(.071f, .135f), new(.071f, .135f),
+                new(.104f, .243f), new(.104f, .243f), new(.109f, .25f), new(.107f, .258f), new(.107f, .258f), new(.093f, .258f), new(.093f, .258f), new(.093f, .25f)
+            }, 36, lamp),
+            // Cap: a cone over the top of the glass with a small finial.
+            () => b.Lathe(new List<Vector2> {
+                new(.05f, GlassBottom + GlassHeight - .012f), new(.062f, GlassBottom + GlassHeight - .006f), new(.062f, GlassBottom + GlassHeight - .006f),
+                new(.062f, GlassBottom + GlassHeight + .004f), new(.062f, GlassBottom + GlassHeight + .004f), new(.043f, LampHeight - .006f),
+                new(.043f, LampHeight - .006f), new(.04f, LampHeight), new(.04f, LampHeight), new(.012f, LampHeight + .006f), new(0, LampHeight + .006f)
+            }, 30, lamp),
+        };
+        for (int i = 0; i <= stage && i < parts.Count; i++) parts[i]();
+        return b.ToMesh(name ?? "Lava lamp stage " + stage);
     }
 
     // Oval links, each turned a quarter about the chain from the last, so they read as interlocked.

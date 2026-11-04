@@ -14,7 +14,9 @@ namespace TowerOfBabel.Resources
         SkyEssence = 8,
         SkyBlock = 9,
         Grass = 10,
-        LivingGrass = 11
+        LivingGrass = 11,
+        IronStone = 12,
+        IronIngot = 13
     }
 
     public static class ResourceTypeNames
@@ -30,6 +32,8 @@ namespace TowerOfBabel.Resources
             ResourceType.SkyEssence => "Sky Essence",
             ResourceType.SkyBlock => "Sky Block",
             ResourceType.LivingGrass => "Living Grass",
+            ResourceType.IronStone => "Iron Stone",
+            ResourceType.IronIngot => "Iron Ingot",
             _ => type.ToString()
         };
     }

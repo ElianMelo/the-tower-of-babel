@@ -19,6 +19,7 @@ namespace TowerOfBabel.Resources.Tests
             ("RiverMill", ResourceType.RiverEssence, 2, ResourceType.RiverBlock, 1, 3.5f, "tower-river-mill-01", Kind.Mill, "Block"),
             ("WaterPress", ResourceType.WaterEssence, 2, ResourceType.WaterBlock, 1, 3.5f, "tower-water-press-01", Kind.Press, "Block"),
             ("SkySpinner", ResourceType.SkyEssence, 2, ResourceType.SkyBlock, 1, 3.5f, "tower-sky-spinner-01", Kind.Spin, "Block"),
+            ("IronSmelter", ResourceType.IronStone, 2, ResourceType.IronIngot, 1, 4f, "tower-iron-smelter-01", Kind.Smelt, "Ingot"),
         };
         private static int[] MachineIndices => Enumerable.Range(0, Machines.Length).ToArray();
         private static GameObject Prefab(int i) => AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/" + Machines[i].Name + ".prefab");
@@ -64,6 +65,7 @@ namespace TowerOfBabel.Resources.Tests
                 new[] { "Workshop_RiverStone", "Workshop_RiverGlass" }, // riverbed and flume
                 new[] { "Workshop_WaterGlass", "Workshop_ClearGlass" }, // hydraulic platform with a glass catch basin
                 new[] { "Workshop_Cloud", "Workshop_SkyGlass" },     // cloud cushion with a hovering plate
+                new[] { "Workshop_IronOre", "Workshop_Molten" },     // cast-iron plinth with a glowing runner and casting mould
             };
             var sets = MachineIndices.Select(i =>
             {
@@ -175,6 +177,12 @@ namespace TowerOfBabel.Resources.Tests
                     Assert.That(Turned("Rotor"), Is.GreaterThan(5), "The rotor spins.");
                     Assert.That(Vector3.Angle(Part(root, "Rotor").TransformDirection(Part(Prefab(4), "Rotor").InverseTransformDirection(Vector3.up)), Vector3.up), Is.LessThan(1), "It spins about the vertical axis.");
                     Assert.That(Part(root, "CloudMass").gameObject.activeSelf, Is.True, "Cloud gathers on the spindle.");
+                    break;
+                case Kind.Smelt:
+                    Assert.That(Turned("Fan"), Is.GreaterThan(5), "The cooling fan turns.");
+                    Assert.That(Part(root, "MouldFill").gameObject.activeSelf, Is.True, "Molten iron fills the mould.");
+                    Assert.That(Turned("Needle"), Is.GreaterThan(90), "The temperature dial climbs.");
+                    Assert.That(anim.StrikeCount, Is.EqualTo(1), "The stamp strikes the cast once.");
                     break;
             }
         }

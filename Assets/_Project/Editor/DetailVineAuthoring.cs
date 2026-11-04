@@ -31,8 +31,8 @@ public static class DetailVineAuthoring
         public string MeshPath => MeshFolder + "DetailVine_" + Name + ".asset";
     }
 
-    public static readonly Variant[] Variants = Enumerable.Range(0, TowerAssetTypeExtensions.DetailCount)
-        .Select(i => new Variant { Name = i.ToString(), Type = TowerAssetTypeExtensions.DetailTypes[i], Style = RandomStyle(i) }).ToArray();
+    public static readonly Variant[] Variants = Enumerable.Range(0, TowerAssetTypeExtensions.VineCount)
+        .Select(i => new Variant { Name = i.ToString(), Type = TowerAssetTypeExtensions.VineTypes[i], Style = RandomStyle(i) }).ToArray();
 
     /// <summary>
     /// Shapes cycle through four archetypes (climbing, draped, dense, sparse) so the set always covers them, and every
@@ -115,7 +115,7 @@ public static class DetailVineAuthoring
 
         var structure = manager.CachedChunks.SelectMany(c => c.Assets).Where(a => !a.AssetType.IsDetail()).ToArray();
         var vines = generator.BuildDetailVines(structure);
-        manager.ReplaceCachedAssets(type => type.IsDetail(), vines);
+        manager.ReplaceCachedAssets(type => type.IsVine(), vines);
         AssetDatabase.SaveAssets();
         EditorSceneManager.SaveScene(scene);
         Vector2 c = generator.center;
@@ -343,7 +343,7 @@ public static class DetailVineAuthoring
             var camera = camGo.AddComponent<Camera>(); camera.scene = preview; camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(.62f, .8f, .97f); camera.fieldOfView = 50;
             // Far-renderer path: the same vines drawn instanced with no probes, beside the near ones.
-            var farVines = near.Where(v => v.AssetType.IsDetail()).ToArray();
+            var farVines = near.Where(v => v.AssetType.IsVine()).ToArray();
             string Shot(string name, Vector3 eye, Vector3 look)
             {
                 camera.transform.position = eye; camera.transform.LookAt(look);

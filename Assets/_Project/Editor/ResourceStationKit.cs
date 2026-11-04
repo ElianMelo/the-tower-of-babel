@@ -15,7 +15,8 @@ public static class ResourceStationKit
     public const string TowerScene = "Assets/_Project/Scenes/Tower.unity";
     public const float RowZ = -101.5f;
     public static readonly string[] WorkshopMaterials =
-        { "Pearl", "Azure", "Steel", "Glass", "Heat", "Sand", "Chip", "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick" };
+        { "Pearl", "Azure", "Steel", "Glass", "Heat", "Sand", "Chip", "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
+          "IronOre", "Rust", "Ingot", "Molten" };
     private static readonly string[] OwnMaterials = { "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick" };
 
     public static void RequireCleanTowerScene()
@@ -57,11 +58,14 @@ public static class ResourceStationKit
         importer.importAnimation = false; importer.importCameras = importer.importLights = importer.addCollider = false;
         importer.isReadable = false; importer.importNormals = ModelImporterNormals.Import;
         importer.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;
+        // Materials a later tool creates (such as the iron ones) are skipped until they exist.
         foreach (string name in WorkshopMaterials)
-            importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), "Workshop_" + name), Mat(name));
-        foreach (string name in new[] { "Stone", "Refined" })
-            importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), "Resource_" + name),
-                AssetDatabase.LoadAssetAtPath<Material>(Models + "Materials/Resource_" + name + ".mat"));
+            if (Mat(name) != null) importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), "Workshop_" + name), Mat(name));
+        foreach (string name in new[] { "Stone", "Refined", "IronRock" })
+        {
+            var material = AssetDatabase.LoadAssetAtPath<Material>(Models + "Materials/Resource_" + name + ".mat");
+            if (material != null) importer.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), "Resource_" + name), material);
+        }
         importer.SaveAndReimport();
     }
 
@@ -158,7 +162,7 @@ public static class ResourceStationKit
         Directory.CreateDirectory(Effects);
         int rate = 22050;
         float duration = name switch { "CondenserHum" => 1, "BlockChime" => .9f, "EssenceBurst" => .6f, "SkyStroke" => .35f, "RiverStroke" => .3f,
-            "GrassStroke" => .28f, "GrassBurst" => .5f, _ => .2f };
+            "GrassStroke" => .28f, "GrassBurst" => .5f, "IronClang" => .7f, _ => .2f };
         int length = Mathf.RoundToInt(rate * duration); var random = new System.Random(311 + name.Length * 7); float low = 0, band = 0;
         using (var file = new BinaryWriter(File.Create(path)))
         {
@@ -178,6 +182,9 @@ public static class ResourceStationKit
                     // A soft swish of blades being pulled, then a leafy rustle.
                     case "GrassStroke": value = band * Mathf.Pow(Mathf.Sin(Mathf.PI * t / duration), 2) * 1.1f + low * .25f * Mathf.Exp(-t * 10); break;
                     case "GrassBurst": value = (band * .8f + low * .4f) * Mathf.Exp(-t * 6) * (.7f + .3f * Mathf.Sin(tau * 31 * t)); break;
+                    // A struck iron bar: inharmonic partials that ring out, with a short noisy hit.
+                    case "IronClang": value = ((Mathf.Sin(tau * 523 * t) + .6f * Mathf.Sin(tau * 1387 * t) + .35f * Mathf.Sin(tau * 2291 * t)) * Mathf.Exp(-t * 7) * .22f
+                        + band * Mathf.Exp(-t * 60) * .6f); break;
                     case "EssenceBurst": value = (low * .6f * Mathf.Exp(-t * 7) + (Mathf.Sin(tau * 990 * t) + .4f * Mathf.Sin(tau * 1485 * t)) * Mathf.Exp(-t * 6) * .18f) * .8f; break;
                     // Whole-hertz partials repeat exactly every second, so the one-second hum loops without a click.
                     case "CondenserHum": value = (Mathf.Sin(tau * 90 * t) * .16f + Mathf.Sin(tau * 180 * t) * .07f + Mathf.Sin(tau * 541 * t) * .02f) * (.85f + .15f * Mathf.Sin(tau * 3 * t)); break;

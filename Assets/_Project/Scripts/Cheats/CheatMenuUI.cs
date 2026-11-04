@@ -322,6 +322,8 @@ namespace TowerOfBabel.Cheats
                 ("Gain sky block", "Add the selected amount, respecting the bag capacity", CheatCommand.AddSkyBlock),
                 ("Gain grass", "Add the selected amount, respecting the bag capacity", CheatCommand.AddGrass),
                 ("Gain living grass", "Add the selected amount, respecting the bag capacity", CheatCommand.AddLivingGrass),
+                ("Gain iron stone", "Add the selected amount, respecting the bag capacity", CheatCommand.AddIronStone),
+                ("Gain iron ingot", "Add the selected amount, respecting the bag capacity", CheatCommand.AddIronIngot),
                 ("Fill bag", "Fill every resource to its current capacity", CheatCommand.FillBag),
                 ("Clear bag", "Set every resource amount to zero", CheatCommand.ClearBag),
                 ("Instantly gather target", "Collect the captured resource without waiting", CheatCommand.InstantGather),

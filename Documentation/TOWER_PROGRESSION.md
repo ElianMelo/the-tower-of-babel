@@ -11,6 +11,8 @@ Each floor is built in two phases. **Structure** is the floor tiles, stairs, pil
 - Rolling any structure asset back withdraws the floor's detail again. Built detail is also left out of distant rendering while it is withdrawn.
 - `ChunkManager.GetFloorPhase`, `IsStructureComplete` and `IsAssetReleased` expose the phase; `DetailReleaseChanged` fires once per release or withdrawal. Server build validation goes through the same `CanConstructAsset` check.
 
+Since 2026-11-04 the detail also includes the **lava lamps**: every lamp sconce on the pillars is a buildable block (`TowerAssetType.LavaLamp`) costing 1 **Iron Ingot** per stage, and it lights up only once fully built. See [lava lamps](FrutigerAero/Lighting/LAVA_LAMPS.md#building-the-lamps) and the [iron workshop](FrutigerAero/Resources/IRON_WORKSHOP.md).
+
 Each vine costs 1 **Living Grass** per stage, the processed material grown from gathered Grass. See [vines](FrutigerAero/Foliage/VINES.md) for the shapes, placement and growth, and [grass and living grass](FrutigerAero/Resources/GRASS_WORKSHOP.md) for the resource chain.
 
 The detail vines are separate from the decorative exterior bushes described below, which still appear only once the whole floor, including its detail, is complete. Completed floors and missing floor indices are skipped. The client presentation and server build validation use the same cached progression; the server checks both the start and completion of a build.

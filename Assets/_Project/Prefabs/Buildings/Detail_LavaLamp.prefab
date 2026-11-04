@@ -1,0 +1,175 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4170651203838080145
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4483414164607616946}
+  - component: {fileID: 449506826269225529}
+  - component: {fileID: 6011379205997146497}
+  - component: {fileID: 2791304908962200018}
+  - component: {fileID: 2344359354358814400}
+  - component: {fileID: 3295591004503901826}
+  - component: {fileID: 3076023382762665144}
+  m_Layer: 0
+  m_Name: Detail_LavaLamp
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4483414164607616946
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &449506826269225529
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  m_Mesh: {fileID: 4300000, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+--- !u!23 &6011379205997146497
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 48f4675d0ed1dfb4088603af8ddcc601, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &2791304908962200018
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.3996199, y: 1.2879999, z: 0.75609756}
+  m_Center: {x: 0, y: -0.536, z: 0.3328319}
+--- !u!114 &2344359354358814400
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7f11c1f07a662048af91c0e6a1e1111, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.World.Tower.TowerAsset
+  assetType: 17
+--- !u!114 &3295591004503901826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e9351dffeafc734f971e35967334c71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Outline
+  settings: {fileID: 11400000, guid: 22f5db7a03e9d884c89fe2e7fc5fc9e3, type: 2}
+--- !u!114 &3076023382762665144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170651203838080145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0db77396aaf32945ad7890fc52f24d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TowerOfBabel.Gameplay::TowerOfBabel.Buildings.Building
+  resourceType: 13
+  resourceCostPerStage: 1
+  interactionDuration: 2.5
+  shakeStrength: 0.01
+  shakeSpeed: 24
+  visuals: {fileID: 4483414164607616946}
+  outline: {fileID: 3295591004503901826}
+  meshFilter: {fileID: 449506826269225529}
+  stageMeshes:
+  - {fileID: 4300000, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: 8793390389488213353, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: -2150025684056897546, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: -8629303101631977544, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: -7070722775273365783, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: 8360435408499536734, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: 7058891750582335587, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: 6122517900669847151, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: -1238501617914608786, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: -2528532611747891731, guid: 8ced5546786d35947a8cf6a14f31f70c, type: 2}
+  - {fileID: 4300000, guid: 514df92923b591841bbad17fc8ec5f83, type: 2}

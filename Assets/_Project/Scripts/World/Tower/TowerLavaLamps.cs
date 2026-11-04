@@ -11,9 +11,10 @@ namespace TowerOfBabel.World.Tower
     /// <summary>
     /// Lava lamps hung like torches on the tower's pillars: inside, one lamp then three bare pillars around every ring,
     /// plus lamps scattered on the outside of free pillars. A pillar carries at most one lamp (inside or outside), and
-    /// two lamps never hang on neighbouring pillars. Lamps are placed from the chunk cache and drawn instanced, so the
-    /// tower carries no lamp objects. A lamp shows once its pillar is built. Every lamp in view, up to a budget,
-    /// carries a real spotlight projecting one shared, animated caustics cookie.
+    /// two lamps never hang on neighbouring pillars. Each lamp is a buildable detail asset (TowerAssetType.LavaLamp):
+    /// the tower draws its chrome sconce stage by stage, and once it is fully built this component adds the lava glass
+    /// and its light. Lamps are drawn instanced, so the tower carries no lamp objects. Every lamp in view, up to a
+    /// budget, carries a real spotlight projecting one shared, animated caustics cookie.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class TowerLavaLamps : MonoBehaviour
@@ -60,13 +61,19 @@ namespace TowerOfBabel.World.Tower
             /// <summary>Hangs on the outside face of the pillar.</summary>
             public bool exterior;
             public Matrix4x4 mount;
+            /// <summary>The buildable lamp asset hung here; -1 when the tower has no lamp assets.</summary>
+            public ChunkKey lampKey;
+            public int lamp;
             public Vector3 Position => mount.GetColumn(3);
         }
 
         private readonly struct Part
         {
             public readonly Mesh Mesh; public readonly Material Material; public readonly Matrix4x4 Local; public readonly ShadowCastingMode Shadows;
-            public Part(Mesh mesh, Material material, Matrix4x4 local, ShadowCastingMode shadows) { Mesh = mesh; Material = material; Local = local; Shadows = shadows; }
+            /// <summary>The tower draws this part itself, as the finished stage of the buildable lamp.</summary>
+            public readonly bool DrawnByTower;
+            public Part(Mesh mesh, Material material, Matrix4x4 local, ShadowCastingMode shadows, bool drawnByTower)
+            { Mesh = mesh; Material = material; Local = local; Shadows = shadows; DrawnByTower = drawnByTower; }
         }
 
         private sealed class FloorBatch
@@ -140,6 +147,7 @@ namespace TowerOfBabel.World.Tower
             if (subscribed || chunks == null) return;
             chunks.AssetStageChanged += OnStageChanged;
             chunks.ConstructionFloorChanged += MarkAllDirty;
+            chunks.DetailReleaseChanged += OnDetailReleaseChanged;
             subscribed = true;
         }
 
@@ -148,6 +156,7 @@ namespace TowerOfBabel.World.Tower
             if (!subscribed || chunks == null) { subscribed = false; return; }
             chunks.AssetStageChanged -= OnStageChanged;
             chunks.ConstructionFloorChanged -= MarkAllDirty;
+            chunks.DetailReleaseChanged -= OnDetailReleaseChanged;
             subscribed = false;
         }
 
@@ -158,37 +167,126 @@ namespace TowerOfBabel.World.Tower
 
         private void MarkAllDirty() { foreach (var b in batchList) b.dirty = true; }
 
+        private void OnDetailReleaseChanged(int floor)
+        {
+            if (floors.TryGetValue(floor, out var batch)) batch.dirty = true;
+        }
+
+        /// <summary>The placement rules: where on a pillar a lamp hangs, and which pillars carry one.</summary>
+        public readonly struct Layout
+        {
+            public readonly float MountHeight, PillarRadius, ExteriorChance, StairClearance, StairHeadroom;
+            public readonly bool Interior;
+            public readonly int Seed;
+            public Layout(float mountHeight, float pillarRadius, bool interior, float exteriorChance, int seed, float stairClearance, float stairHeadroom)
+            {
+                MountHeight = mountHeight; PillarRadius = pillarRadius; Interior = interior; ExteriorChance = exteriorChance;
+                Seed = seed; StairClearance = stairClearance; StairHeadroom = stairHeadroom;
+            }
+        }
+
+        public Layout CurrentLayout => new(mountHeight, pillarRadius, interior, exteriorChance, placementSeed, stairClearance, stairHeadroom);
+        /// <summary>The lamps come from buildable lamp assets in the chunk cache, and each lights up once it is built.</summary>
+        public bool UsesLampAssets { get; private set; }
+
+        /// <summary>
+        /// Takes the lamps from the buildable lamp assets in the chunk cache when there are any; otherwise places them on
+        /// the pillars (see <see cref="Place"/>) and shows each with its pillar.
+        /// </summary>
+        public void Rebuild()
+        {
+            placements.Clear(); floors.Clear(); batchList.Clear(); parts.Clear(); UsesLampAssets = false;
+            builtFromChunks = chunks != null ? chunks.CachedChunks.Count : -1;
+            if (chunks == null || lampPrefab == null) return;
+            CollectParts();
+            var structure = new List<(ChunkKey key, ChunkAssetData asset, int floor)>();
+            var lamps = new List<(ChunkKey key, ChunkAssetData asset)>();
+            foreach (var chunk in chunks.CachedChunks)
+                foreach (var asset in chunk.Assets)
+                {
+                    if (asset.AssetType == TowerAssetType.LavaLamp) lamps.Add((chunk.Key, asset));
+                    else if (asset.AssetType == TowerAssetType.Pillar || asset.AssetType == TowerAssetType.Stair) structure.Add((chunk.Key, asset, chunk.Key.FloorIndex));
+                }
+            var computed = Place(structure, chunks.FloorCenter, StairBounds(), lampBounds, CurrentLayout);
+            if (lamps.Count == 0)
+            {
+                foreach (var placement in computed) AddPlacement(placement);
+            }
+            else
+            {
+                // The built lamps are what counts. Match each to its spot on a pillar for the ring position and face.
+                UsesLampAssets = true;
+                var spots = new Dictionary<Vector3Int, Placement>();
+                foreach (var placement in computed) spots[Spot(placement.Position)] = placement;
+                Vector2 center = chunks.FloorCenter;
+                foreach (var (key, lamp) in lamps)
+                {
+                    if (!spots.TryGetValue(Spot(lamp.Position), out var placement))
+                    {
+                        var outward = new Vector3(lamp.Position.x - center.x, 0, lamp.Position.z - center.y);
+                        placement = new Placement { key = key, pillar = -1, floor = key.FloorIndex, ringIndex = -1,
+                            exterior = Vector3.Dot(lamp.Rotation * Vector3.forward, outward) > 0 };
+                    }
+                    placement.mount = Matrix4x4.TRS(lamp.Position, lamp.Rotation, Vector3.one);
+                    placement.lampKey = key; placement.lamp = lamp.LocalIndex;
+                    AddPlacement(placement);
+                }
+            }
+            foreach (var batch in batchList)
+            {
+                batch.matrices = new Matrix4x4[parts.Count][];
+                for (int p = 0; p < parts.Count; p++) batch.matrices[p] = new Matrix4x4[batch.placements.Count];
+            }
+        }
+
+        private static Vector3Int Spot(Vector3 position) => Vector3Int.RoundToInt(position * 100);
+
+        /// <summary>
+        /// The buildable lamp assets for a tower: one at every spot <see cref="Place"/> finds on the given pillars and
+        /// stairs. <paramref name="floorOf"/> gives each asset's floor index.
+        /// </summary>
+        public List<ChunkAssetData> BuildLampAssets(IEnumerable<ChunkAssetData> towerAssets, Func<ChunkAssetData, int> floorOf, Vector2 center, Bounds stairMesh)
+        {
+            var structure = new List<(ChunkKey, ChunkAssetData, int)>();
+            foreach (var asset in towerAssets)
+                if (asset.AssetType == TowerAssetType.Pillar || asset.AssetType == TowerAssetType.Stair) structure.Add((default, asset, floorOf(asset)));
+            var result = new List<ChunkAssetData>();
+            foreach (var placement in Place(structure, center, stairMesh, LampBounds(), CurrentLayout))
+                result.Add(new ChunkAssetData(0, TowerAssetType.LavaLamp, placement.Position, placement.mount.rotation, Vector3.one));
+            return result;
+        }
+
+        /// <summary>The lamp assets for the cached tower, placed by the current rules.</summary>
+        public List<ChunkAssetData> BuildLampAssets()
+        {
+            var assets = new List<ChunkAssetData>();
+            foreach (var chunk in chunks.CachedChunks) assets.AddRange(chunk.Assets);
+            return BuildLampAssets(assets, a => chunks.WorldToChunk(a.Position).FloorIndex, chunks.FloorCenter, StairBounds());
+        }
+
         /// <summary>
         /// Places a lamp on every fourth pillar of each ring (ordered by angle, clear of stairs), then scatters lamps on the
         /// other face of pillars whose neighbours are both bare. A pillar never carries two lamps.
         /// </summary>
-        public void Rebuild()
+        public static List<Placement> Place(IEnumerable<(ChunkKey key, ChunkAssetData asset, int floor)> structure, Vector2 center,
+            Bounds stairMesh, Bounds lampBounds, Layout layout)
         {
-            placements.Clear(); floors.Clear(); batchList.Clear(); parts.Clear();
-            builtFromChunks = chunks != null ? chunks.CachedChunks.Count : -1;
-            if (chunks == null || lampPrefab == null) return;
-            CollectParts();
+            var result = new List<Placement>();
             var pillars = new SortedDictionary<int, List<(ChunkKey key, ChunkAssetData asset)>>();
             var stairs = new Dictionary<int, List<ChunkAssetData>>();
-            foreach (var chunk in chunks.CachedChunks)
+            foreach (var (key, asset, floor) in structure)
             {
-                foreach (var asset in chunk.Assets)
+                if (asset.AssetType == TowerAssetType.Pillar)
                 {
-                    int floor = chunk.Key.FloorIndex;
-                    if (asset.AssetType == TowerAssetType.Pillar)
-                    {
-                        if (!pillars.TryGetValue(floor, out var list)) pillars[floor] = list = new();
-                        list.Add((chunk.Key, asset));
-                    }
-                    else if (asset.AssetType == TowerAssetType.Stair)
-                    {
-                        if (!stairs.TryGetValue(floor, out var list)) stairs[floor] = list = new();
-                        list.Add(asset);
-                    }
+                    if (!pillars.TryGetValue(floor, out var list)) pillars[floor] = list = new();
+                    list.Add((key, asset));
+                }
+                else if (asset.AssetType == TowerAssetType.Stair)
+                {
+                    if (!stairs.TryGetValue(floor, out var list)) stairs[floor] = list = new();
+                    list.Add(asset);
                 }
             }
-            Bounds stairMesh = StairBounds();
-            Vector2 center = chunks.FloorCenter;
             float Angle(Vector3 p) => Mathf.Repeat(Mathf.Atan2(p.z - center.y, p.x - center.x), Mathf.PI * 2);
             foreach (var pair in pillars)
             {
@@ -204,25 +302,21 @@ namespace TowerOfBabel.World.Tower
                     if (outward.sqrMagnitude < 1e-6f) return;
                     outward.Normalize();
                     var facing = outside ? outward : -outward;
-                    var mount = Matrix4x4.TRS(pillar.Position + Vector3.up * mountHeight + facing * pillarRadius,
+                    var mount = Matrix4x4.TRS(pillar.Position + Vector3.up * layout.MountHeight + facing * layout.PillarRadius,
                         Quaternion.LookRotation(facing, Vector3.up), Vector3.one);
-                    if (TouchesStairs(mount, pair.Key, stairs, stairMesh)) return;
-                    AddPlacement(new Placement { key = key, pillar = pillar.LocalIndex, floor = pair.Key, ringIndex = i, exterior = outside, mount = mount });
+                    if (TouchesStairs(mount, pair.Key, stairs, stairMesh, lampBounds, layout)) return;
+                    result.Add(new Placement { key = key, pillar = pillar.LocalIndex, floor = pair.Key, ringIndex = i, exterior = outside, mount = mount, lamp = -1 });
                     occupied[i] = true;
                 }
                 // The regular pattern. A ring that does not divide by four skips its last lamp if it would sit next to the first.
                 for (int i = 0; i < n; i += PillarInterval)
-                    if (Free(i)) TryPlace(i, !interior);
+                    if (Free(i)) TryPlace(i, !layout.Interior);
                 // Random lamps on the other face, only where the pillar and both its neighbours are bare.
-                if (exteriorChance > 0)
+                if (layout.ExteriorChance > 0)
                     for (int i = 0; i < n; i++)
-                        if (Free(i) && Hash01(pair.Key, i, placementSeed) < exteriorChance) TryPlace(i, interior);
+                        if (Free(i) && Hash01(pair.Key, i, layout.Seed) < layout.ExteriorChance) TryPlace(i, layout.Interior);
             }
-            foreach (var batch in batchList)
-            {
-                batch.matrices = new Matrix4x4[parts.Count][];
-                for (int p = 0; p < parts.Count; p++) batch.matrices[p] = new Matrix4x4[batch.placements.Count];
-            }
+            return result;
         }
 
         /// <summary>Stable 0..1 value per floor, pillar and seed, so scattered lamps never move between sessions.</summary>
@@ -254,15 +348,35 @@ namespace TowerOfBabel.World.Tower
             var root = lampPrefab.transform;
             var inverse = root.worldToLocalMatrix;
             bool any = false;
+            // With buildable lamps, the tower already draws the chrome sconce as the lamp's finished stage.
+            // Unity-null checks: an unassigned serialized prefab is not C# null.
+            var lampAsset = chunks != null && chunks.AssetPrefabs != null ? chunks.AssetPrefabs.GetPrefab(TowerAssetType.LavaLamp) : null;
+            var building = lampAsset != null ? lampAsset.GetComponent<Building>() : null;
+            var drawnByTower = building != null ? building.GetStageMesh(ChunkAssetData.CompletedStage) : null;
             foreach (var renderer in lampPrefab.GetComponentsInChildren<MeshRenderer>(true))
             {
                 var filter = renderer.GetComponent<MeshFilter>();
                 if (filter == null || filter.sharedMesh == null || renderer.sharedMaterial == null) continue;
                 var local = inverse * renderer.transform.localToWorldMatrix;
-                parts.Add(new Part(filter.sharedMesh, renderer.sharedMaterial, local, renderer.shadowCastingMode));
+                parts.Add(new Part(filter.sharedMesh, renderer.sharedMaterial, local, renderer.shadowCastingMode, filter.sharedMesh == drawnByTower));
                 var b = TransformBounds(filter.sharedMesh.bounds, local);
                 if (!any) { lampBounds = b; any = true; } else lampBounds.Encapsulate(b);
             }
+        }
+
+        /// <summary>Bounds of the whole lamp in sconce space.</summary>
+        public Bounds LampBounds()
+        {
+            if (lampPrefab == null) return new Bounds();
+            var inverse = lampPrefab.transform.worldToLocalMatrix;
+            Bounds bounds = default; bool any = false;
+            foreach (var filter in lampPrefab.GetComponentsInChildren<MeshFilter>(true))
+            {
+                if (filter.sharedMesh == null) continue;
+                var b = TransformBounds(filter.sharedMesh.bounds, inverse * filter.transform.localToWorldMatrix);
+                if (!any) { bounds = b; any = true; } else bounds.Encapsulate(b);
+            }
+            return bounds;
         }
 
         private Bounds StairBounds()
@@ -274,7 +388,7 @@ namespace TowerOfBabel.World.Tower
         }
 
         // A stair passing the pillar would run through a hanging lamp, or someone climbing it would: leave that pillar bare.
-        private bool TouchesStairs(Matrix4x4 mount, int floor, Dictionary<int, List<ChunkAssetData>> stairs, Bounds stairMesh)
+        private static bool TouchesStairs(Matrix4x4 mount, int floor, Dictionary<int, List<ChunkAssetData>> stairs, Bounds stairMesh, Bounds lampBounds, Layout layout)
         {
             if (stairMesh.size == Vector3.zero) return false;
             Vector3 origin = mount.GetColumn(3);
@@ -285,9 +399,9 @@ namespace TowerOfBabel.World.Tower
                 {
                     if ((stair.Position - origin).sqrMagnitude > 64) continue;
                     var inverse = Quaternion.Inverse(stair.Rotation);
-                    Vector3 c = Vector3.Scale(stairMesh.center, stair.Scale), e = Vector3.Scale(stairMesh.extents, stair.Scale) + Vector3.one * stairClearance;
+                    Vector3 c = Vector3.Scale(stairMesh.center, stair.Scale), e = Vector3.Scale(stairMesh.extents, stair.Scale) + Vector3.one * layout.StairClearance;
                     // Stairs only turn about Y, so the walking space is the step box raised by the headroom.
-                    c.y += stairHeadroom * .5f; e.y += stairHeadroom * .5f;
+                    c.y += layout.StairHeadroom * .5f; e.y += layout.StairHeadroom * .5f;
                     for (int x = 0; x <= 2; x++) for (int y = 0; y <= 4; y++) for (int z = 0; z <= 2; z++)
                     {
                         var local = lampBounds.min + Vector3.Scale(lampBounds.size, new Vector3(x * .5f, y * .25f, z * .5f));
@@ -299,12 +413,18 @@ namespace TowerOfBabel.World.Tower
             return false;
         }
 
-        /// <summary>A lamp shows once its pillar is complete, on floors the player can see.</summary>
+        /// <summary>
+        /// A buildable lamp shows once it is fully built and its floor's detail is released; without lamp assets, a lamp
+        /// shows once its pillar is complete. Only on floors the player can see.
+        /// </summary>
         public bool IsShown(int placement)
         {
             var p = placements[placement];
-            return chunks != null && chunks.IsFloorVisible(p.floor) &&
-                   chunks.TryGetAsset(p.key, p.pillar, out var pillar) && pillar.Stage >= ChunkAssetData.CompletedStage;
+            if (chunks == null || !chunks.IsFloorVisible(p.floor)) return false;
+            if (p.lamp >= 0)
+                return chunks.IsAssetReleased(p.floor, TowerAssetType.LavaLamp) &&
+                       chunks.TryGetAsset(p.lampKey, p.lamp, out var lamp) && lamp.Stage >= ChunkAssetData.CompletedStage;
+            return chunks.TryGetAsset(p.key, p.pillar, out var pillar) && pillar.Stage >= ChunkAssetData.CompletedStage;
         }
 
         private void EnsureBuilt()
@@ -366,6 +486,7 @@ namespace TowerOfBabel.World.Tower
                 for (int p = 0; p < parts.Count; p++)
                 {
                     var part = parts[p];
+                    if (UsesLampAssets && part.DrawnByTower) continue;
                     var settings = new RenderParams(part.Material)
                     {
                         camera = camera, worldBounds = batch.bounds, layer = gameObject.layer,

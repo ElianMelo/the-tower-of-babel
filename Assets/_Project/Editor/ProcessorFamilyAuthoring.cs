@@ -42,7 +42,12 @@ public static class ProcessorFamilyAuthoring
             ProcessorId = "tower-water-press-01", Output = "WaterBlock", X = 15, Process = Kind.Press, Glow = new Color(.45f, .75f, 1), Formerly = "WaterCondenser" },
         new() { Name = "SkySpinner", Source = "SkyEssence", Target = "SkyBlock", SourceAmount = 2, TargetAmount = 1, Duration = 3.5f,
             ProcessorId = "tower-sky-spinner-01", Output = "SkyBlock", X = 21.6f, Process = Kind.Spin, Glow = new Color(.75f, .78f, 1), Formerly = "SkyCondenser" },
+        // Built after IronWorkshopAuthoring has created the iron definitions and materials.
+        new() { Name = "IronSmelter", Source = "IronStone", Target = "IronIngot", SourceAmount = 2, TargetAmount = 1, Duration = 4,
+            ProcessorId = "tower-iron-smelter-01", Output = "IronIngot", X = 35.2f, Process = Kind.Smelt, Glow = new Color(1, .55f, .15f) },
     };
+
+    public static Spec Machine(string name) => Machines.Single(m => m.Name == name);
 
     [MenuItem("Tower of Babel/Resources/Apply processor family")]
     public static void Apply()
@@ -51,7 +56,7 @@ public static class ProcessorFamilyAuthoring
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         CreateMaterials();
         foreach (string model in Machines.SelectMany(m => new[] { m.Name, m.Output }).Distinct().Append("EssenceMote")) ImportModel(model);
-        foreach (string sound in new[] { "CondenserHum", "BlockChime" }) MakeSound(sound);
+        foreach (string sound in new[] { "CondenserHum", "BlockChime", "IronClang" }) MakeSound(sound);
         foreach (var spec in Machines)
         {
             if (spec.Formerly != null)
@@ -76,7 +81,7 @@ public static class ProcessorFamilyAuthoring
         Debug.Log("Processor family applied: " + string.Join(", ", Machines.Select(m => m.Name)));
     }
 
-    private static void Build(Spec spec)
+    internal static void Build(Spec spec)
     {
         var root = new GameObject(spec.Name);
         try
@@ -112,6 +117,7 @@ public static class ProcessorFamilyAuthoring
                 case Kind.Mill: Mill(root, model, anim); break;
                 case Kind.Press: Press(root, model, anim, glints); break;
                 case Kind.Spin: Spinner(root, model, anim); break;
+                case Kind.Smelt: Smelter(root, model, anim, hum); break;
             }
             anim.ApplyModifiedPropertiesWithoutUndo();
             foreach (var hidden in new[] { "Feed" }.Select(n => Find(model, n))) hidden.gameObject.SetActive(false);
@@ -210,6 +216,34 @@ public static class ProcessorFamilyAuthoring
         var wisps = Particles(root.transform, "Rotor wisps", new Vector3(0, 1.5f, 0), AssetDatabase.LoadAssetAtPath<Material>(Models + "Materials/Workshop_Dust.mat"), null,
             new Color(.97f, .98f, 1, .55f), .1f, .25f, -.03f, .9f, .5f, 10, .75f);
         Refs(anim, "workEffects", new UnityEngine.Object[] { wisps });
+    }
+
+    private static void Smelter(GameObject root, GameObject model, SerializedObject anim, AudioSource loop)
+    {
+        Spin(anim, Find(model, "Fan"), Vector3.right, 520);
+        // Molten iron rises in the sight glass as the ore melts, then runs down the runner into the mould.
+        var melt = FillLevel(anim, Find(model, "MeltColumn"), Vector3.up, new Vector2(.25f, .68f));
+        melt.FindPropertyRelative("drainWindow").vector2Value = new Vector2(.7f, .86f);
+        melt.FindPropertyRelative("drainTo").floatValue = .25f;
+        FillLevel(anim, Find(model, "MouldFill"), Vector3.up, new Vector2(.7f, .86f));
+        // Once the mould is full, the stamp comes down on the cast with one ringing strike.
+        Travel(anim, Find(model, "Stamp"), Vector3.down, .3f, new Vector2(.86f, .97f), 1, .004f);
+        var dial = Append(anim, "dials");
+        dial.FindPropertyRelative("part").objectReferenceValue = Find(model, "Needle");
+        dial.FindPropertyRelative("axis").vector3Value = Vector3.forward;
+        dial.FindPropertyRelative("angle").floatValue = -200;
+        // An ore chunk is lobbed up into the hopper on the dome and sinks into the furnace.
+        Feed(anim, model, new Vector3(0, -1.1f, -1.4f), Vector3.zero, .6f, new Vector2(.28f, .6f), new Vector3(0, -.55f, 0), 0);
+        Refs(anim, "heatSurfaces", new UnityEngine.Object[] { Find(model, "HeatCoil").GetComponent<Renderer>() });
+        anim.FindProperty("heatColor").colorValue = new Color(1, .35f, .05f);
+        var sparks = Particles(root.transform, "Sight glass sparks", new Vector3(0, 1.1f, -.62f), Mat("Molten"), Mesh("RockChip"), new Color(1, .6f, .15f), .012f, .03f, .5f, .6f, .7f, 10);
+        var smoke = Particles(root.transform, "Chimney smoke", new Vector3(-.28f, 2.64f, .3f), AssetDatabase.LoadAssetAtPath<Material>(Models + "Materials/Workshop_Dust.mat"), null,
+            new Color(.82f, .86f, .9f, .3f), .14f, .32f, -.06f, 1.2f, .3f, 5);
+        var strike = Particles(root.transform, "Stamp sparks", new Vector3(0, .46f, -1f), Mat("Molten"), Mesh("RockChip"), new Color(1, .7f, .25f), .015f, .035f, .9f, .5f, 1.6f, 0, .12f);
+        anim.FindProperty("strikeEffect").objectReferenceValue = strike;
+        anim.FindProperty("strikeClip").objectReferenceValue = Clip("IronClang");
+        Refs(anim, "workEffects", new UnityEngine.Object[] { sparks, smoke });
+        loop.clip = AssetDatabase.LoadAssetAtPath<AudioClip>(Effects + "KilnMotor.wav") ?? loop.clip;
     }
 
     // ------------------------------------------------------------------ channel helpers

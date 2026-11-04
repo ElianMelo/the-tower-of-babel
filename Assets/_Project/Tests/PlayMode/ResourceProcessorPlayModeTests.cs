@@ -383,6 +383,38 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [UnityTest]
+        public IEnumerator HostIron_GatherThenSmeltIntoAnIngotExactlyOnce()
+        {
+            var node = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == ResourceType.IronStone);
+            var original = node.Definition; var definition = Object.Instantiate(original);
+            Set(definition, "interactionDuration", .3f); Set(definition, "respawnCooldown", .5f); Set(node, "definition", definition);
+            try
+            {
+                var feedback = node.GetComponent<ResourceHarvestFeedback>();
+                Seed(ResourceType.IronStone, 0); Seed(ResourceType.IronIngot, 0); player.transform.position = node.transform.position;
+                Invoke(raycaster, "SetTarget", node.GetComponentInChildren<Collider>().gameObject);
+                Assert.That(raycaster.TryBeginCurrentInteraction(), Is.True);
+                yield return WaitFor(() => service.GetLocalAmount(ResourceType.IronStone) == 1, "Iron stone did not reach the wallet.");
+                Assert.That(feedback.IsDepleted, Is.True); Assert.That(feedback.MarkerVisible, Is.True, "Ore bricks stay during cooldown.");
+                Assert.That(feedback.CompletionCount, Is.EqualTo(1));
+                yield return WaitFor(() => node.CanInteract, "The iron stone did not respawn.");
+            }
+            finally { Set(node, "definition", original); Object.Destroy(definition); }
+
+            Object.Destroy(processor.gameObject); yield return null;
+            processor = Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/IronSmelter.prefab")).GetComponent<ResourceProcessor>();
+            processor.transform.position = new Vector3(0, 1000, 0); player.transform.position = processor.transform.position;
+            Set(processor, "processorId", "test-IronSmelter"); Set(processor, "interactionDuration", .35f);
+            Invoke(service, "RebuildNodeLookup"); Seed(ResourceType.IronStone, 4); Seed(ResourceType.IronIngot, 0);
+            var motion = processor.GetComponent<ProcessorMachineAnimation>();
+            int completed = 0; processor.ServerCompleted += () => completed++;
+            Begin(); yield return WaitFor(() => completed == 1, "The smelter exchange did not complete through the host RPC flow.");
+            Assert.That(service.GetLocalAmount(ResourceType.IronStone), Is.EqualTo(2)); Assert.That(service.GetLocalAmount(ResourceType.IronIngot), Is.EqualTo(1));
+            Assert.That(store.GetAmount(connection.ClientId, ResourceType.IronIngot), Is.EqualTo(1));
+            Assert.That(motion.IsOutputVisible, Is.True); Assert.That(motion.CompletionCount, Is.EqualTo(1));
+        }
+
+        [UnityTest]
         public IEnumerator RockCooldown_LeavesBricksEmitsMeshChipsAndRestoresTheNode()
         {
             var stone = Object.FindObjectsByType<Resource>(FindObjectsSortMode.None).Single(n => n.Definition.ResourceType == ResourceType.Stone);

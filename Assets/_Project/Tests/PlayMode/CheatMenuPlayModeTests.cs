@@ -162,10 +162,11 @@ namespace TowerOfBabel.Resources.Tests
             yield return Wait(() => resources.GetLocalAmount(ResourceType.Stone) == 0 && resources.GetLocalAmount(ResourceType.ProcessedStone) == 0, "Bag did not clear");
             menu.SetAmount(10); menu.ActionButtons["Gain sand"].onClick.Invoke(); menu.ActionButtons["Gain glass"].onClick.Invoke();
             yield return Wait(() => resources.GetLocalAmount(ResourceType.Sand) == 10 && resources.GetLocalAmount(ResourceType.Glass) == 10, "New resource cheats failed");
-            foreach (var label in new[] { "river essence", "river block", "water essence", "water block", "sky essence", "sky block", "grass", "living grass" })
+            foreach (var label in new[] { "river essence", "river block", "water essence", "water block", "sky essence", "sky block", "grass", "living grass", "iron stone", "iron ingot" })
                 menu.ActionButtons["Gain " + label].onClick.Invoke();
             yield return Wait(() => new[] { ResourceType.RiverEssence, ResourceType.RiverBlock, ResourceType.WaterEssence, ResourceType.WaterBlock,
-                ResourceType.SkyEssence, ResourceType.SkyBlock, ResourceType.Grass, ResourceType.LivingGrass }.All(t => resources.GetLocalAmount(t) == 10), "Essence, block and grass cheats failed");
+                ResourceType.SkyEssence, ResourceType.SkyBlock, ResourceType.Grass, ResourceType.LivingGrass, ResourceType.IronStone, ResourceType.IronIngot }
+                .All(t => resources.GetLocalAmount(t) == 10), "Essence, block, grass and iron cheats failed");
             Assert.That(upgrades.RequestCheatStat(CheatStat.BuildSpeed, 10), Is.True);
             Assert.That(upgrades.RequestCheatStat(CheatStat.GatherProduction, 5), Is.True);
             Assert.That(upgrades.RequestCheatStat(CheatStat.WalkSpeed, 3), Is.True);

@@ -23,7 +23,9 @@ namespace TowerOfBabel.World.Tower
         Vine8 = 13,
         Vine9 = 14,
         Vine10 = 15,
-        Vine11 = 16
+        Vine11 = 16,
+        // A lava lamp sconce hung on a pillar, built from iron ingots. It lights up once complete.
+        LavaLamp = 17
     }
 
     /// <summary>Each floor is built in two phases: the structure first, then the detail that dresses it.</summary>
@@ -42,7 +44,9 @@ namespace TowerOfBabel.World.Tower
         [SerializeField] private GameObject arch;
         [SerializeField] private GameObject glassWaterFloor;
         [Tooltip("One prefab per detail vine shape, in TowerAssetType order.")]
-        [SerializeField] private GameObject[] vines = new GameObject[TowerAssetTypeExtensions.DetailCount];
+        [SerializeField] private GameObject[] vines = new GameObject[TowerAssetTypeExtensions.VineCount];
+        [Tooltip("The buildable lava lamp sconce of the detail phase.")]
+        [SerializeField] private GameObject lavaLamp;
 
         public bool IsComplete => floor != null && stair != null && pillar != null && arch != null;
 
@@ -55,7 +59,8 @@ namespace TowerOfBabel.World.Tower
                 TowerAssetType.Pillar => pillar,
                 TowerAssetType.Arch => arch,
                 TowerAssetType.GlassWaterFloor => glassWaterFloor,
-                _ when assetType.IsDetail() => vines != null && assetType.DetailIndex() < vines.Length ? vines[assetType.DetailIndex()] : null,
+                TowerAssetType.LavaLamp => lavaLamp,
+                _ when assetType.IsVine() => vines != null && assetType.VineIndex() < vines.Length ? vines[assetType.VineIndex()] : null,
                 _ => null
             };
         }
@@ -79,10 +84,13 @@ namespace TowerOfBabel.World.Tower
                 case TowerAssetType.GlassWaterFloor:
                     glassWaterFloor = prefab;
                     break;
-                case var detail when detail.IsDetail():
-                    if (vines == null || vines.Length < TowerAssetTypeExtensions.DetailCount)
-                        Array.Resize(ref vines, TowerAssetTypeExtensions.DetailCount);
-                    vines[detail.DetailIndex()] = prefab;
+                case TowerAssetType.LavaLamp:
+                    lavaLamp = prefab;
+                    break;
+                case var vine when vine.IsVine():
+                    if (vines == null || vines.Length < TowerAssetTypeExtensions.VineCount)
+                        Array.Resize(ref vines, TowerAssetTypeExtensions.VineCount);
+                    vines[vine.VineIndex()] = prefab;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetType), assetType, null);
@@ -93,15 +101,25 @@ namespace TowerOfBabel.World.Tower
     public static class TowerAssetTypeExtensions
     {
         public static bool IsFloor(this TowerAssetType type) => type == TowerAssetType.Floor || type == TowerAssetType.GlassWaterFloor;
-        public const int DetailCount = TowerAssetType.Vine11 - TowerAssetType.Vine0 + 1;
-        public static readonly TowerAssetType[] DetailTypes =
+        public const int VineCount = TowerAssetType.Vine11 - TowerAssetType.Vine0 + 1;
+        /// <summary>The twelve vine shapes, in order.</summary>
+        public static readonly TowerAssetType[] VineTypes =
         {
             TowerAssetType.Vine0, TowerAssetType.Vine1, TowerAssetType.Vine2, TowerAssetType.Vine3,
             TowerAssetType.Vine4, TowerAssetType.Vine5, TowerAssetType.Vine6, TowerAssetType.Vine7,
             TowerAssetType.Vine8, TowerAssetType.Vine9, TowerAssetType.Vine10, TowerAssetType.Vine11
         };
-        public static bool IsDetail(this TowerAssetType type) => type >= TowerAssetType.Vine0 && type <= TowerAssetType.Vine11;
-        public static int DetailIndex(this TowerAssetType type) => type - TowerAssetType.Vine0;
+        /// <summary>Every detail-phase type: the vines, then the lava lamp.</summary>
+        public static readonly TowerAssetType[] DetailTypes =
+        {
+            TowerAssetType.Vine0, TowerAssetType.Vine1, TowerAssetType.Vine2, TowerAssetType.Vine3,
+            TowerAssetType.Vine4, TowerAssetType.Vine5, TowerAssetType.Vine6, TowerAssetType.Vine7,
+            TowerAssetType.Vine8, TowerAssetType.Vine9, TowerAssetType.Vine10, TowerAssetType.Vine11,
+            TowerAssetType.LavaLamp
+        };
+        public static bool IsVine(this TowerAssetType type) => type >= TowerAssetType.Vine0 && type <= TowerAssetType.Vine11;
+        public static int VineIndex(this TowerAssetType type) => type - TowerAssetType.Vine0;
+        public static bool IsDetail(this TowerAssetType type) => type.IsVine() || type == TowerAssetType.LavaLamp;
         public static TowerConstructionPhase Phase(this TowerAssetType type) =>
             type.IsDetail() ? TowerConstructionPhase.Detail : TowerConstructionPhase.Structure;
     }

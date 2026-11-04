@@ -17,7 +17,8 @@ namespace TowerOfBabel.Cheats
         BuildAsset, AdvanceAsset, ResetAsset, BuildFloor, ResetFloor, BuildTower, ResetTower,
         UnlockAllUpgrades, ResetModifiers, AddSand, AddGlass,
         AddRiverEssence, AddRiverBlock, AddWaterEssence, AddWaterBlock, AddSkyEssence, AddSkyBlock,
-        AddGrass, AddLivingGrass, BuildFloorStructure, BuildFloorDetail
+        AddGrass, AddLivingGrass, BuildFloorStructure, BuildFloorDetail,
+        AddIronStone, AddIronIngot
     }
 
     [Serializable]

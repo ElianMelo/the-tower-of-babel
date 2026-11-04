@@ -169,21 +169,30 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
-        public void Vines_AreTheOnlyDetailTypes()
+        public void DetailTypes_AreTheVinesAndTheLavaLamp()
         {
-            Assert.That(TowerAssetTypeExtensions.DetailTypes.Length, Is.EqualTo(TowerAssetTypeExtensions.DetailCount));
-            Assert.That(TowerAssetTypeExtensions.DetailTypes.Select(t => t.DetailIndex()), Is.EqualTo(Enumerable.Range(0, TowerAssetTypeExtensions.DetailCount)));
+            Assert.That(TowerAssetTypeExtensions.VineTypes.Length, Is.EqualTo(TowerAssetTypeExtensions.VineCount));
+            Assert.That(TowerAssetTypeExtensions.VineTypes.Select(t => t.VineIndex()), Is.EqualTo(Enumerable.Range(0, TowerAssetTypeExtensions.VineCount)));
+            Assert.That(TowerAssetTypeExtensions.DetailTypes, Is.EqualTo(TowerAssetTypeExtensions.VineTypes.Append(TowerAssetType.LavaLamp)));
+            Assert.That((byte)TowerAssetType.LavaLamp, Is.EqualTo(17), "Appended, so cached and saved values never shift.");
             foreach (TowerAssetType type in System.Enum.GetValues(typeof(TowerAssetType)))
+            {
                 Assert.That(type.IsDetail(), Is.EqualTo(System.Array.IndexOf(TowerAssetTypeExtensions.DetailTypes, type) >= 0), type.ToString());
+                Assert.That(type.IsVine(), Is.EqualTo(System.Array.IndexOf(TowerAssetTypeExtensions.VineTypes, type) >= 0), type.ToString());
+            }
+            Assert.That(TowerAssetType.LavaLamp.Phase(), Is.EqualTo(TowerConstructionPhase.Detail));
             var set = new TowerAssetPrefabSet();
             var prefab = new GameObject("Shape 7");
+            var lamp = new GameObject("Lamp");
             try
             {
                 set.SetPrefab(TowerAssetType.Vine7, prefab);
+                set.SetPrefab(TowerAssetType.LavaLamp, lamp);
                 Assert.That(set.GetPrefab(TowerAssetType.Vine7), Is.SameAs(prefab));
                 Assert.That(set.GetPrefab(TowerAssetType.Vine0), Is.Null);
+                Assert.That(set.GetPrefab(TowerAssetType.LavaLamp), Is.SameAs(lamp));
             }
-            finally { Object.DestroyImmediate(prefab); }
+            finally { Object.DestroyImmediate(prefab); Object.DestroyImmediate(lamp); }
         }
 
         [Test]
@@ -198,7 +207,7 @@ namespace TowerOfBabel.World.Tests
                 Assert.That(vines.Count, Is.EqualTo(pillars.Length * 2), "Full coverage puts a vine on both faces of every pillar.");
                 foreach (var vine in vines)
                 {
-                    Assert.That(vine.AssetType.IsDetail(), vine.AssetType.ToString());
+                    Assert.That(vine.AssetType.IsVine(), vine.AssetType.ToString());
                     Assert.That(pillars.Min(p => Vector3.Distance(p, vine.Position)), Is.LessThan(.001f), "Rooted on a pillar.");
                     Assert.That(Mathf.Abs(Vector3.Dot(vine.Rotation * Vector3.forward, Outward(vine))), Is.EqualTo(1).Within(.001f), "Faces the inside or the outside.");
                     Assert.That(Mathf.Abs(vine.Scale.x), Is.EqualTo(1)); Assert.That(vine.Scale.y, Is.EqualTo(1));

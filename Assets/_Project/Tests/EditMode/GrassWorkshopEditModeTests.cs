@@ -18,7 +18,7 @@ namespace TowerOfBabel.Resources.Tests
         private const string NodePath = "Assets/_Project/Prefabs/Resources/Grass.prefab";
         private const string PlanterPath = "Assets/_Project/Prefabs/Processor/GrassPlanter.prefab";
         private static readonly string[] VinePrefabs =
-            Enumerable.Range(0, TowerAssetTypeExtensions.DetailCount).Select(i => "Detail_Vine_" + i).ToArray();
+            Enumerable.Range(0, TowerAssetTypeExtensions.VineCount).Select(i => "Detail_Vine_" + i).ToArray();
 
         [Test]
         public void GrassTypes_AreAppendedWithReadableNames()
@@ -106,7 +106,7 @@ namespace TowerOfBabel.Resources.Tests
                 var building = prefab.GetComponent<Building>();
                 Assert.That(building.ResourceType, Is.EqualTo(ResourceType.LivingGrass), prefab.name);
                 Assert.That(building.ResourceCostPerStage, Is.EqualTo(1));
-                Assert.That(prefab.GetComponent<TowerAsset>().AssetType, Is.EqualTo(TowerAssetTypeExtensions.DetailTypes[i]));
+                Assert.That(prefab.GetComponent<TowerAsset>().AssetType, Is.EqualTo(TowerAssetTypeExtensions.VineTypes[i]));
                 Assert.That(prefab.GetComponentsInChildren<Collider>(true).Length, Is.EqualTo(1));
                 Assert.That(prefab.GetComponent<MeshRenderer>().sharedMaterial.shader.name, Is.EqualTo("TowerOfBabel/Foliage/Clinging Vine"));
                 Assert.That(prefab.GetComponent<MeshRenderer>().sharedMaterial.enableInstancing, Is.True);

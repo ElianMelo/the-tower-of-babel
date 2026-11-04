@@ -1,5 +1,7 @@
 # Stone and processor assets
 
+> **Reworked stone (2026-11-04):** the stone node now uses a new model from `Tools/BuildingAero/build_iron_workshop.py`: three split boulders with flat chiselled facets, moss on their top faces, pebbles and three small quartz shards. See [iron workshop](IRON_WORKSHOP.md#reworked-stone). The notes below describe the first cluster.
+
 > **Superseded processor (2026-10-31):** the stone processor below has been replaced by the stone processor of the [processor family](PROCESSOR_FAMILY.md), which has a gantry hammer, rollers and the shared family base. `ResourceWorkshopAuthoring` now only builds the stone node. The processor notes below are historical.
 
 The later [sand, glass and gathering feedback pass](SAND_GLASS.md) extends this workshop with a sand resource, glass kiln, capped Unity particles, rock cooldown bricks and spatial audio. Its validation report supersedes the historical validation note below for the updated resource flow.

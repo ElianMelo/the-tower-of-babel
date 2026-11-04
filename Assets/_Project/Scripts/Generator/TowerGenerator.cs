@@ -17,7 +17,9 @@ public class TowerGenerator : MonoBehaviour
 
     [Header("Detail phase")]
     [Tooltip("Buildable vine shapes released after a floor's structure is complete, in TowerAssetType order (Vine0..Vine7).")]
-    public GameObject[] detailVineObjects = new GameObject[TowerAssetTypeExtensions.DetailCount];
+    public GameObject[] detailVineObjects = new GameObject[TowerAssetTypeExtensions.VineCount];
+    [Tooltip("The buildable lava lamp sconce, hung where the scene's TowerLavaLamps places its lamps.")]
+    public GameObject detailLavaLampObject;
     [Tooltip("Average share of pillar faces with a vine. The outside and inside of each pillar are separate building blocks.")]
     [Range(0, 1)] public float detailVineCoverage = .22f;
     [Tooltip("How strongly vines gather into patches around each ring: 0 spreads them evenly, 1 leaves bare stretches between thick patches.")]
@@ -235,6 +237,7 @@ public class TowerGenerator : MonoBehaviour
             RemoveBlockingFloor();
             EnsurePillarSupports();
             CreateDetailVines();
+            CreateDetailLamps();
             // Decoration data survives ConfigureTower's removal of temporary construction objects.
             GetComponent<TowerBushScatter>()?.Generate(this);
         }
@@ -349,6 +352,25 @@ public class TowerGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>Buildable lava lamps, placed by the scene's TowerLavaLamps rules on the generated pillars.</summary>
+    private void CreateDetailLamps()
+    {
+        var lamps = FindFirstObjectByType<TowerLavaLamps>(FindObjectsInactive.Include);
+        if (detailLavaLampObject == null || lamps == null || heighIncrease <= 0) return;
+        var assets = parent.GetComponentsInChildren<TowerAsset>()
+            .Select(a => new ChunkAssetData(0, a.AssetType, a.transform.position, a.transform.rotation, a.transform.lossyScale));
+        Mesh stairMesh = stairStepObject != null
+            ? stairStepObject.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? stairStepObject.GetComponent<MeshFilter>()?.sharedMesh
+            : null;
+        var stairBounds = stairMesh != null ? stairMesh.bounds : new Bounds(Vector3.zero, Vector3.zero);
+        foreach (var lamp in lamps.BuildLampAssets(assets, a => Mathf.FloorToInt((a.Position.y + .001f) / heighIncrease), center, stairBounds))
+        {
+            var instance = CreateTowerAsset(detailLavaLampObject, TowerAssetType.LavaLamp, lamp.Position, lamp.Rotation, "Detail lava lamp");
+            var s = parent.lossyScale;
+            instance.transform.localScale = new Vector3(1 / s.x, 1 / s.y, 1 / s.z);
+        }
+    }
+
     /// <summary>
     /// Deterministic detail-phase vines. The outside and inside face of every pillar are considered separately, so each
     /// face is its own building block. A smooth random density around each ring makes vines gather into patches with
@@ -360,13 +382,13 @@ public class TowerGenerator : MonoBehaviour
         var result = new List<ChunkAssetData>();
         if (heighIncrease <= 0 || detailVineObjects == null) return result;
         var variants = new List<(TowerAssetType type, Vector3[] samples)>();
-        for (int i = 0; i < TowerAssetTypeExtensions.DetailTypes.Length && i < detailVineObjects.Length; i++)
+        for (int i = 0; i < TowerAssetTypeExtensions.VineTypes.Length && i < detailVineObjects.Length; i++)
         {
             var prefab = detailVineObjects[i];
             if (prefab == null) continue;
             Mesh mesh = prefab.GetComponent<TowerOfBabel.Buildings.Building>()?.GetStageMesh(10) ?? prefab.GetComponent<MeshFilter>()?.sharedMesh;
             if (mesh == null) continue;
-            variants.Add((TowerAssetTypeExtensions.DetailTypes[i], StairSamples(mesh)));
+            variants.Add((TowerAssetTypeExtensions.VineTypes[i], StairSamples(mesh)));
         }
         if (variants.Count == 0) return result;
         Mesh stairMesh = stairStepObject != null
@@ -466,8 +488,9 @@ public class TowerGenerator : MonoBehaviour
             TowerAssetType.Stair => stairStepObject,
             TowerAssetType.Pillar => pillarObject,
             TowerAssetType.Arch => archObject,
-            _ when assetType.IsDetail() =>
-                detailVineObjects != null && assetType.DetailIndex() < detailVineObjects.Length ? detailVineObjects[assetType.DetailIndex()] : null,
+            TowerAssetType.LavaLamp => detailLavaLampObject,
+            _ when assetType.IsVine() =>
+                detailVineObjects != null && assetType.VineIndex() < detailVineObjects.Length ? detailVineObjects[assetType.VineIndex()] : null,
             _ => null
         };
     }

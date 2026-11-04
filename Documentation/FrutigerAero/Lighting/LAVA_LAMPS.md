@@ -13,6 +13,16 @@ Lava lamp sconces hang like torches on the **inside** of the tower's pillars, ov
 
 The sconce origin is where the wall plate meets the pillar. The lamp hangs 1.15 m below the arm; no colliders. Inside, the spotlight washes the arch spandrels above the pillar and the underside of the glass ramp.
 
+## Building the lamps
+
+Since 2026-11-04 every lamp is a **buildable block** of the floor's detail phase, like the [vines](../Foliage/VINES.md). Each costs **1 Iron Ingot per stage** (10 per lamp), the processed material smelted from gathered Iron Stone ([iron workshop](../Resources/IRON_WORKSHOP.md)).
+
+- **Asset type:** `TowerAssetType.LavaLamp` (17), appended so cached and saved values never shift. It is a detail type, so it is hidden and unbuildable until the floor's structure is complete, and the floor unlocks the next one only once its lamps are built too.
+- **Where:** one lamp asset at each of the 2,981 spots described under [Placement and runtime](#placement-and-runtime). The asset's position and rotation are the sconce mount. Lamps sort after every other type in their chunk, so adding them left every existing asset's index unchanged.
+- **Prefab:** `Prefabs/Buildings/Detail_LavaLamp.prefab` (a `Building` with `TowerAsset`, outline and one box collider over the whole hanging lamp). Its 11 stage meshes assemble the chrome sconce: wall rosette (0), arm (1), brace (2), hook and ring (3), one chain at a time (4–6), collar and lugs (7), the lower and upper halves of the base (8–9), and the cap (10). Stages 0–9 live in `Models/Lighting/LavaLamp_Stages.asset`; stage 10 is the sconce mesh itself.
+- **Lighting up:** the tower draws the chrome at every stage. Once a lamp reaches stage 10, `TowerLavaLamps` adds the lava glass and the lamp can take a light rig. A half-built lamp has no glass or light, and rolling the floor's structure back withdraws its lamps with the rest of the detail.
+- **Authoring:** **Tower of Babel/Environment/Apply tower lava lamps** now also builds the stages and prefab, registers it on the `ChunkManager` and `TowerGenerator` (`detailLavaLampObject`), and replaces the cached lamp assets. A full tower regeneration places the lamps with the same rules.
+
 ## Fluid shader
 
 `TowerOfBabel/Lighting/Lava Lamp Fluid` (`Shaders/AeroLavaLamp.shader`) ray marches the wax inside the glass mesh in object space, based on the common lava-lamp technique of signed-distance metaballs:
@@ -44,7 +54,7 @@ Free downloads were reviewed first (OpenGameArt CC0 sets by Calinou, mads and le
 
 The stair ramp is 4 m wide, runs against the inside of the pillar ring all the way round and climbs a full floor per ring, so it passes every interior lamp at some height. A lamp that would touch the steps is left out and the pattern carries on: **1,499 of 2,067** pattern slots keep a lamp. Where the ramp runs just below a lamp, someone climbing along the pillar edge can pass through it (lamps have no colliders). This was the chosen trade-off: `stairHeadroom` (default 0) also keeps a climber's head clear — 1 m leaves 1,165 lamps, 2.05 m leaves 823 with long bare stretches.
 
-- A lamp shows once **its pillar is complete**, on floors the player can see; stage changes and floor unlocks refresh only the affected floor.
+- A lamp shows once **its lamp asset is fully built** and its floor's detail is released, on floors the player can see; stage changes, detail releases and floor unlocks refresh only the affected floor. (A tower without lamp assets falls back to showing each lamp with its pillar.)
 - Lamps draw with `Graphics.RenderMeshInstanced` per floor, culled by frustum and a 260 m distance; the tower carries no lamp GameObjects.
 - Up to **24 light rigs** (prefab instances with their renderers off and their `AeroProjectionLamp` removed) move every 0.25 s to the nearest built lamps **in view** within 90 m. A lamp counts as in view when the camera frustum sees the wall its spotlight washes (about 6 m above it), so lamps just below the screen edge still light the arches in shot. Rigs that stay on a chosen lamp are not moved. The renderer is Forward+, which has no per-object light limit.
 - Only the nearest lamp within 20 m casts spotlight shadows.
@@ -60,4 +70,5 @@ Runtime lighting is local presentation; it changes no construction state.
 - EditMode `TowerLavaLampEditModeTests`: outside lamps only on free pillars and facing out, never neighbours or two per pillar, stable random scatter, the ring-seam rule, every lamp in view lit (more than four) with one shared 512 px cookie turned per lamp, distance fade; and the earlier checks: one-in-four pattern and inward mount transform, pillar-built visibility and rollback, hidden upper floors, stair rejection keeping the pattern, the headroom option, nearest-light selection and release, day dimming, prefab wiring (cookie reuse, upward spot, instancing, mesh/shader dimensions), and the Tower scene placement.
 - EditMode `LavaLampShaderEditModeTests`: blue fluid with green wax, wax motion over time, night glow much brighter than day and over the bloom threshold.
 - EditMode `AeroCausticsFlipbookEditModeTests`: flipbook imports, cookie sharpness, colour split, motion and aperture.
+- EditMode `TowerLavaLampEditModeTests` for the buildable lamps (2026-11-04): one lamp asset at every spot keeping its ring position and face, light only once built and after the floor's structure, withdrawal on rollback, generator placement matching the cached placement, the stage prefab (iron ingot cost, growing stages, finished stage is the sconce mesh, collider over the lamp), and the Tower scene wiring.
 - PlayMode `TowerLavaLampPlayModeTests` (automated runner only): instanced drawing, live upward projections with the shared cookie animating many times a second, day dimming and release at distance.
