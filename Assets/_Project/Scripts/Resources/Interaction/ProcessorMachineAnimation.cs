@@ -10,7 +10,7 @@ namespace TowerOfBabel.Resources.Interaction
     /// the tray), so imported models that keep Blender's Z-up local axes still move correctly.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class ProcessorMachineAnimation : MonoBehaviour
+    public sealed class ProcessorMachineAnimation : MonoBehaviour, IAmbientActivity
     {
         public enum ProcessKind : byte { Crush, Melt, Mill, Press, Spin, Grow, Smelt }
 
@@ -20,6 +20,8 @@ namespace TowerOfBabel.Resources.Interaction
             public Vector3 axis = Vector3.up;
             [Tooltip("Degrees per second at full work.")] public float speed = 180;
             [Tooltip("Speed builds from 35% to 100% across the cycle.")] public bool rampWithProgress = true;
+            [Tooltip("Degrees per second while idle, so the part never stops dead (a turbine turning in the breeze).")]
+            public float idleSpeed;
         }
 
         [Serializable] public sealed class Travel
@@ -122,6 +124,12 @@ namespace TowerOfBabel.Resources.Interaction
         public int PulseCount => pulses.Length;
         public int FillCount => fills.Length;
         public int DialCount => dials.Length;
+        public float Progress => progress;
+        /// <summary>Work effort for ambient motion: eases in with the work blend and grows with progress.</summary>
+        public float Activity => blend * Mathf.Lerp(.55f, 1, Mathf.SmoothStep(0, 1, progress));
+        public float Impulse => celebration > 0 ? celebration / OutputDuration : 0;
+        public bool Dormant => false;
+        private bool idleSpins;
 
         private void Awake() { Initialize(); ResetImmediately(); }
 
@@ -152,6 +160,7 @@ namespace TowerOfBabel.Resources.Interaction
                 };
             }
             spinAngles = new float[spins.Length]; strikes = new int[travels.Length];
+            idleSpins = Array.Exists(spins, s => s.part != null && s.idleSpeed != 0);
             statusLights ??= Array.Empty<Renderer>(); heatSurfaces ??= Array.Empty<Renderer>();
             block = new MaterialPropertyBlock();
             lightBlocks = Capture(statusLights); heatBlocks = Capture(heatSurfaces);
@@ -221,10 +230,11 @@ namespace TowerOfBabel.Resources.Interaction
             ApplyPose();
         }
 
-        private void Update()
+        private void Update() => Tick(Time.deltaTime);
+
+        private void Tick(float dt)
         {
-            if (!initialized || !working && blend <= 0 && celebration <= 0) return;
-            float dt = Time.deltaTime;
+            if (!initialized || !working && blend <= 0 && celebration <= 0 && !idleSpins) return;
             elapsed += dt;
             blend = Mathf.MoveTowards(blend, working ? 1 : 0, dt / .25f);
             AdvanceSpins(dt);
@@ -235,9 +245,14 @@ namespace TowerOfBabel.Resources.Interaction
         private void AdvanceSpins(float dt)
         {
             float charge = Mathf.SmoothStep(0, 1, progress);
+            // A completed cycle keeps the parts whirling for a moment before they coast back to idle.
+            float coast = celebration > 0 ? celebration / OutputDuration : 0;
+            // The whirl winds up over a moment instead of doubling the speed in one frame.
+            coast *= Mathf.SmoothStep(0, 1, (1 - coast) * OutputDuration / .25f);
             for (int i = 0; i < spins.Length; i++)
             {
-                float speed = spins[i].speed * blend * (spins[i].rampWithProgress ? Mathf.Lerp(.35f, 1, charge) : 1);
+                float work = spins[i].speed * (spins[i].rampWithProgress ? Mathf.Lerp(.35f, 1, charge) : 1);
+                float speed = Mathf.Lerp(spins[i].idleSpeed, work, blend) + spins[i].speed * coast * coast * (spins[i].idleSpeed != 0 ? 1.2f : 0);
                 spinAngles[i] = Mathf.Repeat(spinAngles[i] + speed * dt, 360);
             }
         }
@@ -410,11 +425,24 @@ namespace TowerOfBabel.Resources.Interaction
         private void OnDisable() => ResetImmediately();
 
 #if UNITY_EDITOR
-        /// <summary>Edit Mode preview sample. A non-negative completionElapsed samples the confirmed output.</summary>
+        /// <summary>Edit Mode preview: advance the real runtime update by dt (drive it with BeginWork, SetProgress, ConfirmCompletion).</summary>
+        public void StepEditor(float dt) { if (Application.isPlaying) return; Initialize(); Tick(dt); }
+
+        /// <summary>
+        /// Edit Mode preview sample. A non-negative completionElapsed samples the confirmed output; a negative
+        /// normalizedProgress samples the machine at rest (idle spins only).
+        /// </summary>
         public void SampleEditorPose(float seconds, float normalizedProgress, float completionElapsed = -1)
         {
             if (Application.isPlaying) return;
             Initialize();
+            if (normalizedProgress < 0 && completionElapsed < 0)
+            {
+                working = confirmed = false; elapsed = seconds; blend = 0; progress = 0; celebration = 0;
+                for (int i = 0; i < spins.Length; i++) spinAngles[i] = Mathf.Repeat(seconds * spins[i].idleSpeed, 360);
+                ApplyPose();
+                return;
+            }
             working = completionElapsed < 0; confirmed = !working;
             elapsed = seconds; blend = 1; progress = Mathf.Clamp01(normalizedProgress);
             celebration = confirmed ? Mathf.Max(0, OutputDuration - completionElapsed) : 0;

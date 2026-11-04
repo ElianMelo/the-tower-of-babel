@@ -294,7 +294,7 @@ namespace TowerOfBabel.Resources.Tests
         {
             (ResourceType.RiverEssence, ResourceType.RiverBlock, "RiverMill"),
             (ResourceType.WaterEssence, ResourceType.WaterBlock, "WaterPress"),
-            (ResourceType.SkyEssence, ResourceType.SkyBlock, "SkySpinner"),
+            (ResourceType.SkyEssence, ResourceType.SkyBlock, "WindCondenser"),
         };
         private static IEnumerable<int> EssenceFamilyIndices => Enumerable.Range(0, EssenceFamilies.Length);
 

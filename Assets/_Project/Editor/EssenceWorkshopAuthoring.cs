@@ -40,9 +40,10 @@ public static class EssenceWorkshopAuthoring
             FloaterPrefix = "Droplet_", Base = "MossBed", Glass = "WaterGlass", Glow = "WaterFoam", Stroke = "WaterStroke",
             EssenceType = ResourceType.WaterEssence, BlockType = ResourceType.WaterBlock, NodeId = 3002, Style = EssenceHarvestFeedback.EssenceStyle.WaterWobble,
             GlowColor = new Color(.35f, .55f, .8f), MoteColor = new Color(.6f, .85f, 1, .9f), NodeX = 11.8f },
-        new() { Essence = "Sky Essence", Block = "Sky Block", NodeModel = "SkyCloud", Container = "SkyEssence", Body = "Cloud",
-            FloaterPrefix = "Tuft_", Base = "SkyStones", Glass = "SkyGlass", Glow = "SkyGlow", Stroke = "SkyStroke", GlowOnBase = true,
-            EssenceType = ResourceType.SkyEssence, BlockType = ResourceType.SkyBlock, NodeId = 3003, Style = EssenceHarvestFeedback.EssenceStyle.SkyDrift,
+        // Cloud Dandelions replaced the fallen cloud on 2026-11-04: cloud seed heads on stalks over a leaf rosette.
+        new() { Essence = "Sky Essence", Block = "Sky Block", NodeModel = "SkyDandelions", Container = "SkyEssence", Body = "Bloom",
+            FloaterPrefix = "Seed_", Base = "Rosette", Glass = "SkyGlass", Glow = "SkyGlow", Stroke = "SkyStroke",
+            EssenceType = ResourceType.SkyEssence, BlockType = ResourceType.SkyBlock, NodeId = 3003, Style = EssenceHarvestFeedback.EssenceStyle.SkyBloom,
             GlowColor = new Color(.75f, .78f, 1), MoteColor = new Color(.92f, .95f, 1, .9f), NodeX = 18.4f },
     };
 
@@ -110,7 +111,7 @@ public static class EssenceWorkshopAuthoring
             var mote = Mesh("EssenceMote");
             var motes = Particles(group.transform, "Essence motes", new Vector3(0, .35f, 0), Mat(f.Glow), mote, f.MoteColor, .03f, .07f, -.14f, 1.3f, .7f, 0, .45f);
             var burst = Particles(group.transform, "Essence burst", new Vector3(0, .25f, 0), Mat(f.Glass), mote, f.MoteColor, .04f, .1f,
-                f.Style == EssenceHarvestFeedback.EssenceStyle.SkyDrift ? -.05f : .5f, 1.1f, 1.8f, 0, .5f);
+                f.Style is EssenceHarvestFeedback.EssenceStyle.SkyDrift or EssenceHarvestFeedback.EssenceStyle.SkyBloom ? -.05f : .5f, 1.1f, 1.8f, 0, .5f);
             var audio = SoundSource(group, "Gather sounds");
             var feedback = new SerializedObject(node.AddComponent<EssenceHarvestFeedback>());
             feedback.FindProperty("style").enumValueIndex = (int)f.Style;
@@ -119,7 +120,10 @@ public static class EssenceWorkshopAuthoring
             var floaters = container.Cast<Transform>().Where(t => t.name.StartsWith(f.FloaterPrefix)).OrderBy(t => t.name).ToArray();
             var list = feedback.FindProperty("floaters"); list.arraySize = floaters.Length;
             for (int i = 0; i < floaters.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = floaters[i];
-            var glows = f.GlowOnBase ? new[] { Find(model, f.Base) }
+            bool bloom = f.Style == EssenceHarvestFeedback.EssenceStyle.SkyBloom;
+            // Dandelions: the glowing hearts inside the seed heads (the Receptacle part of each stalk) pulse.
+            var glows = bloom ? new[] { Find(container.gameObject, "Bloom"), Find(container.gameObject, "Stalk_1"), Find(container.gameObject, "Stalk_2") }
+                : f.GlowOnBase ? new[] { Find(model, f.Base) }
                 : f.Style == EssenceHarvestFeedback.EssenceStyle.WaterWobble ? new[] { Find(container.gameObject, f.Body) }
                 : floaters.Append(Find(container.gameObject, f.Spinner)).ToArray();
             var glowList = feedback.FindProperty("glowRenderers"); glowList.arraySize = glows.Length;
@@ -131,9 +135,29 @@ public static class EssenceWorkshopAuthoring
             feedback.FindProperty("breakClip").objectReferenceValue = Clip("EssenceBurst");
             feedback.FindProperty("respawnClip").objectReferenceValue = Clip("Respawn");
             feedback.ApplyModifiedPropertiesWithoutUndo();
+            if (bloom) BloomAmbience(node, container.gameObject, group, mote);
             PrefabUtility.SaveAsPrefabAsset(node, f.NodePrefab);
         }
         finally { Object.DestroyImmediate(node); }
+    }
+
+    /// <summary>
+    /// Idle life for the dandelions: the side stalks nod out of step with the centre one (which the harvest feedback
+    /// sways), seeds keep drifting off downwind and sparkles rise; while gathered the seeds stream away in numbers.
+    /// </summary>
+    private static void BloomAmbience(GameObject node, GameObject container, GameObject group, Mesh mote)
+    {
+        var drift = Particles(group.transform, "Drifting seeds", new Vector3(0, .95f, 0), Mat("Cloud"), mote, new Color(1, 1, 1, .95f), .02f, .04f, -.025f, 3.2f, .06f, 1, .3f);
+        var wind = drift.velocityOverLifetime; wind.enabled = true; wind.space = ParticleSystemSimulationSpace.World;
+        wind.x = new ParticleSystem.MinMaxCurve(.22f, .45f); wind.y = new ParticleSystem.MinMaxCurve(0, 0); wind.z = new ParticleSystem.MinMaxCurve(-.05f, .08f);
+        var noise = drift.noise; noise.enabled = true; noise.strength = .25f; noise.frequency = .6f; noise.scrollSpeed = .3f;
+        var sparkle = Particles(group.transform, "Sky sparkle", new Vector3(0, .55f, 0), Mat("SkyGlow"), mote, new Color(.8f, .9f, 1), .012f, .026f, -.03f, 2, .05f, 1, .7f);
+        var ambient = new SerializedObject(node.AddComponent<AmbientMotion>());
+        ProcessorFamilyAuthoring.AmbientChannel(ambient, Find(container, "Stalk_1"), AmbientMotion.Kind.Sway, Vector3.right, 2.5f, 4.5f, 1.05f, 0, .7f);
+        ProcessorFamilyAuthoring.AmbientChannel(ambient, Find(container, "Stalk_2"), AmbientMotion.Kind.Sway, Vector3.forward, 2.8f, 5, .85f, 2, .7f);
+        ProcessorFamilyAuthoring.AmbientEffects(ambient, (drift, 1.2f, 9), (sparkle, 1.5f, 4));
+        ambient.FindProperty("visibility").objectReferenceValue = Find(container, "Bloom").GetComponent<Renderer>();
+        ambient.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static ResourceDefinition Definition(string name, ResourceType type, int amount, float duration, float cooldown)

@@ -18,7 +18,7 @@ namespace TowerOfBabel.Resources.Tests
             ("GlassFurnace", ResourceType.Sand, 2, ResourceType.Glass, 1, 3.5f, "tower-glass-kiln-01", Kind.Melt, "Slab"),
             ("RiverMill", ResourceType.RiverEssence, 2, ResourceType.RiverBlock, 1, 3.5f, "tower-river-mill-01", Kind.Mill, "Block"),
             ("WaterPress", ResourceType.WaterEssence, 2, ResourceType.WaterBlock, 1, 3.5f, "tower-water-press-01", Kind.Press, "Block"),
-            ("SkySpinner", ResourceType.SkyEssence, 2, ResourceType.SkyBlock, 1, 3.5f, "tower-sky-spinner-01", Kind.Spin, "Block"),
+            ("WindCondenser", ResourceType.SkyEssence, 2, ResourceType.SkyBlock, 1, 3.5f, "tower-sky-spinner-01", Kind.Spin, "Block"),
             ("IronSmelter", ResourceType.IronStone, 2, ResourceType.IronIngot, 1, 4f, "tower-iron-smelter-01", Kind.Smelt, "Ingot"),
         };
         private static int[] MachineIndices => Enumerable.Range(0, Machines.Length).ToArray();
@@ -53,6 +53,7 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(prefab.GetComponentsInChildren<AudioSource>(true).All(a => !a.playOnAwake && a.spatialBlend == 1), Is.True);
             }
             Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/RiverCondenser.prefab"), Is.Null, "Condensers were renamed.");
+            Assert.That(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Processor/SkySpinner.prefab"), Is.Null, "The Sky spinner became the Wind Condenser.");
         }
 
         [Test]
@@ -64,7 +65,7 @@ namespace TowerOfBabel.Resources.Tests
                 new[] { "Workshop_Brick", "Workshop_Heat" },         // brick hearth with glowing vents, cooling rack
                 new[] { "Workshop_RiverStone", "Workshop_RiverGlass" }, // riverbed and flume
                 new[] { "Workshop_WaterGlass", "Workshop_ClearGlass" }, // hydraulic platform with a glass catch basin
-                new[] { "Workshop_Cloud", "Workshop_SkyGlass" },     // cloud cushion with a hovering plate
+                new[] { "Workshop_Meadow", "Workshop_LeafGlow" },     // Bliss-style meadow hill with green status lights
                 new[] { "Workshop_IronOre", "Workshop_Molten" },     // cast-iron plinth with a glowing runner and casting mould
             };
             var sets = MachineIndices.Select(i =>
@@ -174,9 +175,11 @@ namespace TowerOfBabel.Resources.Tests
                     Assert.That(Part(root, "WaterColumn").gameObject.activeSelf, Is.True);
                     break;
                 case Kind.Spin:
-                    Assert.That(Turned("Rotor"), Is.GreaterThan(5), "The rotor spins.");
-                    Assert.That(Vector3.Angle(Part(root, "Rotor").TransformDirection(Part(Prefab(4), "Rotor").InverseTransformDirection(Vector3.up)), Vector3.up), Is.LessThan(1), "It spins about the vertical axis.");
-                    Assert.That(Part(root, "CloudMass").gameObject.activeSelf, Is.True, "Cloud gathers on the spindle.");
+                    Assert.That(Turned("Rotor"), Is.GreaterThan(5), "The turbine rotor spins.");
+                    Vector3 front = root.transform.forward, restFront = Prefab(4).transform.forward;
+                    Assert.That(Vector3.Angle(Part(root, "Rotor").TransformDirection(Part(Prefab(4), "Rotor").InverseTransformDirection(restFront)), front), Is.LessThan(1),
+                        "It turns about the front axis, facing the player.");
+                    Assert.That(Part(root, "CloudMass").gameObject.activeSelf, Is.True, "Cloud fills the orb.");
                     break;
                 case Kind.Smelt:
                     Assert.That(Turned("Fan"), Is.GreaterThan(5), "The cooling fan turns.");
@@ -204,7 +207,7 @@ namespace TowerOfBabel.Resources.Tests
                     Assert.That(instance[0].GetComponent<ProcessorMachineAnimation>(), Is.Not.Null);
                     Assert.That(instance[0].transform.position.y, Is.LessThan(.4f), m.Name + " stands on the ground.");
                 }
-                foreach (string old in new[] { "RiverCondenser", "WaterCondenser", "SkyCondenser" })
+                foreach (string old in new[] { "RiverCondenser", "WaterCondenser", "SkyCondenser", "SkySpinner" })
                     Assert.That(all.Any(g => g.name == old), Is.False, old + " was renamed.");
                 foreach (string node in new[] { "RiverEssence", "WaterEssence", "SkyEssence" })
                     Assert.That(all.Single(g => g.name == node && g.GetComponent<Resource>() != null).transform.position.y, Is.LessThan(.4f));

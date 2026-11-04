@@ -16,8 +16,9 @@ public static class ResourceStationKit
     public const float RowZ = -101.5f;
     public static readonly string[] WorkshopMaterials =
         { "Pearl", "Azure", "Steel", "Glass", "Heat", "Sand", "Chip", "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
-          "IronOre", "Rust", "Ingot", "Molten" };
-    private static readonly string[] OwnMaterials = { "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick" };
+          "IronOre", "Rust", "Ingot", "Molten", "GrassBlade", "LeafGlow", "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem" };
+    private static readonly string[] OwnMaterials = { "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
+        "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem" };
 
     public static void RequireCleanTowerScene()
     {
@@ -93,8 +94,13 @@ public static class ResourceStationKit
         return hits.Any() ? hits.First().point.y + .02f : .03f;
     }
 
+    /// <summary>
+    /// The scene instance of a station: a root object, or a prefab instance root inside a hierarchy group (the Tower
+    /// scene keeps them under "Resources" and "Processors"). Searching roots only used to add a duplicate per run.
+    /// </summary>
     public static Transform SceneRoot(string name) => UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None)
-        .FirstOrDefault(t => t.parent == null && t.name == name);
+        .Where(t => t.name == name && (t.parent == null || PrefabUtility.IsAnyPrefabInstanceRoot(t.gameObject)))
+        .OrderBy(t => t.parent == null ? 1 : 0).FirstOrDefault();
 
     /// <summary>Adds a missing scene instance, or regrounds an existing one, keeping its x and z.</summary>
     public static void PlaceOrGround(string prefabPath, string name, float x, float z = RowZ)
@@ -126,23 +132,28 @@ public static class ResourceStationKit
         {
             string path = Models + "Materials/Workshop_" + name + ".mat"; var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
             if (mat == null) { mat = new Material(Shader.Find("Universal Render Pipeline/Lit")); AssetDatabase.CreateAsset(mat, path); }
-            bool glass = name.EndsWith("Glass"), glow = name.EndsWith("Glow") || name == "WaterFoam";
+            // Frosted turbine blades and wind ribbons are see-through like glass; ribbons and pollen also glow softly.
+            bool glass = name.EndsWith("Glass") || name == "FrostBlade" || name == "WindRibbon";
+            bool glow = name.EndsWith("Glow") || name == "WaterFoam" || name == "WindRibbon" || name == "Pollen";
             Color color = name switch
             {
                 "RiverGlass" => new Color(.16f, .82f, .7f, .58f), "RiverGlow" => new Color(.4f, 1, .8f),
                 "WaterGlass" => new Color(.12f, .45f, .95f, .66f), "ClearGlass" => new Color(.9f, .97f, 1, .16f), "Brick" => new Color(.78f, .45f, .32f), "WaterFoam" => new Color(.9f, .97f, 1),
                 "SkyGlass" => new Color(.55f, .78f, 1, .56f), "SkyGlow" => new Color(.78f, .82f, 1),
                 "RiverStone" => new Color(.6f, .66f, .7f), "Moss" => new Color(.36f, .6f, .46f),
+                "Meadow" => new Color(.22f, .64f, .15f), "FrostBlade" => new Color(.86f, .95f, 1, .5f), "WindRibbon" => new Color(.85f, .95f, 1, .38f),
+                "Daisy" => new Color(1, 1, 1), "Pollen" => new Color(1, .8f, .18f), "Leaf" => new Color(.16f, .58f, .13f), "Stem" => new Color(.42f, .7f, .25f),
                 _ => new Color(.97f, .98f, 1)
             };
             mat.SetColor("_BaseColor", color);
-            mat.SetFloat("_Smoothness", glass ? .96f : glow ? .8f : name == "RiverStone" ? .55f : name == "Moss" || name == "Brick" ? .25f : .4f);
+            mat.SetFloat("_Smoothness", name == "FrostBlade" ? .88f : glass ? .96f : glow ? .8f : name == "RiverStone" ? .55f : name == "Moss" || name == "Brick" ? .25f
+                : name == "Meadow" ? .72f : name == "Leaf" ? .62f : .4f);
             mat.SetFloat("_Metallic", glass ? .12f : 0);
             mat.enableInstancing = true;
             if (glow)
             {
                 mat.EnableKeyword("_EMISSION"); mat.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
-                mat.SetColor("_EmissionColor", name == "WaterFoam" ? new Color(.12f, .16f, .2f) : color * .9f);
+                mat.SetColor("_EmissionColor", name == "WaterFoam" ? new Color(.12f, .16f, .2f) : name == "WindRibbon" ? color * .45f : name == "Pollen" ? color * .4f : color * .9f);
             }
             if (glass)
             {
@@ -162,7 +173,7 @@ public static class ResourceStationKit
         Directory.CreateDirectory(Effects);
         int rate = 22050;
         float duration = name switch { "CondenserHum" => 1, "BlockChime" => .9f, "EssenceBurst" => .6f, "SkyStroke" => .35f, "RiverStroke" => .3f,
-            "GrassStroke" => .28f, "GrassBurst" => .5f, "IronClang" => .7f, _ => .2f };
+            "GrassStroke" => .28f, "GrassBurst" => .5f, "IronClang" => .7f, "SkyChime" => 1.1f, _ => .2f };
         int length = Mathf.RoundToInt(rate * duration); var random = new System.Random(311 + name.Length * 7); float low = 0, band = 0;
         using (var file = new BinaryWriter(File.Create(path)))
         {
@@ -185,6 +196,15 @@ public static class ResourceStationKit
                     // A struck iron bar: inharmonic partials that ring out, with a short noisy hit.
                     case "IronClang": value = ((Mathf.Sin(tau * 523 * t) + .6f * Mathf.Sin(tau * 1387 * t) + .35f * Mathf.Sin(tau * 2291 * t)) * Mathf.Exp(-t * 7) * .22f
                         + band * Mathf.Exp(-t * 60) * .6f); break;
+                    // The reward note: a bright rising arpeggio (G, B, E) over a soft airy breath.
+                    case "SkyChime":
+                        value = band * Mathf.Exp(-t * 5) * .18f;
+                        for (int k = 0; k < 3; k++)
+                        {
+                            float start = k * .085f, f = new[] { 784f, 988f, 1319f }[k];
+                            if (t >= start) value += (Mathf.Sin(tau * f * (t - start)) + .3f * Mathf.Sin(tau * f * 2 * (t - start))) * Mathf.Exp(-(t - start) * 4.2f) * .16f;
+                        }
+                        break;
                     case "EssenceBurst": value = (low * .6f * Mathf.Exp(-t * 7) + (Mathf.Sin(tau * 990 * t) + .4f * Mathf.Sin(tau * 1485 * t)) * Mathf.Exp(-t * 6) * .18f) * .8f; break;
                     // Whole-hertz partials repeat exactly every second, so the one-second hum loops without a click.
                     case "CondenserHum": value = (Mathf.Sin(tau * 90 * t) * .16f + Mathf.Sin(tau * 180 * t) * .07f + Mathf.Sin(tau * 541 * t) * .02f) * (.85f + .15f * Mathf.Sin(tau * 3 * t)); break;

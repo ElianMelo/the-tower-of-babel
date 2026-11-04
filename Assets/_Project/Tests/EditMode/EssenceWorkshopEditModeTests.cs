@@ -18,7 +18,7 @@ namespace TowerOfBabel.Resources.Tests
         {
             (ResourceType.RiverEssence, ResourceType.RiverBlock, "RiverEssence", "RiverEssence", "PoolBed"),
             (ResourceType.WaterEssence, ResourceType.WaterBlock, "WaterEssence", "WaterEssence", "MossBed"),
-            (ResourceType.SkyEssence, ResourceType.SkyBlock, "SkyEssence", "SkyEssence", "SkyStones"),
+            (ResourceType.SkyEssence, ResourceType.SkyBlock, "SkyEssence", "SkyEssence", "Rosette"),
         };
         private static int[] FamilyIndices => Enumerable.Range(0, Families.Length).ToArray();
         private static string NodePath(int i) => "Assets/_Project/Prefabs/Resources/" + Families[i].Node + ".prefab";

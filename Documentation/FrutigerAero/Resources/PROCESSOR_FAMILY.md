@@ -15,7 +15,7 @@ Revised on 2026-10-31 after review: the bases no longer look the same. Each one 
 | Glass kiln | A round firebrick hearth (two staggered brick rings) on a steel foot | A steel cooling rack with pearl bars | Three amber vents |
 | River mill | A riverbed: river stones ringing a shallow stream around a pearl island | A pearl flume carrying a glowing stream | Three teal pebble-lights on the island |
 | Water press | A heavy steel footing and azure hydraulic platform, with bolts and a drain grate | A glass catch basin with water; the block settles half into it | Three upright gauge bars |
-| Sky spinner | A pearl disc resting on cloud puffs, with a glowing ring | A glass plate hovering with a glow ring | Three floating glow orbs |
+| Wind Condenser (2026-11-04, replaced the Sky spinner) | A glossy Bliss-style grass hill with daisies and a glass cloud orb | A pearl dish on a stem at the front of the hill | Three green glow lamps on the hill |
 | Iron smelter (2026-11-04) | A cast-iron plinth with azure trim, bolts and a glowing runner | A casting mould on a steel table, under a stamp | Three molten-orange lamps on the deck |
 
 Above the base, each machine has its own silhouette and process:
@@ -26,7 +26,7 @@ Above the base, each machine has its own silhouette and process:
 | Glass kiln (`GlassFurnace`) | 2 sand → 1 glass, 3.5 s | Melt | Sand drops onto the lid of a pearl dome furnace. The bellows breathe, the lid lifts, the amber porthole heats up and fills with molten glass, and the chimney gives off embers and vapour. |
 | River mill (`RiverMill`) | 2 river essence → 1 river block, 3.5 s | Mill | River essence drops into a funnel over a glowing glass sluice. A side water wheel and two gears turn, the wheel splashes, and the glass mould on the front fills with teal. |
 | Water press (`WaterPress`) | 2 water essence → 1 water block, 3.5 s | Press | A tall two-pillar press. Water fills the glass cylinder, then the piston comes down and squeezes it while the pressure gauge climbs. Bubbles rise inside, and steam puffs out on completion. |
-| Sky spinner (`SkySpinner`) | 2 sky essence → 1 sky block, 3.5 s | Spin | A low drum with a glass dome. Cloud essence drops onto the hub, a three-arm rotor with cloud tufts and a top fan spin up, and cloud gathers on the spindle inside the dome while wisps swirl around. |
+| Wind Condenser (`WindCondenser`, formerly `SkySpinner`) | 2 sky essence → 1 sky block, 3.5 s | Spin | A wind turbine on a grass hill over a glass cloud orb. The cloud tuft is swept up into the rotor's wind and drawn down the tower into the orb; the rotor winds up, the orb fills with cloud and its ring charges, and completion pops the orb with a gust ring. It also moves at rest. See [sky workshop](SKY_WORKSHOP.md). |
 | Iron smelter (`IronSmelter`) | 2 iron stone → 1 iron ingot, 4 s | Smelt | An ore chunk is lobbed into the hopper on the dome. The heat coils glow, the side cooling fan spins up, molten iron rises in the sight glass and the temperature dial climbs; then the melt runs down into the mould and the stamp strikes the cast once with a ringing clang. Sparks fly at the sight glass and the chimney smokes. See [iron workshop](IRON_WORKSHOP.md). |
 
 Recipes, durations, prefab asset IDs and scene positions are unchanged. The old `RiverCondenser`, `WaterCondenser` and `SkyCondenser` prefabs were moved to their new names, so their asset IDs carry over. The stone processor was floating at y = 1.5 and now stands on the ground.

@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Resource_IronRock
+    second: {fileID: 2100000, guid: 54c39de9201791f44b48c7e812c19ffd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Resource_Refined
     second: {fileID: 2100000, guid: c8e5a395ca0f35c4aab1e49faa9c4d01, type: 2}
   - first:
@@ -42,13 +47,58 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Workshop_Daisy
+    second: {fileID: 2100000, guid: 7d3c7a3124b05a14797713ffba6c8cbc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_FrostBlade
+    second: {fileID: 2100000, guid: f1257b79fcb93104da80a7d973cbe019, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Workshop_Glass
     second: {fileID: 2100000, guid: b9202c9fd7acf4d43ac22a37c7556b33, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Workshop_GrassBlade
+    second: {fileID: 2100000, guid: 5a009af684cf0f945b03ba5400c84802, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Workshop_Heat
     second: {fileID: 2100000, guid: b705c8e0b4f3d5e4b94bd330b6958a8e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_Ingot
+    second: {fileID: 2100000, guid: 54e0244fa39321641b0a58f19e7fcd29, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_IronOre
+    second: {fileID: 2100000, guid: 98cd7ec6171151c4bba0ce65d2bdab8a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_Leaf
+    second: {fileID: 2100000, guid: 56df5550875247b4d8c1440f223d96fa, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_LeafGlow
+    second: {fileID: 2100000, guid: 9460a7fba2ee244479f0cc22ae96d250, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_Meadow
+    second: {fileID: 2100000, guid: bc8b1c50ecc88ad40ab072d54c9a22a4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_Molten
+    second: {fileID: 2100000, guid: 52e2fba83c3af764bb9bfba916abe43a, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -59,6 +109,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Workshop_Pearl
     second: {fileID: 2100000, guid: 50aab8d489d7fde419135aca58f8e97f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_Pollen
+    second: {fileID: 2100000, guid: a61d84177f8d5104a96063c7c9d441d1, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -74,6 +129,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Workshop_RiverStone
     second: {fileID: 2100000, guid: 01fb2d0ef5954bc4eaf03bac2ebf8134, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_Rust
+    second: {fileID: 2100000, guid: 333a57f09ba5e384f98bb0be0ff905c3, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -102,6 +162,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Workshop_Stem
+    second: {fileID: 2100000, guid: b664819c99e72434996bbc1383ff4b3c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Workshop_WaterFoam
     second: {fileID: 2100000, guid: 33b756d8b28a8184e94e55b52f0720b5, type: 2}
   - first:
@@ -109,6 +174,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Workshop_WaterGlass
     second: {fileID: 2100000, guid: f88f924c384aece4e83f08ebaff20082, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_WindRibbon
+    second: {fileID: 2100000, guid: e4a20358758b2ee41b90dd0c6f89e42a, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0

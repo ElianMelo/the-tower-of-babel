@@ -9916,14 +9916,17 @@ MonoBehaviour:
     axis: {x: 1, y: 0, z: 0}
     speed: 150
     rampWithProgress: 1
+    idleSpeed: 0
   - part: {fileID: 4385990210711666958}
     axis: {x: 1, y: 0, z: 0}
     speed: 120
     rampWithProgress: 1
+    idleSpeed: 0
   - part: {fileID: 2844535971126725528}
     axis: {x: 1, y: 0, z: 0}
     speed: -175
     rampWithProgress: 1
+    idleSpeed: 0
   travels: []
   pulses: []
   fills:

@@ -9,9 +9,10 @@ namespace TowerOfBabel.Resources.Interaction
     /// move; the collider stays fixed. Directions come from this node's transform, not the model's axes.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class EssenceHarvestFeedback : MonoBehaviour, IHarvestFeedback
+    public sealed class EssenceHarvestFeedback : MonoBehaviour, IHarvestFeedback, IAmbientActivity
     {
-        public enum EssenceStyle : byte { RiverSwirl, WaterWobble, SkyDrift }
+        /// <summary>Appended only: the value is serialized in the node prefabs.</summary>
+        public enum EssenceStyle : byte { RiverSwirl, WaterWobble, SkyDrift, SkyBloom }
 
         [SerializeField] private EssenceStyle style;
         [Tooltip("Ground-anchored essence mass (pool water, bubble clump, cloud). Pivot on the ground.")]
@@ -31,11 +32,14 @@ namespace TowerOfBabel.Resources.Interaction
         private Transform[] parts;
         private Vector3[] positions, scales, ups;
         private Quaternion[] rotations;
-        private Vector3 bodyUpMask = Vector3.up;
+        private Vector3 bodyUpMask = Vector3.up, bodySide = Vector3.right;
         private MaterialPropertyBlock block;
         private MaterialPropertyBlock[] originalBlocks;
         private bool initialized, working, depleted;
         private float progress, blend, impact, elapsed, spin, respawnTime;
+        // SkyBloom eases its release and seed puff so the stalks never jerk: progress already rises smoothly,
+        // but a cancelled gather would otherwise snap the stalks upright in one frame.
+        private float easedGather, easedImpact;
         private int stroke;
 
         public EssenceStyle Style => style;
@@ -50,6 +54,9 @@ namespace TowerOfBabel.Resources.Interaction
         public float FloaterLift { get; private set; }
         public Transform Body => body;
         public int FloaterCount => floaters != null ? floaters.Length : 0;
+        public float Activity => blend * Mathf.Lerp(.6f, 1, progress);
+        public float Impulse => impact;
+        public bool Dormant => depleted;
 
         private void Awake() { Initialize(); ResetFeedback(); }
 
@@ -72,6 +79,7 @@ namespace TowerOfBabel.Resources.Interaction
             {
                 Vector3 local = body.InverseTransformDirection(transform.up).normalized;
                 bodyUpMask = new Vector3(Mathf.Abs(local.x), Mathf.Abs(local.y), Mathf.Abs(local.z));
+                bodySide = (body.parent != null ? body.parent.InverseTransformDirection(transform.right) : transform.right).normalized;
             }
             glowRenderers ??= System.Array.Empty<Renderer>();
             block = new MaterialPropertyBlock(); originalBlocks = new MaterialPropertyBlock[glowRenderers.Length];
@@ -120,6 +128,7 @@ namespace TowerOfBabel.Resources.Interaction
         {
             Initialize();
             depleted = false; progress = 0; respawnTime = RespawnDuration;
+            easedGather = easedImpact = 0;
             Emit(motes, 8);
             Sound(respawnClip, .2f, 1.1f);
             ApplyPose();
@@ -130,18 +139,22 @@ namespace TowerOfBabel.Resources.Interaction
             impact = 1;
             Emit(motes, 5);
             Emit(burst, 3);
-            float pitch = style switch { EssenceStyle.WaterWobble => 1.05f, EssenceStyle.SkyDrift => 1.2f, _ => .95f };
+            float pitch = style switch { EssenceStyle.WaterWobble => 1.05f, EssenceStyle.SkyDrift => 1.2f, EssenceStyle.SkyBloom => 1.28f, _ => .95f };
             Sound(strokeClip, .24f, pitch * Mathf.Lerp(.92f, 1.14f, progress));
         }
 
-        private void Update()
+        private void Update() => Tick(Time.deltaTime);
+
+        private void Tick(float dt)
         {
             if (!initialized) return;
-            float dt = Time.deltaTime;
             elapsed += dt;
             blend = Mathf.MoveTowards(blend, working ? 1 : 0, dt / .3f);
             impact = Mathf.MoveTowards(impact, 0, dt * 5);
             spin = Mathf.Repeat(spin + dt * Mathf.Lerp(18, 200, blend), 360);
+            float rawGather = working ? Mathf.SmoothStep(0, 1, progress) : 0;
+            easedGather = Mathf.Max(rawGather, Mathf.Lerp(easedGather, rawGather, 1 - Mathf.Exp(-dt * 4)));
+            easedImpact = Mathf.Lerp(easedImpact, impact, 1 - Mathf.Exp(-dt * 9));
             if (respawnTime > 0) respawnTime = Mathf.Max(0, respawnTime - dt);
             ApplyPose();
         }
@@ -149,7 +162,11 @@ namespace TowerOfBabel.Resources.Interaction
         private void ApplyPose()
         {
             if (!initialized) return;
+            bool bloom = style == EssenceStyle.SkyBloom;
             float gather = working ? Mathf.SmoothStep(0, 1, progress) : 0;
+            // What the dandelions show: the gather, easing back after a cancel.
+            float shown = bloom ? Mathf.Max(gather, easedGather) : gather;
+            float hit = bloom ? easedImpact : impact;
             float regrow = respawnTime > 0 ? 1 - Mathf.Pow(respawnTime / RespawnDuration, 3) : 1;
             float grow = Mathf.Lerp(.08f, 1, regrow);
             // Same proportions as the sand pile: narrower and much lower, anchored on the ground.
@@ -164,6 +181,9 @@ namespace TowerOfBabel.Resources.Interaction
                     case EssenceStyle.WaterWobble:
                         float wobble = Mathf.Sin(elapsed * (4.5f + blend * 6)) * (.035f + blend * .05f + impact * .07f);
                         width *= 1 + wobble; height *= 1 - wobble * 1.6f; break;
+                    case EssenceStyle.SkyBloom:
+                        // Seed heads puff up a touch with each pull, as if the wind fills them.
+                        width *= 1 + hit * .04f; break;
                     case EssenceStyle.SkyDrift:
                         float breathe = Mathf.Sin(elapsed * 1.2f) * .03f + blend * Mathf.Sin(elapsed * 5) * .03f;
                         width *= 1 + breathe; height *= 1 + breathe * .6f; break;
@@ -171,8 +191,17 @@ namespace TowerOfBabel.Resources.Interaction
                         height *= 1 + Mathf.Sin(elapsed * 3.1f) * .04f * (1 + blend * 2); break;
                 }
                 body.localScale = Vector3.Scale(scales[0], Vector3.one * width + bodyUpMask * (height - width));
+                // Dandelions are not squashed: the stalks shrink back whole and lean downwind as their seeds blow away.
+                if (bloom) body.localScale = scales[0] * (Mathf.Lerp(1, .5f, shown) * grow * (1 + hit * .03f));
                 float turn = style == EssenceStyle.SkyDrift ? Mathf.Sin(elapsed * .4f) * 6 : 0;
                 body.localRotation = Quaternion.AngleAxis(turn, ups[0]) * rotations[0];
+                if (bloom)
+                {
+                    // Stalks nod slowly in the breeze and bow downwind as they are gathered; each pull is a gust, not a shake.
+                    float nod = Mathf.Sin(elapsed * 1.1f) * 2.2f + Mathf.Sin(elapsed * .43f + 1) * 1.6f;
+                    float bow = blend * 3 + shown * 21 + hit * 2.5f;
+                    body.localRotation = Quaternion.AngleAxis(nod + bow, bodySide) * rotations[0];
+                }
             }
             if (spinner != null)
             {
@@ -188,11 +217,11 @@ namespace TowerOfBabel.Resources.Interaction
                 float bob = Mathf.Sin(elapsed * (1.4f + i * .31f) + i * 1.9f) * .04f;
                 float sway = Mathf.Sin(elapsed * (.9f + i * .23f) + i) * .05f * (1 + blend);
                 Vector3 side = Vector3.Cross(ups[p], positions[p]).normalized;
-                float lift = FloaterLift * (1 + i * .15f);
-                floater.localPosition = positions[p] + ups[p] * (bob + lift) + side * sway - positions[p] * (gather * .35f);
-                floater.localScale = scales[p] * grow * Mathf.Lerp(1, .25f, gather);
+                float lift = shown * .55f * (1 + i * .15f);
+                floater.localPosition = positions[p] + ups[p] * (bob + lift) + side * sway - positions[p] * (shown * .35f);
+                floater.localScale = scales[p] * grow * Mathf.Lerp(1, .25f, shown);
             }
-            float glow = .5f + .2f * Mathf.Sin(elapsed * 2.1f) + blend * (.5f + gather) + impact * .8f;
+            float glow = .5f + .2f * Mathf.Sin(elapsed * 2.1f) + blend * (.5f + gather) + hit * .8f;
             for (int i = 0; i < glowRenderers.Length; i++)
             {
                 var renderer = glowRenderers[i]; if (renderer == null) continue;
@@ -220,6 +249,7 @@ namespace TowerOfBabel.Resources.Interaction
         {
             Initialize();
             working = depleted = false; progress = blend = impact = respawnTime = spin = 0;
+            easedGather = easedImpact = 0;
             for (int i = 0; i < parts.Length; i++)
                 if (parts[i] != null) { parts[i].localPosition = positions[i]; parts[i].localScale = scales[i]; parts[i].localRotation = rotations[i]; }
             for (int i = 0; i < glowRenderers.Length; i++) if (glowRenderers[i] != null) glowRenderers[i].SetPropertyBlock(originalBlocks[i]);
@@ -236,6 +266,9 @@ namespace TowerOfBabel.Resources.Interaction
         }
 
 #if UNITY_EDITOR
+        /// <summary>Edit Mode preview: advance the real runtime update by dt (drive it with BeginWork, SetProgress, Deplete).</summary>
+        public void StepEditor(float dt) { if (Application.isPlaying) return; Initialize(); Tick(dt); }
+
         /// <summary>Edit Mode preview sample on a disposable instance, without Play Mode.</summary>
         public void SampleEditorPose(float seconds, float normalizedProgress, bool gathering = true)
         {
@@ -246,6 +279,7 @@ namespace TowerOfBabel.Resources.Interaction
             stroke = Mathf.FloorToInt(progress * Strokes);
             impact = gathering ? Mathf.Exp(-Mathf.Repeat(progress * Strokes, 1) * 4) : 0;
             spin = Mathf.Repeat(seconds * Mathf.Lerp(18, 200, blend), 360);
+            easedGather = gathering ? Mathf.SmoothStep(0, 1, progress) : 0; easedImpact = impact;
             ApplyPose();
         }
 #endif

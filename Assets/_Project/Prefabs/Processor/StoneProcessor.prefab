@@ -97,10 +97,12 @@ MonoBehaviour:
     axis: {x: 1, y: 0, z: 0}
     speed: 260
     rampWithProgress: 1
+    idleSpeed: 0
   - part: {fileID: 6648983621056692749}
     axis: {x: 1, y: 0, z: 0}
     speed: -260
     rampWithProgress: 1
+    idleSpeed: 0
   travels:
   - part: {fileID: 503693379452541923}
     direction: {x: 0, y: -1, z: 0}

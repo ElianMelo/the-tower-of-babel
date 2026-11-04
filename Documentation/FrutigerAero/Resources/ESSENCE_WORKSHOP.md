@@ -33,7 +33,7 @@ On 2026-10-31 the essences were reworked to follow the stone cluster and sand mo
 | --- | --- | --- | --- |
 | River Essence (`RiverPool.fbx`) | A teal spring pool with a glowing spiral current and three drifting wisps | A ring of smooth river pebbles around a pebble bed | `RiverEssence-Icon.png` |
 | Water Essence (`WaterBubbles.fbx`) | A wobbling clump of clear water bubbles with foam inside, and four loose droplets | A moss patch with small pebbles | `WaterEssence-Icon.png` |
-| Sky Essence (`SkyCloud.fbx`) | A fallen cloud mound with four drifting cloud tufts | Glowing sky crystal shards and white pebbles | `SkyEssence-Icon.png` |
+| Sky Essence (`SkyDandelions.fbx`, from 2026-11-04; formerly `SkyCloud.fbx`) | Three cloud dandelion clocks on stalks, with loose cloud seeds drifting | A glossy leaf rosette with a bud, a yellow bloom, pebbles and grass (see [sky workshop](SKY_WORKSHOP.md)) | `SkyEssence-Icon.png` |
 
 The processed blocks keep their models:
 - `RiverBlock.fbx`: rounded teal glass with wave ribbons.

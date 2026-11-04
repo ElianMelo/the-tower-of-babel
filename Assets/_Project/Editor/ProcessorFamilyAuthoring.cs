@@ -40,8 +40,9 @@ public static class ProcessorFamilyAuthoring
             ProcessorId = "tower-river-mill-01", Output = "RiverBlock", X = 8.4f, Process = Kind.Mill, Glow = new Color(.3f, 1, .75f), Formerly = "RiverCondenser" },
         new() { Name = "WaterPress", Source = "WaterEssence", Target = "WaterBlock", SourceAmount = 2, TargetAmount = 1, Duration = 3.5f,
             ProcessorId = "tower-water-press-01", Output = "WaterBlock", X = 15, Process = Kind.Press, Glow = new Color(.45f, .75f, 1), Formerly = "WaterCondenser" },
-        new() { Name = "SkySpinner", Source = "SkyEssence", Target = "SkyBlock", SourceAmount = 2, TargetAmount = 1, Duration = 3.5f,
-            ProcessorId = "tower-sky-spinner-01", Output = "SkyBlock", X = 21.6f, Process = Kind.Spin, Glow = new Color(.75f, .78f, 1), Formerly = "SkyCondenser" },
+        // The Wind Condenser replaced the Sky spinner on 2026-11-04 (prefab moved, so its GUID and processor ID carry over).
+        new() { Name = "WindCondenser", Source = "SkyEssence", Target = "SkyBlock", SourceAmount = 2, TargetAmount = 1, Duration = 3.5f,
+            ProcessorId = "tower-sky-spinner-01", Output = "SkyBlock", X = 21.6f, Process = Kind.Spin, Glow = new Color(.5f, 1, .4f), Formerly = "SkySpinner" },
         // Built after IronWorkshopAuthoring has created the iron definitions and materials.
         new() { Name = "IronSmelter", Source = "IronStone", Target = "IronIngot", SourceAmount = 2, TargetAmount = 1, Duration = 4,
             ProcessorId = "tower-iron-smelter-01", Output = "IronIngot", X = 35.2f, Process = Kind.Smelt, Glow = new Color(1, .55f, .15f) },
@@ -56,7 +57,7 @@ public static class ProcessorFamilyAuthoring
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         CreateMaterials();
         foreach (string model in Machines.SelectMany(m => new[] { m.Name, m.Output }).Distinct().Append("EssenceMote")) ImportModel(model);
-        foreach (string sound in new[] { "CondenserHum", "BlockChime", "IronClang" }) MakeSound(sound);
+        foreach (string sound in new[] { "CondenserHum", "BlockChime", "IronClang", "SkyChime" }) MakeSound(sound);
         foreach (var spec in Machines)
         {
             if (spec.Formerly != null)
@@ -116,7 +117,7 @@ public static class ProcessorFamilyAuthoring
                 case Kind.Melt: Kiln(root, model, anim, hum); break;
                 case Kind.Mill: Mill(root, model, anim); break;
                 case Kind.Press: Press(root, model, anim, glints); break;
-                case Kind.Spin: Spinner(root, model, anim); break;
+                case Kind.Spin: WindCondenser(root, model, anim, glints); break;
                 case Kind.Smelt: Smelter(root, model, anim, hum); break;
             }
             anim.ApplyModifiedPropertiesWithoutUndo();
@@ -206,16 +207,87 @@ public static class ProcessorFamilyAuthoring
         Refs(anim, "completionEffects", new UnityEngine.Object[] { glints, steam });
     }
 
-    private static void Spinner(GameObject root, GameObject model, SerializedObject anim)
+    /// <summary>
+    /// Wind Condenser (sky essence): a turbine on a Bliss-style hill over a glass cloud orb. At rest the rotor turns in
+    /// the breeze, a ring of cloud orbits the tower, wind ribbons spiral up it and daisies nod (AmbientMotion). Working,
+    /// a cloud tuft is swept up into the rotor's wind and drawn down the tower into the orb, the rotor winds up, the orb
+    /// fills with cloud and its glow ring charges. Completion whirls the rotor, pops the orb and sends a gust ring out
+    /// over the grass.
+    /// </summary>
+    private static void WindCondenser(GameObject root, GameObject model, SerializedObject anim, ParticleSystem glints)
     {
-        Spin(anim, Find(model, "Rotor"), Vector3.up, 300);
-        Spin(anim, Find(model, "Fan"), Vector3.up, 720);
-        FillLevel(anim, Find(model, "CloudMass"), Vector3.up, new Vector2(.15f, .9f));
-        // A cloud drifts in from the side onto the hub and is spun out across the rotor.
-        Feed(anim, model, new Vector3(-1.2f, -.5f, -1f), Vector3.zero, .5f, new Vector2(.3f, .65f), Vector3.zero, .25f);
-        var wisps = Particles(root.transform, "Rotor wisps", new Vector3(0, 1.5f, 0), AssetDatabase.LoadAssetAtPath<Material>(Models + "Materials/Workshop_Dust.mat"), null,
-            new Color(.97f, .98f, 1, .55f), .1f, .25f, -.03f, .9f, .5f, 10, .75f);
-        Refs(anim, "workEffects", new UnityEngine.Object[] { wisps });
+        Spin(anim, Find(model, "Rotor"), Vector3.forward, 320);
+        anim.FindProperty("spins").GetArrayElementAtIndex(0).FindPropertyRelative("idleSpeed").floatValue = 30;
+        FillLevel(anim, Find(model, "CloudMass"), Vector3.up, new Vector2(.32f, .92f));
+        // Swept up from in front of the player into the wind at the hub, then drawn down the tower into the orb.
+        Feed(anim, model, new Vector3(0, -1.5f, -1.05f), Vector3.zero, .7f, new Vector2(.3f, .7f), new Vector3(0, -1.22f, .29f), .06f);
+        Refs(anim, "heatSurfaces", new UnityEngine.Object[] { Find(model, "OrbGlow").GetComponent<Renderer>() });
+        anim.FindProperty("heatColor").colorValue = new Color(.45f, .85f, 1);
+        anim.FindProperty("completionClip").objectReferenceValue = Clip("SkyChime");
+        var dust = AssetDatabase.LoadAssetAtPath<Material>(Models + "Materials/Workshop_Dust.mat");
+        var mote = Mesh("EssenceMote");
+        var hub = Find(model, "Rotor").position - root.transform.position;
+        var orb = Find(model, "Orb").position - root.transform.position;
+
+        // Work: cloud is sucked in around the rotor and motes swirl inside the orb.
+        var intake = Particles(root.transform, "Cloud intake", hub, dust, null, new Color(.97f, .99f, 1, .6f), .1f, .22f, 0, .9f, .05f, 16, .85f);
+        var v = intake.velocityOverLifetime; v.enabled = true; v.space = ParticleSystemSimulationSpace.Local; v.radial = -1.1f;
+        var swirl = Particles(root.transform, "Orb swirl", orb, Mat("SkyGlow"), mote, new Color(.75f, .9f, 1), .015f, .035f, 0, .8f, .05f, 12, .3f);
+        var o = swirl.velocityOverLifetime; o.enabled = true; o.space = ParticleSystemSimulationSpace.Local; o.orbitalZ = 3.2f; o.radial = -.15f;
+        // The essence leaves a cloud trail on its way in, so the player can follow it into the machine.
+        var trail = Particles(Find(model, "Feed"), "Feed trail", Vector3.zero, dust, null, new Color(1, 1, 1, .6f), .05f, .12f, 0, .55f, .05f, 30, .08f);
+        Refs(anim, "workEffects", new UnityEngine.Object[] { intake, swirl, trail });
+
+        // Completion: a puff of cloud from the orb and a gust ring rolling out over the grass, with the output glints.
+        var puff = Particles(root.transform, "Cloud burst", orb, dust, null, new Color(1, 1, 1, .75f), .14f, .3f, -.04f, 1, 1.1f, 0, .35f);
+        var ring = Particles(root.transform, "Gust ring", new Vector3(0, .38f, 0), dust, null, new Color(.95f, .99f, 1, .7f), .1f, .18f, 0, .65f, 2.4f);
+        var circle = ring.shape; circle.shapeType = ParticleSystemShapeType.Circle; circle.radius = .35f; circle.radiusThickness = 0;
+        Refs(anim, "completionEffects", new UnityEngine.Object[] { glints, puff, ring });
+
+        // Ambient: motes and pollen drift at rest and thicken while it works; wind streaks blow through the rotor.
+        var motes = Particles(root.transform, "Sky motes", orb + Vector3.up * .2f, Mat("SkyGlow"), mote, new Color(.8f, .92f, 1), .014f, .03f, -.02f, 2.2f, .08f, 3, 1);
+        var pollen = Particles(root.transform, "Pollen drift", new Vector3(0, .34f, 0), Mat("Pollen"), mote, new Color(1, .85f, .3f), .01f, .02f, -.03f, 2.6f, .05f, 2, .8f);
+        var streaks = Particles(root.transform, "Wind streaks", hub + new Vector3(0, -.1f, -1.1f), dust, null, new Color(.95f, .98f, 1, .32f), .03f, .06f, 0, .8f, 2.2f, 1);
+        streaks.transform.localRotation = Quaternion.identity;          // the cone points along +Z: front to back, through the rotor
+        var cone = streaks.shape; cone.angle = 8; cone.radius = .55f;
+        var stretch = streaks.GetComponent<ParticleSystemRenderer>(); stretch.renderMode = ParticleSystemRenderMode.Stretch; stretch.lengthScale = 5; stretch.velocityScale = .05f;
+
+        var ambient = new SerializedObject(root.AddComponent<AmbientMotion>());
+        AmbientChannel(ambient, Find(model, "CloudRing"), AmbientMotion.Kind.Spin, Vector3.up, 8, 42, 0, 0, .4f);
+        AmbientChannel(ambient, Find(model, "WindSpiral_0"), AmbientMotion.Kind.Spin, Vector3.up, 18, 95, 0, 0, .5f);
+        AmbientChannel(ambient, Find(model, "WindSpiral_1"), AmbientMotion.Kind.Spin, Vector3.up, -15, -80, 0, 0, .5f);
+        AmbientChannel(ambient, Find(model, "WindSpiral_0"), AmbientMotion.Kind.Breathe, Vector3.up, .02f, .035f, 1.1f, 0, .3f);
+        AmbientChannel(ambient, Find(model, "WindSpiral_1"), AmbientMotion.Kind.Breathe, Vector3.up, .02f, .035f, .9f, 1.4f, .3f);
+        AmbientChannel(ambient, Find(model, "OrbCloud"), AmbientMotion.Kind.Spin, Vector3.up, 6, 32, 0, 0, .2f);
+        AmbientChannel(ambient, Find(model, "OrbCloud"), AmbientMotion.Kind.Bob, Vector3.up, .01f, .018f, .8f, 0, 0);
+        AmbientChannel(ambient, Find(model, "Orb"), AmbientMotion.Kind.Punch, Vector3.up, .04f, .08f, 0, 0, 0);
+        for (int i = 0; TryFind(model, "Daisy_" + i) != null; i++)
+        {
+            float a = i * 2.39f;
+            AmbientChannel(ambient, Find(model, "Daisy_" + i), AmbientMotion.Kind.Sway, new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a)), 3, 5, .9f + i * .09f, i, .7f);
+        }
+        AmbientEffects(ambient, (motes, 3, 12), (pollen, 2, 5), (streaks, .8f, 10));
+        ambient.FindProperty("visibility").objectReferenceValue = Find(model, "MachineBody").GetComponent<Renderer>();
+        ambient.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    internal static void AmbientChannel(SerializedObject so, Transform part, AmbientMotion.Kind kind, Vector3 axis, float idle, float work, float rate, float phase, float gust)
+    {
+        var e = Append(so, "channels");
+        e.FindPropertyRelative("part").objectReferenceValue = part; e.FindPropertyRelative("kind").enumValueIndex = (int)kind;
+        e.FindPropertyRelative("axis").vector3Value = axis; e.FindPropertyRelative("idle").floatValue = idle; e.FindPropertyRelative("work").floatValue = work;
+        e.FindPropertyRelative("rate").floatValue = rate; e.FindPropertyRelative("phase").floatValue = phase; e.FindPropertyRelative("gust").floatValue = gust;
+    }
+
+    internal static void AmbientEffects(SerializedObject so, params (ParticleSystem Effect, float Idle, float Work)[] effects)
+    {
+        foreach (var (effect, idle, work) in effects)
+        {
+            var e = Append(so, "ambients");
+            e.FindPropertyRelative("effect").objectReferenceValue = effect;
+            e.FindPropertyRelative("idleRate").floatValue = idle; e.FindPropertyRelative("workRate").floatValue = work;
+            var emission = effect.emission; emission.rateOverTime = 0;      // AmbientMotion sets the rate at run time
+        }
     }
 
     private static void Smelter(GameObject root, GameObject model, SerializedObject anim, AudioSource loop)
