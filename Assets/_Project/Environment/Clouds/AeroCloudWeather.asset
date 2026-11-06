@@ -1,0 +1,92 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 443374caccc3a6b4ba841fe1c1d5312a, type: 3}
+  m_Name: AeroCloudWeather
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroCloudWeatherLibrary
+  clearDay:
+  - preset: {fileID: 11400000, guid: 52bcfc56e30b1b441b9018752f84c7c4, type: 2}
+    weight: 1.6
+  - preset: {fileID: 11400000, guid: eb1d04b720e5bb04e902e6b627c5e427, type: 2}
+    weight: 1.2
+  - preset: {fileID: 11400000, guid: af5897af267b3eb47b1181645d34bf5b, type: 2}
+    weight: 0.7
+  - preset: {fileID: 11400000, guid: c4a8c23d6162d474984b7c4973644d1f, type: 2}
+    weight: 0.8
+  - preset: {fileID: 11400000, guid: aea6d96b0e3babc47aba2ad71233c59e, type: 2}
+    weight: 0.7
+  - preset: {fileID: 11400000, guid: af9120a81b53f9140be7626a556c6355, type: 2}
+    weight: 1.4
+  - preset: {fileID: 11400000, guid: 2da5df34fcdb41149a3c113736fbbf3c, type: 2}
+    weight: 0.5
+  - preset: {fileID: 11400000, guid: 56ded9994596e1448af6dd5f089871ce, type: 2}
+    weight: 0.9
+  - preset: {fileID: 11400000, guid: 417c38619c2a12b408f1385bff3e34fd, type: 2}
+    weight: 0.8
+  - preset: {fileID: 11400000, guid: 61e7db4898c4c9346b3880731ab057a5, type: 2}
+    weight: 0.8
+  randomizeClearDays: 1
+  amountTiers:
+  - {fileID: 11400000, guid: 5824023909fad40489038496dfc407c2, type: 2}
+  - {fileID: 11400000, guid: 06e6a4bb297039b4c93ff190dbc97cd0, type: 2}
+  - {fileID: 11400000, guid: 556a5d42c5abf0d4583041f41a4a42b4, type: 2}
+  densityTiers:
+  - {fileID: 11400000, guid: 35e07f918e1a7df4c96961c3f65b17d4, type: 2}
+  - {fileID: 11400000, guid: e4919cf6459bd6d489bd6a5a946bb24d, type: 2}
+  - {fileID: 11400000, guid: 72e0c145223f0234392311ca152d41d8, type: 2}
+  rerollSeconds: {x: 240, y: 480}
+  rerollAtDawn: 1
+  transitionSeconds: 90
+  rain:
+  - preset: {fileID: 11400000, guid: d4b3b6887ad0f1f49987dc5e1153a867, type: 2}
+    weight: 3
+  - preset: {fileID: 11400000, guid: 26d34df3f2a2b1741b987d35c0197d32, type: 2}
+    weight: 1.5
+  - preset: {fileID: 11400000, guid: d553d859edc18f04ebe4c05ff2e7da7d, type: 2}
+    weight: 1.5
+  - preset: {fileID: 11400000, guid: 7091110b67d509e46a65774920c69ace, type: 2}
+    weight: 1
+  rainBlend:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 2.2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.45
+      value: 0.85
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  moonLightBoost: 2.2
+  nightAmbientBoost: 1.6
+  planetRadiusKm: 1200

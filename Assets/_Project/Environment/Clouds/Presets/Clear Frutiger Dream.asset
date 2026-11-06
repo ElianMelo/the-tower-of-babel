@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b73d23ea0c553eb458021e0ef25409cc, type: 3}
+  m_Name: Clear Frutiger Dream
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroCloudPreset
+  weather: 0
+  notes: Glossy, airy Aero clouds with saturated blue shadows.
+  look:
+    coverage: 0.35
+    density: 0.75
+    cloudSize: 0.9
+    cloudType: 0.52
+    erosion: 0.3
+    edgeSoftness: 0.4
+    baseAltitude: 150
+    thickness: 450
+    heightVariation: 220
+    windDirection: 60
+    windSpeed: 8
+    evolution: 1.5
+    shear: 150
+    sunLight: 1.15
+    ambientLight: 1.25
+    litTint: {r: 1, g: 0.98, b: 0.95, a: 1}
+    shadowTint: {r: 0.72, g: 0.86, b: 1, a: 1}
+    darkness: 0
+    powder: 0.3
+    silverLining: 0.75
+    multiScatter: 0.5
+    hazeDistance: 14000
+    hazeStrength: 0.35
+    fadeDistance: 32000
+    sunOcclusion: 0.08

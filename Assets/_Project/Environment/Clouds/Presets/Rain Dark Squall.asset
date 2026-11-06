@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b73d23ea0c553eb458021e0ef25409cc, type: 3}
+  m_Name: Rain Dark Squall
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroCloudPreset
+  weather: 3
+  notes: Fast, ragged, dark squall line.
+  look:
+    coverage: 0.92
+    density: 2.9
+    cloudSize: 1.1
+    cloudType: 0.6
+    erosion: 0.5
+    edgeSoftness: 0.3
+    baseAltitude: 105
+    thickness: 1100
+    heightVariation: 120
+    windDirection: 60
+    windSpeed: 22
+    evolution: 5
+    shear: 500
+    sunLight: 0.5
+    ambientLight: 0.5
+    litTint: {r: 0.8, g: 0.82, b: 0.86, a: 1}
+    shadowTint: {r: 0.38, g: 0.42, b: 0.5, a: 1}
+    darkness: 0.95
+    powder: 0.75
+    silverLining: 0.3
+    multiScatter: 0.3
+    hazeDistance: 8000
+    hazeStrength: 0.85
+    fadeDistance: 20000
+    sunOcclusion: 0.4

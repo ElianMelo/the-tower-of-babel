@@ -27,7 +27,7 @@ The controller sits on *Aero island atmosphere* in `Scenes/Tower.unity`, next to
 - **Splashes.** About 45% of drop hits spawn a short, fading splash.
 - **Day and night.** Drops are grey-blue by day (so they read against a bright sky) and dim blue at night, using the cycle's daylight.
 - **Sprite crop.** The package's drop fills only the middle 12% of its texture, so `AeroRainDrop.mat` crops to that column (`_BaseMap` scale 0.14 × 0.95, offset 0.43 × 0.03). Without the crop, each drop renders as a hair-thin sliver.
-- **Overcast.** While it rains, the sun drops to 45%, the sky, ambient and skybox exposure dim to 78% and turn slightly grey, and fog is 2.2× denser. With no rain the cycle is unchanged.
+- **Overcast.** While it rains, the sun drops to 45%, the sky, ambient and skybox exposure dim to 78% and turn slightly grey, and fog is 2.2× denser. With no rain the cycle is unchanged. The [volumetric clouds](VOLUMETRIC_CLOUDS.md) blend to a dark rain preset on the same rain ramp.
 - **Audio.** The rain loop plays at 0.8 outside and 0.3 under cover; an upward raycast checks for cover four times a second.
 
 Tuning lives in `Environment/Lighting/AeroRain.asset` (`AeroRainProfile`), with the materials `AeroRainDrop.mat` and `AeroRainSplash.mat` (URP *Particles/Unlit*, alpha blended, soft particles). `Editor/AeroRainAuthoring.Apply()` (menu **Tools ▸ Tower of Babel ▸ Author Rain and Weather**) recreates the profile, materials and scene wiring.

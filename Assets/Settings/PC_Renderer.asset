@@ -103,7 +103,8 @@ MonoBehaviour:
   - {fileID: -2124080719806019376}
   - {fileID: -3769485875767993071}
   - {fileID: 5114573714426461207}
-  m_RendererFeatureMap: ad6b866f10d7b46c0a00da493b717d0c3835704d339485d2d0c8b4d5d6bf85e2111dff4c9118b0cb177cf0f1b19dfa46
+  - {fileID: 3149411639748435993}
+  m_RendererFeatureMap: ad6b866f10d7b46c0a00da493b717d0c3835704d339485d2d0c8b4d5d6bf85e2111dff4c9118b0cb177cf0f1b19dfa4619a0af3633f5b42b
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -150,6 +151,28 @@ MonoBehaviour:
     mask: {fileID: 4800000, guid: 19ae7b440d27f4f9990007afdc74ddaf, type: 3}
     outline: {fileID: 4800000, guid: fb375234a1509436fa2a7d37f08912f8, type: 3}
     clear: {fileID: 4800000, guid: b854aa374420b4b47992044f7c9a0719, type: 3}
+--- !u!114 &3149411639748435993
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 774365e64e8232644888ad90a7c2fa55, type: 3}
+  m_Name: Aero volumetric clouds
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroVolumetricCloudsRendererFeature
+  m_Active: 1
+  cloudShader: {fileID: 4800000, guid: e2b6514f222620248bde6c3126e71324, type: 3}
+  quality: {fileID: 11400000, guid: 8d5a1cc12c93dad408bc6103757f5ff4, type: 2}
+  shapeNoise: {fileID: 11700000, guid: 144dbb1e7dd8de447aba220c70a45ad4, type: 2}
+  detailNoise: {fileID: 11700000, guid: bfbd2f2deda352d40869e64f71588f90, type: 2}
+  coverageMap: {fileID: 2800000, guid: bedd9df9ec5c1794ebfc980c1b4b6c0f, type: 2}
+  shapeTile: 1200
+  detailTile: 200
+  coverageTile: 7000
+  extinction: 0.009
 --- !u!114 &5114573714426461207
 MonoBehaviour:
   m_ObjectHideFlags: 0

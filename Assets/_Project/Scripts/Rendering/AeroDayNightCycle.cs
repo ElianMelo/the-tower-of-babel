@@ -18,6 +18,8 @@ namespace TowerOfBabel.Rendering
         /// <summary>Rain clouds, 0 clear .. 1 full overcast. Set by AeroRainController.</summary>
         [System.NonSerialized] public float overcast;
         [System.NonSerialized] public float overcastSunScale = .45f, overcastSkyScale = .78f, overcastFogScale = 2.2f;
+        /// <summary>Sunlight blocked by the volumetric clouds, 0..1. Set by AeroVolumetricClouds; dims only the sun.</summary>
+        [System.NonSerialized] public float cloudShade;
         public float CycleSeconds => profile != null ? Mathf.Max(60, profile.cycleSeconds) : 1200;
         public bool Advancing => profile != null && profile.advanceTime && !paused;
         private Material originalSky, ownedSky;
@@ -59,7 +61,7 @@ namespace TowerOfBabel.Rendering
             float elevation = Mathf.Sin((timeOfDay - .25f) * Mathf.PI * 2);
             sun.transform.rotation = Quaternion.Euler(timeOfDay * 360 - 90, profile.sunAzimuth, 0);
             sun.color = Color.Lerp(profile.sunsetSun, profile.daySun, Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.02f, .38f, elevation)));
-            sun.intensity = profile.sunIntensity * day * Mathf.Lerp(1, overcastSunScale, cloud);
+            sun.intensity = profile.sunIntensity * day * Mathf.Lerp(1, overcastSunScale, cloud) * (1 - Mathf.Clamp01(cloudShade));
             sun.enabled = day > .001f;
             var flare = sun.GetComponent<LensFlareComponentSRP>();
             if (flare != null) flare.intensity = profile.sunFlareIntensity * day;
