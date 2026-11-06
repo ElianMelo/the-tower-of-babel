@@ -13,30 +13,31 @@ MonoBehaviour:
   m_Name: Clear Altocumulus Fleece
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroCloudPreset
   weather: 0
-  notes: High, thin sheet of small rounded puffs.
+  notes: 'Altocumulus: a high field of small, rounded cloudlets with shaded undersides,
+    like fleece.'
   look:
-    coverage: 0.5
-    density: 0.5
-    cloudSize: 0.45
-    cloudType: 0.2
-    erosion: 0.7
-    edgeSoftness: 0.3
-    baseAltitude: 450
-    thickness: 250
-    heightVariation: 250
+    coverage: 0.45
+    density: 0.85
+    cloudSize: 0.3
+    cloudType: 0.24
+    erosion: 0.35
+    edgeSoftness: 0.25
+    baseAltitude: 900
+    thickness: 300
+    heightVariation: 40
     windDirection: 60
-    windSpeed: 14
-    evolution: 1.5
-    shear: 150
-    sunLight: 1
-    ambientLight: 1
-    litTint: {r: 1, g: 1, b: 1, a: 1}
-    shadowTint: {r: 0.82, g: 0.88, b: 1, a: 1}
+    windSpeed: 12
+    evolution: 1.2
+    shear: 25
+    sunLight: 1.05
+    ambientLight: 1.15
+    litTint: {r: 1, g: 0.98, b: 0.95, a: 1}
+    shadowTint: {r: 0.72, g: 0.84, b: 1, a: 1}
     darkness: 0
-    powder: 0.5
-    silverLining: 0.65
-    multiScatter: 0.5
-    hazeDistance: 14000
+    powder: 0.4
+    silverLining: 0.7
+    multiScatter: 0.55
+    hazeDistance: 11000
     hazeStrength: 0.55
-    fadeDistance: 32000
-    sunOcclusion: 0.05
+    fadeDistance: 18000
+    sunOcclusion: 0.04

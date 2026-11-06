@@ -22,7 +22,7 @@ public static class AeroCloudReview
     /// <param name="presetNames">Preset asset names, or null for every preset.</param>
     /// <param name="times">Times of day (0 midnight, .5 noon) as columns.</param>
     public static string Capture(string[] presetNames, float[] times, string sheetName, int width = 480, int height = 270,
-        Vector3? position = null, Vector3? euler = null)
+        Vector3? position = null, Vector3? euler = null, int settleFrames = 16)
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Capture in Edit Mode.");
         var clouds = Object.FindFirstObjectByType<AeroVolumetricClouds>();
@@ -42,6 +42,10 @@ public static class AeroCloudReview
         var sheet = new Texture2D(width * times.Length, height * presets.Length, TextureFormat.RGB24, false);
         var frame = new Texture2D(width, height, TextureFormat.RGB24, false);
         var active = RenderTexture.active;
+        // Compile shaders synchronously: with async compilation a capture right after a shader edit still renders
+        // the previous variant (or nothing), so a review would judge stale code.
+        bool asyncCompile = ShaderUtil.allowAsyncCompilation;
+        ShaderUtil.allowAsyncCompilation = false;
         try
         {
             for (int row = 0; row < presets.Length; row++)
@@ -50,7 +54,7 @@ public static class AeroCloudReview
                 clouds.previewPreset = presets[row];
                 cycle.ApplyTime(times[column]);
                 clouds.Tick(0);
-                for (int i = 0; i < 6; i++) camera.Render(); // settle the temporal history
+                for (int i = 0; i < settleFrames; i++) camera.Render(); // settle the temporal history (new jitter each render)
                 RenderTexture.active = target;
                 frame.ReadPixels(new Rect(0, 0, width, height), 0, 0); frame.Apply();
                 sheet.SetPixels(column * width, (presets.Length - 1 - row) * height, width, height, frame.GetPixels());
@@ -66,6 +70,7 @@ public static class AeroCloudReview
         finally
         {
             RenderTexture.active = active;
+            ShaderUtil.allowAsyncCompilation = asyncCompile;
             clouds.previewPreset = oldPreview; cycle.ApplyTime(oldTime); clouds.Tick(0);
             Object.DestroyImmediate(cameraObject); target.Release(); Object.DestroyImmediate(target);
             Object.DestroyImmediate(sheet); Object.DestroyImmediate(frame);

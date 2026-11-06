@@ -32,6 +32,15 @@ namespace TowerOfBabel.Rendering
         [Tooltip("Extinction per metre at density 1.")]
         [Range(.001f, .1f)] public float extinction = .009f;
 
+        [Header("Exposure")]
+        [Tooltip("Scales direct sun/moon light on the clouds. The scattering model is far brighter than the sky, so " +
+                 "at 1 every sunlit cloud clips to one flat white; lower keeps shaded bellies and lit billows apart.")]
+        [Range(.05f, 2)] public float sunExposure = DefaultSunExposure;
+        [Tooltip("Scales sky light (the blue fill in shadowed sides and bases).")]
+        [Range(0, 3)] public float skyExposure = DefaultSkyExposure;
+
+        public const float DefaultSunExposure = .45f, DefaultSkyExposure = 1.1f;
+
         private Material material;
         private CloudPass pass;
         private LateCompositePass latePass;
@@ -40,6 +49,8 @@ namespace TowerOfBabel.Rendering
         public const float HeightNoiseFrequency = 6;
 
         public const int TracePass = 0, TemporalPass = 1, CompositePass = 2;
+        /// <summary>Distinct ray-march jitter patterns before the sequence repeats.</summary>
+        public const int JitterCycle = 64;
         public bool Ready => material != null && shapeNoise != null && detailNoise != null && coverageMap != null && quality != null;
 
         public override void Create()
@@ -79,7 +90,8 @@ namespace TowerOfBabel.Rendering
 
         /// <summary>Shader constants for one camera and look. Public for tests.</summary>
         public static void FillConstants(MaterialPropertyBlock p, AeroVolumetricClouds clouds, AeroCloudQuality quality,
-            float shapeTile, float detailTile, float coverageTile, float extinction)
+            float shapeTile, float detailTile, float coverageTile, float extinction,
+            float sunExposure = DefaultSunExposure, float skyExposure = DefaultSkyExposure)
         {
             var l = clouds.Look;
             float size = Mathf.Max(.25f, l.cloudSize);
@@ -99,7 +111,8 @@ namespace TowerOfBabel.Rendering
             p.SetVector(Ids.AmbientTop, (Vector4)clouds.AmbientTop);
             p.SetVector(Ids.AmbientBottom, (Vector4)clouds.AmbientBottom);
             p.SetVector(Ids.FogColor, (Vector4)clouds.FogColor);
-            p.SetVector(Ids.March, new Vector4(quality.primarySteps, quality.lightSteps, Time.frameCount % 64, quality.maxStep));
+            p.SetVector(Ids.March, new Vector4(quality.primarySteps, quality.lightSteps, Time.frameCount % JitterCycle, quality.maxStep));
+            p.SetVector(Ids.Tone, new Vector4(sunExposure, skyExposure, 0, 0));
         }
 
         private static class Ids
@@ -114,6 +127,7 @@ namespace TowerOfBabel.Rendering
                 Forward = Shader.PropertyToID("_AeroCloudForward"), Texel = Shader.PropertyToID("_AeroCloudTexel"),
                 DepthTexel = Shader.PropertyToID("_AeroCloudDepthTexel"), Temporal = Shader.PropertyToID("_AeroCloudTemporal"),
                 PrevView = Shader.PropertyToID("_AeroCloudPrevView"), Composite = Shader.PropertyToID("_AeroCloudComposite"), Heights = Shader.PropertyToID("_AeroCloudHeights"),
+                Tone = Shader.PropertyToID("_AeroCloudTone"),
                 ShapeNoise = Shader.PropertyToID("_AeroCloudShapeNoise"), DetailNoise = Shader.PropertyToID("_AeroCloudDetailNoise"),
                 Coverage = Shader.PropertyToID("_AeroCloudCoverage"), Depth = Shader.PropertyToID("_AeroCloudDepth"),
                 History = Shader.PropertyToID("_AeroCloudHistory"), BlitTexture = Shader.PropertyToID("_BlitTexture"),
@@ -164,12 +178,27 @@ namespace TowerOfBabel.Rendering
             private readonly ProfilingSampler traceSampler = new("Aero cloud trace"), temporalSampler = new("Aero cloud temporal"),
                 compositeSampler = new("Aero cloud composite"), lateSampler = new("Aero cloud composite over water");
 
+            private readonly Dictionary<Camera, int> jitterFrames = new();
+
             public CloudPass(AeroVolumetricCloudsRendererFeature owner) { this.owner = owner; }
+
+            private int NextJitterFrame(Camera camera)
+            {
+                if (jitterFrames.Count > 16)
+                {
+                    stale.Clear();
+                    foreach (var key in jitterFrames.Keys) if (key == null) stale.Add(key);
+                    foreach (var key in stale) jitterFrames.Remove(key);
+                }
+                jitterFrames.TryGetValue(camera, out int frame);
+                jitterFrames[camera] = (frame + 1) % JitterCycle;
+                return frame;
+            }
 
             public void Dispose()
             {
                 foreach (var h in histories.Values) h.Release();
-                histories.Clear();
+                histories.Clear(); jitterFrames.Clear();
             }
 
             private History HistoryFor(Camera camera, int width, int height)
@@ -207,7 +236,10 @@ namespace TowerOfBabel.Rendering
                 Vector3 position = camera.transform.position;
 
                 var constants = blocks[0];
-                FillConstants(constants, clouds, quality, owner.shapeTile, owner.detailTile, owner.coverageTile, owner.extinction);
+                FillConstants(constants, clouds, quality, owner.shapeTile, owner.detailTile, owner.coverageTile, owner.extinction, owner.sunExposure, owner.skyExposure);
+                // A new jitter pattern every traced frame, per camera: Time.frameCount stands still between several
+                // renders in one frame (editor captures, extra cameras), which froze the step slices into bands.
+                var march = constants.GetVector(Ids.March); march.z = NextJitterFrame(camera); constants.SetVector(Ids.March, march);
                 constants.SetVector(Ids.Camera, new Vector4(position.x, position.y, position.z, Mathf.Max(1, position.y)));
                 constants.SetVector(Ids.Forward, camera.transform.forward);
                 constants.SetVector(Ids.Texel, new Vector4(1f / width, 1f / height, width, height));
@@ -268,7 +300,7 @@ namespace TowerOfBabel.Rendering
             {
                 Ids.Layer, Ids.Shape, Ids.Shape2, Ids.Wind, Ids.WindDir, Ids.Lighting, Ids.Haze, Ids.SunDir, Ids.SunColor,
                 Ids.AmbientTop, Ids.AmbientBottom, Ids.FogColor, Ids.March, Ids.Camera, Ids.Forward, Ids.Texel, Ids.DepthTexel, Ids.BlitScaleBias,
-                Ids.Composite, Ids.Heights
+                Ids.Composite, Ids.Heights, Ids.Tone
             };
 
             private static void CopyConstants(MaterialPropertyBlock from, MaterialPropertyBlock to)

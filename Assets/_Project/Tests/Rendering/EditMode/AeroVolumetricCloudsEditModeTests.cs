@@ -128,8 +128,10 @@ namespace TowerOfBabel.Rendering.Tests
 
             // Review 2026-11-06: smaller clouds at different heights. Clear skies spread their clouds over 100 m or
             // more above the base; rain decks stay a low, even ceiling.
+            // Review 2026-11-06 (later): high layers (fleece, veils) are exempt. Their clouds are only 50-100 m tall,
+            // so a large float tilted and smeared them into streaks; altocumulus forms as one layer anyway.
             var clearLooks = library.clearDay.Select(e => e.preset.look).ToArray();
-            foreach (var p in library.clearDay.Select(e => e.preset))
+            foreach (var p in library.clearDay.Select(e => e.preset).Where(p => p.look.cloudType >= .25f))
                 Assert.That(p.look.heightVariation, Is.GreaterThanOrEqualTo(100), $"{p.name}: clouds float at different heights.");
             foreach (var p in library.rain.Select(e => e.preset))
                 Assert.That(p.look.heightVariation, Is.LessThanOrEqualTo(150), $"{p.name}: the rain deck stays low.");
@@ -143,6 +145,84 @@ namespace TowerOfBabel.Rendering.Tests
             string hlsl = File.ReadAllText("Assets/_Project/Shaders/Aero/AeroClouds.hlsl");
             StringAssert.Contains("float AeroBaseRamp(float metresAboveBase, float thickness, float type, float lift)", hlsl);
             StringAssert.Contains("min(lerp(50, 90, type), thickness * .3)", hlsl);
+        }
+
+        [Test]
+        public void ReworkedPresets_FleeceIsARoundedCloudletFieldAndDreamIsCrispCumulus()
+        {
+            // Review 2026-11-06: the old fleece (thin torn sheet, erosion .7, 250 m float) read as floating lines;
+            // Frutiger Dream was soft, flat white blobs.
+            var library = Library;
+            var fleece = library.clearDay.Select(e => e.preset).Single(p => p.name == "Clear Altocumulus Fleece").look;
+            Assert.That(fleece.cloudType, Is.LessThan(.25f), "Fleece stays a high layer.");
+            Assert.That(fleece.baseAltitude, Is.InRange(600, 1000), "Altocumulus floats well above the cumulus.");
+            Assert.That(fleece.cloudSize, Is.LessThanOrEqualTo(.35f), "Small cloudlets.");
+            Assert.That(fleece.erosion, Is.LessThanOrEqualTo(.4f), "Rounded billows, not torn wisps.");
+            Assert.That(fleece.heightVariation, Is.LessThanOrEqualTo(60), "One layer; a large float smears thin cloudlets.");
+            Assert.That(fleece.shear, Is.LessThanOrEqualTo(50), "Cloudlets stay upright.");
+            Assert.That(fleece.fadeDistance, Is.LessThanOrEqualTo(20000), "The far field melts into haze before it aliases.");
+            var dream = library.clearDay.Select(e => e.preset).Single(p => p.name == "Clear Frutiger Dream").look;
+            Assert.That(dream.erosion, Is.GreaterThanOrEqualTo(.45f), "Billowy cauliflower tops.");
+            Assert.That(dream.edgeSoftness, Is.LessThanOrEqualTo(.3f), "Crisp outlines.");
+            Assert.That(dream.shadowTint.b, Is.GreaterThan(dream.shadowTint.r + .25f), "Sky-blue shaded bellies.");
+
+            // The shipped assets are what "Reset cloud presets to shipped values" rebuilds. The authoring script lives
+            // in the editor assembly, which test assemblies cannot reference, so read its definitions by reflection.
+            var authoring = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("AeroCloudAuthoring")).Single(t => t != null);
+            var definitions = ((System.Collections.IEnumerable)authoring.GetMethod("PresetDefinitions").Invoke(null, null)).Cast<object>().ToArray();
+            foreach (string name in new[] { "Clear Altocumulus Fleece", "Clear Frutiger Dream" })
+            {
+                var definition = definitions.Single(d => (string)d.GetType().GetField("name").GetValue(d) == name);
+                var args = new object[] { AeroCloudLook.Default };
+                ((System.Delegate)definition.GetType().GetField("edit").GetValue(definition)).DynamicInvoke(args);
+                var look = (AeroCloudLook)args[0];
+                var shipped = library.clearDay.Select(e => e.preset).Single(p => p.name == name);
+                Assert.That(JsonUtility.ToJson(shipped.look.Sanitized()), Is.EqualTo(JsonUtility.ToJson(look.Sanitized())), name + " matches its definition.");
+                Assert.That(shipped.notes, Is.EqualTo((string)definition.GetType().GetField("notes").GetValue(definition)));
+            }
+        }
+
+        [Test]
+        public void Exposure_KeepsSunlitCloudsOffTheTonemapperShoulder()
+        {
+            var feature = Feature;
+            Assert.That(feature.sunExposure, Is.InRange(.2f, .7f), "At 1 every sunlit cloud clipped to one flat white.");
+            Assert.That(feature.skyExposure, Is.InRange(.8f, 1.5f));
+            var go = new GameObject("Exposure fixture"); go.SetActive(false);
+            var quality = ScriptableObject.CreateInstance<AeroCloudQuality>();
+            try
+            {
+                var clouds = go.AddComponent<AeroVolumetricClouds>();
+                var block = new MaterialPropertyBlock();
+                AeroVolumetricCloudsRendererFeature.FillConstants(block, clouds, quality, 1200, 200, 7000, .009f, .35f, 1.2f);
+                Assert.That(block.GetVector("_AeroCloudTone"), Is.EqualTo(new Vector4(.35f, 1.2f, 0, 0)));
+            }
+            finally { Object.DestroyImmediate(go); Object.DestroyImmediate(quality); }
+        }
+
+        [Test]
+        public void Shader_GuardsAgainstTheLinesThatCutThroughClouds()
+        {
+            string hlsl = File.ReadAllText("Assets/_Project/Shaders/Aero/AeroClouds.hlsl");
+            // Tops keep the Worley cell centres (billows); eroding them left only the cell borders, a net of lines.
+            StringAssert.Contains("detail = lerp(detail, 1 - detail, saturate(h * 3));", hlsl);
+            // Whole-step skipping keeps one sample lattice for every pixel (a 1.6x skip drew contour bands).
+            StringAssert.DoesNotContain("step * 1.6", hlsl);
+            StringAssert.Contains("else t += step * 2;", hlsl);
+            // The jitter walks a golden-ratio sequence, so every pixel visits all phases.
+            StringAssert.Contains("_AeroCloudMarch.z * .61803398875", hlsl);
+            // Review 2026-11-06 (Cotton Puffs): empty air is marched in double steps, so the start offset must span a
+            // double step. Spanning one left half the positions unvisited and thin fringes converged to a comb of
+            // horizontal teeth. Each pixel's phase is hashed independently (interleaved gradient noise repeats
+            // every ~3 rows, which the temporal blend turned into row-dependent stripes).
+            StringAssert.Contains("min(stepSize, max(8, range.x * .25)) * 2 * AeroPixelPhase(pixel);", hlsl);
+            StringAssert.DoesNotContain("52.9829189", hlsl);
+            // The per-cloud float mixes a rotated lookup at an unrelated scale (no axis-aligned repeat), and the
+            // weather map is filtered to the sample footprint.
+            StringAssert.Contains("float2 turned = float2(uv.x * .819 - uv.y * .574, uv.x * .574 + uv.y * .819) * .731;", hlsl);
+            StringAssert.Contains("_AeroCloudCoverage, sampler_LinearRepeat, (world.xz + drift) * _AeroCloudShape2.z, coverageLod)", hlsl);
+            string feature = File.ReadAllText("Assets/_Project/Scripts/Rendering/Clouds/AeroVolumetricCloudsRendererFeature.cs");
+            StringAssert.Contains("march.z = NextJitterFrame(camera);", feature);
         }
 
         [Test]
@@ -432,6 +512,11 @@ namespace TowerOfBabel.Rendering.Tests
             float softest = library.densityTiers.Min(t => t.densityMultiplier.x);
             var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
             h.Camera.fieldOfView = 90; h.Camera.farClipPlane = 65536;
+            // Over black, a cloud counts by its own light. Over the harness's grey, thin sunlit clouds at realistic
+            // exposure (and this harness's weaker sun) matched the grey and went uncounted, though they cover the sky.
+            h.Camera.backgroundColor = Color.black;
+            // ...and under the game's noon sun (the harness default is weaker), since cloud light scales with it.
+            h.Sun.intensity = AssetDatabase.LoadAssetAtPath<AeroDayNightProfile>("Assets/_Project/Environment/Lighting/AeroDayNight.asset").sunIntensity;
             h.Camera.transform.SetPositionAndRotation(new Vector3(0, 3000, 0), Quaternion.Euler(90, 0, 0));
             var background = h.Render();
             var cloudsObject = CloudsInScene(h, preset);
@@ -501,6 +586,86 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(variedUp, Is.GreaterThan(.1f), "Some clouds float above the rest. " + report);
                 Assert.That(variedDown, Is.GreaterThan(.2f), "Others stay low. " + report);
                 TestContext.WriteLine(report);
+            }
+            finally { Object.DestroyImmediate(cloudsObject); }
+        }
+
+        static float Percentile(float[] sorted, float p) => sorted[Mathf.Clamp(Mathf.RoundToInt((sorted.Length - 1) * p), 0, sorted.Length - 1)];
+
+        [Test]
+        public void Gpu_SunlitCumulusHaveShadedBlueBelliesAndBrightBillows()
+        {
+            // Review 2026-11-06: Frutiger Dream rendered as flat white blobs. The sun term was ~3x too bright, so
+            // every cloud sat on the tonemapper's shoulder, and thick bellies were lit almost like thin fringes.
+            using var h = new AeroRenderHarness(96);
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            preset.look = Library.clearDay.Select(e => e.preset).Single(p => p.name == "Clear Frutiger Dream").look;
+            preset.look.hazeStrength = 0;
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 20, 0), Quaternion.Euler(-35, 20, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            try
+            {
+                h.Render(); var image = h.Render();
+                var cloud = image.Where((c, i) => Rgb(c - background[i]) > .08f).ToArray();
+                Assert.That(cloud.Length, Is.GreaterThan(image.Length / 10), "Clouds in view.");
+                var lum = cloud.Select(c => c.grayscale).OrderBy(x => x).ToArray();
+                float low = Percentile(lum, .1f), high = Percentile(lum, .9f);
+                var shaded = cloud.OrderBy(c => c.grayscale).Take(cloud.Length / 5).ToArray();
+                float blue = shaded.Average(c => c.b), red = shaded.Average(c => c.r);
+                string report = $"cloud share {cloud.Length / (float)image.Length:0.00}, luminance p10 {low:0.000} p90 {high:0.000}, shaded rgb ({red:0.000}, {shaded.Average(c => c.g):0.000}, {blue:0.000})";
+                TestContext.WriteLine(report);
+                Assert.That(low, Is.LessThan(high * .6f), "Shaded bellies sit clearly below the lit billows. " + report);
+                Assert.That(high, Is.LessThan(h.Sun.intensity * 1.6f), "Lit parts stay in range instead of blowing out. " + report);
+                // The harness's ambient is neutral grey (in game it is the blue sky), so only the shadow tint adds blue here.
+                Assert.That(blue, Is.GreaterThan(red * 1.03f), "Shadows lean blue, not flat grey. " + report);
+            }
+            finally { Object.DestroyImmediate(cloudsObject); }
+        }
+
+        [Test]
+        public void Gpu_HighCloudletFieldShowsNoStreaksFanningToTheHorizon()
+        {
+            // Review 2026-11-06: Altocumulus Fleece showed straight lines converging on vanishing points along the
+            // world axes. The per-cloud height float repeated on an axis-aligned grid, and grazing rays through the
+            // thin layer summed the repeats. Streaks near the horizon run nearly vertical on screen, while a healthy
+            // field is flattened by perspective, so horizontal pixel differences outgrow vertical ones only with streaks.
+            using var h = new AeroRenderHarness(256); // streaks are 1-2 px wide; coarser renders blur them away
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            var shipped = Library.clearDay.Select(e => e.preset).Single(p => p.name == "Clear Altocumulus Fleece").look;
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 30, 0), Quaternion.Euler(-4, 135, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            var clouds = cloudsObject.GetComponent<AeroVolumetricClouds>();
+            float Streakiness(AeroCloudLook look)
+            {
+                preset.look = look; clouds.Tick(0);
+                for (int i = 0; i < 4; i++) h.Render();
+                var image = h.Render();
+                // The band from the horizon up ~10 degrees (rows count from the bottom).
+                int s = h.Size, from = s / 2 - 1, to = s / 2 + s / 8;
+                float horizontal = 0, vertical = 0;
+                for (int y = from; y < to; y++)
+                for (int x = 0; x < s - 1; x++)
+                {
+                    float c = (image[y * s + x] - background[y * s + x]).grayscale;
+                    horizontal += Mathf.Abs((image[y * s + x + 1] - background[y * s + x + 1]).grayscale - c);
+                    vertical += Mathf.Abs((image[(y + 1) * s + x] - background[(y + 1) * s + x]).grayscale - c);
+                }
+                return horizontal / Mathf.Max(vertical, 1e-5f);
+            }
+            try
+            {
+                float clean = Streakiness(shipped);
+                var floating = shipped; floating.heightVariation = 250; floating.fadeDistance = 32000; // the old fleece's float and reach
+                float streaky = Streakiness(floating);
+                string report = $"shipped {clean:0.000}, with a 250 m float {streaky:0.000}";
+                TestContext.WriteLine(report);
+                Assert.That(streaky, Is.GreaterThan(clean * 1.15f), "The measure detects streaks. " + report);
+                Assert.That(streaky, Is.GreaterThan(clean * 1.25f), "...clearly. " + report);
+                Assert.That(clean, Is.LessThan(.7f), "The shipped fleece has no streak fan (it measured ~0.62; streaky skies ~0.87). " + report);
             }
             finally { Object.DestroyImmediate(cloudsObject); }
         }

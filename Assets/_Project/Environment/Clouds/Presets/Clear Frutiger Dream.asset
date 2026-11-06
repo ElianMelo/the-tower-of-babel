@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: Clear Frutiger Dream
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroCloudPreset
   weather: 0
-  notes: Glossy, airy Aero clouds with saturated blue shadows.
+  notes: 'Bright Frutiger Aero cumulus: crisp billowy tops, sky-blue shaded bellies.'
   look:
     coverage: 0.35
-    density: 0.75
+    density: 0.85
     cloudSize: 0.9
     cloudType: 0.52
-    erosion: 0.3
-    edgeSoftness: 0.4
+    erosion: 0.5
+    edgeSoftness: 0.28
     baseAltitude: 150
     thickness: 450
     heightVariation: 220
@@ -28,12 +28,12 @@ MonoBehaviour:
     windSpeed: 8
     evolution: 1.5
     shear: 150
-    sunLight: 1.15
-    ambientLight: 1.25
-    litTint: {r: 1, g: 0.98, b: 0.95, a: 1}
-    shadowTint: {r: 0.72, g: 0.86, b: 1, a: 1}
+    sunLight: 1.1
+    ambientLight: 1.2
+    litTint: {r: 1, g: 0.97, b: 0.92, a: 1}
+    shadowTint: {r: 0.66, g: 0.8, b: 1, a: 1}
     darkness: 0
-    powder: 0.3
+    powder: 0.45
     silverLining: 0.75
     multiScatter: 0.5
     hazeDistance: 14000

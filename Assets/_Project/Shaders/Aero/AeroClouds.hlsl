@@ -35,6 +35,7 @@ float4 _AeroCloudDepthTexel; // xy full-resolution texel size, z downsample
 float4 _AeroCloudTemporal;   // x history weight (0 = reset)
 float4x4 _AeroCloudPrevView; // last frame's world-to-camera matrix
 float4 _AeroCloudComposite;  // x: 0 composite before transparents, 1 after (downward rays from inside or above)
+float4 _AeroCloudTone;       // x sun exposure, y sky-light exposure (keeps sunlit faces off the tonemapper shoulder)
 
 #define AERO_CLOUD_NO_HIT 1e7
 
@@ -139,27 +140,42 @@ float AeroHeightProfile(float h, float type, float baseRamp)
 
 // Metres this column's cloud floats above the layer base. The map's height channel, sampled at ~1 km patches,
 // gives each cloud its own base, so clouds sit at different heights instead of on one shared floor.
-float AeroCloudFloat(float2 cloudXZ)
+float AeroCloudFloat(float2 cloudXZ, float coverageLod)
 {
     if (_AeroCloudHeights.x <= 0) return 0;
-    float g = SAMPLE_TEXTURE2D_LOD(_AeroCloudCoverage, sampler_LinearRepeat, cloudXZ * _AeroCloudShape2.z * _AeroCloudHeights.y + float2(.37, .61), 0).g;
-    float x = saturate((g - .25) / .55); // the channel spans ~.25-.8; spread it over 0..1
+    // One lookup at 6x the map's tile repeated on an axis-aligned grid (every ~350 m on small presets). Grazing rays
+    // through a thin layer crossed many repeats and summed them into straight lines fanning out from the vanishing
+    // point. A second lookup, rotated off the axes at an unrelated scale, gives the sum no common period.
+    float2 uv = cloudXZ * _AeroCloudShape2.z * _AeroCloudHeights.y;
+    float2 turned = float2(uv.x * .819 - uv.y * .574, uv.x * .574 + uv.y * .819) * .731; // 35 degrees
+    float lod = coverageLod + log2(max(_AeroCloudHeights.y, 1));
+    float g = SAMPLE_TEXTURE2D_LOD(_AeroCloudCoverage, sampler_LinearRepeat, uv + float2(.37, .61), lod).g * .55
+            + SAMPLE_TEXTURE2D_LOD(_AeroCloudCoverage, sampler_LinearRepeat, turned + float2(.13, .29), lod).g * .45;
+    // Smooth at both ends: a clamped ramp creased every cloud base along two height contours.
+    float x = smoothstep(.3, .72, g);
     // Squared: most clouds stay near the base (the top tower floors can enter them), fewer float high.
     return _AeroCloudHeights.x * x * x;
 }
 
+// Mip of the 3D shape noise for a sample footprint of `metres` (half-texel bias keeps near clouds crisp).
+float AeroFootprintLod(float metres) { return log2(max(metres * _AeroCloudShape.z * 128, 1e-4)) - 1; }
+
 // Density before detail erosion; h = height inside this column's cloud (0 base, 1 top);
-// coverage = local cloud amount for this column.
+// coverage = local cloud amount for this column. `lod` is the sample footprint in shape-noise mips (unclamped).
 float AeroBaseDensity(float3 world, float altitude, float lod, out float h, out float coverage)
 {
     float metres = altitude - _AeroCloudLayer.x;
     h = 0; coverage = 0;
     if (metres <= 0 || altitude >= _AeroCloudLayer.y) return 0;
     float2 drift = _AeroCloudWind.xy;
-    metres -= AeroCloudFloat(world.xz + drift);
+    // The weather map decides where small clouds form, so it must be filtered to the sample footprint like the
+    // 3D noise. Read at full resolution, long steps near the horizon skipped across its texels (aliasing) and
+    // small-cloud presets showed streaks fanning out from the vanishing point.
+    float coverageLod = clamp(lod + log2(2 * _AeroCloudShape2.z / _AeroCloudShape.z), 0, 8);
+    metres -= AeroCloudFloat(world.xz + drift, coverageLod);
     h = metres / _AeroCloudLayer.w;
     if (h <= 0 || h >= 1) return 0;
-    float2 map = SAMPLE_TEXTURE2D_LOD(_AeroCloudCoverage, sampler_LinearRepeat, (world.xz + drift) * _AeroCloudShape2.z, 0).rg;
+    float2 map = SAMPLE_TEXTURE2D_LOD(_AeroCloudCoverage, sampler_LinearRepeat, (world.xz + drift) * _AeroCloudShape2.z, coverageLod).rg;
     float amount = _AeroCloudShape.x;
     // The equalized map decides where clouds form (a share `amount` of the sky); inside those regions local
     // coverage rises fast, so the shape noise only breaks up edges instead of thresholding the area a second time.
@@ -175,7 +191,7 @@ float AeroBaseDensity(float3 world, float altitude, float lod, out float h, out 
     if (profile <= 0) return 0;
     float3 shapePos = float3(world.x + drift.x, altitude + _AeroCloudWind.z, world.z + drift.y);
     shapePos.xz += _AeroCloudWindDir.xy * (h * _AeroCloudWind.w);
-    float shape = SAMPLE_TEXTURE3D_LOD(_AeroCloudShapeNoise, sampler_LinearRepeat, shapePos * _AeroCloudShape.z, lod).r;
+    float shape = SAMPLE_TEXTURE3D_LOD(_AeroCloudShapeNoise, sampler_LinearRepeat, shapePos * _AeroCloudShape.z, clamp(lod, 0, 7)).r; // 128^3: mip 7 is the tile average
     // Remap above the coverage threshold so every cloud reaches full density in its core, however low the
     // coverage. Softness lengthens the fringe; transparency comes from density, not from a weak core that
     // detail erosion would eat away.
@@ -186,8 +202,9 @@ float AeroErode(float base, float3 world, float altitude, float h, float coverag
 {
     float3 detailPos = float3(world.x + _AeroCloudWind.x * 1.6, altitude - _AeroCloudWind.z * 2, world.z + _AeroCloudWind.y * 1.6);
     float detail = SAMPLE_TEXTURE3D_LOD(_AeroCloudDetailNoise, sampler_LinearRepeat, detailPos * _AeroCloudShape.w, lod).r;
-    // Wispy, torn bases; billowy tops.
-    detail = lerp(1 - detail, detail, saturate(h * 3));
+    // The detail Worley is 1 at cell centres. Tops erode between cells (1 - detail) so round billows stay;
+    // bases erode the centres for wispy, torn undersides. The reverse leaves only the cell borders: a net of lines.
+    detail = lerp(detail, 1 - detail, saturate(h * 3));
     float erode = detail * _AeroCloudShape2.x * .85 * lerp(1, .65, coverage);
     return saturate((base - erode) / max(1 - erode, .05));
 }
@@ -217,10 +234,32 @@ float AeroLightDepth(float3 relative, float3 sunDir, float baseH, float lod)
     return depth * _AeroCloudShape.y * (1 + _AeroCloudLighting.w * 2.5);
 }
 
-float AeroInterleavedNoise(float2 pixel)
+// Optical depth of the cloud straight above a sample. Sky light comes mostly from above, so the mass overhead
+// decides how much reaches a sample: deep bellies turn blue-grey while thin edges and tops stay bright.
+float AeroSkyDepth(float3 relative, float lod)
 {
-    pixel += _AeroCloudMarch.z * float2(47, 17) * .695;
-    return frac(52.9829189 * frac(dot(pixel, float2(.06711056, .00583715))));
+    float reach = clamp(_AeroCloudLayer.w * .5, 60, 400);
+    float depth = 0, previous = 0;
+    [unroll] for (int i = 1; i <= 3; i++)
+    {
+        float t = reach * i * i / 9.0;
+        float3 p = relative + float3(0, (t + previous) * .5, 0);
+        float h, coverage;
+        depth += AeroBaseDensity(p + float3(_AeroCloudCamera.x, 0, _AeroCloudCamera.z), AeroAltitude(p), lod + 1, h, coverage) * (t - previous);
+        previous = t;
+    }
+    return depth * _AeroCloudShape.y;
+}
+
+// Per-pixel ray start offset in [0, 1). Each pixel gets an independent hashed phase, and a golden-ratio step per
+// frame walks it through all phases for the temporal pass to average. Interleaved gradient noise was used before,
+// but it repeats every ~3.2 rows and the per-frame step shifts every pixel alike, so the temporal blend kept a
+// row-dependent remainder: a comb of horizontal teeth on thin cloud fringes. Independent phases leave fine grain.
+float AeroPixelPhase(float2 pixel)
+{
+    uint2 q = (uint2)(int2)floor(pixel) * uint2(1597334673u, 3812015801u);
+    uint n = (q.x ^ q.y) * 1597334673u;
+    return frac(n * (1.0 / 4294967296.0) + _AeroCloudMarch.z * .61803398875);
 }
 
 // From inside or above the layer, rays that look down cross the cloud before reaching water; those pixels are
@@ -261,19 +300,31 @@ float4 AeroTraceClouds(float2 uv, float2 pixel, float sceneDistance)
     float meanDistance = 0, meanWeight = 0;
     // Inside a cloud (the top tower floors) steps start short and grow with distance, so the fog around the
     // camera is sampled finely; from outside the layer, range.x is far and every step is stepSize.
-    float t = range.x + min(stepSize, max(8, range.x * .25)) * AeroInterleavedNoise(pixel);
+    // Empty air is crossed in double steps, so the start offset spans a double step: offset over a single step
+    // left half the lattice positions unvisited on every frame, and thin fringes between them were missed on some
+    // rows and always hit on others (a comb of horizontal teeth that the temporal pass converged to).
+    float t = range.x + min(stepSize, max(8, range.x * .25)) * 2 * AeroPixelPhase(pixel);
+    float start = t;
+    int fine = 0; // samples left at single steps since the last cloud
     [loop] for (int i = 0; i < steps && t < range.y; i++)
     {
         float step = min(stepSize, max(8, t * .25));
         // Long steps (toward the horizon) read coarser mips so distant clouds do not sparkle.
-        float shapeLod = clamp(log2(step * _AeroCloudShape.z * 128) - 1, 0, 5);
-        float detailLod = clamp(log2(step * _AeroCloudShape.w * 32) - 1, 0, 4);
+        float shapeLod = AeroFootprintLod(step); // unclamped: the weather map needs the full footprint
+        // Down to the last mip (the tile average): capped one level short, the detail tile (~110 m on small
+        // presets) still repeated along grazing rays and drew streaks fanning out from the vanishing point.
+        float detailLod = clamp(log2(step * _AeroCloudShape.w * 32) - 1, 0, 5);
         float3 relative = ray * t;
         float3 world = relative + float3(_AeroCloudCamera.x, 0, _AeroCloudCamera.z);
         float altitude = AeroAltitude(relative);
         float h, coverage;
         float base = AeroBaseDensity(world, altitude, shapeLod, h, coverage);
-        if (base <= 0) { t += step * 1.6; continue; }
+        // Empty air: double steps. Every move is a whole number of steps so all pixels keep the same jittered
+        // sample lattice; a fractional skip shifted it by a different amount per pixel and drew contour lines.
+        if (base <= 0) { if (fine > 0) { fine--; t += step; } else t += step * 2; continue; }
+        // Entering a cloud after a double step: back up one step so its edge is not cut, then march finely.
+        if (fine == 0 && t > start + step * .5) { fine = 4; t -= step; continue; }
+        fine = 4;
         float density = AeroErode(base, world, altitude, h, coverage, detailLod);
         // Thin the cloud right around the camera so a player building inside one still sees nearby blocks.
         density *= smoothstep(0, 45, t);
@@ -283,10 +334,14 @@ float4 AeroTraceClouds(float2 uv, float2 pixel, float sceneDistance)
             float stepTransmittance = exp(-extinction * step);
             float weight = transmittance * (1 - stepTransmittance);
             float lightDepth = AeroLightDepth(relative, sunDir, h, shapeLod);
-            float sunTerm = exp(-lightDepth) * phase0 + ms * exp(-lightDepth * ms) * phase1 + ms * ms * exp(-lightDepth * ms * ms) * phase2;
+            // Multiple-scattering octaves (Wrenninge). Extinction falls off faster than the octave energy, so
+            // light still reaches deep inside, but thick cores sit clearly darker than thin, sunlit fringes.
+            float b1 = saturate(.35 + ms * .7), b2 = b1 * b1;
+            float sunTerm = exp(-lightDepth) * phase0 + ms * exp(-lightDepth * b1) * phase1 + ms * ms * exp(-lightDepth * b2) * phase2;
             float powder = lerp(1, saturate((1 - exp(-extinction * 60)) * 2), _AeroCloudLighting.x * powderFacing);
             sun += sunTerm * powder * 4 * PI * weight;
-            float ambientOcclusion = lerp(.45, 1, saturate(h * 1.4)) * lerp(1, .55, _AeroCloudLighting.w);
+            float skyVisibility = exp(-AeroSkyDepth(relative, shapeLod) * .6);
+            float ambientOcclusion = lerp(.3, 1, skyVisibility) * lerp(.7, 1, saturate(h * 1.4)) * lerp(1, .55, _AeroCloudLighting.w);
             ambient += lerp(_AeroCloudAmbientBottom.rgb, _AeroCloudAmbientTop.rgb, saturate(h * 1.2)) * ambientOcclusion * weight;
             meanDistance += t * weight; meanWeight += weight;
             transmittance *= stepTransmittance;
@@ -296,7 +351,7 @@ float4 AeroTraceClouds(float2 uv, float2 pixel, float sceneDistance)
     }
     if (meanWeight <= 0) return float4(_AeroCloudFogColor.rgb * wall, 1 - wall);
     meanDistance /= meanWeight;
-    float3 color = sun * _AeroCloudSunColor.rgb + ambient;
+    float3 color = sun * _AeroCloudSunColor.rgb * _AeroCloudTone.x + ambient * _AeroCloudTone.y;
     // Aerial perspective: distant clouds melt into the horizon haze, then fade out.
     float haze = (1 - exp(-meanDistance / _AeroCloudHaze.x)) * _AeroCloudHaze.y;
     color = lerp(color, _AeroCloudFogColor.rgb * (1 - transmittance), haze);
