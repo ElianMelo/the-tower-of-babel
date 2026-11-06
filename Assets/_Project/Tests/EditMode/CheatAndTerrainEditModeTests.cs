@@ -180,6 +180,72 @@ namespace TowerOfBabel.Resources.Tests
         }
 
         [Test]
+        public void VisualPanel_OpensSmallInTheTopLeftInPlaceOfTheFullMenuAndReturns()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/UI/FrutigerAero/Prefabs/Screens/CheatMenu.prefab");
+            var root = UnityEngine.Object.Instantiate(prefab);
+            try
+            {
+                var menu = root.GetComponent<CheatMenuUI>(); menu.BuildView(); menu.ShowPreview();
+                Assert.That(menu.ActionButtons.ContainsKey("Visual controls"), Is.True, "Quick actions open the visual panel.");
+                menu.SelectCategory("World"); Assert.That(menu.ActionButtons.ContainsKey("Visual controls"), Is.True, "Also listed under World.");
+                menu.ActionButtons["Visual controls"].onClick.Invoke();
+                Assert.That(menu.IsVisualPanelVisible, Is.True);
+                Assert.That(menu.IsVisible, Is.False, "The full menu and its dark overlay hide so the scene stays visible.");
+                Assert.That(menu.IsOpen, Is.True);
+                foreach (string key in new[] { "Cycle day/night", "Sunrise", "Noon", "Sunset", "Midnight", "-1 hour", "+1 hour", "Freeze time", "Rain", "Automatic weather",
+                    "Previous cloud preset", "Next cloud preset", "Automatic clouds", "Reroll clouds", "Wetness preset", "Post look", "Full menu", "Close" })
+                    Assert.That(menu.VisualButtons.ContainsKey(key), Is.True, key);
+
+                var panel = menu.VisualButtons["Cycle day/night"].GetComponentInParent<UnityEngine.UI.VerticalLayoutGroup>().GetComponent<RectTransform>();
+                Assert.That(panel.name, Is.EqualTo("Visual controls"));
+                Assert.That(panel.anchorMin, Is.EqualTo(new Vector2(0, 1))); Assert.That(panel.anchorMax, Is.EqualTo(new Vector2(0, 1)));
+                Assert.That(panel.pivot, Is.EqualTo(new Vector2(0, 1)));
+                Assert.That(panel.anchoredPosition.x, Is.InRange(0, 40)); Assert.That(panel.anchoredPosition.y, Is.InRange(-40, 0));
+                UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
+                Assert.That(panel.rect.width, Is.LessThanOrEqualTo(420), "Compact: about a quarter of the 1600-wide reference screen.");
+                Assert.That(panel.rect.height, Is.InRange(200, 520), "Compact: leaves most of the 900-high reference screen visible.");
+                foreach (var b in menu.VisualButtons.Values)
+                {
+                    var r = (RectTransform)b.transform; Assert.That(r.rect.width, Is.GreaterThan(0), b.name);
+                    Assert.That(panel.rect.Contains(panel.InverseTransformPoint(r.TransformPoint(r.rect.center))), Is.True, b.name + " sits inside the panel.");
+                }
+
+                menu.VisualButtons["Next cloud preset"].onClick.Invoke();
+                Assert.That(menu.VisualStatusText, Is.Not.Empty, "Every visual action reports in the compact panel.");
+                menu.SetLookAround(true); Assert.That(menu.IsLookingAround, Is.True, "Right mouse hands the camera back while the panel is open.");
+                menu.VisualButtons["Full menu"].onClick.Invoke();
+                Assert.That(menu.IsVisible, Is.True); Assert.That(menu.IsVisualPanelVisible, Is.False);
+                Assert.That(menu.IsLookingAround, Is.False, "Leaving the panel ends look-around.");
+                menu.SetLookAround(true); Assert.That(menu.IsLookingAround, Is.False, "Look-around only works from the visual panel.");
+                menu.ShowVisualPanel(); menu.VisualButtons["Close"].onClick.Invoke();
+                Assert.That(menu.IsOpen, Is.False, "Close hides everything.");
+                menu.ShowVisualPanel(); Assert.That(menu.IsVisualPanelVisible, Is.True, "The panel can also open directly.");
+                menu.Toggle(); Assert.That(menu.IsOpen, Is.False, "F3 closes the visual panel.");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        [Test]
+        public void VisualPanel_DayCycleStepsSunriseNoonSunsetMidnightAndFormatsTheClock()
+        {
+            Assert.That(CheatMenuUI.DayPhases.Select(p => p.name), Is.EqualTo(new[] { "Sunrise", "Noon", "Sunset", "Midnight" }));
+            string Next(float time) => CheatMenuUI.DayPhases[CheatMenuUI.NextDayPhase(time)].name;
+            Assert.That(Next(0), Is.EqualTo("Sunrise"));
+            Assert.That(Next(.27f), Is.EqualTo("Noon"));
+            Assert.That(Next(.5f), Is.EqualTo("Sunset"));
+            Assert.That(Next(.73f), Is.EqualTo("Midnight"));
+            Assert.That(Next(.9f), Is.EqualTo("Midnight"));
+            Assert.That(Next(.996f), Is.EqualTo("Sunrise"), "Just before midnight counts as midnight already.");
+            Assert.That(Next(.4f), Is.EqualTo("Noon"));
+            Assert.That(CheatMenuUI.FormatTimeOfDay(0), Is.EqualTo("00:00"));
+            Assert.That(CheatMenuUI.FormatTimeOfDay(.5f), Is.EqualTo("12:00"));
+            Assert.That(CheatMenuUI.FormatTimeOfDay(.75f), Is.EqualTo("18:00"));
+            Assert.That(CheatMenuUI.FormatTimeOfDay(1.25f), Is.EqualTo("06:00"));
+            Assert.That(CheatMenuUI.FormatTimeOfDay(.9999f), Is.EqualTo("00:00"));
+        }
+
+        [Test]
         public void AeroInputField_BuildsAGlassWellWithCaretAccentAndPlaceholder()
         {
             var canvas = new GameObject("Canvas", typeof(Canvas));

@@ -13,6 +13,7 @@ using TowerOfBabel.Networking.Weather;
 using TowerOfBabel.Resources;
 using TowerOfBabel.Resources.Interaction;
 using TowerOfBabel.Upgrades;
+using TowerOfBabel.Weather;
 using TowerOfBabel.World.Chunks;
 using TowerOfBabel.World.Tower;
 using UnityEngine;
@@ -28,7 +29,10 @@ namespace TowerOfBabel.Cheats
         [SerializeField] private TMP_FontAsset regularFont, boldFont;
         [SerializeField] private Material glassMaterial;
         [SerializeField] private GameObject buttonPrefab;
-        private GameObject visuals;
+        private GameObject visuals, visualPanel;
+        private TMP_Text visualStatus, timeLabel, cloudLabel;
+        private readonly Dictionary<string, UnityEngine.UI.Button> visualButtons = new();
+        private bool lookingAround;
         private RectTransform content;
         private TMP_Text status, context, jobLabel;
         private TMP_InputField search, amountInput, floorInput;
@@ -64,6 +68,16 @@ namespace TowerOfBabel.Cheats
         private static readonly Color Ink = new(.055f, .20f, .29f, 1);
         private static readonly string[] Categories = { "Quick actions", "Progression", "Construction", "Inventory", "Stats", "World", "Animations" };
         public bool IsVisible => visuals != null && visuals.activeSelf;
+        /// <summary>The compact top-left visual controls, open while the full menu is hidden so the scene stays visible.</summary>
+        public bool IsVisualPanelVisible => visualPanel != null && visualPanel.activeSelf;
+        public bool IsOpen => IsVisible || IsVisualPanelVisible;
+        public bool IsLookingAround => lookingAround;
+        public IReadOnlyDictionary<string, UnityEngine.UI.Button> VisualButtons => visualButtons;
+        public string VisualStatusText => visualStatus != null ? visualStatus.text : string.Empty;
+        public string CloudText => cloudLabel != null ? cloudLabel.text : string.Empty;
+        public string TimeText => timeLabel != null ? timeLabel.text : string.Empty;
+        /// <summary>Times of day the visual panel's Cycle button steps through: sunrise, noon, sunset, midnight.</summary>
+        public static readonly (string name, float time)[] DayPhases = { ("Sunrise", .27f), ("Noon", WeatherClock.Noon), ("Sunset", .73f), ("Midnight", WeatherClock.Midnight) };
         public bool IsGodMode => flying;
         public bool AllProfessions => allProfessions;
         public IReadOnlyDictionary<string, UnityEngine.UI.Toggle> ToggleControls => toggleControls;
@@ -80,8 +94,9 @@ namespace TowerOfBabel.Cheats
             Bind();
             var keyboard = Keyboard.current;
             if (keyboard != null && keyboard.f3Key.wasPressedThisFrame) Toggle();
-            if (IsVisible && keyboard != null && keyboard.escapeKey.wasPressedThisFrame) { consumedEscapeFrame = Time.frameCount; Hide(); }
-            if (IsVisible && Time.unscaledTime >= refreshTime) { refreshTime = Time.unscaledTime + .2f; RefreshValues(); }
+            if (IsOpen && keyboard != null && keyboard.escapeKey.wasPressedThisFrame) { consumedEscapeFrame = Time.frameCount; Hide(); }
+            UpdateLookAround();
+            if (IsOpen && Time.unscaledTime >= refreshTime) { refreshTime = Time.unscaledTime + .2f; RefreshValues(); }
             UpdateFlight();
         }
         private void LateUpdate()
@@ -92,7 +107,7 @@ namespace TowerOfBabel.Cheats
             float fieldOfView = service.GetLocalCheatStat(CheatStat.CameraFov);
             if (!Mathf.Approximately(fieldOfView, CheatProfile.Default(CheatStat.CameraFov))) Camera.main.fieldOfView = fieldOfView;
         }
-        public void Toggle() { if (IsVisible) Hide(); else Show(); }
+        public void Toggle() { if (IsOpen) Hide(); else Show(); }
         public void SelectCategory(string name)
         {
             if (!Categories.Contains(name)) throw new ArgumentException("Unknown cheat category.", nameof(name));
@@ -112,11 +127,10 @@ namespace TowerOfBabel.Cheats
         {
             if (IsVisible) return;
             if (visuals == null) BuildView();
+            bool fromVisualPanel = IsVisualPanelVisible;
+            if (fromVisualPanel) { EndLookAround(); visualPanel.SetActive(false); }
             ResolvePlayer(); CaptureTarget();
-            InterfaceManager.Instance?.HideInventory(); InterfaceManager.Instance?.HideUpgrade(); InterfaceManager.Instance?.HideEmotes();
-            FindFirstObjectByType<AeroDock>()?.Close();
-            previousCursor = CursorStateConfig.Current; CursorStateConfig.UnlockedVisible.Apply();
-            controls?.SetModalInputLocked(true);
+            if (!fromVisualPanel) BeginModal();
             visuals.SetActive(true); visuals.transform.SetAsLastSibling();
             if (chunks != null) floorInput.text = ((chunks.ActiveConstructionFloor ?? chunks.CurrentChunk.FloorIndex) + 1).ToString();
             Bind(); RebuildRows(); RefreshValues();
@@ -124,9 +138,44 @@ namespace TowerOfBabel.Cheats
         }
         public void Hide()
         {
-            if (!IsVisible) return;
-            visuals.SetActive(false); controls?.SetModalInputLocked(false);
+            if (!IsOpen) return;
+            EndLookAround();
+            visuals.SetActive(false); if (visualPanel != null) visualPanel.SetActive(false);
+            controls?.SetModalInputLocked(false);
             if (previousCursor.HasValue) previousCursor.Value.Apply(); previousCursor = null;
+        }
+        /// <summary>Swaps the full menu for the compact visual controls in the top-left corner (opens it directly when closed).</summary>
+        public void ShowVisualPanel()
+        {
+            if (IsVisualPanelVisible) return;
+            if (visuals == null) BuildView();
+            if (IsVisible) visuals.SetActive(false);
+            else BeginModal();
+            Bind(); visualPanel.SetActive(true); visualPanel.transform.SetAsLastSibling(); RefreshValues();
+            SetStatus("Visual controls - hold right mouse to look around.");
+        }
+        private void BeginModal()
+        {
+            InterfaceManager.Instance?.HideInventory(); InterfaceManager.Instance?.HideUpgrade(); InterfaceManager.Instance?.HideEmotes();
+            FindFirstObjectByType<AeroDock>()?.Close();
+            previousCursor = CursorStateConfig.Current; CursorStateConfig.UnlockedVisible.Apply();
+            ResolvePlayer(); controls?.SetModalInputLocked(true);
+        }
+        /// <summary>While the visual panel is open, holding the right mouse button hands the camera and movement back to the player.</summary>
+        public void SetLookAround(bool look)
+        {
+            if (look == lookingAround || look && !IsVisualPanelVisible) return;
+            lookingAround = look;
+            controls?.SetModalInputLocked(!look);
+            if (look) { Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false; } else CursorStateConfig.UnlockedVisible.Apply();
+        }
+        private void EndLookAround() { if (lookingAround) SetLookAround(false); }
+        private void UpdateLookAround()
+        {
+            if (!IsVisualPanelVisible) { EndLookAround(); return; }
+            var mouse = Mouse.current; if (mouse == null) return;
+            if (mouse.rightButton.wasPressedThisFrame) SetLookAround(true);
+            else if (lookingAround && !mouse.rightButton.isPressed) SetLookAround(false);
         }
         public void ShowPreview() { if (visuals == null) BuildView(); visuals.SetActive(true); RefreshValues(); SetStatus("F3 toggles this menu - choose a category or search for an action."); }
         private void ResolvePlayer()
@@ -160,7 +209,7 @@ namespace TowerOfBabel.Cheats
             if (boundService != null) boundService.CheatResult += SetStatus;
         }
         private void Unbind() { if (boundService != null) boundService.CheatResult -= SetStatus; boundService = null; }
-        private void SetStatus(string message) { if (status != null) status.text = message; }
+        private void SetStatus(string message) { if (status != null) status.text = message; if (visualStatus != null) visualStatus.text = message; }
         private void Sent(bool sent) { SetStatus(sent ? "Request sent..." : "Connect to a session first, then try again."); }
         private void RequestWeather(Func<NetworkWeatherService, bool> request, string done)
         {
@@ -184,6 +233,7 @@ namespace TowerOfBabel.Cheats
             foreach (var item in professionOutlines) item.Value.enabled = item.Key == (allProfessions ? "ALL" : job.ToString());
             foreach (var item in toggleValues) if (item.toggle != null) { bool value = item.read(); item.toggle.SetIsOnWithoutNotify(value); ShowMark(item.toggle.graphic, value); item.caption.text = value ? "On" : "Off"; }
             if (context != null) context.text = $"Target: {targetDescription}     |     Bag: {NetworkResourceService.Instance?.LocalCapacity ?? 50} per resource";
+            RefreshVisualPanel();
             foreach (var pair in statFields) if (pair.field != null && !pair.field.isFocused)
                 pair.field.SetTextWithoutNotify((service != null ? service.GetLocalCheatStat(pair.stat) : CheatProfile.Default(pair.stat)).ToString("0.##", CultureInfo.InvariantCulture));
         }
@@ -235,6 +285,98 @@ namespace TowerOfBabel.Cheats
             status = Text("Ready", panel, 17); Stretch(status.rectTransform, 28, 28, 0, 14); status.rectTransform.anchorMax = new Vector2(1, 0); status.rectTransform.sizeDelta = new Vector2(-56, 38);
             status.rectTransform.anchoredPosition = new Vector2(0, 32);
             RebuildRows(); visuals.SetActive(false);
+            BuildVisualPanel();
+        }
+        private void BuildVisualPanel()
+        {
+            var panel = Panel("Visual controls", transform); visualPanel = panel.gameObject;
+            Place(panel, 16, 16, 392, 0);
+            var layout = panel.gameObject.AddComponent<UnityEngine.UI.VerticalLayoutGroup>(); layout.spacing = 6; layout.padding = new RectOffset(14, 14, 10, 12);
+            layout.childControlWidth = layout.childControlHeight = true; layout.childForceExpandHeight = false; layout.childForceExpandWidth = true;
+            panel.gameObject.AddComponent<UnityEngine.UI.ContentSizeFitter>().verticalFit = UnityEngine.UI.ContentSizeFitter.FitMode.PreferredSize;
+            RectTransform Line(string name) { var line = Rect(name, panel); Horizontal(line, 6); line.gameObject.AddComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 34; return line; }
+            void Small(RectTransform line, string key, string label, UnityAction action, float width, bool flexible = true)
+            {
+                var b = Button(line, label, action, width); var le = b.GetComponent<UnityEngine.UI.LayoutElement>(); le.preferredHeight = 34; if (flexible) le.flexibleWidth = 1;
+                b.GetComponentInChildren<TMP_Text>().fontSize = 14; visualButtons[key] = b;
+            }
+            TMP_Text Caption(string value, float size, bool bold = false) { var t = Text(value, panel, size, bold); t.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = size + 8; return t; }
+            var header = Line("Header"); var title = Text("Visual controls", header, 20, true); title.GetComponent<UnityEngine.UI.LayoutElement>().flexibleWidth = 1;
+            Small(header, "Full menu", "Full menu", Show, 96, false); Small(header, "Close", "X", Hide, 34, false);
+            timeLabel = Caption("Time of day", 15, true);
+            var phases = Line("Time of day");
+            Small(phases, "Cycle day/night", "Cycle", CycleDayPhase, 58);
+            foreach (var phase in DayPhases) { float time = phase.time; string name = phase.name; Small(phases, name, name, () => SetTimeOfDay(time, name), 58); }
+            var timeControls = Line("Time controls");
+            Small(timeControls, "-1 hour", "-1 h", () => StepHours(-1), 50); Small(timeControls, "+1 hour", "+1 h", () => StepHours(1), 50);
+            Small(timeControls, "Freeze time", "Freeze", () => RequestWeather(w => w.RequestFreezeTime(!w.TimeFrozen), "Day/night freeze toggled."), 110);
+            Caption("Weather", 15, true);
+            var weather = Line("Weather");
+            Small(weather, "Rain", "Rain", () => RequestWeather(w => w.RequestRain(!w.Raining), "Rain toggled for everyone."), 120);
+            Small(weather, "Automatic weather", "Auto weather", () => RequestWeather(w => w.RequestAutomaticWeather(!w.AutomaticWeather), "Automatic weather toggled."), 150);
+            cloudLabel = Caption("Clouds", 15, true); cloudLabel.textWrappingMode = TextWrappingModes.Normal; cloudLabel.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 40;
+            var clouds = Line("Clouds");
+            Small(clouds, "Previous cloud preset", "<", () => CycleCloudPreset(-1), 36); Small(clouds, "Next cloud preset", ">", () => CycleCloudPreset(1), 36);
+            Small(clouds, "Automatic clouds", "Auto", AutomaticClouds, 64); Small(clouds, "Reroll clouds", "Reroll", RerollClouds, 74);
+            Caption("Look", 15, true);
+            var look = Line("Look");
+            Small(look, "Wetness preset", "Wetness", () => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; SetStatus(wet != null ? "Wetness: " + wet.CycleWetnessPreset() : "No wetness controller in this scene."); }, 100);
+            Small(look, "Post look", "Post look", () => { var post = FindFirstObjectByType<TowerOfBabel.Rendering.AeroPostProfileSwitcher>(); SetStatus(post != null ? "Post look: " + post.Cycle() : "No post look switcher in this scene."); }, 100);
+            var hint = Caption("Hold right mouse to look and move  |  F3 / Esc close", 12); hint.color = new Color(.15f, .35f, .43f);
+            visualStatus = Caption("Ready", 13); visualStatus.textWrappingMode = TextWrappingModes.Normal; visualStatus.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 34;
+            visualPanel.SetActive(false);
+        }
+        private static TowerOfBabel.Rendering.AeroVolumetricClouds Clouds() => FindFirstObjectByType<TowerOfBabel.Rendering.AeroVolumetricClouds>();
+        private static float CurrentTimeOfDay()
+        {
+            var cycle = FindFirstObjectByType<TowerOfBabel.Rendering.AeroDayNightCycle>();
+            return cycle != null ? cycle.timeOfDay : NetworkWeatherService.Instance != null ? NetworkWeatherService.Instance.State.TimeOfDay : WeatherClock.Noon;
+        }
+        /// <summary>Index into <see cref="DayPhases"/> of the next phase more than a few minutes after <paramref name="timeOfDay"/>, wrapping after midnight.</summary>
+        public static int NextDayPhase(float timeOfDay)
+        {
+            int best = 0; float bestAhead = float.MaxValue;
+            for (int i = 0; i < DayPhases.Length; i++)
+            {
+                float ahead = Mathf.Repeat(DayPhases[i].time - timeOfDay, 1);
+                if (ahead > .01f && ahead < bestAhead) { bestAhead = ahead; best = i; }
+            }
+            return best;
+        }
+        public static string FormatTimeOfDay(float timeOfDay) { int minutes = Mathf.RoundToInt(Mathf.Repeat(timeOfDay, 1) * 1440) % 1440; return $"{minutes / 60:00}:{minutes % 60:00}"; }
+        public void CycleDayPhase() { var phase = DayPhases[NextDayPhase(CurrentTimeOfDay())]; SetTimeOfDay(phase.time, phase.name); }
+        public void StepHours(float hours) { float time = Mathf.Repeat(CurrentTimeOfDay() + hours / 24f, 1); SetTimeOfDay(time, FormatTimeOfDay(time)); }
+        private void SetTimeOfDay(float time, string name) => RequestWeather(w => w.RequestTimeOfDay(time), "Time of day: " + name + ".");
+        public void CycleCloudPreset(int step)
+        {
+            var clouds = Clouds(); if (clouds == null) { SetStatus("No volumetric clouds in this scene."); return; }
+            var preset = clouds.CyclePreviewPreset(step);
+            SetStatus(preset != null ? "Clouds: " + preset.name + " (only on this screen)." : "Clouds: automatic weather.");
+            RefreshVisualPanel();
+        }
+        public void AutomaticClouds()
+        {
+            var clouds = Clouds(); if (clouds == null) { SetStatus("No volumetric clouds in this scene."); return; }
+            clouds.previewPreset = null; clouds.Tick(0); SetStatus("Clouds: automatic weather."); RefreshVisualPanel();
+        }
+        public void RerollClouds()
+        {
+            var clouds = Clouds(); if (clouds == null) { SetStatus("No volumetric clouds in this scene."); return; }
+            clouds.previewPreset = null; clouds.RerollClearSky(true); clouds.Tick(0);
+            SetStatus("New clear sky: " + clouds.ClearRoll.Description + (clouds.RainBlend > .5f ? " (shows once the rain stops)." : ".")); RefreshVisualPanel();
+        }
+        private void RefreshVisualPanel()
+        {
+            if (!IsVisualPanelVisible) return;
+            var weather = NetworkWeatherService.Instance;
+            timeLabel.text = "Time of day  " + FormatTimeOfDay(CurrentTimeOfDay()) + (weather != null && weather.TimeFrozen ? "  (frozen)" : "");
+            var clouds = Clouds();
+            cloudLabel.text = "Clouds  " + (clouds == null ? "none in scene" : clouds.Description);
+            void Label(string key, string text) { if (visualButtons.TryGetValue(key, out var b)) b.GetComponentInChildren<TMP_Text>().text = text; }
+            Label("Rain", weather != null && weather.Raining ? "Rain: On" : "Rain: Off");
+            Label("Automatic weather", weather != null && weather.AutomaticWeather ? "Auto weather: On" : "Auto weather: Off");
+            Label("Freeze time", weather != null && weather.TimeFrozen ? "Unfreeze" : "Freeze");
+            Label("Automatic clouds", clouds != null && clouds.previewPreset == null ? "Auto (on)" : "Auto");
         }
         private bool Matches(string section, string label) => string.IsNullOrWhiteSpace(search?.text) ? category == section || category == "Quick actions" && section == "Quick actions" : (section + " " + label).IndexOf(search.text, StringComparison.OrdinalIgnoreCase) >= 0;
         private void Action(string section, string label, string detail, UnityAction action, string button = "Run")
@@ -292,6 +434,7 @@ namespace TowerOfBabel.Cheats
                 Action(section, "Set day", "Jump everyone to noon", setDay, "Day");
                 Action(section, "Set night", "Jump everyone to midnight", setNight, "Night");
                 ToggleRow(section, "Rain", "Falling rain, splashes and wet surfaces for every player; pauses automatic weather", raining, rain);
+                Action(section, "Visual controls", "Small top-left panel for day/night, weather, clouds and post look, so the scene stays visible", ShowVisualPanel, "Open panel");
             }
             Action("Quick actions", "Start local host", "Start a session here, then use all gameplay actions", () => { var bootstrap = FindFirstObjectByType<NetworkBootstrap>(); SetStatus(bootstrap != null && bootstrap.StartHost() ? "Starting host..." : "A session is already running or the network service is unavailable."); }, "Start host");
             Action("Progression", "Level up", "Selected profession - gain one level and its upgrade point", level, "+1 level");

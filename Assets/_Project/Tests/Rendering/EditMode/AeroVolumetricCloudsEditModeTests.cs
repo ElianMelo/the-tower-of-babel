@@ -40,6 +40,42 @@ namespace TowerOfBabel.Rendering.Tests
         }
 
         [Test]
+        public void PreviewPresetCycle_StepsThroughAutomaticAndEveryLibraryPresetBothWays()
+        {
+            var library = ScriptableObject.CreateInstance<AeroCloudWeatherLibrary>();
+            var a = ScriptableObject.CreateInstance<AeroCloudPreset>(); a.name = "A";
+            var b = ScriptableObject.CreateInstance<AeroCloudPreset>(); b.name = "B";
+            var storm = ScriptableObject.CreateInstance<AeroCloudPreset>(); storm.name = "Storm"; storm.look.coverage = 1;
+            library.clearDay.Add(new AeroCloudWeatherLibrary.Entry { preset = a });
+            library.clearDay.Add(new AeroCloudWeatherLibrary.Entry { preset = b });
+            library.rain.Add(new AeroCloudWeatherLibrary.Entry { preset = storm });
+            library.rain.Add(new AeroCloudWeatherLibrary.Entry { preset = a }); // Duplicates are listed once.
+            var go = new GameObject("Cloud preset cycle fixture"); go.SetActive(false);
+            var clouds = go.AddComponent<AeroVolumetricClouds>(); clouds.library = library; clouds.seed = 7;
+            try
+            {
+                Assert.That(clouds.LibraryPresets(), Is.EqualTo(new[] { a, b, storm }), "Clear-day presets first, then rain, no duplicates.");
+                Assert.That(clouds.CyclePreviewPreset(), Is.SameAs(a));
+                Assert.That(clouds.Description, Is.EqualTo("Preview: A"));
+                Assert.That(clouds.CyclePreviewPreset(), Is.SameAs(b));
+                Assert.That(clouds.CyclePreviewPreset(), Is.SameAs(storm));
+                Assert.That(clouds.Look.coverage, Is.EqualTo(1), "The previewed preset is shown immediately.");
+                Assert.That(clouds.CyclePreviewPreset(), Is.Null, "After the last preset the sky returns to automatic weather.");
+                Assert.That(clouds.CyclePreviewPreset(-1), Is.SameAs(storm), "Stepping back from automatic wraps to the last preset.");
+                clouds.previewPreset = ScriptableObject.CreateInstance<AeroCloudPreset>();
+                Assert.That(clouds.CyclePreviewPreset(), Is.SameAs(a), "An outside preset counts as automatic.");
+                Object.DestroyImmediate(clouds.library); clouds.library = null;
+                clouds.previewPreset = null;
+                Assert.That(clouds.CyclePreviewPreset(), Is.Null, "No library: only automatic.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(go);
+                foreach (var o in new Object[] { a, b, storm, library }) if (o != null) Object.DestroyImmediate(o);
+            }
+        }
+
+        [Test]
         public void ShippedPresets_CoverClearDaysAndDarkHeavyRain()
         {
             var library = Library;

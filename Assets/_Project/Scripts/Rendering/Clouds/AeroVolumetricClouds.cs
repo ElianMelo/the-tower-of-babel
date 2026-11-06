@@ -88,6 +88,32 @@ namespace TowerOfBabel.Rendering
             seed = newSeed; initialized = false; Tick(0);
         }
 
+        /// <summary>Every distinct preset the library can show: clear-day presets first, then rain presets.</summary>
+        public List<AeroCloudPreset> LibraryPresets()
+        {
+            var presets = new List<AeroCloudPreset>();
+            if (library == null) return presets;
+            foreach (var list in new[] { library.clearDay, library.rain })
+                if (list != null)
+                    foreach (var entry in list)
+                        if (entry != null && entry.preset != null && !presets.Contains(entry.preset)) presets.Add(entry.preset);
+            return presets;
+        }
+
+        /// <summary>
+        /// Steps the preview through Automatic (weather-driven, null) and every library preset, wrapping around.
+        /// Local to this client; returns the preset now shown, or null when back on automatic weather.
+        /// </summary>
+        public AeroCloudPreset CyclePreviewPreset(int step = 1)
+        {
+            var presets = LibraryPresets();
+            int count = presets.Count + 1, index = previewPreset != null ? presets.IndexOf(previewPreset) + 1 : 0;
+            index = ((index + step) % count + count) % count;
+            previewPreset = index == 0 ? null : presets[index - 1];
+            Tick(0);
+            return previewPreset;
+        }
+
         /// <summary>Blends to a newly rolled clear-day sky over the library's transition time.</summary>
         public void RerollClearSky(bool instant = false)
         {
