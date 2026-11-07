@@ -12,13 +12,6 @@ namespace TowerOfBabel.Rendering.Tests
 {
     public sealed class AeroWetnessPlayModeTests
     {
-        sealed class MemoryStore : IAeroSettingsStore
-        {
-            public readonly Dictionary<string, int> values = new();
-            public int GetInt(string key, int fallback) => values.TryGetValue(key, out var v) ? v : fallback;
-            public void SetInt(string key, int value) => values[key] = value;
-        }
-
         [UnityTest]
         public IEnumerator Rain_WetsTheWorldAtRuntimeAndDriesAfterwards()
         {
@@ -53,35 +46,6 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(controller.RainAmount, Is.Zero);
             }
             finally { Object.Destroy(root); Object.Destroy(profile); SceneManager.SetActiveScene(previous); }
-            yield return SceneManager.UnloadSceneAsync(scene);
-        }
-
-        [UnityTest]
-        public IEnumerator PostLook_CrossfadesAndRestoresTheSavedChoice()
-        {
-            var previous = SceneManager.GetActiveScene(); var scene = SceneManager.CreateScene("Post look runtime fixture"); SceneManager.SetActiveScene(scene);
-            var store = new MemoryStore(); store.SetInt(AeroPostProfileSwitcher.PreferenceKey, (int)AeroPostLook.BrightAero);
-            var root = new GameObject("Post fixture"); root.SetActive(false);
-            try
-            {
-                var volume = root.AddComponent<Volume>(); volume.isGlobal = true; volume.priority = -50;
-                var switcher = root.AddComponent<AeroPostProfileSwitcher>();
-                switcher.restrained.profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/_Project/UI/FrutigerAero/AeroAtmosphere.asset");
-                switcher.brightAero.profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/_Project/Environment/Lighting/AeroPost_Bright.asset");
-                switcher.y2k.profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/_Project/Environment/Lighting/AeroPost_Y2K.asset");
-                switcher.Store = store; switcher.crossfadeSeconds = .2f;
-                root.SetActive(true);
-                yield return null;
-                Assert.That(switcher.Current, Is.EqualTo(AeroPostLook.BrightAero), "The saved look is restored on start.");
-                Assert.That(volume.sharedProfile, Is.SameAs(switcher.brightAero.profile));
-                switcher.Set(AeroPostLook.Y2K);
-                var fade = root.GetComponentsInChildren<Volume>(true);
-                Assert.That(fade.Length, Is.EqualTo(2), "The outgoing look fades out on a temporary volume.");
-                yield return new WaitForSeconds(.35f);
-                Assert.That(root.GetComponentsInChildren<Volume>(true).Length, Is.EqualTo(1), "The crossfade cleans up after itself.");
-                Assert.That(store.values[AeroPostProfileSwitcher.PreferenceKey], Is.EqualTo((int)AeroPostLook.Y2K));
-            }
-            finally { Object.Destroy(root); SceneManager.SetActiveScene(previous); }
             yield return SceneManager.UnloadSceneAsync(scene);
         }
     }

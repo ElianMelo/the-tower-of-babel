@@ -1,6 +1,6 @@
 # F3 developer controls
 
-Press **F3** to open or close the cheat menu. **Escape** closes it too. The cursor becomes available while it is open, and normal cursor and player controls return when it closes. The menu uses unscaled time and can be reopened while the simulation is paused.
+Press **F3** to open or close the cheat menu. Press **F4** to open the compact graphics window directly. It reviews the time, weather and season [atmosphere presets](FrutigerAero/Lighting/ATMOSPHERE_PRESETS.md). **Escape** closes it too. The cursor becomes available while it is open, and normal cursor and player controls return when it closes. The menu uses unscaled time and can be reopened while the simulation is paused.
 
 Start a session with **Start local host** in Quick actions, or use the existing F1/F2 connection shortcuts. Gameplay changes travel through the existing network services and their authoritative replies update the menu and inventory. No typed project cheat commands remain in the debug console.
 

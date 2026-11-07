@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
@@ -11,15 +10,7 @@ namespace TowerOfBabel.Rendering.Tests
     public sealed class AeroPostProfileEditModeTests
     {
         const string Restrained = "Assets/_Project/UI/FrutigerAero/AeroAtmosphere.asset";
-        const string Bright = "Assets/_Project/Environment/Lighting/AeroPost_Bright.asset";
-        const string Y2K = "Assets/_Project/Environment/Lighting/AeroPost_Y2K.asset";
-
-        sealed class MemoryStore : IAeroSettingsStore
-        {
-            public readonly Dictionary<string, int> values = new();
-            public int GetInt(string key, int fallback) => values.TryGetValue(key, out var v) ? v : fallback;
-            public void SetInt(string key, int value) => values[key] = value;
-        }
+        const string Library = "Assets/_Project/Environment/Lighting/AeroAtmospherePresets.asset";
 
         static VolumeProfile Load(string path)
         {
@@ -29,27 +20,28 @@ namespace TowerOfBabel.Rendering.Tests
         }
 
         [Test]
-        public void Looks_GradeTowardFrutigerAeroWithoutBlowingOut()
+        public void Restrained_GradesTowardFrutigerAeroWithoutBlowingOut()
         {
-            foreach (var path in new[] { Restrained, Bright, Y2K })
-            {
-                var p = Load(path);
-                Assert.That(p.TryGet<Tonemapping>(out var tone) && tone.mode.value == TonemappingMode.Neutral, Is.True, path + " keeps cool whites with Neutral");
-                Assert.That(p.TryGet<Bloom>(out var bloom), Is.True);
-                Assert.That(bloom.threshold.value, Is.GreaterThanOrEqualTo(.88f), path + " bloom threshold keeps marble readable");
-                Assert.That(bloom.clamp.value, Is.LessThanOrEqualTo(16));
-                Assert.That(p.TryGet<WhiteBalance>(out var white) && white.temperature.value < 0, Is.True, path + " is cool");
-                Assert.That(p.TryGet<ColorAdjustments>(out var color) && color.saturation.value > 0, Is.True);
-                Assert.That(p.TryGet<Vignette>(out var vignette) && vignette.intensity.value <= .2f, Is.True, "Minimal vignette");
-                Assert.That(p.TryGet<ScreenSpaceLensFlare>(out var flare) && flare.intensity.value <= .08f, Is.True);
-            }
-            var restrained = Load(Restrained);
-            restrained.TryGet<Bloom>(out var accepted);
-            Assert.That(accepted.intensity.value, Is.InRange(.3f, .7f), "Restrained stays close to the accepted look.");
-            Load(Bright).TryGet<Bloom>(out var brightBloom);
-            Assert.That(brightBloom.intensity.value, Is.GreaterThan(accepted.intensity.value), "Bright Aero glows more.");
-            Assert.That(Load(Y2K).TryGet<FilmGrain>(out var grain) && grain.active && grain.intensity.value > 0, Is.True, "Y2K adds grain.");
-            Assert.That(Load(Bright).TryGet<FilmGrain>(out var noGrain) && noGrain.active, Is.False, "Bright Aero is clean.");
+            var p = Load(Restrained);
+            Assert.That(p.TryGet<Tonemapping>(out var tone) && tone.mode.value == TonemappingMode.Neutral, Is.True, "Neutral keeps cool whites");
+            Assert.That(p.TryGet<Bloom>(out var bloom), Is.True);
+            Assert.That(bloom.threshold.value, Is.GreaterThanOrEqualTo(.88f), "Bloom threshold keeps marble readable");
+            Assert.That(bloom.intensity.value, Is.InRange(.3f, .7f), "Restrained stays close to the accepted look.");
+            Assert.That(bloom.clamp.value, Is.LessThanOrEqualTo(16));
+            Assert.That(p.TryGet<WhiteBalance>(out var white) && white.temperature.value < 0, Is.True, "Cool");
+            Assert.That(p.TryGet<ColorAdjustments>(out var color) && color.saturation.value > 0, Is.True);
+            Assert.That(p.TryGet<Vignette>(out var vignette) && vignette.intensity.value <= .2f, Is.True, "Minimal vignette");
+            Assert.That(p.TryGet<ScreenSpaceLensFlare>(out var flare) && flare.intensity.value <= .08f, Is.True);
+            Assert.That(p.TryGet<FilmGrain>(out var grain) && grain.active, Is.False, "No Y2K grain.");
+            Assert.That(p.TryGet<ChromaticAberration>(out var fringe) && fringe.active, Is.False, "No colour fringe.");
+        }
+
+        [Test]
+        public void RejectedLooks_AreRetired()
+        {
+            Assert.That(AssetDatabase.LoadAssetAtPath<Object>("Assets/_Project/Environment/Lighting/AeroPost_Bright.asset"), Is.Null, "Bright Aero was rejected.");
+            Assert.That(AssetDatabase.LoadAssetAtPath<Object>("Assets/_Project/Environment/Lighting/AeroPost_Y2K.asset"), Is.Null, "Y2K was rejected.");
+            Assert.That(System.Type.GetType("TowerOfBabel.Rendering.AeroPostProfileSwitcher, TowerOfBabel.Rendering"), Is.Null);
         }
 
         [Test]
@@ -62,49 +54,31 @@ namespace TowerOfBabel.Rendering.Tests
         }
 
         [Test]
-        public void Switcher_SelectsCyclesAndRemembersTheLook()
-        {
-            var go = new GameObject("Post switcher test") { hideFlags = HideFlags.HideAndDontSave };
-            go.SetActive(false);
-            var volume = go.AddComponent<Volume>(); volume.isGlobal = true; volume.priority = -100;
-            var switcher = go.AddComponent<AeroPostProfileSwitcher>();
-            switcher.restrained.profile = Load(Restrained); switcher.brightAero.profile = Load(Bright); switcher.y2k.profile = Load(Y2K);
-            var store = new MemoryStore(); switcher.Store = store; switcher.crossfadeSeconds = 0;
-            go.SetActive(true);
-            try
-            {
-                switcher.Set(AeroPostLook.BrightAero);
-                Assert.That(volume.sharedProfile, Is.EqualTo(switcher.brightAero.profile));
-                Assert.That(store.values[AeroPostProfileSwitcher.PreferenceKey], Is.EqualTo((int)AeroPostLook.BrightAero));
-                Assert.That(switcher.Cycle(), Is.EqualTo(AeroPostLook.Y2K));
-                Assert.That(volume.sharedProfile, Is.EqualTo(switcher.y2k.profile));
-                Assert.That(switcher.Cycle(), Is.EqualTo(AeroPostLook.Restrained));
-                Assert.That(store.values[AeroPostProfileSwitcher.PreferenceKey], Is.EqualTo((int)AeroPostLook.Restrained));
-            }
-            finally { Object.DestroyImmediate(go); }
-        }
-
-        [Test]
-        public void TowerScene_GlobalVolumeHasTheSwitcherAndTheExitVolumeStillWins()
+        public void TowerScene_GlobalVolumeIsRestrainedAndTheExitVolumeStillWinsOverTheGrade()
         {
             TowerSceneAccess.With(scene =>
             {
                 var volumes = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Volume>(true)).ToArray();
                 var global = volumes.Single(v => v.isGlobal);
-                var switcher = global.GetComponent<AeroPostProfileSwitcher>();
-                Assert.That(switcher, Is.Not.Null);
-                Assert.That(switcher.restrained.profile, Is.EqualTo(Load(Restrained)));
-                Assert.That(switcher.brightAero.profile, Is.EqualTo(Load(Bright)));
-                Assert.That(switcher.y2k.profile, Is.EqualTo(Load(Y2K)));
-                Assert.That(global.sharedProfile, Is.EqualTo(Load(Restrained)), "The accepted look stays the default.");
+                Assert.That(global.sharedProfile, Is.EqualTo(Load(Restrained)), "The accepted look stays the base.");
+                Assert.That(global.GetComponents<MonoBehaviour>().Any(m => m == null), Is.False, "No missing scripts left by the retired switcher.");
                 var exit = volumes.Single(v => !v.isGlobal);
-                Assert.That(exit.priority, Is.GreaterThan(global.priority));
+                var director = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<AeroAtmosphereDirector>(true)).Single();
+                Assert.That(director.baseVolume, Is.SameAs(global));
+                Assert.That(global.priority + 1, Is.LessThan(exit.priority), "The runtime grade sits above Restrained and below the tower exit volume.");
             });
         }
 
         [Test]
-        public void BrightLook_KeepsLitWhiteMarbleBelowClipping()
+        public void BrightestPreset_KeepsLitWhiteMarbleBelowClipping()
         {
+            var library = AssetDatabase.LoadAssetAtPath<AeroAtmospherePresetLibrary>(Library);
+            Assert.That(library, Is.Not.Null);
+            // The permutation with the most exposure and bloom is the one most likely to clip.
+            var brightest = Enumerable.Range(0, AeroAtmospherePresetLibrary.PermutationCount).Select(AeroAtmospherePresetLibrary.Permutation)
+                .Where(p => p.time is AeroTimeSlot.MidDay or AeroTimeSlot.Morning or AeroTimeSlot.Afternoon)
+                .OrderByDescending(p => { var l = library.Compose(p.time, p.weather, p.season).look; return l.exposure + l.bloomIntensity * .2f; }).First();
+
             using var h = new AeroRenderHarness(128);
             var marble = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Project/Models/Buildings/FrutigerAero/Aero_WhiteMarble_Floor_Tile.mat");
             var mesh = AssetDatabase.LoadAssetAtPath<Mesh>("Assets/_Project/Models/Buildings/FrutigerAero/FloorTileComplete.asset");
@@ -112,12 +86,25 @@ namespace TowerOfBabel.Rendering.Tests
             h.Camera.transform.position = new Vector3(0, 3, -4); h.Camera.transform.LookAt(new Vector3(0, 0, 4));
             h.Camera.allowHDR = true;
             var data = h.Camera.GetUniversalAdditionalCameraData(); data.renderPostProcessing = true; data.volumeLayerMask = 1 << AeroRenderHarness.Layer;
-            var go = new GameObject("Bright review volume") { layer = AeroRenderHarness.Layer };
+            var go = new GameObject("Restrained review volume") { layer = AeroRenderHarness.Layer };
             UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, h.Scene);
-            var volume = go.AddComponent<Volume>(); volume.isGlobal = true; volume.priority = 100; volume.sharedProfile = Load(Bright);
-            var image = h.Render();
-            float clipped = image.Count(c => c.r > .995f && c.g > .995f && c.b > .995f) / (float)image.Length;
-            Assert.That(clipped, Is.LessThan(.02f), "Bright Aero must keep detail in sunlit white marble.");
+            var baseVolume = go.AddComponent<Volume>(); baseVolume.isGlobal = true; baseVolume.priority = 100; baseVolume.sharedProfile = Load(Restrained);
+            var directorObject = new GameObject("Grade review") { layer = AeroRenderHarness.Layer };
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(directorObject, h.Scene);
+            var director = directorObject.AddComponent<AeroAtmosphereDirector>();
+            director.library = library; director.baseVolume = baseVolume; director.Store = new MemoryAeroSettingsStore();
+            try
+            {
+                director.SetSeason(brightest.season, false, true);
+                director.SetWeatherOverride(brightest.weather, true);
+                director.dayNight = null; director.fallbackTimeOfDay = library.TimeOf(brightest.time);
+                director.Tick(0);
+                director.GradeVolume.gameObject.layer = AeroRenderHarness.Layer;
+                var image = h.Render();
+                float clipped = image.Count(c => c.r > .995f && c.g > .995f && c.b > .995f) / (float)image.Length;
+                Assert.That(clipped, Is.LessThan(.02f), $"{brightest} must keep detail in sunlit white marble.");
+            }
+            finally { director.Shutdown(); }
         }
     }
 }

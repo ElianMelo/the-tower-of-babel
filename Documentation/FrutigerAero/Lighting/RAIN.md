@@ -59,7 +59,7 @@ The rules live in plain classes in `Scripts/Weather/`: `WeatherDirector` (reques
 | **Set day** / **Set night** | Jumps the clock to noon / midnight. |
 | **Freeze time of day** | Stops the day/night cycle, for inspecting assets in one light. |
 
-**Wetness preset** and **Post look** remain local previews.
+**Wetness preset** remains a local preview. Post looks were retired on 2026-11-07; see [atmosphere presets](ATMOSPHERE_PRESETS.md).
 
 ## Feedback round (2026-10-31)
 

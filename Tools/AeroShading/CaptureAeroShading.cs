@@ -154,7 +154,7 @@ public static class CaptureAeroShading
             wet.OverrideWetness(.18f); wet.Tick(0);
 
             cameraData.renderPostProcessing = true; volume.enabled = true;
-            foreach (var (look, path) in new[] { ("restrained", AeroShadingAuthoring.RestrainedPath), ("bright", AeroShadingAuthoring.BrightPath), ("y2k", AeroShadingAuthoring.Y2KPath) })
+            foreach (var (look, path) in new[] { ("restrained", AeroShadingAuthoring.RestrainedPath) })
             {
                 volume.sharedProfile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(path);
                 Shot("post-" + look + "-materials", new Vector3(24, 8.6f, 3.2f), new Vector3(24, 7, 9));

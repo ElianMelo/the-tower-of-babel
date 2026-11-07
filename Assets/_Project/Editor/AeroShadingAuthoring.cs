@@ -9,16 +9,15 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 /// <summary>
-/// Authors the Frutiger Aero shading pass: global wetness profile, the three post looks
-/// (Restrained / Bright Aero / Y2K), HDR grading on PC and the Tower scene wiring.
+/// Authors the Frutiger Aero shading pass: global wetness profile, the Restrained post profile,
+/// HDR grading on PC and the Tower scene wiring. Bright Aero and Y2K were rejected on 2026-11-07;
+/// time/weather/season grading now comes from AeroAtmospherePresetAuthoring.
 /// Idempotent; see Documentation/FrutigerAero/Lighting/POST_PROFILES.md and WETNESS.md.
 /// </summary>
 public static class AeroShadingAuthoring
 {
     public const string WetnessPath = "Assets/_Project/Environment/Lighting/AeroWetness.asset";
     public const string RestrainedPath = "Assets/_Project/UI/FrutigerAero/AeroAtmosphere.asset";
-    public const string BrightPath = "Assets/_Project/Environment/Lighting/AeroPost_Bright.asset";
-    public const string Y2KPath = "Assets/_Project/Environment/Lighting/AeroPost_Y2K.asset";
     public const string ScenePath = "Assets/_Project/Scenes/Tower.unity";
     const string Drops = "Assets/MoveRotateResize/DYNAMIC- Falling Rain/Rain/Textures/rain_drops_01.tga";
     const string Streaks = "Assets/MoveRotateResize/DYNAMIC- Falling Rain/Rain/Textures/rain_streaks_01.png";
@@ -30,7 +29,7 @@ public static class AeroShadingAuthoring
             throw new InvalidOperationException("Author this project's shading in Edit Mode.");
     }
 
-    [MenuItem("Tower of Babel/Rendering/Apply Aero shading, wetness and post looks")]
+    [MenuItem("Tower of Babel/Rendering/Apply Aero shading, wetness and post profile")]
     public static string Apply()
     {
         Guard();
@@ -105,15 +104,6 @@ public static class AeroShadingAuthoring
         return component;
     }
 
-    static VolumeProfile LoadOrCreate(string path)
-    {
-        var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(path);
-        if (profile != null) return profile;
-        profile = ScriptableObject.CreateInstance<VolumeProfile>();
-        AssetDatabase.CreateAsset(profile, path);
-        return profile;
-    }
-
     public struct Look
     {
         public float threshold, bloom, scatter, clamp; public Color bloomTint; public bool highQuality;
@@ -132,25 +122,6 @@ public static class AeroShadingAuthoring
         temperature = -6, tint = 2, lift = new Vector4(.97f, 1, 1.04f, 0), gamma = new Vector4(1, 1, 1, 0), gain = new Vector4(.99f, 1, 1.02f, .02f),
         vignette = .14f, vignetteColor = new Color(.05f, .15f, .35f), aberration = 0, grain = 0, lensFlare = .035f, keepFlare = true
     };
-
-    public static readonly Look Bright = new()
-    {
-        threshold = .92f, bloom = .85f, scatter = .7f, clamp = 16, bloomTint = new Color(.85f, .95f, 1), highQuality = true,
-        exposure = .1f, contrast = 12, saturation = 26, filter = new Color(.97f, 1, 1.03f),
-        temperature = -10, tint = 3, lift = new Vector4(.96f, 1, 1.05f, 0), gamma = new Vector4(.98f, 1, 1.02f, 0), gain = new Vector4(.98f, 1, 1.02f, 0),
-        split = true, splitShadows = new Color(.18f, .48f, .84f), splitHighlights = new Color(.95f, 1, .98f), splitBalance = -25,
-        vignette = .12f, vignetteColor = new Color(.05f, .15f, .35f), aberration = .04f, grain = 0, lensFlare = .05f
-    };
-
-    public static Look Y2K
-    {
-        get
-        {
-            var look = Bright;
-            look.bloom = 1f; look.saturation = 30; look.aberration = .06f; look.grain = .15f; look.vignette = .16f;
-            return look;
-        }
-    }
 
     public static void Write(VolumeProfile profile, Look look)
     {
@@ -194,21 +165,6 @@ public static class AeroShadingAuthoring
             ?? throw new InvalidOperationException("Missing accepted atmosphere profile " + RestrainedPath);
         // Keep the accepted screen-space flare streak settings; only grading and bloom move.
         Write(restrained, Restrained);
-        var bright = LoadOrCreate(BrightPath);
-        CopyFlareSettings(restrained, bright);
-        Write(bright, Bright);
-        var y2k = LoadOrCreate(Y2KPath);
-        CopyFlareSettings(restrained, y2k);
-        Write(y2k, Y2K);
-    }
-
-    static void CopyFlareSettings(VolumeProfile from, VolumeProfile to)
-    {
-        if (!from.TryGet<ScreenSpaceLensFlare>(out var source)) return;
-        var target = Override<ScreenSpaceLensFlare>(to);
-        for (int i = 0; i < source.parameters.Count; i++)
-            if (source.parameters[i].overrideState) target.parameters[i].SetValue(source.parameters[i]);
-        for (int i = 0; i < source.parameters.Count; i++) target.parameters[i].overrideState = source.parameters[i].overrideState;
     }
 
     public static void ConfigurePipeline()
@@ -235,16 +191,11 @@ public static class AeroShadingAuthoring
             .FirstOrDefault(v => v.isGlobal && v.gameObject.scene == scene);
         if (volume != null)
         {
-            var switcher = volume.GetComponent<AeroPostProfileSwitcher>() ?? volume.gameObject.AddComponent<AeroPostProfileSwitcher>();
-            switcher.restrained.profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(RestrainedPath);
-            switcher.brightAero.profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(BrightPath);
-            switcher.y2k.profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(Y2KPath);
-            switcher.dayNight = atmosphere; switcher.defaultLook = AeroPostLook.Restrained;
-            volume.sharedProfile = switcher.restrained.profile;
-            EditorUtility.SetDirty(switcher); EditorUtility.SetDirty(volume);
+            volume.sharedProfile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(RestrainedPath);
+            EditorUtility.SetDirty(volume);
         }
         EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
-        return "Tower scene wired (wetness controller, post look switcher).";
+        return "Tower scene wired (wetness controller, Restrained global volume).";
     }
 }
 #endif

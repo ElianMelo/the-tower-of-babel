@@ -164,7 +164,8 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(menu.ActionButtons.ContainsKey("Set day"), Is.True);
                 Assert.That(menu.ActionButtons.ContainsKey("Set night"), Is.True);
                 Assert.That(menu.ActionButtons.ContainsKey("Wetness preset"), Is.True);
-                Assert.That(menu.ActionButtons.ContainsKey("Post look"), Is.True);
+                Assert.That(menu.ActionButtons.ContainsKey("Season"), Is.True, "Season cycle replaces the retired post looks.");
+                Assert.That(menu.ActionButtons.ContainsKey("Post look"), Is.False);
                 menu.SelectAllProfessions(); Assert.That(menu.AllProfessions, Is.True);
                 menu.SelectCategory("Stats");
                 var fields = root.GetComponentsInChildren<TMPro.TMP_InputField>(true);
@@ -193,9 +194,12 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(menu.IsVisualPanelVisible, Is.True);
                 Assert.That(menu.IsVisible, Is.False, "The full menu and its dark overlay hide so the scene stays visible.");
                 Assert.That(menu.IsOpen, Is.True);
-                foreach (string key in new[] { "Cycle day/night", "Sunrise", "Noon", "Sunset", "Midnight", "-1 hour", "+1 hour", "Freeze time", "Rain", "Automatic weather",
-                    "Previous cloud preset", "Next cloud preset", "Automatic clouds", "Reroll clouds", "Wetness preset", "Post look", "Full menu", "Close" })
+                foreach (string key in new[] { "Cycle day/night", "Morning", "Mid-day", "Afternoon", "Night", "Midnight", "-1 hour", "+1 hour", "Freeze time",
+                    "Weather Clear", "Weather Cloudy", "Weather Rain", "Weather Auto", "Season Spring", "Season Summer", "Season Autumn", "Season Winter",
+                    "Previous preset", "Next preset", "Live preset",
+                    "Previous cloud preset", "Next cloud preset", "Automatic clouds", "Reroll clouds", "Wetness preset", "Full menu", "Close" })
                     Assert.That(menu.VisualButtons.ContainsKey(key), Is.True, key);
+                Assert.That(menu.VisualButtons.ContainsKey("Post look"), Is.False, "Bright Aero and Y2K were rejected.");
 
                 var panel = menu.VisualButtons["Cycle day/night"].GetComponentInParent<UnityEngine.UI.VerticalLayoutGroup>().GetComponent<RectTransform>();
                 Assert.That(panel.name, Is.EqualTo("Visual controls"));
@@ -204,7 +208,7 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(panel.anchoredPosition.x, Is.InRange(0, 40)); Assert.That(panel.anchoredPosition.y, Is.InRange(-40, 0));
                 UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(panel);
                 Assert.That(panel.rect.width, Is.LessThanOrEqualTo(420), "Compact: about a quarter of the 1600-wide reference screen.");
-                Assert.That(panel.rect.height, Is.InRange(200, 520), "Compact: leaves most of the 900-high reference screen visible.");
+                Assert.That(panel.rect.height, Is.InRange(200, 860), "Fits the 900-high reference screen; the scene stays visible to the right.");
                 foreach (var b in menu.VisualButtons.Values)
                 {
                     var r = (RectTransform)b.transform; Assert.That(r.rect.width, Is.GreaterThan(0), b.name);
@@ -221,28 +225,84 @@ namespace TowerOfBabel.Resources.Tests
                 menu.ShowVisualPanel(); menu.VisualButtons["Close"].onClick.Invoke();
                 Assert.That(menu.IsOpen, Is.False, "Close hides everything.");
                 menu.ShowVisualPanel(); Assert.That(menu.IsVisualPanelVisible, Is.True, "The panel can also open directly.");
+                menu.ToggleVisualPanel(); Assert.That(menu.IsOpen, Is.False, "F4 closes the graphics window.");
+                menu.ToggleVisualPanel(); Assert.That(menu.IsVisualPanelVisible, Is.True, "F4 opens the graphics window directly.");
+                Assert.That(menu.IsVisible, Is.False, "Without the full menu.");
                 menu.Toggle(); Assert.That(menu.IsOpen, Is.False, "F3 closes the visual panel.");
             }
             finally { UnityEngine.Object.DestroyImmediate(root); }
         }
 
         [Test]
-        public void VisualPanel_DayCycleStepsSunriseNoonSunsetMidnightAndFormatsTheClock()
+        public void VisualPanel_DayCycleStepsThroughTheFiveTimePresetsAndFormatsTheClock()
         {
-            Assert.That(CheatMenuUI.DayPhases.Select(p => p.name), Is.EqualTo(new[] { "Sunrise", "Noon", "Sunset", "Midnight" }));
+            Assert.That(CheatMenuUI.DayPhases.Select(p => p.name), Is.EqualTo(new[] { "Morning", "Mid-day", "Afternoon", "Night", "Midnight" }));
+            var library = ScriptableObject.CreateInstance<TowerOfBabel.Rendering.AeroAtmospherePresetLibrary>();
+            try
+            {
+                foreach (var phase in CheatMenuUI.DayPhases)
+                {
+                    var slot = (TowerOfBabel.Rendering.AeroTimeSlot)Array.IndexOf(CheatMenuUI.DayPhases, phase);
+                    Assert.That(phase.time, Is.EqualTo(library.TimeOf(slot)).Within(1e-5f), phase.name + " jumps to its atmosphere preset.");
+                }
+            }
+            finally { UnityEngine.Object.DestroyImmediate(library); }
             string Next(float time) => CheatMenuUI.DayPhases[CheatMenuUI.NextDayPhase(time)].name;
-            Assert.That(Next(0), Is.EqualTo("Sunrise"));
-            Assert.That(Next(.27f), Is.EqualTo("Noon"));
-            Assert.That(Next(.5f), Is.EqualTo("Sunset"));
-            Assert.That(Next(.73f), Is.EqualTo("Midnight"));
-            Assert.That(Next(.9f), Is.EqualTo("Midnight"));
-            Assert.That(Next(.996f), Is.EqualTo("Sunrise"), "Just before midnight counts as midnight already.");
-            Assert.That(Next(.4f), Is.EqualTo("Noon"));
+            Assert.That(Next(0), Is.EqualTo("Morning"));
+            Assert.That(Next(7f / 24), Is.EqualTo("Mid-day"));
+            Assert.That(Next(.5f), Is.EqualTo("Afternoon"));
+            Assert.That(Next(16.5f / 24), Is.EqualTo("Night"));
+            Assert.That(Next(21f / 24), Is.EqualTo("Midnight"));
+            Assert.That(Next(.996f), Is.EqualTo("Morning"), "Just before midnight counts as midnight already.");
+            Assert.That(Next(.4f), Is.EqualTo("Mid-day"));
             Assert.That(CheatMenuUI.FormatTimeOfDay(0), Is.EqualTo("00:00"));
             Assert.That(CheatMenuUI.FormatTimeOfDay(.5f), Is.EqualTo("12:00"));
             Assert.That(CheatMenuUI.FormatTimeOfDay(.75f), Is.EqualTo("18:00"));
             Assert.That(CheatMenuUI.FormatTimeOfDay(1.25f), Is.EqualTo("06:00"));
             Assert.That(CheatMenuUI.FormatTimeOfDay(.9999f), Is.EqualTo("00:00"));
+        }
+
+        [Test]
+        public void GraphicsWindow_BrowsesEveryAtmospherePresetAndShowsItsValues()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/UI/FrutigerAero/Prefabs/Screens/CheatMenu.prefab");
+            var root = UnityEngine.Object.Instantiate(prefab);
+            var host = new GameObject("Atmosphere director host") { hideFlags = HideFlags.HideAndDontSave };
+            var director = host.AddComponent<TowerOfBabel.Rendering.AeroAtmosphereDirector>();
+            var store = new MemoryStore();
+            try
+            {
+                director.library = AssetDatabase.LoadAssetAtPath<TowerOfBabel.Rendering.AeroAtmospherePresetLibrary>("Assets/_Project/Environment/Lighting/AeroAtmospherePresets.asset");
+                director.Store = store; director.EnsureInitialized();
+                var menu = root.GetComponent<CheatMenuUI>(); menu.BuildView(); menu.ShowVisualPanel();
+                int index = TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.IndexOf(TowerOfBabel.Rendering.AeroTimeSlot.Night, TowerOfBabel.Rendering.AeroWeatherKind.Cloudy, TowerOfBabel.Rendering.AeroSeason.Autumn);
+                menu.ApplyPreset(index);
+                Assert.That(director.Season, Is.EqualTo(TowerOfBabel.Rendering.AeroSeason.Autumn));
+                Assert.That(director.WeatherOverride, Is.EqualTo(TowerOfBabel.Rendering.AeroWeatherKind.Cloudy));
+                Assert.That(store.values[TowerOfBabel.Rendering.AeroAtmosphereDirector.SeasonKey], Is.EqualTo((int)TowerOfBabel.Rendering.AeroSeason.Autumn));
+                Assert.That(menu.PresetText, Does.Contain($"{index + 1}/60").And.Contain("Autumn").And.Contain("Cloudy").And.Contain("Night"));
+                Assert.That(menu.PresetDetailsText, Does.Contain("sat").And.Contain("Fog").And.Contain("Particles"), "The window shows the preset's values for review.");
+                Assert.That(menu.VisualStatusText, Does.Contain("Preset " + (index + 1)));
+                menu.VisualButtons["Next preset"].onClick.Invoke();
+                Assert.That(menu.PresetText, Does.Contain($"{index + 2}/60"));
+                menu.ApplyPreset(59); menu.VisualButtons["Next preset"].onClick.Invoke();
+                Assert.That(menu.PresetText, Does.StartWith("Preset 1/60"), "Browsing wraps around all 60 presets.");
+                menu.VisualButtons["Season Spring"].onClick.Invoke();
+                Assert.That(director.Season, Is.EqualTo(TowerOfBabel.Rendering.AeroSeason.Spring));
+                menu.VisualButtons["Weather Rain"].onClick.Invoke();
+                Assert.That(director.WeatherOverride, Is.EqualTo(TowerOfBabel.Rendering.AeroWeatherKind.Rain));
+                menu.VisualButtons["Live preset"].onClick.Invoke();
+                Assert.That(director.WeatherOverride, Is.Null, "Live returns to automatic weather.");
+                Assert.That(menu.PresetText, Does.Contain("(live)"));
+            }
+            finally { director.Shutdown(); UnityEngine.Object.DestroyImmediate(host); UnityEngine.Object.DestroyImmediate(root); }
+        }
+
+        sealed class MemoryStore : TowerOfBabel.Rendering.IAeroSettingsStore
+        {
+            public readonly Dictionary<string, int> values = new();
+            public int GetInt(string key, int fallback) => values.TryGetValue(key, out var v) ? v : fallback;
+            public void SetInt(string key, int value) => values[key] = value;
         }
 
         [Test]

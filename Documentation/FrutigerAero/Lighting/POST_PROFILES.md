@@ -1,3 +1,5 @@
+> **2026-11-07: Bright Aero and Y2K were rejected.** Their profiles, the `AeroPostProfileSwitcher` and the Post look buttons are removed. Restrained remains the base global volume. Time, weather and season grading now comes from the [atmosphere presets](ATMOSPHERE_PRESETS.md). The rest of this page is kept as history.
+
 # Post-processing looks
 
 Added 2026-10-29. The user asked for two switchable profiles, plus an optional Y2K variant. **Restrained** stays the default until another look is accepted.

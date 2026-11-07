@@ -1,0 +1,394 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fa9b6581a89dad49a581ddf6d0a6e22, type: 3}
+  m_Name: AeroAtmospherePresets
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroAtmospherePresetLibrary
+  times:
+  - slot: 0
+    time: 0.29166666
+    notes: 07:00 fresh mist, peach sun, cool shade.
+    look:
+      exposure: 0.05
+      contrast: 4
+      saturation: 14
+      temperature: -3
+      tint: 2
+      colorFilter: {r: 1, g: 0.99, b: 0.98, a: 1}
+      bloomIntensity: 0.6
+      bloomThreshold: 0.93
+      bloomTint: {r: 1, g: 0.96, b: 0.9, a: 1}
+      vignette: 0.12
+      splitShadows: {r: 0.44, g: 0.5, b: 0.58, a: 1}
+      splitHighlights: {r: 0.56, g: 0.51, b: 0.46, a: 1}
+      splitBalance: 10
+      sunTint: {r: 1, g: 0.93, b: 0.84, a: 1}
+      sunScale: 0.9
+      ambientTint: {r: 0.98, g: 0.98, b: 1, a: 1}
+      ambientScale: 1
+      shadowStrength: 0.75
+      skyExposureScale: 1
+      fogColor: {r: 0.76, g: 0.82, b: 0.88, a: 1}
+      fogDensityScale: 1.4
+      night: 0
+      particleLight: 1
+      particleScale: 1
+  - slot: 1
+    time: 0.5
+    notes: 12:00 clean sky blue and grass green; the accepted Restrained baseline,
+      slightly richer.
+    look:
+      exposure: 0.05
+      contrast: 7
+      saturation: 16
+      temperature: -7
+      tint: 2
+      colorFilter: {r: 1, g: 1, b: 1, a: 1}
+      bloomIntensity: 0.55
+      bloomThreshold: 0.95
+      bloomTint: {r: 0.92, g: 0.97, b: 1, a: 1}
+      vignette: 0.12
+      splitShadows: {r: 0.46, g: 0.5, b: 0.56, a: 1}
+      splitHighlights: {r: 0.51, g: 0.51, b: 0.5, a: 1}
+      splitBalance: 0
+      sunTint: {r: 1, g: 1, b: 0.98, a: 1}
+      sunScale: 1.05
+      ambientTint: {r: 0.98, g: 1, b: 1.02, a: 1}
+      ambientScale: 1.05
+      shadowStrength: 0.85
+      skyExposureScale: 1.05
+      fogColor: {r: 0.64, g: 0.79, b: 0.9, a: 1}
+      fogDensityScale: 1
+      night: 0
+      particleLight: 1
+      particleScale: 1
+  - slot: 2
+    time: 0.6875
+    notes: '16:30 golden hour: warm low sun, teal shadows, honey haze.'
+    look:
+      exposure: 0.03
+      contrast: 6
+      saturation: 17
+      temperature: 5
+      tint: 1
+      colorFilter: {r: 1, g: 0.98, b: 0.95, a: 1}
+      bloomIntensity: 0.65
+      bloomThreshold: 0.92
+      bloomTint: {r: 1, g: 0.93, b: 0.82, a: 1}
+      vignette: 0.13
+      splitShadows: {r: 0.44, g: 0.51, b: 0.57, a: 1}
+      splitHighlights: {r: 0.58, g: 0.53, b: 0.45, a: 1}
+      splitBalance: 10
+      sunTint: {r: 1, g: 0.87, b: 0.7, a: 1}
+      sunScale: 0.95
+      ambientTint: {r: 1, g: 0.96, b: 0.9, a: 1}
+      ambientScale: 1
+      shadowStrength: 0.75
+      skyExposureScale: 1
+      fogColor: {r: 0.8, g: 0.79, b: 0.76, a: 1}
+      fogDensityScale: 1.2
+      night: 0
+      particleLight: 1.05
+      particleScale: 1
+  - slot: 3
+    time: 0.875
+    notes: 21:00 blue hour into night, moonlit and readable.
+    look:
+      exposure: 0.12
+      contrast: 5
+      saturation: 11
+      temperature: -10
+      tint: 3
+      colorFilter: {r: 0.97, g: 0.99, b: 1.03, a: 1}
+      bloomIntensity: 0.75
+      bloomThreshold: 0.9
+      bloomTint: {r: 0.8, g: 0.92, b: 1, a: 1}
+      vignette: 0.16
+      splitShadows: {r: 0.45, g: 0.48, b: 0.58, a: 1}
+      splitHighlights: {r: 0.52, g: 0.5, b: 0.56, a: 1}
+      splitBalance: -10
+      sunTint: {r: 1, g: 1, b: 1, a: 1}
+      sunScale: 1
+      ambientTint: {r: 0.9, g: 0.95, b: 1.05, a: 1}
+      ambientScale: 1.15
+      shadowStrength: 0.6
+      skyExposureScale: 1
+      fogColor: {r: 0.2, g: 0.3, b: 0.48, a: 1}
+      fogDensityScale: 1.1
+      night: 1
+      particleLight: 0.55
+      particleScale: 1
+  - slot: 4
+    time: 0
+    notes: 00:00 deepest calm blue; fireflies and lamps carry the glow.
+    look:
+      exposure: -0.12
+      contrast: 5
+      saturation: 10
+      temperature: -13
+      tint: 4
+      colorFilter: {r: 0.97, g: 0.99, b: 1.03, a: 1}
+      bloomIntensity: 0.8
+      bloomThreshold: 0.9
+      bloomTint: {r: 0.75, g: 0.9, b: 1, a: 1}
+      vignette: 0.18
+      splitShadows: {r: 0.46, g: 0.47, b: 0.57, a: 1}
+      splitHighlights: {r: 0.52, g: 0.5, b: 0.56, a: 1}
+      splitBalance: -10
+      sunTint: {r: 1, g: 1, b: 1, a: 1}
+      sunScale: 1
+      ambientTint: {r: 0.88, g: 0.93, b: 1.06, a: 1}
+      ambientScale: 0.85
+      shadowStrength: 0.5
+      skyExposureScale: 0.65
+      fogColor: {r: 0.11, g: 0.17, b: 0.31, a: 1}
+      fogDensityScale: 0.9
+      night: 1
+      particleLight: 0.45
+      particleScale: 1
+  weathers:
+  - weather: 0
+    notes: Full sun, crisp shadows, a touch more colour.
+    adjust:
+      exposure: 0
+      contrast: 0
+      saturation: 1
+      temperature: 0
+      tint: 0
+      vignette: 0
+      splitBalance: 0
+      colorFilter: {r: 1, g: 1, b: 1, a: 1}
+      bloomScale: 1
+      splitScale: 1
+      sunTint: {r: 1, g: 1, b: 1, a: 1}
+      sunScale: 1
+      ambientTint: {r: 1, g: 1, b: 1, a: 1}
+      ambientScale: 1
+      shadowScale: 1
+      skyExposureScale: 1
+      fogTint: {r: 1, g: 1, b: 1, a: 1}
+      fogDesaturate: 0
+      fogDensityScale: 1
+      particleScale: 1
+    particleScale: 1
+    precipitationScale: 0.55
+  - weather: 1
+    notes: Soft diffuse light, pearly haze, gentle shadows.
+    adjust:
+      exposure: -0.03
+      contrast: -2
+      saturation: -3
+      temperature: -2
+      tint: 0
+      vignette: 0.01
+      splitBalance: 0
+      colorFilter: {r: 1, g: 1, b: 1, a: 1}
+      bloomScale: 0.85
+      splitScale: 0.7
+      sunTint: {r: 1, g: 1, b: 1, a: 1}
+      sunScale: 0.9
+      ambientTint: {r: 0.99, g: 1, b: 1.02, a: 1}
+      ambientScale: 1.08
+      shadowScale: 0.6
+      skyExposureScale: 0.95
+      fogTint: {r: 0.98, g: 1, b: 1.02, a: 1}
+      fogDesaturate: 0.2
+      fogDensityScale: 1.2
+      particleScale: 1
+    particleScale: 0.7
+    precipitationScale: 1
+  - weather: 2
+    notes: 'Cosy rain: cool, misty, shadows almost gone; snow thickens in winter.'
+    adjust:
+      exposure: -0.05
+      contrast: -1
+      saturation: -5
+      temperature: -4
+      tint: -1
+      vignette: 0.02
+      splitBalance: 0
+      colorFilter: {r: 0.97, g: 0.99, b: 1.02, a: 1}
+      bloomScale: 1.1
+      splitScale: 0.8
+      sunTint: {r: 1, g: 1, b: 1, a: 1}
+      sunScale: 1
+      ambientTint: {r: 1, g: 1, b: 1, a: 1}
+      ambientScale: 1.05
+      shadowScale: 0.4
+      skyExposureScale: 1
+      fogTint: {r: 0.96, g: 1, b: 1.03, a: 1}
+      fogDesaturate: 0.15
+      fogDensityScale: 1.3
+      particleScale: 1
+    particleScale: 0.2
+    precipitationScale: 1.7
+  seasons:
+  - season: 0
+    notes: Pastel green freshness, drifting blossom petals; pollen glow at night.
+    adjust:
+      exposure: 0.03
+      contrast: -1
+      saturation: 3
+      temperature: -1
+      tint: -2
+      vignette: 0
+      splitBalance: 0
+      colorFilter: {r: 0.98, g: 1.02, b: 0.99, a: 1}
+      bloomScale: 1.05
+      splitScale: 1
+      sunTint: {r: 1, g: 0.99, b: 0.95, a: 1}
+      sunScale: 1
+      ambientTint: {r: 0.98, g: 1.03, b: 0.98, a: 1}
+      ambientScale: 1
+      shadowScale: 1
+      skyExposureScale: 1
+      fogTint: {r: 0.99, g: 1.02, b: 1, a: 1}
+      fogDesaturate: 0
+      fogDensityScale: 1.1
+      particleScale: 1
+    dayParticles:
+      kind: 1
+      color: {r: 1, g: 0.86, b: 0.92, a: 1}
+      density: 0.55
+      size: 0.09
+      fallSpeed: 0.35
+      drift: 0.6
+      glow: 1
+    nightParticles:
+      kind: 0
+      color: {r: 0.55, g: 1, b: 0.85, a: 1}
+      density: 0.35
+      size: 0.05
+      fallSpeed: -0.03
+      drift: 0.25
+      glow: 2.2
+    precipitation: 0
+  - season: 1
+    notes: Vivid sky and grass, golden dust motes by day, fireflies at night.
+    adjust:
+      exposure: 0.03
+      contrast: 1
+      saturation: 4
+      temperature: 2
+      tint: 0
+      vignette: 0
+      splitBalance: 0
+      colorFilter: {r: 1.01, g: 1, b: 0.98, a: 1}
+      bloomScale: 1
+      splitScale: 1
+      sunTint: {r: 1, g: 0.98, b: 0.92, a: 1}
+      sunScale: 1.05
+      ambientTint: {r: 1, g: 1, b: 1, a: 1}
+      ambientScale: 1
+      shadowScale: 1
+      skyExposureScale: 1
+      fogTint: {r: 1, g: 1, b: 1, a: 1}
+      fogDesaturate: 0
+      fogDensityScale: 0.9
+      particleScale: 1
+    dayParticles:
+      kind: 0
+      color: {r: 1, g: 0.95, b: 0.78, a: 1}
+      density: 0.5
+      size: 0.045
+      fallSpeed: 0.03
+      drift: 0.3
+      glow: 1.15
+    nightParticles:
+      kind: 0
+      color: {r: 0.75, g: 1, b: 0.45, a: 1}
+      density: 0.8
+      size: 0.06
+      fallSpeed: -0.02
+      drift: 0.35
+      glow: 3
+    precipitation: 0
+  - season: 2
+    notes: Amber light, misty depth, tumbling leaves; warm motes at night.
+    adjust:
+      exposure: 0
+      contrast: 1
+      saturation: 1
+      temperature: 7
+      tint: 1
+      vignette: 0
+      splitBalance: 5
+      colorFilter: {r: 1.03, g: 0.99, b: 0.93, a: 1}
+      bloomScale: 1.05
+      splitScale: 1.2
+      sunTint: {r: 1, g: 0.91, b: 0.76, a: 1}
+      sunScale: 0.95
+      ambientTint: {r: 1.02, g: 0.97, b: 0.9, a: 1}
+      ambientScale: 1
+      shadowScale: 1
+      skyExposureScale: 1
+      fogTint: {r: 1.05, g: 1, b: 0.92, a: 1}
+      fogDesaturate: 0
+      fogDensityScale: 1.35
+      particleScale: 1
+    dayParticles:
+      kind: 2
+      color: {r: 1, g: 0.6, b: 0.25, a: 1}
+      density: 0.5
+      size: 0.16
+      fallSpeed: 0.9
+      drift: 1.2
+      glow: 1
+    nightParticles:
+      kind: 0
+      color: {r: 1, g: 0.75, b: 0.45, a: 1}
+      density: 0.25
+      size: 0.05
+      fallSpeed: 0
+      drift: 0.25
+      glow: 1.6
+    precipitation: 0
+  - season: 3
+    notes: Cool clean light, soft snowfall that thickens with clouds and rain.
+    adjust:
+      exposure: 0.06
+      contrast: 1
+      saturation: -5
+      temperature: -8
+      tint: 1
+      vignette: 0
+      splitBalance: 0
+      colorFilter: {r: 0.97, g: 1, b: 1.04, a: 1}
+      bloomScale: 1.1
+      splitScale: 1
+      sunTint: {r: 1, g: 0.98, b: 0.96, a: 1}
+      sunScale: 0.85
+      ambientTint: {r: 0.94, g: 0.98, b: 1.06, a: 1}
+      ambientScale: 1.05
+      shadowScale: 1
+      skyExposureScale: 1
+      fogTint: {r: 0.95, g: 1, b: 1.06, a: 1}
+      fogDesaturate: 0.15
+      fogDensityScale: 1.25
+      particleScale: 1
+    dayParticles:
+      kind: 3
+      color: {r: 1, g: 1, b: 1, a: 1}
+      density: 0.7
+      size: 0.07
+      fallSpeed: 0.8
+      drift: 0.5
+      glow: 1
+    nightParticles:
+      kind: 3
+      color: {r: 0.9, g: 0.95, b: 1, a: 1}
+      density: 0.6
+      size: 0.07
+      fallSpeed: 0.7
+      drift: 0.45
+      glow: 1
+    precipitation: 1
+  overrides: []

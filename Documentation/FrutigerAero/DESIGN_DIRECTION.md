@@ -14,7 +14,8 @@ For projected river caustics, preserve the accepted larger 90-degree footprint, 
 - **Shading library.** The [Aero shading library](Lighting/AERO_SHADING_LIBRARY.md) adds brushed-steel anisotropy, pearlescent thin film, clear "jelly" Y2K plastic, refractive glass, subsurface and back-lit leaves, and soap-film bubbles.
 - **Wetness.** A [global dew/rain wetness](Lighting/WETNESS.md) driver is ported from DYNAMIC Rain/Wetness. [Falling rain](Lighting/RAIN.md) (2026-10-31, awaiting review) adds URP drops, splashes, rain audio and an overcast sky, by day or night, with weather and time of day synced to every player.
 - **Volumetric clouds.** [Ray-marched clouds](Lighting/VOLUMETRIC_CLOUDS.md) (2026-11-05, awaiting review) replace the skybox's painted clouds with a clean procedural sky plus a cloud layer that follows the sun and moon, rolls randomized clear-day skies (style × small/medium/large amount × soft/medium/dense density) and darkens into a low, heavy deck while it rains. Every look is a ScriptableObject preset (14 shipped).
-- **Post looks.** Three switchable [post looks](Lighting/POST_PROFILES.md): Restrained (default), Bright Aero and Y2K.
+- **Post looks.** [Restrained](Lighting/POST_PROFILES.md) is the base grade. Bright Aero and Y2K were rejected on 2026-11-07.
+- **Atmosphere presets.** [Time of day × weather × season presets](Lighting/ATMOSPHERE_PRESETS.md) (2026-11-07, awaiting review) layer 60 Restrained-centred permutations over it. Each one grades the global volume, fog, sun, ambient and shadows, and adds seasonal floating particles. Review them in the F4 graphics window.
 - **Feedback round, 2026-10-29.**
   - **Accepted:** the glass river.
   - **Floors:** walkable decks now stay clean under dew and rain (no beads).

@@ -42,7 +42,7 @@ API:
 The F3 developer menu's **World** section has:
 - a **Rain** toggle (synced through `NetworkWeatherService`, see [rain](RAIN.md));
 - **Wetness preset**;
-- **Post look** (see [post profiles](POST_PROFILES.md)).
+- **Season** and the F4 weather presets (see [atmosphere presets](ATMOSPHERE_PRESETS.md)).
 
 ## Shading (`Shaders/Aero/AeroWetness.hlsl`)
 

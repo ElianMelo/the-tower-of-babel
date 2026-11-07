@@ -30,7 +30,8 @@ namespace TowerOfBabel.Cheats
         [SerializeField] private Material glassMaterial;
         [SerializeField] private GameObject buttonPrefab;
         private GameObject visuals, visualPanel;
-        private TMP_Text visualStatus, timeLabel, cloudLabel;
+        private TMP_Text visualStatus, timeLabel, cloudLabel, presetLabel, presetDetails;
+        private int? presetCursor;
         private readonly Dictionary<string, UnityEngine.UI.Button> visualButtons = new();
         private bool lookingAround;
         private RectTransform content;
@@ -76,8 +77,13 @@ namespace TowerOfBabel.Cheats
         public string VisualStatusText => visualStatus != null ? visualStatus.text : string.Empty;
         public string CloudText => cloudLabel != null ? cloudLabel.text : string.Empty;
         public string TimeText => timeLabel != null ? timeLabel.text : string.Empty;
-        /// <summary>Times of day the visual panel's Cycle button steps through: sunrise, noon, sunset, midnight.</summary>
-        public static readonly (string name, float time)[] DayPhases = { ("Sunrise", .27f), ("Noon", WeatherClock.Noon), ("Sunset", .73f), ("Midnight", WeatherClock.Midnight) };
+        public string PresetText => presetLabel != null ? presetLabel.text : string.Empty;
+        public string PresetDetailsText => presetDetails != null ? presetDetails.text : string.Empty;
+        /// <summary>The atmosphere time presets the graphics window jumps to and its Cycle button steps through.</summary>
+        public static readonly (string name, float time)[] DayPhases =
+        {
+            ("Morning", 7f / 24), ("Mid-day", WeatherClock.Noon), ("Afternoon", 16.5f / 24), ("Night", 21f / 24), ("Midnight", WeatherClock.Midnight)
+        };
         public bool IsGodMode => flying;
         public bool AllProfessions => allProfessions;
         public IReadOnlyDictionary<string, UnityEngine.UI.Toggle> ToggleControls => toggleControls;
@@ -94,6 +100,7 @@ namespace TowerOfBabel.Cheats
             Bind();
             var keyboard = Keyboard.current;
             if (keyboard != null && keyboard.f3Key.wasPressedThisFrame) Toggle();
+            else if (keyboard != null && keyboard.f4Key.wasPressedThisFrame) ToggleVisualPanel();
             if (IsOpen && keyboard != null && keyboard.escapeKey.wasPressedThisFrame) { consumedEscapeFrame = Time.frameCount; Hide(); }
             UpdateLookAround();
             if (IsOpen && Time.unscaledTime >= refreshTime) { refreshTime = Time.unscaledTime + .2f; RefreshValues(); }
@@ -108,6 +115,8 @@ namespace TowerOfBabel.Cheats
             if (!Mathf.Approximately(fieldOfView, CheatProfile.Default(CheatStat.CameraFov))) Camera.main.fieldOfView = fieldOfView;
         }
         public void Toggle() { if (IsOpen) Hide(); else Show(); }
+        /// <summary>F4: opens the graphics window (compact visual controls) directly, or closes it.</summary>
+        public void ToggleVisualPanel() { if (IsVisualPanelVisible) Hide(); else ShowVisualPanel(); }
         public void SelectCategory(string name)
         {
             if (!Categories.Contains(name)) throw new ArgumentException("Unknown cheat category.", nameof(name));
@@ -152,7 +161,7 @@ namespace TowerOfBabel.Cheats
             if (IsVisible) visuals.SetActive(false);
             else BeginModal();
             Bind(); visualPanel.SetActive(true); visualPanel.transform.SetAsLastSibling(); RefreshValues();
-            SetStatus("Visual controls - hold right mouse to look around.");
+            SetStatus("Graphics window - hold right mouse to look around.");
         }
         private void BeginModal()
         {
@@ -301,32 +310,92 @@ namespace TowerOfBabel.Cheats
                 b.GetComponentInChildren<TMP_Text>().fontSize = 14; visualButtons[key] = b;
             }
             TMP_Text Caption(string value, float size, bool bold = false) { var t = Text(value, panel, size, bold); t.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = size + 8; return t; }
-            var header = Line("Header"); var title = Text("Visual controls", header, 20, true); title.GetComponent<UnityEngine.UI.LayoutElement>().flexibleWidth = 1;
+            var header = Line("Header"); var title = Text("Graphics", header, 20, true); title.GetComponent<UnityEngine.UI.LayoutElement>().flexibleWidth = 1;
             Small(header, "Full menu", "Full menu", Show, 96, false); Small(header, "Close", "X", Hide, 34, false);
             timeLabel = Caption("Time of day", 15, true);
-            var phases = Line("Time of day");
-            Small(phases, "Cycle day/night", "Cycle", CycleDayPhase, 58);
-            foreach (var phase in DayPhases) { float time = phase.time; string name = phase.name; Small(phases, name, name, () => SetTimeOfDay(time, name), 58); }
+            var phasesA = Line("Time of day"); var phasesB = Line("Time of day 2");
+            for (int i = 0; i < DayPhases.Length; i++) { float time = DayPhases[i].time; string name = DayPhases[i].name; Small(i < 3 ? phasesA : phasesB, name, name, () => { presetCursor = null; SetTimeOfDay(time, name); }, 58); }
+            Small(phasesB, "Cycle day/night", "Cycle", CycleDayPhase, 58);
             var timeControls = Line("Time controls");
             Small(timeControls, "-1 hour", "-1 h", () => StepHours(-1), 50); Small(timeControls, "+1 hour", "+1 h", () => StepHours(1), 50);
             Small(timeControls, "Freeze time", "Freeze", () => RequestWeather(w => w.RequestFreezeTime(!w.TimeFrozen), "Day/night freeze toggled."), 110);
             Caption("Weather", 15, true);
             var weather = Line("Weather");
-            Small(weather, "Rain", "Rain", () => RequestWeather(w => w.RequestRain(!w.Raining), "Rain toggled for everyone."), 120);
-            Small(weather, "Automatic weather", "Auto weather", () => RequestWeather(w => w.RequestAutomaticWeather(!w.AutomaticWeather), "Automatic weather toggled."), 150);
+            foreach (TowerOfBabel.Rendering.AeroWeatherKind kind in Enum.GetValues(typeof(TowerOfBabel.Rendering.AeroWeatherKind)))
+            { var k = kind; Small(weather, "Weather " + k, k.ToString(), () => { presetCursor = null; SetWeatherPreset(k); }, 70); }
+            Small(weather, "Weather Auto", "Auto", () => { presetCursor = null; SetWeatherPreset(null); }, 60);
+            Caption("Season", 15, true);
+            var seasons = Line("Season");
+            foreach (TowerOfBabel.Rendering.AeroSeason value in Enum.GetValues(typeof(TowerOfBabel.Rendering.AeroSeason)))
+            { var v = value; Small(seasons, "Season " + v, TowerOfBabel.Rendering.AeroAtmosphereNames.Of(v), () => { presetCursor = null; SetSeason(v); }, 70); }
+            presetLabel = Caption("Preset", 15, true); presetLabel.textWrappingMode = TextWrappingModes.Normal; presetLabel.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 40;
+            var browser = Line("Preset browser");
+            Small(browser, "Previous preset", "< Prev", () => StepPreset(-1), 70); Small(browser, "Next preset", "Next >", () => StepPreset(1), 70);
+            Small(browser, "Live preset", "Live", LivePreset, 64);
+            presetDetails = Caption("", 11); presetDetails.textWrappingMode = TextWrappingModes.Normal; presetDetails.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 50;
+            presetDetails.color = new Color(.1f, .27f, .36f);
             cloudLabel = Caption("Clouds", 15, true); cloudLabel.textWrappingMode = TextWrappingModes.Normal; cloudLabel.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 40;
             var clouds = Line("Clouds");
             Small(clouds, "Previous cloud preset", "<", () => CycleCloudPreset(-1), 36); Small(clouds, "Next cloud preset", ">", () => CycleCloudPreset(1), 36);
             Small(clouds, "Automatic clouds", "Auto", AutomaticClouds, 64); Small(clouds, "Reroll clouds", "Reroll", RerollClouds, 74);
-            Caption("Look", 15, true);
-            var look = Line("Look");
-            Small(look, "Wetness preset", "Wetness", () => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; SetStatus(wet != null ? "Wetness: " + wet.CycleWetnessPreset() : "No wetness controller in this scene."); }, 100);
-            Small(look, "Post look", "Post look", () => { var post = FindFirstObjectByType<TowerOfBabel.Rendering.AeroPostProfileSwitcher>(); SetStatus(post != null ? "Post look: " + post.Cycle() : "No post look switcher in this scene."); }, 100);
-            var hint = Caption("Hold right mouse to look and move  |  F3 / Esc close", 12); hint.color = new Color(.15f, .35f, .43f);
+            Small(clouds, "Wetness preset", "Wet", () => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; SetStatus(wet != null ? "Wetness: " + wet.CycleWetnessPreset() : "No wetness controller in this scene."); }, 56);
+            var hint = Caption("Hold right mouse to look and move  |  F4 / Esc close", 12); hint.color = new Color(.15f, .35f, .43f);
             visualStatus = Caption("Ready", 13); visualStatus.textWrappingMode = TextWrappingModes.Normal; visualStatus.GetComponent<UnityEngine.UI.LayoutElement>().preferredHeight = 34;
             visualPanel.SetActive(false);
         }
         private static TowerOfBabel.Rendering.AeroVolumetricClouds Clouds() => FindFirstObjectByType<TowerOfBabel.Rendering.AeroVolumetricClouds>();
+        private static TowerOfBabel.Rendering.AeroAtmosphereDirector Director() =>
+            TowerOfBabel.Rendering.AeroAtmosphereDirector.Instance != null ? TowerOfBabel.Rendering.AeroAtmosphereDirector.Instance : FindFirstObjectByType<TowerOfBabel.Rendering.AeroAtmosphereDirector>();
+        /// <summary>Forces a weather preset (rain is synced to everyone; the cloudy look is local), or null for automatic weather.</summary>
+        public void SetWeatherPreset(TowerOfBabel.Rendering.AeroWeatherKind? kind)
+        {
+            var director = Director();
+            director?.SetWeatherOverride(kind);
+            if (!kind.HasValue)
+            {
+                var clouds = Clouds(); if (clouds != null) { clouds.previewPreset = null; clouds.Tick(0); }
+                RequestWeather(w => w.RequestAutomaticWeather(true), "Weather: automatic.");
+            }
+            else RequestWeather(w => w.RequestRain(kind == TowerOfBabel.Rendering.AeroWeatherKind.Rain), "Weather: " + kind + ".");
+            if (director == null) SetStatus("No atmosphere director in this scene.");
+            RefreshVisualPanel();
+        }
+        /// <summary>Picks the season look and particles (this screen only, remembered).</summary>
+        public void SetSeason(TowerOfBabel.Rendering.AeroSeason season)
+        {
+            var director = Director(); if (director == null) { SetStatus("No atmosphere director in this scene."); return; }
+            director.SetSeason(season); SetStatus("Season: " + TowerOfBabel.Rendering.AeroAtmosphereNames.Of(season) + " (this screen only).");
+            RefreshVisualPanel();
+        }
+        public void CycleSeason() { var d = Director(); if (d == null) { SetStatus("No atmosphere director in this scene."); return; } SetSeason((TowerOfBabel.Rendering.AeroSeason)(((int)d.Season + 1) % TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.SeasonCount)); }
+        /// <summary>Steps through all 60 time x weather x season presets, freezing time so each one can be reviewed.</summary>
+        public void StepPreset(int step)
+        {
+            var director = Director(); if (director == null || director.library == null) { SetStatus("No atmosphere director in this scene."); return; }
+            ApplyPreset((presetCursor ?? director.CurrentIndex) + step);
+        }
+        public void ApplyPreset(int index)
+        {
+            var director = Director(); if (director == null || director.library == null) { SetStatus("No atmosphere director in this scene."); return; }
+            int count = TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.PermutationCount;
+            index = ((index % count) + count) % count; presetCursor = index;
+            var (time, weather, season) = TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.Permutation(index);
+            director.SetSeason(season);
+            SetWeatherPreset(weather);
+            float t = director.library.TimeOf(time);
+            if (director.dayNight != null) director.dayNight.SetTime(t);
+            RequestWeather(w => w.RequestTimeOfDay(t) & w.RequestFreezeTime(true), "");
+            SetStatus($"Preset {index + 1}/{count}: {TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.Describe(time, weather, season)} (time frozen for review).");
+            RefreshVisualPanel();
+        }
+        /// <summary>Back to the live sky: automatic weather and clouds, clock running (the season stays).</summary>
+        public void LivePreset()
+        {
+            presetCursor = null;
+            SetWeatherPreset(null);
+            RequestWeather(w => w.RequestFreezeTime(false), "Live atmosphere: automatic weather, clock running.");
+            RefreshVisualPanel();
+        }
         private static float CurrentTimeOfDay()
         {
             var cycle = FindFirstObjectByType<TowerOfBabel.Rendering.AeroDayNightCycle>();
@@ -373,10 +442,26 @@ namespace TowerOfBabel.Cheats
             var clouds = Clouds();
             cloudLabel.text = "Clouds  " + (clouds == null ? "none in scene" : clouds.Description);
             void Label(string key, string text) { if (visualButtons.TryGetValue(key, out var b)) b.GetComponentInChildren<TMP_Text>().text = text; }
-            Label("Rain", weather != null && weather.Raining ? "Rain: On" : "Rain: Off");
-            Label("Automatic weather", weather != null && weather.AutomaticWeather ? "Auto weather: On" : "Auto weather: Off");
             Label("Freeze time", weather != null && weather.TimeFrozen ? "Unfreeze" : "Freeze");
             Label("Automatic clouds", clouds != null && clouds.previewPreset == null ? "Auto (on)" : "Auto");
+            var director = Director();
+            var forced = director != null ? director.WeatherOverride : null;
+            foreach (TowerOfBabel.Rendering.AeroWeatherKind kind in Enum.GetValues(typeof(TowerOfBabel.Rendering.AeroWeatherKind)))
+                Label("Weather " + kind, forced == kind ? "[" + kind + "]" : kind.ToString());
+            Label("Weather Auto", director != null && !forced.HasValue ? "[Auto]" : "Auto");
+            foreach (TowerOfBabel.Rendering.AeroSeason season in Enum.GetValues(typeof(TowerOfBabel.Rendering.AeroSeason)))
+            {
+                string name = TowerOfBabel.Rendering.AeroAtmosphereNames.Of(season);
+                Label("Season " + season, director != null && director.Season == season ? "[" + name + "]" : name);
+            }
+            if (director == null || director.library == null) { presetLabel.text = "Preset  no atmosphere director"; presetDetails.text = ""; return; }
+            int index = presetCursor ?? director.CurrentIndex;
+            var (pt, pw, ps) = TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.Permutation(index);
+            presetLabel.text = $"Preset {index + 1}/{TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.PermutationCount}  " +
+                               TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.Describe(pt, pw, ps) + (presetCursor.HasValue ? "  (review)" : "  (live)");
+            presetDetails.text = presetCursor.HasValue
+                ? TowerOfBabel.Rendering.AeroAtmosphereDirector.Summarize(director.library.Compose(pt, pw, ps))
+                : TowerOfBabel.Rendering.AeroAtmosphereDirector.Summarize(director.Current);
         }
         private bool Matches(string section, string label) => string.IsNullOrWhiteSpace(search?.text) ? category == section || category == "Quick actions" && section == "Quick actions" : (section + " " + label).IndexOf(search.text, StringComparison.OrdinalIgnoreCase) >= 0;
         private void Action(string section, string label, string detail, UnityAction action, string button = "Run")
@@ -434,7 +519,7 @@ namespace TowerOfBabel.Cheats
                 Action(section, "Set day", "Jump everyone to noon", setDay, "Day");
                 Action(section, "Set night", "Jump everyone to midnight", setNight, "Night");
                 ToggleRow(section, "Rain", "Falling rain, splashes and wet surfaces for every player; pauses automatic weather", raining, rain);
-                Action(section, "Visual controls", "Small top-left panel for day/night, weather, clouds and post look, so the scene stays visible", ShowVisualPanel, "Open panel");
+                Action(section, "Visual controls", "F4 graphics window: time, weather and season presets, clouds and wetness, with the scene still visible", ShowVisualPanel, "Open panel");
             }
             Action("Quick actions", "Start local host", "Start a session here, then use all gameplay actions", () => { var bootstrap = FindFirstObjectByType<NetworkBootstrap>(); SetStatus(bootstrap != null && bootstrap.StartHost() ? "Starting host..." : "A session is already running or the network service is unavailable."); }, "Start host");
             Action("Progression", "Level up", "Selected profession - gain one level and its upgrade point", level, "+1 level");
@@ -487,8 +572,7 @@ namespace TowerOfBabel.Cheats
                 value => RequestWeather(service => service.RequestFreezeTime(value), value ? "Time of day frozen." : "Day/night cycle running."));
             Action("World", "Wetness preset", "Cycle dry, dew, soaked and weather-driven surface film",
                 () => { var wet = TowerOfBabel.Rendering.AeroWetnessController.Instance; SetStatus(wet != null ? "Wetness: " + wet.CycleWetnessPreset() : "No wetness controller in this scene."); }, "Cycle");
-            Action("World", "Post look", "Cycle Restrained, Bright Aero and Y2K colour grading",
-                () => { var post = FindFirstObjectByType<TowerOfBabel.Rendering.AeroPostProfileSwitcher>(); SetStatus(post != null ? "Post look: " + post.Cycle() : "No post look switcher in this scene."); }, "Cycle");
+            Action("World", "Season", "Cycle the spring, summer, autumn and winter atmosphere (this screen only)", CycleSeason, "Cycle");
             Action("World", "Scan construction", "Close this menu and highlight nearby unfinished work", () => { Hide(); FindFirstObjectByType<PlayerInteractionRaycaster>()?.ScanNearbyConstruction(); }, "Scan");
             Action("World", "Cancel current action", "Stop gathering, processing or construction", () => { ResolvePlayer(); player?.GetComponent<PlayerInteractionRaycaster>()?.CancelCurrentInteraction(); SetStatus("Action cancelled."); }, "Cancel");
             foreach (PlayerAnimationTrigger trigger in Enum.GetValues(typeof(PlayerAnimationTrigger)))
