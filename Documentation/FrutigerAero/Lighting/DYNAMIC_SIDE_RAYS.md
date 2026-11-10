@@ -13,7 +13,7 @@ Select `Assets/_Project/Environment/Lighting/TowerInteriorRays.asset` to adjust 
 | Balanced PC | Half | 16 steps | 32 m | 2 |
 | Low | Quarter | 12 steps | 32 m | 1 |
 
-Native sun shadow distance was 50 m; since 2026-11-03 it is 120 m with a 2048 shadow map and three cascades ending at 8.4, 30 and 120 m (150 m with four cascades cost ~5 ms of GPU) (`ShadowDistanceAuthoring`, menu **Tower of Babel/Environment/Apply shadow distance**). Fill sources use the low shadow tier (256 px) inside a 1024 px additional-light atlas (it was 512 px in a 2048 atlas, which overflowed: "Too many additional punctual lights shadows"). See [performance](../../Performance/PERFORMANCE.md).
+Native sun shadow distance was 50 m; since 2026-11-03 it is 120 m with three cascades (150 m with four cascades cost ~5 ms of GPU). Since 2026-11-10 the map is 4096 again and the cascades end at 8.4, 32.4 and 120 m: the shafts are shaped only by this map, and at 2048 (with the second cascade ending at 30 m, short of the 32 m march) they shimmered with camera motion and lost thin arch and pillar shadows (`ShadowDistanceAuthoring`, menu **Tower of Babel/Environment/Apply shadow distance**). Fill sources use the low shadow tier (256 px) inside a 1024 px additional-light atlas (it was 512 px in a 2048 atlas, which overflowed: "Too many additional punctual lights shadows"). See [performance](../../Performance/PERFORMANCE.md).
 
 ## Architecture and transitions
 

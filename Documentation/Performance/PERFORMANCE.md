@@ -6,7 +6,7 @@ Feedback: outside the tower the game ran at ~30 fps, the first LOD attempt (chea
 
 - **GPU-resident far instancing.** `InstancedFarChunkRenderer` uploads each render cell's transforms (and inverses) to GPU buffers only when the cell rebuilds and draws pages with `Graphics.RenderMeshIndirect`. The tower shaders (pillar, arch, floor, glass floor, glass step, vine) have `#pragma instancing_options procedural:AeroFarSetup` (`Shaders/Aero/AeroFarInstancing.hlsl`); shading is unchanged. The old per-frame `RenderMeshInstanced` path remains as fallback (`GpuResidentInstancing`).
 - **Mesh-only LOD, same material.** Finished Floor, Stair, Pillar, Arch and GlassWaterFloor draw ~50% triangle meshes past 70 m and ~30% past 140 m (stairs stay at 50%). At 1080p those distances keep the change below a pixel; tests compare full and LOD renders at game pixel density. Vines always use their full mesh. Build with **Tower of Babel/Performance/Build far mesh LODs** (`TowerMeshLodAuthoring`).
-- Shadow budgets: sun 120 m / 3 cascades / 2048; spot-light atlas 1024 with 256 px shadows (fixes "Too many additional punctual lights shadows"); river cookie 1024, river shadows within 20 m.
+- Shadow budgets: sun 120 m / 3 cascades (8.4, 32.4, 120 m) / 4096 (2048 made the interior god rays shimmer, 2026-11-10); spot-light atlas 1024 with 256 px shadows (fixes "Too many additional punctual lights shadows"); river cookie 1024, river shadows within 20 m.
 - Nearby water light skipped when no lake is in view; river glass floors that refract nothing share one render pass.
 - Rejected after measuring: depth priming (the far tower is vertex bound; the prepass cost 10 ms).
 

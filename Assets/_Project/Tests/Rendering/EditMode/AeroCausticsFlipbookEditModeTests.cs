@@ -97,7 +97,12 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(pipeline.shadowDistance, Is.InRange(100, 150), "Well past the old 50 m cut-off, within the frame budget.");
             Assert.That(pipeline.shadowCascadeCount, Is.EqualTo(3));
             Assert.That(pipeline.cascade3Split.x * pipeline.shadowDistance, Is.LessThan(12), "The nearest cascade stays tight and sharp.");
-            Assert.That(pipeline.mainLightShadowmapResolution, Is.EqualTo(2048), "Performance pass: 4096 cost more than it showed.");
+            Assert.That(pipeline.mainLightShadowmapResolution, Is.EqualTo(4096),
+                "Interior sun shafts are shaped by this map; at 2048 they shimmered and lost thin arch shadows.");
+            // Every shaft sample stays in the sharp first two cascades, never the coarse 120 m one.
+            var rays = AssetDatabase.LoadAssetAtPath<TowerOfBabel.Rendering.AeroRaySettings>("Assets/_Project/Environment/Lighting/TowerInteriorRays.asset");
+            Assert.That(pipeline.cascade3Split.y * pipeline.shadowDistance, Is.GreaterThanOrEqualTo(Mathf.Min(rays.distance, 32)),
+                "The second cascade covers the full shaft march.");
             Assert.That(pipeline.additionalLightsShadowmapResolution, Is.EqualTo(1024), "Spot shadows are all 256 px; a 1024 atlas holds 16.");
         }
     }
