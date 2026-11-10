@@ -90,7 +90,9 @@ public class TowerGenerator : MonoBehaviour
                 GlassWaterFloorLayout.TileCenter(sector.Position, sector.Rotation, sector.Scale, center), GetWallRadius(floor), tileDecreaseRate);
             var prefab = glass ? glassWaterFloorObject : floorTileObject;
             GameObject instance = CreateTowerAsset(prefab, glass ? TowerAssetType.GlassWaterFloor : TowerAssetType.Floor, sector.Position, sector.Rotation);
-            float thickness = sector.Scale.y * (glass ? 1f : TowerFloorLayout.DeckThicknessStretch);
+            // Glass river tiles share the deck thickness so their underside meets the white tiles' flush; a thinner
+            // glass slab left a 5 cm strip of the white tile's side visible from below at every join.
+            float thickness = sector.Scale.y * TowerFloorLayout.DeckThicknessStretch;
             instance.transform.localScale = new Vector3(sector.Scale.x / parent.lossyScale.x,
                 thickness / parent.lossyScale.y, sector.Scale.z / parent.lossyScale.z);
             if (template != null)

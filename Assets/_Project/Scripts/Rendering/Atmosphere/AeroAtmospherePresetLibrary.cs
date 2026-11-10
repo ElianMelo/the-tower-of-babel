@@ -95,16 +95,34 @@ namespace TowerOfBabel.Rendering
         public SeasonPreset Season(AeroSeason season) { foreach (var s in seasons) if (s.season == season) return s; return DefaultSeasons()[(int)season]; }
         public float TimeOf(AeroTimeSlot slot) => Time(slot).time;
 
+        // Runtime caches so the per-frame compose does not allocate. Rebuilt when values change in the Inspector.
+        [NonSerialized] private TimePreset[] sortedTimes;
+        [NonSerialized] private readonly AeroAtmosphereAdjust[] weatherBuffer = new AeroAtmosphereAdjust[WeatherCount];
+        [NonSerialized] private float[] exactWeights;
+
+        private static int ByTime(TimePreset a, TimePreset b) => a.time.CompareTo(b.time);
+
+        private TimePreset[] SortedTimes()
+        {
+            if (sortedTimes != null) return sortedTimes;
+            var sorted = new TimePreset[TimeCount];
+            for (int i = 0; i < TimeCount; i++) sorted[i] = Time((AeroTimeSlot)i);
+            Array.Sort(sorted, ByTime);
+            return sortedTimes = sorted;
+        }
+
+        /// <summary>Drops cached values after the presets are edited from code.</summary>
+        public void InvalidateCache() => sortedTimes = null;
+
         /// <summary>The two time presets around <paramref name="timeOfDay"/> and the smoothed blend between them.</summary>
         public void TimeNeighbours(float timeOfDay, out AeroTimeSlot from, out AeroTimeSlot to, out float blend)
         {
             timeOfDay = Mathf.Repeat(timeOfDay, 1);
-            var sorted = new List<TimePreset>(TimeCount);
-            for (int i = 0; i < TimeCount; i++) sorted.Add(Time((AeroTimeSlot)i));
-            sorted.Sort((a, b) => a.time.CompareTo(b.time));
-            int next = sorted.FindIndex(t => t.time > timeOfDay);
-            if (next < 0) next = 0;
-            int previous = (next - 1 + sorted.Count) % sorted.Count;
+            var sorted = SortedTimes();
+            int next = 0;
+            while (next < sorted.Length && sorted[next].time <= timeOfDay) next++;
+            if (next >= sorted.Length) next = 0;
+            int previous = (next - 1 + sorted.Length) % sorted.Length;
             float start = sorted[previous].time, span = Mathf.Repeat(sorted[next].time - start, 1);
             if (span <= 0) span = 1;
             from = sorted[previous].slot; to = sorted[next].slot;
@@ -121,8 +139,9 @@ namespace TowerOfBabel.Rendering
         /// <summary>One exact permutation, as listed in the review window.</summary>
         public Frame Compose(AeroTimeSlot time, AeroWeatherKind weather, AeroSeason season)
         {
-            var weights = new float[WeatherCount]; weights[(int)weather] = 1;
-            return Compose(TimeOf(time), weights, season, season, 1);
+            exactWeights ??= new float[WeatherCount];
+            Array.Clear(exactWeights, 0, WeatherCount); exactWeights[(int)weather] = 1;
+            return Compose(TimeOf(time), exactWeights, season, season, 1);
         }
 
         /// <summary>
@@ -131,14 +150,21 @@ namespace TowerOfBabel.Rendering
         /// </summary>
         public Frame Compose(float timeOfDay, float[] weatherWeights, AeroSeason fromSeason, AeroSeason toSeason, float seasonBlend)
         {
+            var frame = new Frame();
+            Compose(timeOfDay, weatherWeights, fromSeason, toSeason, seasonBlend, ref frame);
+            return frame;
+        }
+
+        /// <summary>Fills an existing frame, reusing its particle array: the allocation-free path used every frame.</summary>
+        public void Compose(float timeOfDay, float[] weatherWeights, AeroSeason fromSeason, AeroSeason toSeason, float seasonBlend, ref Frame frame)
+        {
             if (weatherWeights == null || weatherWeights.Length != WeatherCount) throw new ArgumentException("Expected clear, cloudy and rain weights.", nameof(weatherWeights));
             seasonBlend = Mathf.Clamp01(seasonBlend);
             TimeNeighbours(timeOfDay, out var fromSlot, out var toSlot, out float timeBlend);
             var look = AeroAtmosphereLook.Lerp(Time(fromSlot).look, Time(toSlot).look, timeBlend);
 
-            var weatherAdjusts = new AeroAtmosphereAdjust[WeatherCount];
-            for (int i = 0; i < WeatherCount; i++) { weatherAdjusts[i] = Weather((AeroWeatherKind)i).adjust; weatherAdjusts[i].particleScale = 1; }
-            look = AeroAtmosphereAdjust.Blend(weatherAdjusts, weatherWeights).Apply(look);
+            for (int i = 0; i < WeatherCount; i++) { weatherBuffer[i] = Weather((AeroWeatherKind)i).adjust; weatherBuffer[i].particleScale = 1; }
+            look = AeroAtmosphereAdjust.Blend(weatherBuffer, weatherWeights).Apply(look);
             var seasonFrom = Season(fromSeason); var seasonTo = Season(toSeason);
             look = AeroAtmosphereAdjust.Lerp(seasonFrom.adjust, seasonTo.adjust, seasonBlend).Apply(look);
 
@@ -153,20 +179,15 @@ namespace TowerOfBabel.Rendering
 
             int dominantWeather = 0;
             for (int i = 1; i < WeatherCount; i++) if (weatherWeights[i] > weatherWeights[dominantWeather]) dominantWeather = i;
-            return new Frame
-            {
-                look = look,
-                particles = new[]
-                {
-                    Layer(seasonFrom.dayParticles, seasonFrom, look, weatherWeights, (1 - look.night) * (1 - seasonBlend)),
-                    Layer(seasonFrom.nightParticles, seasonFrom, look, weatherWeights, look.night * (1 - seasonBlend)),
-                    Layer(seasonTo.dayParticles, seasonTo, look, weatherWeights, (1 - look.night) * seasonBlend),
-                    Layer(seasonTo.nightParticles, seasonTo, look, weatherWeights, look.night * seasonBlend)
-                },
-                slot = timeBlend < .5f ? fromSlot : toSlot,
-                weather = (AeroWeatherKind)dominantWeather,
-                season = seasonBlend < .5f ? fromSeason : toSeason
-            };
+            if (frame.particles == null || frame.particles.Length != 4) frame.particles = new AeroParticleLayer[4];
+            frame.look = look;
+            frame.particles[0] = Layer(seasonFrom.dayParticles, seasonFrom, look, weatherWeights, (1 - look.night) * (1 - seasonBlend));
+            frame.particles[1] = Layer(seasonFrom.nightParticles, seasonFrom, look, weatherWeights, look.night * (1 - seasonBlend));
+            frame.particles[2] = Layer(seasonTo.dayParticles, seasonTo, look, weatherWeights, (1 - look.night) * seasonBlend);
+            frame.particles[3] = Layer(seasonTo.nightParticles, seasonTo, look, weatherWeights, look.night * seasonBlend);
+            frame.slot = timeBlend < .5f ? fromSlot : toSlot;
+            frame.weather = (AeroWeatherKind)dominantWeather;
+            frame.season = seasonBlend < .5f ? fromSeason : toSeason;
         }
 
         static float Weight(float[] weights, AeroWeatherKind kind)
@@ -192,10 +213,12 @@ namespace TowerOfBabel.Rendering
         public void ResetToDefaults()
         {
             times = DefaultTimes(); weathers = DefaultWeathers(); seasons = DefaultSeasons(); overrides = new List<PermutationOverride>();
+            sortedTimes = null;
         }
 
         private void OnValidate()
         {
+            sortedTimes = null;
             if (times == null || times.Length != TimeCount) times = DefaultTimes();
             if (weathers == null || weathers.Length != WeatherCount) weathers = DefaultWeathers();
             if (seasons == null || seasons.Length != SeasonCount) seasons = DefaultSeasons();

@@ -4,6 +4,9 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+// Unity's Is extends NUnit's with allocation constraints.
+using UnityEngine.TestTools.Constraints;
+using Is = UnityEngine.TestTools.Constraints.Is;
 
 namespace TowerOfBabel.Rendering.Tests
 {
@@ -310,6 +313,31 @@ namespace TowerOfBabel.Rendering.Tests
                     RenderSettings.ambientProbe, RenderSettings.reflectionIntensity) = (fog.Item1, fog.Item2, fog.Item3, fog.Item4, fog.Item5, fog.Item6, fog.Item7, fog.Item8, fog.Item9, fog.Item10, fog.Item11);
                 Shader.SetGlobalFloat("_AeroDaylight", fog.Item12);
             }
+        }
+
+        [Test]
+        public void PerFrameCompose_AndDirectorTick_DoNotAllocate()
+        {
+            var library = Defaults();
+            var go = new GameObject("Allocation test director") { hideFlags = HideFlags.HideAndDontSave };
+            var director = go.AddComponent<AeroAtmosphereDirector>();
+            try
+            {
+                var weights = new float[] { .5f, .3f, .2f };
+                var frame = new AeroAtmospherePresetLibrary.Frame();
+                library.Compose(.4f, weights, AeroSeason.Autumn, AeroSeason.Winter, .5f, ref frame); // warm the caches
+                float time = .4f;
+                Assert.That(() => { time += .001f; library.Compose(time, weights, AeroSeason.Autumn, AeroSeason.Winter, .5f, ref frame); },
+                    Is.Not.AllocatingGCMemory(), "Composing a frame reuses its buffers.");
+                var reused = frame.particles;
+                library.Compose(.9f, weights, AeroSeason.Spring, AeroSeason.Spring, 1, ref frame);
+                Assert.That(frame.particles, Is.SameAs(reused));
+
+                director.library = library; director.Store = new MemoryAeroSettingsStore();
+                director.Tick(.016f); director.Tick(.016f);
+                Assert.That(() => director.Tick(.016f), Is.Not.AllocatingGCMemory(), "The director runs every frame without garbage.");
+            }
+            finally { director.Shutdown(); Object.DestroyImmediate(go); Object.DestroyImmediate(library); }
         }
 
         [Test]

@@ -270,6 +270,48 @@ namespace TowerOfBabel.World.Tests
         }
 
         [Test]
+        public void NearPool_KeepsASmallReserveSoNewFloorsRentInsteadOfInstantiating()
+        {
+            GameObject managerObject = new("ChunkManagerReserveTest");
+            managerObject.SetActive(false);
+            ChunkManager manager = managerObject.AddComponent<ChunkManager>();
+            NearTowerAssetPool nearPool = managerObject.AddComponent<NearTowerAssetPool>();
+            GameObject towerRoot = new("TowerRoot");
+            GameObject poolPrefab = CreateTypedAsset("PoolPrefab", null, Vector3.zero, TowerAssetType.Floor);
+            poolPrefab.SetActive(false);
+            ConfigureAllPrefabs(manager, poolPrefab);
+            for (int i = 0; i < 3; i++) CreateTypedAsset("Floor " + i, towerRoot.transform, Vector3.right * i, TowerAssetType.Floor);
+            SetField(manager, "towerRoot", towerRoot);
+            SetField(manager, "nearAssetPool", nearPool);
+            manager.CacheChunks();
+            Object.DestroyImmediate(towerRoot);
+            try
+            {
+                InvokePrivate(manager, "ApplyTowerVisibility", new ChunkKey(0, 0, 0), true);
+                Assert.That(nearPool.ActiveInstanceCount, Is.EqualTo(3));
+                int capacity = nearPool.GetCapacity(TowerAssetType.Floor);
+                Assert.That(nearPool.AvailableCount(TowerAssetType.Floor), Is.Zero);
+                Assert.That(nearPool.AvailableCount(TowerAssetType.Pillar), Is.Zero);
+
+                InvokePrivate(nearPool, "Update");
+                Assert.That(nearPool.AvailableCount(TowerAssetType.Floor), Is.EqualTo(NearTowerAssetPool.ReservePerFrame), "A couple of spares per frame, not a burst.");
+                for (int frame = 0; frame < 10; frame++) InvokePrivate(nearPool, "Update");
+                Assert.That(nearPool.AvailableCount(TowerAssetType.Floor), Is.EqualTo(NearTowerAssetPool.MinimumReserve), "The reserve stops at its target.");
+                Assert.That(nearPool.AvailableCount(TowerAssetType.Pillar), Is.Zero, "Types not in use get no reserve.");
+                Assert.That(nearPool.GetCapacity(TowerAssetType.Floor), Is.EqualTo(capacity + NearTowerAssetPool.MinimumReserve));
+
+                nearPool.ReserveEnabled = false;
+                InvokePrivate(nearPool, "Update");
+                Assert.That(nearPool.GetCapacity(TowerAssetType.Floor), Is.EqualTo(capacity + NearTowerAssetPool.MinimumReserve));
+            }
+            finally
+            {
+                Object.DestroyImmediate(managerObject);
+                Object.DestroyImmediate(poolPrefab);
+            }
+        }
+
+        [Test]
         public void ChunkManager_AdvancesOneStageAndNotifiesListeners()
         {
             ChunkManager manager = CreateInactiveChunkManager(out GameObject managerObject);

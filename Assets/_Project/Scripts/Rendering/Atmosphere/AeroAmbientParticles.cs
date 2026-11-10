@@ -1,3 +1,4 @@
+using Unity.Profiling;
 using UnityEngine;
 
 namespace TowerOfBabel.Rendering
@@ -10,6 +11,7 @@ namespace TowerOfBabel.Rendering
     public sealed class AeroAmbientParticles
     {
         public const int KindCount = 4;
+        private static readonly ProfilerMarker ApplyMarker = new("Aero.Atmosphere.Particles");
         /// <summary>Spawns per second at density 1 for one shape.</summary>
         public const float MaxRate = 48;
         public const float Lifetime = 9;
@@ -22,6 +24,10 @@ namespace TowerOfBabel.Rendering
         /// <summary>Current spawn rate per shape, after shelter.</summary>
         public float[] Rates { get; } = new float[KindCount];
         public Color[] Colors { get; } = new Color[KindCount];
+        private readonly bool[] applied = new bool[KindCount];
+        private readonly Color[] appliedColors = new Color[KindCount];
+        private readonly Vector4[] appliedShapes = new Vector4[KindCount];
+        private readonly float[] appliedRates = new float[KindCount];
         public ParticleSystem System(AeroParticleKind kind) => systems[(int)kind];
         public GameObject Root => root;
 
@@ -73,6 +79,7 @@ namespace TowerOfBabel.Rendering
         /// </summary>
         public void Apply(AeroParticleLayer[] layers, Vector3 cameraPosition, Vector3 cameraForward, bool sheltered, bool enabled)
         {
+            using var _ = ApplyMarker.Auto();
             Vector3 flat = new Vector3(cameraForward.x, 0, cameraForward.z);
             flat = flat.sqrMagnitude > 1e-4f ? flat.normalized : Vector3.forward;
             root.transform.position = cameraPosition + Vector3.up * 3 + flat * 8;
@@ -93,19 +100,29 @@ namespace TowerOfBabel.Rendering
                 if (weight > 0)
                 {
                     color /= weight; size /= weight; fall /= weight; drift /= weight; color.a = 1; Colors[k] = color;
-                    var main = ps.main;
-                    main.startColor = color;
-                    main.startSize = new ParticleSystem.MinMaxCurve(size * .7f, size * 1.3f);
-                    var velocity = ps.velocityOverLifetime;
-                    velocity.x = new ParticleSystem.MinMaxCurve(-drift * .5f, drift * .5f);
-                    velocity.y = new ParticleSystem.MinMaxCurve(-fall * 1.25f, -fall * .75f);
-                    velocity.z = new ParticleSystem.MinMaxCurve(-drift * .5f, drift * .5f);
-                    var noise = ps.noise; noise.strength = Mathf.Max(.05f, drift * .6f);
+                    var shape = new Vector4(size, fall, drift, 0);
+                    // Module writes cost more than the maths; only push values that visibly changed.
+                    if (!applied[k] || MaxDifference(color, appliedColors[k]) > .004f || (shape - appliedShapes[k]).sqrMagnitude > 1e-6f)
+                    {
+                        applied[k] = true; appliedColors[k] = color; appliedShapes[k] = shape;
+                        var main = ps.main;
+                        main.startColor = color;
+                        main.startSize = new ParticleSystem.MinMaxCurve(size * .7f, size * 1.3f);
+                        var velocity = ps.velocityOverLifetime;
+                        velocity.x = new ParticleSystem.MinMaxCurve(-drift * .5f, drift * .5f);
+                        velocity.y = new ParticleSystem.MinMaxCurve(-fall * 1.25f, -fall * .75f);
+                        velocity.z = new ParticleSystem.MinMaxCurve(-drift * .5f, drift * .5f);
+                        var noise = ps.noise; noise.strength = Mathf.Max(.05f, drift * .6f);
+                    }
                 }
-                var emission = ps.emission; emission.rateOverTime = rate;
+                if (!Mathf.Approximately(rate, appliedRates[k])) { appliedRates[k] = rate; var emission = ps.emission; emission.rateOverTime = rate; }
+                // Idle shapes stop simulating once their last particle has faded.
                 if (rate > 0 && !ps.isPlaying) ps.Play(false);
+                else if (rate <= 0 && ps.isPlaying && ps.particleCount == 0) ps.Stop(false, ParticleSystemStopBehavior.StopEmitting);
             }
         }
+
+        private static float MaxDifference(Color a, Color b) => Mathf.Max(Mathf.Abs(a.r - b.r), Mathf.Max(Mathf.Abs(a.g - b.g), Mathf.Abs(a.b - b.b)));
 
         public void Destroy()
         {

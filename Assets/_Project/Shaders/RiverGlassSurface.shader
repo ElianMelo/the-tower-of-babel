@@ -57,12 +57,18 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
         struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float4 tangentOS:TANGENT; float3 floorPatch:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
         struct Varyings { float4 positionCS:SV_POSITION; float3 ws:TEXCOORD0; half3 normal:TEXCOORD1; float fog:TEXCOORD2; float3 local:TEXCOORD3; float slab:TEXCOORD4; UNITY_VERTEX_OUTPUT_STEREO };
         #include "BuildingRadialFloor.hlsl"
+        // World-space depth nudge: 2 mm near, growing slowly with distance for depth precision; far below the slab.
+        float RiverDepthBias(float distance){return .002+distance*.0002;}
         Varyings Vert(Attributes i)
         {
             Varyings o=(Varyings)0; UNITY_SETUP_INSTANCE_ID(i); UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
             o.local=_RadialFloor>1.5?i.floorPatch:i.positionOS.xyz;
             BendRadialFloor(i); o.ws=TransformObjectToWorld(i.positionOS.xyz);
-            o.positionCS=TransformWorldToHClip(o.ws);o.normal=TransformObjectToWorldNormal(i.normalOS);
+            // The river shares its floor tile's surface: nudge only its depth a few millimetres toward the camera so it
+            // wins the depth test without z-fighting. A fixed world distance (not a slope-scaled Offset) cannot leak
+            // through the 20 cm slab or past channel edges at grazing angles.
+            float3 toCamera=GetCameraPositionWS()-o.ws; float cameraDistance=length(toCamera);
+            o.positionCS=TransformWorldToHClip(o.ws+toCamera/max(cameraDistance,1e-4)*min(RiverDepthBias(cameraDistance),cameraDistance*.5));o.normal=TransformObjectToWorldNormal(i.normalOS);
             // World thickness of the 20 cm template slab (tiles may be scaled vertically).
             o.slab=abs(mul((float3x3)GetObjectToWorldMatrix(),float3(0,1,0)).y);
             o.fog=ComputeFogFactor(o.positionCS.z);return o;

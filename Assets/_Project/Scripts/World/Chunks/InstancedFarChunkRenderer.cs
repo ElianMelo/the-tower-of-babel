@@ -53,6 +53,9 @@ namespace TowerOfBabel.World.Chunks
         [SerializeField] private bool useLightProbes = true;
         [Tooltip("Detail vines are small and numerous; their pages stop drawing beyond this distance. Zero disables the limit.")]
         [SerializeField, Min(0f)] private float detailDrawDistance = 140f;
+        [Tooltip("Milliseconds per frame spent rebuilding changed render cells (new cells first, then nearest). Cells that " +
+                 "wait keep drawing their previous state. Zero rebuilds everything at once.")]
+        [SerializeField, Min(0f)] private float rebuildBudgetMs = 2f;
 
         [Header("Mesh LOD (same material)")]
         [Tooltip("Simplified copies of the finished Floor, Stair, Pillar, Arch and GlassWaterFloor (TowerMeshLodAuthoring), " +
@@ -88,6 +91,13 @@ namespace TowerOfBabel.World.Chunks
         public static int LodSlot(TowerAssetType type, int level) => (int)type * 2 + level - 1;
         /// <summary>Pages drawn with a simplified mesh in the last frame.</summary>
         public int LodPageCount { get; private set; }
+        /// <summary>Render cells rebuilt last frame, and those still waiting for the rebuild budget.</summary>
+        public int RebuiltCellCount { get; private set; }
+        public int PendingCellCount { get; private set; }
+        public float RebuildBudgetMs { get => rebuildBudgetMs; set => rebuildBudgetMs = Mathf.Max(0, value); }
+        private readonly List<(float priority, TypeBatch batch, RenderCell cell)> dirtyCells = new();
+        private static readonly Comparison<(float priority, TypeBatch batch, RenderCell cell)> ByPriority = (a, b) => a.priority.CompareTo(b.priority);
+        private readonly System.Diagnostics.Stopwatch rebuildClock = new();
         public float Lod1Distance => lod1Distance;
         public float Lod2Distance => lod2Distance;
 
@@ -201,6 +211,7 @@ namespace TowerOfBabel.World.Chunks
                     ? Mathf.Min(maximumDistanceSquared > 0f ? maximumDistanceSquared : float.MaxValue, detailDrawDistance * detailDrawDistance)
                     : maximumDistanceSquared;
 
+                RebuildDirtyCells(cameraPosition);
                 foreach (TypeBatch batch in batches.Values)
                 {
                     BatchRenderStats stats = batch.Render(
@@ -219,12 +230,40 @@ namespace TowerOfBabel.World.Chunks
             }
         }
 
+        /// <summary>
+        /// Rebuilds changed cells within the frame budget. Never-built cells always build (they draw nothing yet);
+        /// changed cells follow nearest first (a chunk that just moved near is still drawn here until its cell
+        /// rebuilds), at least one per frame.
+        /// </summary>
+        private void RebuildDirtyCells(Vector3 cameraPosition)
+        {
+            dirtyCells.Clear();
+            foreach (TypeBatch batch in batches.Values) batch.CollectDirty(cameraPosition, dirtyCells);
+            dirtyCells.Sort(ByPriority);
+            rebuildClock.Restart();
+            int rebuilt = 0;
+            using (RebuildMarker.Auto())
+                foreach (var entry in dirtyCells)
+                {
+                    // Never-built cells (priority below zero) draw nothing yet, so they always build; changed cells keep
+                    // drawing their previous state and wait for the budget.
+                    bool isNew = entry.priority < 0;
+                    if (!isNew && rebuilt > 0 && rebuildBudgetMs > 0 && rebuildClock.Elapsed.TotalMilliseconds >= rebuildBudgetMs) break;
+                    entry.batch.Rebuild(entry.cell, useLightProbes);
+                    rebuilt++;
+                }
+            RebuiltCellCount = rebuilt;
+            PendingCellCount = dirtyCells.Count - rebuilt;
+            dirtyCells.Clear();
+        }
+
         public void LoadChunk(in FarChunkSnapshot snapshot)
         {
             RiverGlassRenderRegistry.Register(this);
             AeroBuildingReflectionRegistry.Register(this);
             EnsureModelBatches();
-            RemoveChunk(snapshot.Key);
+            // Reloading replaces the chunk inside its cell rather than removing it first: a cell that would empty and
+            // be recreated would draw nothing until its budgeted rebuild.
             loadedChunks.Add(snapshot.Key);
 
             if (!preparedChunks.TryGetValue(snapshot.Key, out PreparedChunk prepared) ||
@@ -239,6 +278,8 @@ namespace TowerOfBabel.World.Chunks
                 if (prepared.MatricesByModel.TryGetValue(pair.Key, out List<Matrix4x4> matrices) &&
                     matrices.Count > 0)
                     pair.Value.SetChunk(snapshot.Key, pair.Key.IsRiver ? RenderCellKey.From(snapshot.Key, 1, cellHorizontalSpan) : prepared.CellKey, matrices);
+                else
+                    pair.Value.RemoveChunk(snapshot.Key);
             }
         }
 
@@ -559,7 +600,7 @@ namespace TowerOfBabel.World.Chunks
                 Bounds bounds = default;
                 foreach (var cell in cells.Values)
                 {
-                    cell.RebuildIfDirty(meshBounds, false);
+                    if (!cell.Built) cell.RebuildIfDirty(meshBounds, false);
                     foreach (var page in cell.Pages)
                     {
                         if (page.Bounds.SqrDistance(eye) > range * range || !GeometryUtility.TestPlanesAABB(planes, page.Bounds)) continue;
@@ -643,6 +684,13 @@ namespace TowerOfBabel.World.Chunks
 
             public void SetChunk(ChunkKey owner, RenderCellKey cellKey, List<Matrix4x4> matrices)
             {
+                // Same cell: swap the instances in place so the cell keeps drawing until it rebuilds.
+                if (cellByChunk.TryGetValue(owner, out RenderCellKey existingKey) && existingKey.Equals(cellKey) &&
+                    cells.TryGetValue(cellKey, out RenderCell existing))
+                {
+                    Count += matrices.Count - existing.ReplaceChunk(owner, matrices);
+                    return;
+                }
                 RemoveChunk(owner);
                 if (!cells.TryGetValue(cellKey, out RenderCell cell))
                 {
@@ -668,6 +716,15 @@ namespace TowerOfBabel.World.Chunks
                     cells.Remove(cellKey);
                 }
             }
+
+            public void CollectDirty(Vector3 cameraPosition, List<(float priority, TypeBatch batch, RenderCell cell)> into)
+            {
+                foreach (RenderCell cell in cells.Values)
+                    if (cell.Dirty)
+                        into.Add((cell.Built ? cell.Bounds.SqrDistance(cameraPosition) : -1f, this, cell));
+            }
+
+            public void Rebuild(RenderCell cell, bool useLightProbes) => cell.RebuildIfDirty(meshBounds, useLightProbes);
 
             public BatchRenderStats Render(int layer, Camera camera, Plane[] planes,
                 Vector3 cameraPosition, float maximumDistanceSquared, bool useLightProbes)
@@ -695,8 +752,28 @@ namespace TowerOfBabel.World.Chunks
 
                 foreach (RenderCell cell in cells.Values)
                 {
-                    using (RebuildMarker.Auto())
-                        cell.RebuildIfDirty(meshBounds, useLightProbes);
+                    // Rebuilt by the owner's budgeted pass; a cell still waiting draws its previous, consistent state.
+                    // Resident pages share one transform buffer, so neighbouring visible pages with the same mesh level
+                    // and shadow mode draw as one run: one indirect draw instead of one per 511-instance page.
+                    int runs = 0, runStart = 0, runEnd = -1, runLevel = 0;
+                    bool runShadows = false;
+                    Bounds runBounds = default;
+
+                    void FlushRun()
+                    {
+                        if (runEnd < 0) return;
+                        cell.EnsureGpu();
+                        RenderParams runParams = baseParams;
+                        runParams.shadowCastingMode = runShadows ? ShadowCastingMode.On : ShadowCastingMode.Off;
+                        runParams.worldBounds = runBounds;
+                        runParams.matProps = cell.RunProperties(runs, runStart, Detail, shVersion);
+                        runParams.lightProbeUsage = Detail ? LightProbeUsage.CustomProvided : LightProbeUsage.Off;
+                        Mesh runMesh = levels[runLevel] != null ? levels[runLevel] : levels[0];
+                        cell.SetRunCommand(runs, runMesh, runEnd - runStart);
+                        Graphics.RenderMeshIndirect(runParams, runMesh, cell.Arguments, 1, runs);
+                        runs++; drawCalls++; residentDraws++;
+                        runEnd = -1;
+                    }
 
                     IReadOnlyList<RenderPage> pages = cell.Pages;
                     for (int i = 0; i < pages.Count; i++)
@@ -709,29 +786,36 @@ namespace TowerOfBabel.World.Chunks
                         if (outsideFrustum || outsideDistance)
                         {
                             culledPages++;
+                            FlushRun();
                             continue;
                         }
 
-                        RenderParams renderParams = baseParams;
-                        if (floor && RiverGlassRenderRegistry.NeedsProjectionShadows(page.Bounds,camera,layer))
-                            renderParams.shadowCastingMode=ShadowCastingMode.On;
-                        renderParams.worldBounds = page.Bounds;
+                        bool shadows = floor && RiverGlassRenderRegistry.NeedsProjectionShadows(page.Bounds, camera, layer);
                         // Same material and shader at every level; only distant pages use the lighter mesh.
                         int level = LevelFor(page.Bounds.SqrDistance(cameraPosition));
                         Mesh drawMesh = levels[level];
                         if (level > 0) lodPages++;
+                        visiblePages++;
                         if (resident && page.LightProbeProperties == null)
                         {
-                            // Same draw, transforms already on the GPU: one indirect draw, no per-instance copy.
-                            cell.EnsureGpu(levels);
-                            renderParams.matProps = cell.PageProperties(i, cell.Floor, Detail, shVersion);
-                            renderParams.lightProbeUsage = Detail ? LightProbeUsage.CustomProvided : LightProbeUsage.Off;
-                            Graphics.RenderMeshIndirect(renderParams, drawMesh, cell.Arguments, 1, level * pages.Count + i);
-                            visiblePages++;
-                            drawCalls++;
-                            residentDraws++;
+                            if (runEnd == page.StartIndex && runLevel == level && runShadows == shadows)
+                            {
+                                runEnd += page.Count; runBounds.Encapsulate(page.Bounds);
+                            }
+                            else
+                            {
+                                FlushRun();
+                                runStart = page.StartIndex; runEnd = page.StartIndex + page.Count;
+                                runLevel = level; runShadows = shadows; runBounds = page.Bounds;
+                            }
                             continue;
                         }
+                        FlushRun();
+
+                        RenderParams renderParams = baseParams;
+                        if (shadows)
+                            renderParams.shadowCastingMode = ShadowCastingMode.On;
+                        renderParams.worldBounds = page.Bounds;
                         renderParams.matProps = page.LightProbeProperties;
                         if (river)
                         {
@@ -755,9 +839,10 @@ namespace TowerOfBabel.World.Chunks
                         }
                         Graphics.RenderMeshInstanced(renderParams, drawMesh, 0,
                             cell.Matrices, page.Count, page.StartIndex);
-                        visiblePages++;
                         drawCalls++;
                     }
+                    FlushRun();
+                    if (runs > 0) cell.UploadRunCommands(runs);
                 }
 
                 return new BatchRenderStats(visiblePages, culledPages, drawCalls, residentDraws, lodPages);
@@ -767,7 +852,7 @@ namespace TowerOfBabel.World.Chunks
             {
                 foreach (var cell in cells.Values)
                 {
-                    cell.RebuildIfDirty(meshBounds, false);
+                    if (!cell.Built) cell.RebuildIfDirty(meshBounds, false);
                     foreach (var page in cell.Pages)
                     {
                         if (planes != null && !GeometryUtility.TestPlanesAABB(planes, page.Bounds)) continue;
@@ -813,9 +898,24 @@ namespace TowerOfBabel.World.Chunks
             private readonly List<int> floorIndices = new();
             private readonly List<Bounds> instanceBounds = new();
             private readonly List<RenderPage> pages = new();
+            private readonly List<KeyValuePair<ChunkKey, List<Matrix4x4>>> orderedChunks = new();
+            private static readonly Comparison<KeyValuePair<ChunkKey, List<Matrix4x4>>> BySpace = (a, b) =>
+            {
+                int c = a.Key.FloorIndex.CompareTo(b.Key.FloorIndex);
+                if (c != 0) return c;
+                c = a.Key.X.CompareTo(b.Key.X);
+                return c != 0 ? c : a.Key.Z.CompareTo(b.Key.Z);
+            };
             private bool dirty = true;
 
             public bool IsEmpty => matricesByChunk.Count == 0;
+            public bool Dirty => dirty;
+            /// <summary>True once the cell has pages; until then it draws nothing.</summary>
+            public bool Built { get; private set; }
+            /// <summary>World bounds of the cell's last rebuild.</summary>
+            public Bounds Bounds { get; private set; }
+            // Shared scratch for inverse transforms: rebuilds no longer allocate a new array per cell.
+            private static Matrix4x4[] inverseScratch = Array.Empty<Matrix4x4>();
             public List<Matrix4x4> Matrices => matrices;
             public IReadOnlyList<int> FloorIndices => floorIndices;
             public IReadOnlyList<Bounds> InstanceBounds => instanceBounds;
@@ -825,6 +925,15 @@ namespace TowerOfBabel.World.Chunks
             {
                 matricesByChunk[key] = chunkMatrices;
                 dirty = true;
+            }
+
+            /// <summary>Replaces a chunk's instances; returns how many it had before.</summary>
+            public int ReplaceChunk(ChunkKey key, List<Matrix4x4> chunkMatrices)
+            {
+                int previous = matricesByChunk.TryGetValue(key, out List<Matrix4x4> old) ? old.Count : 0;
+                matricesByChunk[key] = chunkMatrices;
+                dirty = true;
+                return previous;
             }
 
             public int RemoveChunk(ChunkKey key)
@@ -842,8 +951,16 @@ namespace TowerOfBabel.World.Chunks
             private bool gpuDirty = true;
             public GraphicsBuffer Arguments => gpuArguments;
 
-            /// <summary>Uploads the cell's transforms and page commands once per rebuild (not per frame).</summary>
-            public void EnsureGpu(Mesh[] levels)
+            // Run commands: one indirect command per merged run of visible pages, rewritten only when the runs change.
+            private GraphicsBuffer.IndirectDrawIndexedArgs[] runCommands = Array.Empty<GraphicsBuffer.IndirectDrawIndexedArgs>();
+            private GraphicsBuffer.IndirectDrawIndexedArgs[] uploadedCommands = Array.Empty<GraphicsBuffer.IndirectDrawIndexedArgs>();
+            private int uploadedRuns = -1;
+            private float[] runBases = Array.Empty<float>();
+            private readonly Mesh[] commandMeshes = new Mesh[3];
+            private readonly GraphicsBuffer.IndirectDrawIndexedArgs[] commandTemplates = new GraphicsBuffer.IndirectDrawIndexedArgs[3];
+
+            /// <summary>Uploads the cell's transforms once per rebuild (not per frame) and sizes the run commands.</summary>
+            public void EnsureGpu()
             {
                 if (!gpuDirty && gpuObjectToWorld != null) return;
                 int count = Mathf.Max(1, matrices.Count);
@@ -853,51 +970,83 @@ namespace TowerOfBabel.World.Chunks
                     gpuObjectToWorld = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, 64) { name = "Far cell object to world" };
                     gpuWorldToObject = new GraphicsBuffer(GraphicsBuffer.Target.Structured, count, 64) { name = "Far cell world to object" };
                 }
-                var inverse = new Matrix4x4[matrices.Count];
-                for (int i = 0; i < inverse.Length; i++) inverse[i] = matrices[i].inverse;
+                if (inverseScratch.Length < matrices.Count) inverseScratch = new Matrix4x4[Mathf.NextPowerOfTwo(matrices.Count)];
+                for (int i = 0; i < matrices.Count; i++) inverseScratch[i] = matrices[i].inverse;
                 gpuObjectToWorld.SetData(matrices);
-                gpuWorldToObject.SetData(inverse);
-                // One block of page commands per mesh level (full, LOD1, LOD2), each with that mesh's index range.
-                int commandCount = Mathf.Max(1, pages.Count * levels.Length);
+                gpuWorldToObject.SetData(inverseScratch, 0, 0, matrices.Count);
+                // A run covers at least one page, so there are never more runs than pages.
+                int commandCount = Mathf.Max(1, pages.Count);
                 if (gpuArguments == null || gpuArguments.count < commandCount)
                 {
                     gpuArguments?.Release();
                     gpuArguments = new GraphicsBuffer(GraphicsBuffer.Target.IndirectArguments, commandCount,
-                        GraphicsBuffer.IndirectDrawIndexedArgs.size) { name = "Far cell page commands" };
+                        GraphicsBuffer.IndirectDrawIndexedArgs.size) { name = "Far cell run commands" };
                 }
-                var commands = new GraphicsBuffer.IndirectDrawIndexedArgs[commandCount];
-                for (int level = 0; level < levels.Length; level++)
-                {
-                    Mesh mesh = levels[level] != null ? levels[level] : levels[0];
-                    for (int i = 0; i < pages.Count; i++)
-                        commands[level * pages.Count + i] = new GraphicsBuffer.IndirectDrawIndexedArgs
-                        {
-                            indexCountPerInstance = mesh.GetIndexCount(0), instanceCount = (uint)pages[i].Count,
-                            startIndex = mesh.GetIndexStart(0), baseVertexIndex = mesh.GetBaseVertex(0), startInstance = 0
-                        };
-                }
-                gpuArguments.SetData(commands);
-                pageProperties = new MaterialPropertyBlock[pages.Count];
-                pageShVersions = new int[pages.Count];
+                runCommands = new GraphicsBuffer.IndirectDrawIndexedArgs[commandCount];
+                uploadedCommands = new GraphicsBuffer.IndirectDrawIndexedArgs[commandCount];
+                uploadedRuns = -1;
+                pageProperties = new MaterialPropertyBlock[commandCount];
+                pageShVersions = new int[commandCount];
+                runBases = new float[commandCount];
+                Array.Fill(runBases, -1);
                 gpuDirty = false;
             }
 
-            /// <summary>Per-page draw properties: the cell buffers, the page's first instance and its floor.</summary>
-            public MaterialPropertyBlock PageProperties(int page, int floor, bool ambient, int shVersion)
+            /// <summary>Stages run <paramref name="run"/>: <paramref name="count"/> instances of <paramref name="mesh"/>.</summary>
+            public void SetRunCommand(int run, Mesh mesh, int count)
             {
-                var block = pageProperties[page];
+                int slot = Array.IndexOf(commandMeshes, mesh);
+                if (slot < 0)
+                {
+                    slot = commandMeshes[0] == null ? 0 : commandMeshes[1] == null ? 1 : commandMeshes[2] == null ? 2 : 0;
+                    commandMeshes[slot] = mesh;
+                    commandTemplates[slot] = new GraphicsBuffer.IndirectDrawIndexedArgs
+                    {
+                        indexCountPerInstance = mesh.GetIndexCount(0), startIndex = mesh.GetIndexStart(0), baseVertexIndex = mesh.GetBaseVertex(0)
+                    };
+                }
+                var command = commandTemplates[slot];
+                command.instanceCount = (uint)count; command.startInstance = 0;
+                runCommands[run] = command;
+            }
+
+            /// <summary>Sends the staged run commands to the GPU when they differ from the last upload.</summary>
+            public void UploadRunCommands(int runs)
+            {
+                bool changed = runs > uploadedRuns;
+                for (int i = 0; !changed && i < runs; i++)
+                {
+                    var a = runCommands[i]; var b = uploadedCommands[i];
+                    changed = a.instanceCount != b.instanceCount || a.indexCountPerInstance != b.indexCountPerInstance ||
+                              a.startIndex != b.startIndex || a.baseVertexIndex != b.baseVertexIndex;
+                }
+                if (!changed) return;
+                gpuArguments.SetData(runCommands, 0, 0, runs);
+                Array.Copy(runCommands, uploadedCommands, runs);
+                uploadedRuns = runs;
+            }
+
+            /// <summary>Per-run draw properties: the cell buffers, the run's first instance and its floor.</summary>
+            public MaterialPropertyBlock RunProperties(int run, int firstInstance, bool ambient, int shVersion)
+            {
+                var block = pageProperties[run];
                 if (block == null)
                 {
-                    block = pageProperties[page] = new MaterialPropertyBlock();
+                    block = pageProperties[run] = new MaterialPropertyBlock();
                     block.SetBuffer(FarObjectToWorld, gpuObjectToWorld);
                     block.SetBuffer(FarWorldToObject, gpuWorldToObject);
-                    block.SetFloat(FarBase, pages[page].StartIndex);
-                    block.SetFloat(FarFloor, floor);
+                    block.SetFloat(FarFloor, Floor);
+                    pageShVersions[run] = -1;
                 }
-                if (ambient && pageShVersions[page] != shVersion)
+                if (runBases[run] != firstInstance)
+                {
+                    block.SetFloat(FarBase, firstInstance);
+                    runBases[run] = firstInstance;
+                }
+                if (ambient && pageShVersions[run] != shVersion)
                 {
                     for (int i = 0; i < ShIds.Length; i++) block.SetVector(ShIds[i], ambientSh[i]);
-                    pageShVersions[page] = shVersion;
+                    pageShVersions[run] = shVersion;
                 }
                 return block;
             }
@@ -913,6 +1062,8 @@ namespace TowerOfBabel.World.Chunks
                 ReleaseBuffers();
                 gpuArguments?.Release(); gpuArguments = null;
                 pageProperties = Array.Empty<MaterialPropertyBlock>();
+                Array.Clear(commandMeshes, 0, commandMeshes.Length);
+                uploadedRuns = -1;
                 gpuDirty = true;
             }
 
@@ -925,8 +1076,13 @@ namespace TowerOfBabel.World.Chunks
                 matrices.Clear();
                 floorIndices.Clear(); instanceBounds.Clear();
                 pages.Clear();
+                // Chunks in spatial order (floor, then x, then z), so each page covers neighbouring chunks: tight page
+                // bounds cull well even in large cells.
+                orderedChunks.Clear();
+                foreach (var pair in matricesByChunk) orderedChunks.Add(pair);
+                orderedChunks.Sort(BySpace);
                 using (BoundsMarker.Auto())
-                foreach (var pair in matricesByChunk)
+                foreach (var pair in orderedChunks)
                 {
                     if (!boundsByMatrices.TryGetValue(pair.Value, out List<Bounds> chunkBounds) || chunkBounds.Count != pair.Value.Count)
                     {
@@ -949,6 +1105,13 @@ namespace TowerOfBabel.World.Chunks
                             probeProperties = BuildLightProbeProperties(bounds.center, count);
                     pages.Add(new RenderPage(start, count, bounds, probeProperties));
                 }
+                if (pages.Count > 0)
+                {
+                    Bounds all = pages[0].Bounds;
+                    for (int i = 1; i < pages.Count; i++) all.Encapsulate(pages[i].Bounds);
+                    Bounds = all;
+                }
+                Built = pages.Count > 0;
 
                 dirty = false;
             }

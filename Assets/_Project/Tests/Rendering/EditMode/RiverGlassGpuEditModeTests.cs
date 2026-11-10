@@ -14,6 +14,29 @@ namespace TowerOfBabel.Rendering.Tests
     public sealed class RiverGlassGpuEditModeTests
     {
         [Test]
+        public void RiverPasses_NudgeDepthAFewMillimetres_SoTheyNeitherZFightNorLeak()
+        {
+            // The river draws on its floor tile's own surface; without a depth bias the two flicker (2026-11-09). A
+            // slope-scaled Offset leaked at grazing angles (a stepped line along the channel edge and tile outlines
+            // through the slab seen from below), so the bias is a fixed few millimetres in world space instead.
+            string source = System.IO.File.ReadAllText("Assets/_Project/Shaders/RiverGlassSurface.shader");
+            // Render state between "Pass {" and HLSLPROGRAM.
+            var states = System.Text.RegularExpressions.Regex.Matches(source, @"\bPass\s*\{(.*?)HLSLPROGRAM",
+                System.Text.RegularExpressions.RegexOptions.Singleline).Select(m => m.Groups[1].Value).ToArray();
+            Assert.That(states.Length, Is.EqualTo(2), "River volume and River simple passes.");
+            Assert.That(states.Where(s => System.Text.RegularExpressions.Regex.IsMatch(s, @"\n\s*Offset\b")), Is.Empty,
+                "No slope-scaled Offset: it leaks through the slab at grazing angles.");
+            var bias = System.Text.RegularExpressions.Regex.Match(source, @"float RiverDepthBias\(float distance\)\{return ([\d.]+)\+distance\*([\d.]+);\}");
+            Assert.That(bias.Success, Is.True, "Vert nudges depth with RiverDepthBias.");
+            float near = float.Parse(bias.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
+            float perMetre = float.Parse(bias.Groups[2].Value, System.Globalization.CultureInfo.InvariantCulture);
+            Assert.That(near, Is.InRange(.0005f, .005f), "A few millimetres near the camera.");
+            Assert.That(near + perMetre * 300, Is.LessThan(.1f), "Still well inside the 20 cm slab at 300 m.");
+            Assert.That(source, Does.Contain("TransformWorldToHClip(o.ws+toCamera/max(cameraDistance,1e-4)*min(RiverDepthBias(cameraDistance)"));
+            Assert.That(AssetDatabase.LoadAssetAtPath<Shader>("Assets/_Project/Shaders/RiverGlassSurface.shader").isSupported, Is.True);
+        }
+
+        [Test]
         public void SurfacePattern_OpacityAndBlurControlRenderedDetailWithoutChangingTransparency()
         {
             const int size=256;

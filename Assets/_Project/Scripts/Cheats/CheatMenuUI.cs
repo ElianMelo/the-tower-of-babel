@@ -32,6 +32,7 @@ namespace TowerOfBabel.Cheats
         private GameObject visuals, visualPanel;
         private TMP_Text visualStatus, timeLabel, cloudLabel, presetLabel, presetDetails;
         private int? presetCursor;
+        private float presetDetailsTime;
         private readonly Dictionary<string, UnityEngine.UI.Button> visualButtons = new();
         private bool lookingAround;
         private RectTransform content;
@@ -242,7 +243,7 @@ namespace TowerOfBabel.Cheats
             foreach (var item in professionOutlines) item.Value.enabled = item.Key == (allProfessions ? "ALL" : job.ToString());
             foreach (var item in toggleValues) if (item.toggle != null) { bool value = item.read(); item.toggle.SetIsOnWithoutNotify(value); ShowMark(item.toggle.graphic, value); item.caption.text = value ? "On" : "Off"; }
             if (context != null) context.text = $"Target: {targetDescription}     |     Bag: {NetworkResourceService.Instance?.LocalCapacity ?? 50} per resource";
-            RefreshVisualPanel();
+            RefreshVisualPanel(true);
             foreach (var pair in statFields) if (pair.field != null && !pair.field.isFocused)
                 pair.field.SetTextWithoutNotify((service != null ? service.GetLocalCheatStat(pair.stat) : CheatProfile.Default(pair.stat)).ToString("0.##", CultureInfo.InvariantCulture));
         }
@@ -434,7 +435,7 @@ namespace TowerOfBabel.Cheats
             clouds.previewPreset = null; clouds.RerollClearSky(true); clouds.Tick(0);
             SetStatus("New clear sky: " + clouds.ClearRoll.Description + (clouds.RainBlend > .5f ? " (shows once the rain stops)." : ".")); RefreshVisualPanel();
         }
-        private void RefreshVisualPanel()
+        private void RefreshVisualPanel(bool throttled = false)
         {
             if (!IsVisualPanelVisible) return;
             var weather = NetworkWeatherService.Instance;
@@ -459,6 +460,9 @@ namespace TowerOfBabel.Cheats
             var (pt, pw, ps) = TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.Permutation(index);
             presetLabel.text = $"Preset {index + 1}/{TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.PermutationCount}  " +
                                TowerOfBabel.Rendering.AeroAtmospherePresetLibrary.Describe(pt, pw, ps) + (presetCursor.HasValue ? "  (review)" : "  (live)");
+            // The readout builds several strings; twice a second is enough to follow a blend.
+            if (throttled && Time.unscaledTime < presetDetailsTime) return;
+            presetDetailsTime = Time.unscaledTime + .5f;
             presetDetails.text = presetCursor.HasValue
                 ? TowerOfBabel.Rendering.AeroAtmosphereDirector.Summarize(director.library.Compose(pt, pw, ps))
                 : TowerOfBabel.Rendering.AeroAtmosphereDirector.Summarize(director.Current);

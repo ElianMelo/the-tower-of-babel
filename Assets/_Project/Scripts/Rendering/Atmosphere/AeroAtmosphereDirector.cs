@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
@@ -17,6 +18,7 @@ namespace TowerOfBabel.Rendering
     {
         public const string SeasonKey = "Aero.Season";
         public static AeroAtmosphereDirector Instance { get; private set; }
+        private static readonly ProfilerMarker TickMarker = new("Aero.Atmosphere.Tick");
 
         public AeroAtmospherePresetLibrary library;
         public AeroDayNightCycle dayNight;
@@ -58,7 +60,10 @@ namespace TowerOfBabel.Rendering
         public float SeasonBlend => seasonBlend;
         public AeroWeatherKind? WeatherOverride => weatherOverride;
         public float[] WeatherWeights => (float[])weights.Clone();
-        public AeroAtmospherePresetLibrary.Frame Current { get; private set; }
+        private AeroAtmospherePresetLibrary.Frame current;
+        private readonly float[] targetWeights = new float[AeroAtmospherePresetLibrary.WeatherCount];
+        /// <summary>The look applied this frame. Its particle array is reused every frame; copy it to keep it.</summary>
+        public AeroAtmospherePresetLibrary.Frame Current => current;
         public Volume GradeVolume => gradeObject != null ? gradeObject.GetComponent<Volume>() : null;
         public AeroAmbientParticles Particles => particles;
         public float TimeOfDay => dayNight != null ? dayNight.timeOfDay : fallbackTimeOfDay;
@@ -194,9 +199,10 @@ namespace TowerOfBabel.Rendering
         public void Tick(float dt, Transform view = null)
         {
             if (library == null) return;
+            using var _ = TickMarker.Auto();
             EnsureInitialized();
             dt = Mathf.Max(0, dt);
-            var target = new float[AeroAtmospherePresetLibrary.WeatherCount];
+            var target = targetWeights;
             TargetWeights(target);
             float step = !weightsPrimed || weatherBlendSeconds <= 0 ? 1 : dt / weatherBlendSeconds;
             for (int i = 0; i < weights.Length; i++) weights[i] = Mathf.MoveTowards(weights[i], target[i], step);
@@ -204,8 +210,8 @@ namespace TowerOfBabel.Rendering
             if (seasonBlend < 1) seasonBlend = seasonBlendSeconds <= 0 ? 1 : Mathf.MoveTowards(seasonBlend, 1, dt / seasonBlendSeconds);
             if (seasonBlend >= 1) fromSeason = season;
 
-            var frame = library.Compose(TimeOfDay, weights, fromSeason, season, seasonBlend);
-            Current = frame;
+            library.Compose(TimeOfDay, weights, fromSeason, season, seasonBlend, ref current);
+            var frame = current;
             ApplyVolume(frame.look);
             if (dayNight != null)
             {

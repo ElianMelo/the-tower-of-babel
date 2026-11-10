@@ -237,7 +237,8 @@ namespace TowerOfBabel.World.Tests
                     Assert.That(g.GetFloorOuterRadius(floor), Is.EqualTo(g.GetWallRadius(floor - 1) + g.ArchOuterHalfDepth).Within(.001f));
                 float deckThickness = g.floorTileObject.transform.localScale.y * TowerFloorLayout.DeckThicknessStretch;
                 Assert.That(all.Where(a => a.AssetType == TowerAssetType.Floor).All(a => Mathf.Abs(a.Scale.y - deckThickness) < .0001f), "White deck tiles overlap the arch tops.");
-                Assert.That(all.Where(a => a.AssetType == TowerAssetType.GlassWaterFloor).All(a => Mathf.Abs(a.Scale.y - g.glassWaterFloorObject.transform.localScale.y) < .0001f), "GlassWater keeps its own thickness.");
+                Assert.That(all.Where(a => a.AssetType == TowerAssetType.GlassWaterFloor).All(a => Mathf.Abs(a.Scale.y - deckThickness) < .0001f),
+                    "Glass river tiles share the deck thickness, so the join to a white tile is flush underneath.");
                 float tileBottom = g.floorTileObject.GetComponent<Building>().GetStageMesh(10).bounds.min.y * deckThickness;
                 Assert.That(.2f + tileBottom, Is.LessThan(-.04f), "Tile underside sinks at least 4 cm below the arch top (floor base + 0.2 m).");
                 foreach (var tile in all.Where(a => a.AssetType.IsFloor()))

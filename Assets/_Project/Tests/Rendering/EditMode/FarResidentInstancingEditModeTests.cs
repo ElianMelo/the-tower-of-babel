@@ -95,6 +95,79 @@ namespace TowerOfBabel.Rendering.Tests
             }
         }
 
+        [Test]
+        public void ResidentRuns_MergeNeighbouringPagesIntoOneDrawAndLookTheSame()
+        {
+            bool previous = InstancedFarChunkRenderer.GpuResidentInstancing;
+            Assume.That(InstancedFarChunkRenderer.GpuResidentSupported, "Needs compute buffers and indirect draws.");
+            const int Layer = 31, Size = 256, Count = 1200;
+            var cameraObject = new GameObject("Far run camera") { hideFlags = HideFlags.DontSave };
+            var camera = cameraObject.AddComponent<Camera>();
+            camera.enabled = false; camera.cullingMask = 1 << Layer; camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(.2f, .25f, .3f); camera.farClipPlane = 2000;
+            var target = new RenderTexture(Size, Size, 24, RenderTextureFormat.ARGBHalf); camera.targetTexture = target;
+            var pixels = new Texture2D(Size, Size, TextureFormat.RGBAFloat, false);
+            bool async = ShaderUtil.allowAsyncCompilation; ShaderUtil.allowAsyncCompilation = false;
+            var root = new GameObject("Far run test") { layer = Layer };
+            root.SetActive(false);
+            try
+            {
+                var manager = root.AddComponent<ChunkManager>(); manager.enabled = false;
+                var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Buildings/Pillar.prefab");
+                manager.AssetPrefabs.SetPrefab(TowerAssetType.Pillar, prefab);
+                var far = root.AddComponent<InstancedFarChunkRenderer>();
+                typeof(InstancedFarChunkRenderer).GetField("renderCamera", Private).SetValue(far, camera);
+                typeof(InstancedFarChunkRenderer).GetField("useLightProbes", Private).SetValue(far, false);
+                float size = prefab.GetComponent<MeshFilter>().sharedMesh.bounds.size.magnitude;
+                var assets = new List<ChunkAssetData>();
+                for (int i = 0; i < Count; i++)
+                    assets.Add(new ChunkAssetData(i, TowerAssetType.Pillar, new Vector3((i % 40 - 20) * size * 1.1f, 0, (i / 40) * size * 1.1f),
+                        Quaternion.Euler(0, i * 17, 0), Vector3.one, ChunkAssetData.CompletedStage));
+                far.LoadChunk(new FarChunkSnapshot(new ChunkKey(0, 0, 0), assets));
+                camera.transform.position = new Vector3(0, size * 14, -size * 22);
+                camera.transform.LookAt(new Vector3(0, 0, size * 16));
+
+                Color[] Draw(bool resident)
+                {
+                    InstancedFarChunkRenderer.GpuResidentInstancing = resident;
+                    typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate", Private).Invoke(far, null);
+                    camera.Render();
+                    typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate", Private).Invoke(far, null);
+                    camera.Render();
+                    var old = RenderTexture.active; RenderTexture.active = target;
+                    pixels.ReadPixels(new Rect(0, 0, Size, Size), 0, 0); pixels.Apply();
+                    RenderTexture.active = old;
+                    return pixels.GetPixels();
+                }
+                var instanced = Draw(false);
+                int pages = far.VisiblePageCount;
+                Assert.That(pages, Is.EqualTo(3), "1200 pieces fill three 511-instance pages.");
+                Assert.That(far.DrawCallCount, Is.EqualTo(3), "The instanced path draws one call per page.");
+                var resident = Draw(true);
+                Assert.That(far.VisiblePageCount, Is.EqualTo(pages));
+                Assert.That(far.ResidentDrawCount, Is.EqualTo(1), "Neighbouring visible pages merge into one indirect draw.");
+                Assert.That(far.DrawCallCount, Is.EqualTo(1));
+
+                var background = camera.backgroundColor.linear;
+                bool Covered(Color c) => Mathf.Abs(c.r - background.r) + Mathf.Abs(c.g - background.g) + Mathf.Abs(c.b - background.b) > .02f;
+                int a = instanced.Count(Covered), b = resident.Count(Covered);
+                Assert.That(a, Is.GreaterThan(500), "The instanced reference draws the pieces.");
+                Assert.That(b, Is.InRange(a * .98f, a * 1.02f), $"Every page is drawn by the merged run ({b} vs {a} pixels).");
+                float difference = 0;
+                for (int i = 0; i < instanced.Length; i++)
+                    difference += Mathf.Abs(instanced[i].r - resident[i].r) + Mathf.Abs(instanced[i].g - resident[i].g) + Mathf.Abs(instanced[i].b - resident[i].b);
+                difference /= Mathf.Max(1, a) * 3;
+                Assert.That(difference, Is.LessThan(.03f), $"Same shading (mean difference {difference:F4} per covered channel).");
+            }
+            finally
+            {
+                InstancedFarChunkRenderer.GpuResidentInstancing = previous;
+                ShaderUtil.allowAsyncCompilation = async;
+                Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject);
+                target.Release(); Object.DestroyImmediate(target); Object.DestroyImmediate(pixels);
+            }
+        }
+
         [TestCase(TowerAssetType.Pillar, "Pillar", 100f)]
         [TestCase(TowerAssetType.Pillar, "Pillar", 170f)]
         [TestCase(TowerAssetType.Arch, "Arch", 100f)]
@@ -200,6 +273,50 @@ namespace TowerOfBabel.Rendering.Tests
                 typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate", Private).Invoke(far, null);
                 Assert.That(far.VisiblePageCount, Is.EqualTo(3));
                 Assert.That(far.LodPageCount, Is.EqualTo(2), "30 m keeps the full mesh; 100 m and 200 m are simplified.");
+            }
+            finally { Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject); }
+        }
+
+        [Test]
+        public void Rebuilds_AreSpreadOverFramesNewestAndNearestFirst()
+        {
+            var root = new GameObject("Far rebuild budget"); root.SetActive(false);
+            var cameraObject = new GameObject("Far rebuild camera") { hideFlags = HideFlags.DontSave };
+            try
+            {
+                var camera = cameraObject.AddComponent<Camera>(); camera.enabled = false; camera.farClipPlane = 2000;
+                var manager = root.AddComponent<ChunkManager>(); manager.enabled = false;
+                manager.AssetPrefabs.SetPrefab(TowerAssetType.Pillar, AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Buildings/Pillar.prefab"));
+                var far = root.AddComponent<InstancedFarChunkRenderer>();
+                typeof(InstancedFarChunkRenderer).GetField("renderCamera", Private).SetValue(far, camera);
+                typeof(InstancedFarChunkRenderer).GetField("useLightProbes", Private).SetValue(far, false);
+                var lateUpdate = typeof(InstancedFarChunkRenderer).GetMethod("LateUpdate", Private);
+                ChunkKey Key(int i) => new ChunkKey(0, 0, i * 10);
+                void Load(int i, float z) => far.LoadChunk(new FarChunkSnapshot(Key(i),
+                    new List<ChunkAssetData> { new(0, TowerAssetType.Pillar, new Vector3(0, 0, z), Quaternion.identity, Vector3.one, ChunkAssetData.CompletedStage) }));
+
+                // Four cells, all new: with no budget every cell builds in the first frame.
+                far.RebuildBudgetMs = 0;
+                for (int i = 0; i < 4; i++) Load(i, 40 + i * 60);
+                lateUpdate.Invoke(far, null);
+                Assert.That(far.RebuiltCellCount, Is.EqualTo(4)); Assert.That(far.PendingCellCount, Is.Zero);
+                Assert.That(far.VisiblePageCount, Is.EqualTo(4));
+
+                // Change all four with a budget too small for more than one rebuild per frame.
+                far.RebuildBudgetMs = .0001f;
+                for (int i = 0; i < 4; i++) Load(i, 40 + i * 60);
+                lateUpdate.Invoke(far, null);
+                Assert.That(far.RebuiltCellCount, Is.EqualTo(1), "At least one, but only one, rebuild fits the budget.");
+                Assert.That(far.PendingCellCount, Is.EqualTo(3));
+                Assert.That(far.VisiblePageCount, Is.EqualTo(4), "Cells waiting for a rebuild keep drawing their previous state.");
+                for (int frame = 0; frame < 3; frame++) lateUpdate.Invoke(far, null);
+                Assert.That(far.PendingCellCount, Is.Zero, "Every changed cell catches up within a few frames.");
+
+                // A brand-new cell is rebuilt before an older, nearer one that only changed.
+                Load(0, 40); Load(9, 400);
+                lateUpdate.Invoke(far, null);
+                Assert.That(far.RebuiltCellCount, Is.EqualTo(1));
+                Assert.That(far.VisiblePageCount, Is.EqualTo(5), "The new, never-drawn cell went first.");
             }
             finally { Object.DestroyImmediate(root); Object.DestroyImmediate(cameraObject); }
         }

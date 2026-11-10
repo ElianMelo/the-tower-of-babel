@@ -28,6 +28,10 @@ namespace TowerOfBabel.World.Chunks
         private static readonly ProfilerMarker FloorGeometryMarker = new("Tower.NearPool.FloorGeometry");
         private static readonly ProfilerMarker ActivateMarker = new("Tower.NearPool.Activate");
         private static readonly ProfilerMarker FlushMarker = new("Tower.NearPool.FlushReturns");
+        private static readonly ProfilerMarker ReserveMarker = new("Tower.NearPool.Reserve");
+        /// <summary>Spare instances kept per type, as a share of its pool size (topped up a few per frame).</summary>
+        public const float ReserveShare = .25f;
+        public const int MinimumReserve = 8, ReservePerFrame = 2;
 
         [SerializeField] private Transform poolRoot;
 
@@ -43,6 +47,21 @@ namespace TowerOfBabel.World.Chunks
         private readonly RadialFloorMeshCache floorMeshes = new();
 
         public int ActiveInstanceCount => activeAssets.Count;
+        public bool ReserveEnabled { get; set; } = true;
+
+        /// <summary>
+        /// Keeps a small reserve of spare instances per type, created a couple per frame while nothing else is
+        /// happening, so moving between floors rents from the pool instead of instantiating in one frame.
+        /// </summary>
+        private void Update()
+        {
+            if (!ReserveEnabled) return;
+            using (ReserveMarker.Auto())
+                foreach (TypePool pool in pools.Values)
+                    pool.TopUpReserve(ReservePerFrame);
+        }
+
+        public int AvailableCount(TowerAssetType assetType) => pools.TryGetValue(assetType, out TypePool pool) ? pool.AvailableCount : 0;
         public int ActiveChunkCount => activeChunks.Count;
         public int LastAddedChunkCount { get; private set; }
         public int LastRemovedChunkCount { get; private set; }
@@ -479,6 +498,22 @@ namespace TowerOfBabel.World.Chunks
             private readonly Dictionary<Material, Material> runtimeMaterials = new();
 
             public int Capacity => instances.Count;
+            public int AvailableCount => available.Count;
+
+            /// <summary>Creates up to <paramref name="maximum"/> spare instances while the reserve is short.</summary>
+            public int TopUpReserve(int maximum)
+            {
+                // Only types already in use get a reserve; an unused type stays empty.
+                if (instances.Count == 0) return 0;
+                int target = Mathf.Max(MinimumReserve, Mathf.CeilToInt(instances.Count * ReserveShare));
+                int created = 0;
+                while (created < maximum && available.Count < target)
+                {
+                    available.Push(Create());
+                    created++;
+                }
+                return created;
+            }
 
             public TypePool(TowerAssetType assetType, GameObject prefab, Transform root, ChunkManager chunkManager)
             {
@@ -500,6 +535,11 @@ namespace TowerOfBabel.World.Chunks
                     }
                 }
 
+                return Create();
+            }
+
+            private PooledInstance Create()
+            {
                 GameObject created = Instantiate(prefab, root);
                 created.name = $"Pooled {assetType}";
                 TowerAsset marker = created.GetComponent<TowerAsset>();

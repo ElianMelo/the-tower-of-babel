@@ -28,9 +28,12 @@ namespace TowerOfBabel.Rendering
         private static readonly int Planar = Shader.PropertyToID("_AeroPlanarParams");
         private static readonly List<AeroBuildingFinish> Sources = new();
 
+        public const string ReflectionCameraName = "Aero bounded floor reflection";
+
         private void OnEnable()
         {
             failed = false;
+            DestroyOrphanedReflections();
             if (Sources.Contains(this)) return;
             if (Sources.Count == 0) RenderPipelineManager.beginCameraRendering += BeginCamera;
             Sources.Add(this);
@@ -45,6 +48,29 @@ namespace TowerOfBabel.Rendering
                 Shader.SetGlobalFloat("_AeroFinishCapturing", 0);
             }
             Release();
+        }
+
+        /// <summary>
+        /// Destroys hidden reflection cameras no live source owns. A script reload clears the <see cref="reflection"/>
+        /// field but keeps the hidden camera; left enabled with no target it renders over the Game view from the origin
+        /// (reported 2026-11-09 as the game showing only the lake).
+        /// </summary>
+        public static int DestroyOrphanedReflections()
+        {
+            int destroyed = 0;
+            foreach (var camera in UnityEngine.Resources.FindObjectsOfTypeAll<Camera>())
+            {
+                if (camera == null || camera.name != ReflectionCameraName) continue;
+#if UNITY_EDITOR
+                if (UnityEditor.EditorUtility.IsPersistent(camera)) continue;
+#endif
+                bool owned = false;
+                foreach (var source in Sources) if (source != null && source.reflection == camera) { owned = true; break; }
+                if (owned) continue;
+                CoreUtils.Destroy(camera.gameObject);
+                destroyed++;
+            }
+            return destroyed;
         }
 
         private void LateUpdate()
@@ -80,6 +106,8 @@ namespace TowerOfBabel.Rendering
         {
             LastSubmittedInstances = 0;
             if (IsCapturing) return;
+            // A scene that is unloading cannot take the reflection camera.
+            if (!gameObject.scene.isLoaded) { LastStatus = "Scene unloading"; Release(); return; }
             if (profile == null || camera == null) { LastStatus = "No camera or finish profile"; Release(); return; }
             profile.Apply();
             valid = false;
@@ -157,10 +185,17 @@ namespace TowerOfBabel.Rendering
         {
             if (reflection == null)
             {
-                var go = new GameObject("Aero bounded floor reflection", typeof(Camera), typeof(UniversalAdditionalCameraData));
+                // Created inactive and disabled: if moving it fails (its scene is unloading), it must never be left
+                // behind as a live camera drawing over the Game view.
+                var go = new GameObject(ReflectionCameraName);
+                go.SetActive(false);
                 go.hideFlags = HideFlags.HideAndDontSave;
-                SceneManager.MoveGameObjectToScene(go, gameObject.scene);
-                reflection = go.GetComponent<Camera>(); reflection.enabled = false;
+                var created = go.AddComponent<Camera>(); created.enabled = false;
+                go.AddComponent<UniversalAdditionalCameraData>();
+                try { SceneManager.MoveGameObjectToScene(go, gameObject.scene); }
+                catch (System.ArgumentException) { CoreUtils.Destroy(go); throw; }
+                go.SetActive(true);
+                reflection = created;
             }
             float scale = Mathf.Min(Mathf.Clamp(profile.resolutionScale, .25f, .5f),
                 Mathf.Clamp(profile.maximumResolution, 128, 1024) / (float)Mathf.Max(source.pixelWidth, source.pixelHeight));

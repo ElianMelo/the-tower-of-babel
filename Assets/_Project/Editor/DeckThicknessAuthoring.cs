@@ -6,7 +6,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-/// <summary>Applies the white deck tile thickness to the saved tower. GlassWater tiles are left unchanged. Safe to rerun.</summary>
+/// <summary>Applies the deck tile thickness to the saved tower, white and glass river tiles alike, so their undersides
+/// meet flush. Safe to rerun.</summary>
 public static class DeckThicknessAuthoring
 {
     [MenuItem("Tower of Babel/Buildings/Apply deck tile thickness")]
@@ -21,7 +22,7 @@ public static class DeckThicknessAuthoring
         int changed = 0;
         var floors = manager.CachedChunks.SelectMany(c => c.Assets).Where(a => a.AssetType.IsFloor()).Select(a =>
         {
-            if (a.AssetType != TowerAssetType.Floor || Mathf.Abs(a.Scale.y - target) < .0001f) return a;
+            if (Mathf.Abs(a.Scale.y - target) < .0001f) return a;
             changed++;
             return new ChunkAssetData(a.LocalIndex, a.AssetType, a.Position, a.Rotation, new Vector3(a.Scale.x, target, a.Scale.z), a.Stage);
         }).ToList();
