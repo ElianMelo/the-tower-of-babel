@@ -12,6 +12,8 @@ namespace TowerOfBabel.Rendering
     public sealed class AeroRainController : MonoBehaviour
     {
         public static AeroRainController Instance { get; private set; }
+        public static readonly int RippleParamsId = Shader.PropertyToID("_AeroRainRippleParams");
+        public static readonly int RippleFoamId = Shader.PropertyToID("_AeroRainRippleFoam");
 
         public AeroRainProfile profile;
         public AeroWetnessController wetness;
@@ -74,6 +76,9 @@ namespace TowerOfBabel.Rendering
         {
             if (profile == null || !profile.Ready) return;
             Amount = wetness != null ? wetness.RainAmount : 0;
+            // Water ripples scale with _AeroRain (published by the wetness controller); only their shape lives here.
+            Shader.SetGlobalVector(RippleParamsId, profile.RippleParams);
+            Shader.SetGlobalFloat(RippleFoamId, profile.rippleFoam);
             if (dayNight != null)
             {
                 dayNight.overcastSunScale = profile.sunScale; dayNight.overcastSkyScale = profile.skyScale; dayNight.overcastFogScale = profile.fogScale;

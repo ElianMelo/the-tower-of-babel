@@ -31,7 +31,7 @@ public static class AeroRainAuthoring
         if (Application.dataPath.Replace('\\', '/') != "D:/PersonalProjects/the-tower-of-babel/Assets" || EditorApplication.isPlayingOrWillChangePlaymode)
             throw new InvalidOperationException("Author this project's rain in Edit Mode.");
         var profile = CreateProfile();
-        return "Rain profile ready. " + ConfigureScene(profile);
+        return "Rain profile ready. " + WaterWritesDepth() + ConfigureScene(profile);
     }
 
     public static AeroRainProfile CreateProfile()
@@ -67,6 +67,21 @@ public static class AeroRainAuthoring
         finally { UnityEngine.Object.DestroyImmediate(d); }
     }
 
+    public const string LakeWaterPath = "Assets/_Project/Environment/AeroLakeWater.mat";
+
+    /// <summary>
+    /// The lake (Stylized Water 3) writes depth so rain drawn after it is hidden only where it is behind the
+    /// water. The camera depth texture is copied after opaques, so refraction and soft particles are unaffected.
+    /// </summary>
+    public static string WaterWritesDepth()
+    {
+        var water = AssetDatabase.LoadAssetAtPath<Material>(LakeWaterPath);
+        if (water == null) return "No lake water material. ";
+        water.SetFloat("_ZWrite", 1);
+        EditorUtility.SetDirty(water); AssetDatabase.SaveAssets();
+        return "Lake water writes depth. ";
+    }
+
     static Material ParticleMaterial(string path, string texturePath)
     {
         var material = AssetDatabase.LoadAssetAtPath<Material>(path);
@@ -86,7 +101,11 @@ public static class AeroRainAuthoring
         material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); material.EnableKeyword("_SOFTPARTICLES_ON");
         material.DisableKeyword("_ALPHAPREMULTIPLY_ON"); material.DisableKeyword("_ALPHAMODULATE_ON");
         material.SetOverrideTag("RenderType", "Transparent");
-        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        // After the lake water (Transparent+1, depth writing), so rain in front of water is not painted over.
+        // URP re-derives the queue as Transparent + _QueueOffset when it validates the material, so set both.
+        material.SetFloat("_QueueControl", 0);
+        material.SetFloat("_QueueOffset", AeroRainProfile.RenderQueue - (int)UnityEngine.Rendering.RenderQueue.Transparent);
+        material.renderQueue = AeroRainProfile.RenderQueue;
         EditorUtility.SetDirty(material);
         return material;
     }

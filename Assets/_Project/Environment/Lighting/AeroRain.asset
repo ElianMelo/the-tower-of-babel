@@ -32,6 +32,11 @@ MonoBehaviour:
   splashChance: 0.3
   splashSize: {x: 0.1, y: 0.26}
   splashLifetime: 0.22
+  rippleCellSize: 0.9
+  rippleRate: 1.2
+  rippleStrength: 0.7
+  rippleFadeDistance: 45
+  rippleFoam: 0.3
   dayTint: {r: 0.66, g: 0.74, b: 0.84, a: 0.95}
   nightTint: {r: 0.4, g: 0.5, b: 0.66, a: 0.8}
   splashDayTint: {r: 0.92, g: 0.97, b: 1, a: 0.65}

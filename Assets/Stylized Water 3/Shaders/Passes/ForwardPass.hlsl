@@ -5,6 +5,9 @@
 
 #define COLLAPSIBLE_GROUP 1
 
+//Tower of Babel (project change): rain ripple rings on the water surface. See AeroRainRipples.hlsl.
+#include "Assets/_Project/Shaders/Aero/AeroRainRipples.hlsl"
+
 //Normalize the amount of normal-based distortion between reflection probes and screen-space reflections
 #define SCREENSPACE_REFLECTION_DISTORTION_MULTIPLIER 0.15
 
@@ -409,7 +412,11 @@ float4 ForwardPass(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRONT_FACE_
 	//return float4(water.tangentWorldNormal, 1.0);
 #endif
 	#endif
-	
+
+	//Tower of Babel (project change): Aero rain ripples bend the detail normal while it rains.
+	float3 aeroRainRipple = AeroRainRipples(water.positionWS, water.vertexNormal);
+	water.tangentWorldNormal = normalize(water.tangentWorldNormal + float3(aeroRainRipple.x, 0, aeroRainRipple.y));
+
 	#if _REFRACTION
 	float3 refractionViewDir = water.viewDir;
 
@@ -628,6 +635,8 @@ float4 ForwardPass(Varyings input, FRONT_FACE_TYPE_REAL vertexFace : FRONT_FACE_
 	#endif
 	//return float4(water.foam.xxx, 1);
 #endif
+	//Tower of Babel (project change): faint foam on Aero rain ripple crests.
+	water.foam = saturate(water.foam + aeroRainRipple.z);
 	#endif
 	
 	/* ========

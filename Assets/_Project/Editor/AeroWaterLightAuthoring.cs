@@ -64,6 +64,8 @@ public static class AeroWaterLightAuthoring
         material.SetFloat("_IntersectionLength", .65f); material.SetFloat("_IntersectionFalloff", .45f);
         material.SetFloat("_IntersectionClipping", .25f); material.SetFloat("_FoamBaseAmount", .08f);
         material.SetFloat("_FoamStrength", .35f);
+        // Depth writing: rain (AeroRainProfile.RenderQueue) draws after the water and is hidden only behind it.
+        material.SetFloat("_ZWrite", 1);
         material.EnableKeyword("_CAUSTICS"); material.EnableKeyword("_SCREENSPACEREFLECTIONSENABLED_ON");
         water.material = material; water.meshRenderer.sharedMaterial = material;
         EditorUtility.SetDirty(material); EditorUtility.SetDirty(water); EditorUtility.SetDirty(water.meshRenderer);

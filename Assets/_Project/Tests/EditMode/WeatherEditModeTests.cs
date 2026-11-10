@@ -132,7 +132,7 @@ namespace TowerOfBabel.Resources.Tests
             foreach (var material in new[] { profile.dropMaterial, profile.splashMaterial })
             {
                 Assert.That(material.shader.name, Is.EqualTo("Universal Render Pipeline/Particles/Unlit"));
-                Assert.That(material.renderQueue, Is.EqualTo(3000), "Transparent.");
+                Assert.That(material.renderQueue, Is.EqualTo(AeroRainProfile.RenderQueue), "Transparent, after the lake water.");
                 Assert.That(AssetDatabase.GetAssetPath(material.GetTexture("_BaseMap")), Does.StartWith("Assets/MoveRotateResize/DYNAMIC- Falling Rain/"));
             }
             Assert.That(AssetDatabase.GetAssetPath(profile.rainLoop), Does.StartWith("Assets/MoveRotateResize/DYNAMIC- RainWetness/Audio/"));

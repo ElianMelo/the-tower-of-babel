@@ -26,6 +26,8 @@ namespace TowerOfBabel.Rendering.Tests
 
                 rain.Tick(.1f, camera, Vector3.forward);
                 Assert.That(rain.Drops, Is.Null, "Nothing is built while it is dry.");
+                Assert.That(Shader.GetGlobalVector(AeroRainController.RippleParamsId), Is.EqualTo(profile.RippleParams), "Water ripple shape is published even while dry.");
+                Assert.That(Shader.GetGlobalFloat(AeroRainController.RippleFoamId), Is.EqualTo(profile.rippleFoam));
                 Assert.That(cycle.overcast, Is.Zero);
 
                 wetness.Raining = true; wetness.Tick(1);
