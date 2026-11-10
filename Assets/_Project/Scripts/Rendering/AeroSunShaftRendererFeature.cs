@@ -22,6 +22,8 @@ namespace TowerOfBabel.Rendering
         public ShaftSettings settings = new();
         public AeroRaySettings raySettings;
         [NonSerialized] public float previewTime = -1;
+        /// <summary>Review and tests: draw the shaft light alone instead of adding it to the frame.</summary>
+        [NonSerialized] public bool isolate;
         private Material material;
         private ShaftPass pass;
 
@@ -57,12 +59,14 @@ namespace TowerOfBabel.Rendering
                 public Vector4 volume0, volume1, blend, noise, velocity, fills;
                 public Color tint;
                 public float clock, sunHasCasters;
+                public Vector4 sun;
             }
             private sealed class CompositeData
             {
                 public Material material;
                 public TextureHandle depth, rays;
                 public Vector4 texel;
+                public int pass;
             }
             public ShaftPass(AeroSunShaftRendererFeature owner) { this.owner = owner; }
             public override void RecordRenderGraph(RenderGraph graph, ContextContainer frameData)
@@ -109,6 +113,8 @@ namespace TowerOfBabel.Rendering
                         additionalIndex++;
                     }
                     d.tint = s.tint; d.clock = owner.previewTime;
+                    d.sun = new Vector4(AeroShaftLook.SunGain(profile, context.cycle, lights.visibleLights[lights.mainLightIndex].light),
+                        Mathf.Clamp(profile.sunDensity * density, .001f, .2f), 0, 0);
                     d.sunHasCasters = frameData.Get<UniversalRenderingData>().cullResults.GetShadowCasterBounds(lights.mainLightIndex, out _) ? 1 : 0;
                     builder.UseTexture(d.depth, AccessFlags.Read); builder.UseTexture(d.shadow, AccessFlags.Read);
                     if (d.additionalShadow.IsValid()) builder.UseTexture(d.additionalShadow, AccessFlags.Read);
@@ -119,6 +125,7 @@ namespace TowerOfBabel.Rendering
                         data.material.SetVector(Params, data.parameters); data.material.SetColor(Tint, data.tint);
                         data.material.SetFloat("_AeroShaftClock", data.clock);
                         data.material.SetFloat("_AeroSunHasCasters", data.sunHasCasters);
+                        data.material.SetVector("_AeroSunShaft", data.sun);
                         data.material.SetTexture(Shadow, data.shadow);
                         if (data.additionalShadow.IsValid()) data.material.SetTexture("_AdditionalLightsShadowmapTexture", data.additionalShadow);
                         data.material.SetVector("_AeroTowerVolume0", data.volume0); data.material.SetVector("_AeroTowerVolume1", data.volume1);
@@ -131,12 +138,13 @@ namespace TowerOfBabel.Rendering
                 {
                     d.material = owner.material; d.depth = resources.cameraDepthTexture; d.rays = rays;
                     d.texel = new Vector4(1f / descriptor.width, 1f / descriptor.height, descriptor.width, descriptor.height);
+                    d.pass = owner.isolate ? 2 : 1;
                     builder.UseTexture(d.depth, AccessFlags.Read); builder.UseTexture(d.rays, AccessFlags.Read);
-                    builder.SetRenderAttachment(resources.activeColorTexture, 0, AccessFlags.ReadWrite);
+                    builder.SetRenderAttachment(resources.activeColorTexture, 0, owner.isolate ? AccessFlags.Write : AccessFlags.ReadWrite);
                     builder.SetRenderFunc(static (CompositeData data, RasterGraphContext ctx) =>
                     {
                         data.material.SetTexture(Depth, data.depth); data.material.SetVector(Texel, data.texel);
-                        Blitter.BlitTexture(ctx.cmd, data.rays, new Vector4(1, 1, 0, 0), data.material, 1);
+                        Blitter.BlitTexture(ctx.cmd, data.rays, new Vector4(1, 1, 0, 0), data.material, data.pass);
                     });
                 }
             }

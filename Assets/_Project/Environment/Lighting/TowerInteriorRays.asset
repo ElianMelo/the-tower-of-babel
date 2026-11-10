@@ -14,6 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroRaySettings
   quality: 0
   intensity: 1.15
+  sunStrength: 2
+  sunDensity: 0.06
+  lowSunGain: 1.3
+  highSunGain: 0.8
+  lowSunElevation: 0.4
+  highSunElevation: 0.95
+  hazeResponse: 0.7
+  diffuseLightGain: 0.45
+  moonGain: 3
   density: 0.028
   distance: 32
   softness: 0.4

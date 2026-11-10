@@ -13,11 +13,37 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
         float _AeroShaftClock, _AeroSunHasCasters;
         float4 _AeroTowerVolume0, _AeroTowerVolume1, _AeroTowerBlend;
         float4 _AeroNoise, _AeroNoiseVelocity, _AeroFillIndices;
+        // x: sun-only gain from AeroShaftLook (time of day, haze, moonlight). y: sun-only density per metre.
+        // The sun's air is denser and shorter-ranged than the fills': each beam between two pillars reads on its own
+        // near the viewer, and the far colonnade does not pile up into a wall of haze.
+        float4 _AeroSunShaft;
         // Fill scattering is capped at its ~3 m value: near the arch the 1/d^2 falloff otherwise
         // saturates into blinding orbs (user feedback 2026-10-31: interior too bright and dramatic).
         #define AERO_FILL_SCATTER_CAP .11
+        // Shaft light approaches 1/AERO_SHAFT_SHOULDER (0.8) and never exceeds it.
+        #define AERO_SHAFT_SHOULDER 1.25
         TEXTURE2D_SHADOW(_AeroSunShadow); SAMPLER_CMP(sampler_AeroSunShadow);
         TEXTURE2D_X_FLOAT(_AeroFullDepth);
+        half4 Composite(Varyings input) : SV_Target
+        {
+            UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+            float eye = LinearEyeDepth(SAMPLE_TEXTURE2D_X_LOD(_AeroFullDepth,sampler_PointClamp,input.texcoord,0).r,_ZBufferParams);
+            float2 grid = input.texcoord*_AeroRaysTexelSize.zw-.5;
+            float2 baseUV = (floor(grid)+.5)*_AeroRaysTexelSize.xy;
+            half3 total = 0; float weight = 0;
+            float2 f = frac(grid);
+            // Five taps per axis weighted (1-f, 1, 1, 1, f): a four-texel box that slides smoothly. Every class of the
+            // scatter pass's 4x4 ordered dither gets the same total weight wherever the pixel sits, so the dither
+            // resolves to 256 evenly spaced samples per ray with no pattern left to crawl when the camera turns.
+            [unroll] for (int y=-2;y<=2;y++) [unroll] for (int x=-2;x<=2;x++)
+            {
+                half4 ray = SAMPLE_TEXTURE2D_X_LOD(_BlitTexture,sampler_PointClamp,baseUV+float2(x,y)*_AeroRaysTexelSize.xy,0);
+                float spatial = (x==-2 ? 1-f.x : x==2 ? f.x : 1)*(y==-2 ? 1-f.y : y==2 ? f.y : 1);
+                float w = spatial*exp2(-abs(ray.a-eye)*4/max(1,eye*.05))+1e-5;
+                total += ray.rgb*w; weight += w;
+            }
+            return half4(total/max(weight,.0001),0);
+        }
         float3 WorldPosition(float2 uv, float depth)
         {
             #if !UNITY_REVERSED_Z
@@ -101,12 +127,16 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
                 if(end<=start) return half4(0,0,0,min(LinearEyeDepth(rawDepth,_ZBufferParams),60000));
                 int count = (int)_AeroShaftParams.w;
                 float stepLength = max(0,end-start)/count;
-                // Spatially stable dither breaks shadow-step bands without a history buffer.
-                float jitter = frac(52.9829189*frac(dot(input.positionCS.xy,float2(.06711056,.00583715))));
+                // Ordered 4x4 dither: every 4x4 block holds all sixteen step offsets once, which the composite's
+                // four-texel box averages exactly. No history buffer, and no noise left to shimmer.
+                static const float bayer[16] = {0,8,2,10, 12,4,14,6, 3,11,1,9, 15,7,13,5};
+                uint2 cell = uint2(input.positionCS.xy)&3;
+                float jitter = (bayer[cell.y*4+cell.x]+.5)/16;
                 float clock = _AeroShaftClock >= 0 ? _AeroShaftClock : _Time.y;
                 float3 energy = 0;
                 Light sun = GetMainLight();
-                half phase = .35+.75*pow(saturate(dot(direction,sun.direction)),4);
+                // Side-on beams (walking along the colonnade) must read; facing the sun through an arch must not blow out.
+                half phase = .55+.35*pow(saturate(dot(direction,sun.direction)),4);
                 [loop] for (int i=0;i<count;i++)
                 {
                     float along = start+(i+jitter)*stepLength;
@@ -115,7 +145,8 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
                     float3 advected=(samplePosition-clock*_AeroNoiseVelocity.xyz)*_AeroNoise.x;
                     float mist=lerp(1,smoothstep(.15,.85,Noise(advected)*.7+Noise(advected*2.13+7.1)*.3)*1.7,_AeroNoise.y);
                     float opening=pow(saturate(length(samplePosition.xz-_AeroTowerVolume0.xy)/max(1,_AeroTowerVolume0.z)),4);
-                    float3 illumination=min(sun.color,3)*SunVisibility(samplePosition)*phase;
+                    float3 sunlight=min(sun.color,3)*SunVisibility(samplePosition)*phase*_AeroSunShaft.x;
+                    float3 illumination=0;
                     [unroll] for(int slot=0;slot<2;slot++)
                     {
                         int index=(int)_AeroFillIndices[slot];
@@ -128,9 +159,13 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
                         }
                     }
                     illumination+=half3(.025,.04,.05)*_AeroNoise.z;
-                    energy+=illumination*mask*mist*lerp(.4,1,opening)*exp(-along*_AeroShaftParams.y)*_AeroShaftParams.y*stepLength;
+                    // Sunlight counts mostly near the arches; deep inside (the open core lit from above) it stays a faint veil.
+                    energy+=(illumination*exp(-along*_AeroShaftParams.y)*_AeroShaftParams.y*lerp(.4,1,opening)+sunlight*exp(-along*_AeroSunShaft.y)*_AeroSunShaft.y*lerp(.2,1,opening))*mask*mist*stepLength;
                 }
-                half3 color = clamp(energy*_AeroSunTint.rgb*_AeroShaftParams.z*_AeroTowerBlend.z,0,4);
+                half3 color = max(energy*_AeroSunTint.rgb*_AeroShaftParams.z*_AeroTowerBlend.z,0);
+                // Soft shoulder: beams seen from the side stay nearly linear, while the long lit path seen when facing
+                // the sun through an arch settles below the bloom threshold instead of burning out into a white blob.
+                color /= 1+AERO_SHAFT_SHOULDER*max(color.r,max(color.g,color.b));
                 // The cylinder interval already clips sky-facing rays at the arch boundary.
                 return half4(color,min(LinearEyeDepth(rawDepth,_ZBufferParams),60000));
             }
@@ -145,23 +180,18 @@ Shader "Hidden/TowerOfBabel/Sun Shafts"
             #pragma target 3.5
             #pragma vertex Vert
             #pragma fragment Composite
-            half4 Composite(Varyings input) : SV_Target
-            {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                float eye = LinearEyeDepth(SAMPLE_TEXTURE2D_X_LOD(_AeroFullDepth,sampler_PointClamp,input.texcoord,0).r,_ZBufferParams);
-                float2 grid = input.texcoord*_AeroRaysTexelSize.zw-.5;
-                float2 baseUV = (floor(grid)+.5)*_AeroRaysTexelSize.xy;
-                half3 total = 0; float weight = 0;
-                [unroll] for (int y=-1;y<=1;y++) [unroll] for (int x=-1;x<=1;x++)
-                {
-                    half4 ray = SAMPLE_TEXTURE2D_X_LOD(_BlitTexture,sampler_PointClamp,baseUV+float2(x,y)*_AeroRaysTexelSize.xy,0);
-                    float2 offset = float2(x,y)-frac(grid);
-                    float spatial = exp2(-dot(offset,offset)*.7);
-                    float w = spatial*exp2(-abs(ray.a-eye)*4/max(1,eye*.05));
-                    total += ray.rgb*w; weight += w;
-                }
-                return half4(total/max(weight,.0001),0);
-            }
+            ENDHLSL
+        }
+        Pass
+        {
+            // Review and tests: the shaft light alone, so it can be measured apart from the scene.
+            Name "Isolated sun composite"
+            ZWrite Off ZTest Always Cull Off
+            Blend Off ColorMask RGB
+            HLSLPROGRAM
+            #pragma target 3.5
+            #pragma vertex Vert
+            #pragma fragment Composite
             ENDHLSL
         }
     }

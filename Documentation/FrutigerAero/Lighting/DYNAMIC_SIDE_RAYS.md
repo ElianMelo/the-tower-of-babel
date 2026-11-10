@@ -2,6 +2,8 @@
 
 Accepted by the user on **2026-10-24** as the current tower interior lighting baseline. **Calmer interior (2026-10-31):** the user found the interior too bright and the volume too dramatic. Changes: shafts 1.65 → 1.15, fills 2.2 → 1.5, density 0.035 → 0.028, noise contrast 0.65 → 0.45, haze 0.12 → 0.05, and fill scattering capped at its 3 m value (`AERO_FILL_SCATTER_CAP`). `TowerExitAtmosphere` became a calm interior grade: exposure −0.4 instead of +0.13, no extra contrast, bloom 0.35, shafts ×0.9. Its weight now covers the whole interior (65% deep inside, 100% at the open edge, × 0.8) instead of only the edge. The accepted result is shown in the [lighting capture](DynamicRays/Floor0-Side3-After.png), [standing motion](DynamicRays/Motion.gif) and [walking preview](DynamicRays/Walk.gif). Future lighting changes should preserve this presentation and the construction-aware behavior described below; the measured fixture budget and validation limits remain recorded in this document.
 
+**Visible sun shafts by time, weather and season (2026-11-10):** after the calmer interior, the 120 m shadows, the volumetric clouds and the atmosphere presets, the shaft pass added only about 1% brightness (a third of the 2026-10-25 level) and its dither shimmered when the camera turned. The sun and moon shafts now have their own strength and air density, separate from the fills and interior haze, which keep the calm 2026-10-31 values. See [sun shaft look](#sun-shaft-look).
+
 The tower uses sun-shadow scattering inside its viewed floor volume. Pillars split the shafts, completed decks block light between floors, and the existing day/night cycle supplies the sun/moon direction and color. The fixed crossed particle sheets have been removed from Tower. Fireflies remain a separate system.
 
 ## Settings
@@ -14,6 +16,35 @@ Select `Assets/_Project/Environment/Lighting/TowerInteriorRays.asset` to adjust 
 | Low | Quarter | 12 steps | 32 m | 1 |
 
 Native sun shadow distance was 50 m; since 2026-11-03 it is 120 m with three cascades (150 m with four cascades cost ~5 ms of GPU). Since 2026-11-10 the map is 4096 again and the cascades end at 8.4, 32.4 and 120 m: the shafts are shaped only by this map, and at 2048 (with the second cascade ending at 30 m, short of the 32 m march) they shimmered with camera motion and lost thin arch and pillar shadows (`ShadowDistanceAuthoring`, menu **Tower of Babel/Environment/Apply shadow distance**). Fill sources use the low shadow tier (256 px) inside a 1024 px additional-light atlas (it was 512 px in a 2048 atlas, which overflowed: "Too many additional punctual lights shadows"). See [performance](../../Performance/PERFORMANCE.md).
+
+## Sun shaft look
+
+`AeroShaftLook` turns the key light and the current atmosphere preset into one sun-only gain; the renderer feature passes it to the shader with the sun's own density (`sunDensity`, 0.06 per metre against 0.028 for the fills). Denser, shorter-ranged sun air makes each beam between two pillars read near the viewer instead of piling the far colonnade into a wall of haze.
+
+| Input | Effect on the shafts | Setting |
+| --- | --- | --- |
+| Sun elevation | Low morning and golden-hour sun rakes through the arches (×1.3); a high sun only grazes the openings (×0.8) | `lowSunGain`, `highSunGain`, `lowSunElevation`, `highSunElevation` |
+| Haze | The preset fog thickens them: misty morning ×1.4, autumn ×1.35, winter ×1.25, spring ×1.1, summer ×0.9 (70% applied) | `hazeResponse` |
+| Weather | Diffuse light draws weaker shafts, read from the preset shadow strength: about ×0.65 cloudy, ×0.45 rain, on top of the dimmer sun | `diffuseLightGain` |
+| Night | Moonlight is lifted ×3 so cool shafts stay faintly readable | `moonGain` |
+| Overall | Base strength of sun and moon shafts | `sunStrength` (2) |
+
+Colour follows the light: the presets already tint the sun peach in the morning, amber in autumn and pale in winter. A soft shoulder keeps shaft light under 0.8, so facing the sun through an arch stays below the bloom threshold. Sunlight in the open core counts for a fifth of what it does at the arches.
+
+The step dither is an ordered 4×4 pattern and the composite is a five-tap-per-axis sliding box of four texels: every dither offset gets the same weight wherever the pixel sits, which resolves to 256 evenly spaced samples per ray and leaves no pattern to crawl.
+
+`TowerRayReview.Diagnose(label)` (Edit Mode) renders the review floor for seven time / weather / season looks into `_Screenshots-and-previews-to-delete/GodRays/<label>/` with the frame, the frame without shafts and the shaft light alone, and writes `Diagnosis.json`: light added, beam contrast and frame-to-frame flicker for a still and a turning camera.
+
+| Look | Light added before | After | 2026-10-25 settings |
+| --- | --- | --- | --- |
+| Morning, autumn, clear | 0.013 | 0.075 | 0.022 |
+| Midday, summer, clear | 0.026 | 0.065 | 0.045 |
+| Afternoon, autumn, clear | 0.015 | 0.077 | 0.026 |
+| Morning, spring, cloudy | 0.014 | 0.056 | 0.023 |
+| Morning, autumn, rain | 0.005 | 0.020 | 0.009 |
+| Night, summer, clear | 0.001 | 0.006 | 0.003 |
+
+Mean linear light over the review frame. Flicker while turning one degree per frame fell from 4.1% to 2.3% of the shaft light per frame.
 
 ## Architecture and transitions
 

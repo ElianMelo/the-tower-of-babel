@@ -101,6 +101,151 @@ public static class TowerRayReview
         }
         finally{UnityEngine.Object.DestroyImmediate(root);}
     }
+    public const string DiagnosisFolder="_Screenshots-and-previews-to-delete/GodRays";
+    [Serializable] public sealed class Scenario
+    {
+        public string name;public float time;public AeroWeatherKind weather;public AeroSeason season;
+        /// <summary>Mean linear light the shaft pass adds to the frame before grading, and over the brightest tenth of it.</summary>
+        public float added,addedPeak;
+        /// <summary>Spread of the added light over its mean: beams and gaps read above ~0.6, a flat haze below.</summary>
+        public float contrast;
+        /// <summary>Change of the added light against the average of the neighbouring frames, over its mean: still camera and walking.</summary>
+        public float stillFlicker,walkFlicker;
+    }
+    [Serializable] public sealed class Diagnosis { public string label;public Scenario[] scenarios; }
+    public static readonly (string name,float time,AeroWeatherKind weather,AeroSeason season)[] ReviewLooks=
+    {
+        ("Morning-Autumn-Clear",.32f,AeroWeatherKind.Clear,AeroSeason.Autumn),
+        ("Midday-Summer-Clear",.5f,AeroWeatherKind.Clear,AeroSeason.Summer),
+        ("Afternoon-Autumn-Clear",.69f,AeroWeatherKind.Clear,AeroSeason.Autumn),
+        ("Afternoon-Winter-Clear",.69f,AeroWeatherKind.Clear,AeroSeason.Winter),
+        ("Morning-Spring-Cloudy",.32f,AeroWeatherKind.Cloudy,AeroSeason.Spring),
+        ("Morning-Autumn-Rain",.32f,AeroWeatherKind.Rain,AeroSeason.Autumn),
+        ("Night-Summer-Clear",.9f,AeroWeatherKind.Clear,AeroSeason.Summer)
+    };
+    /// <summary>
+    /// Renders the completed review floor under several time / weather / season looks and measures what the shaft
+    /// pass adds: how much light, how beam-like, and how stable between frames. Edit Mode only; images go to the
+    /// disposable screenshot folder and the scene lighting is restored afterwards.
+    /// </summary>
+    public static Diagnosis Diagnose(string label,int floor=0,bool motion=true)
+    {
+        if(EditorApplication.isPlaying)throw new InvalidOperationException("Review in Edit Mode.");
+        var original=SceneManager.GetActiveScene();if(original.isDirty)throw new InvalidOperationException("Save the scene before review.");
+        var manager=UnityEngine.Object.FindFirstObjectByType<ChunkManager>();
+        var library=AssetDatabase.FindAssets("t:AeroAtmospherePresetLibrary").Select(g=>AssetDatabase.LoadAssetAtPath<AeroAtmospherePresetLibrary>(AssetDatabase.GUIDToAssetPath(g))).FirstOrDefault();
+        var oldSun=RenderSettings.sun;var sky=RenderSettings.skybox;var ambient=RenderSettings.ambientProbe;var fog=RenderSettings.fog;var fogColor=RenderSettings.fogColor;float fogDensity=RenderSettings.fogDensity,reflection=RenderSettings.reflectionIntensity;
+        Color ambientSky=RenderSettings.ambientSkyColor,ambientEquator=RenderSettings.ambientEquatorColor,ambientGround=RenderSettings.ambientGroundColor;var ambientMode=RenderSettings.ambientMode;
+        float daylight=Shader.GetGlobalFloat("_AeroDaylight");
+        var lights=UnityEngine.Object.FindObjectsByType<Light>(FindObjectsSortMode.None);var enabled=lights.Select(l=>l.enabled).ToArray();foreach(var l in lights)l.enabled=false;
+        var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Additive);SceneManager.SetActiveScene(scene);
+        var feature=AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/Settings/PC_Renderer.asset").rendererFeatures.OfType<AeroSunShaftRendererFeature>().Single();bool wasActive=feature.isActive;
+        const int width=960,height=540;
+        var rt=new RenderTexture(width,height,24,RenderTextureFormat.ARGBHalf);var oldTarget=RenderTexture.active;
+        var image=new Texture2D(width,height,TextureFormat.RGBAFloat,false);
+        GameObject root=null;bool async=ShaderUtil.allowAsyncCompilation;ShaderUtil.allowAsyncCompilation=false;
+        string folder=DiagnosisFolder+"/"+label;Directory.CreateDirectory(folder);
+        var result=new Diagnosis {label=label,scenarios=new Scenario[ReviewLooks.Length]};
+        try
+        {
+            root=Build(manager,floor);SceneManager.MoveGameObjectToScene(root,scene);Initialize(root,floor);
+            var camera=root.GetComponentInChildren<Camera>();camera.scene=scene;camera.targetTexture=rt;
+            var fx=root.GetComponent<AeroTowerAtmosphere>();float clock=0;
+            float[] Luma(string save)
+            {
+                camera.Render();camera.Render();RenderTexture.active=rt;image.ReadPixels(new Rect(0,0,width,height),0,0);image.Apply();
+                if(save!=null)
+                {
+                    var ldr=new Texture2D(width,height,TextureFormat.RGB24,false);ldr.SetPixels(image.GetPixels());ldr.Apply();
+                    File.WriteAllBytes(folder+"/"+save+".png",ldr.EncodeToPNG());UnityEngine.Object.DestroyImmediate(ldr);
+                }
+                var raw=image.GetPixelData<Color>(0);var luma=new float[raw.Length];
+                for(int i=0;i<luma.Length;i++)luma[i]=Mathf.Clamp(raw[i].r*.2126f+raw[i].g*.7152f+raw[i].b*.0722f,0,4);
+                return luma;
+            }
+            void Settle(){for(int i=0;i<30;i++){clock+=.1f;fx.Sample(camera.transform.position,clock);} feature.previewTime=clock;}
+            var cameraData=camera.GetUniversalAdditionalCameraData();
+            float[] Added(string save)
+            {
+                if(save!=null){feature.SetActive(true);Luma(save);feature.SetActive(false);Luma(save+"-Off");feature.SetActive(true);}
+                // The shaft light alone, before grading: animated materials and bloom cannot leak into the measure.
+                feature.isolate=true;cameraData.renderPostProcessing=false;
+                try
+                {
+                    var shafts=Luma(null);if(save==null)return shafts;
+                    // The shaft light alone, four times brighter, to judge its shape.
+                    var view=new Texture2D(width,height,TextureFormat.RGB24,false);var pixels=image.GetPixels();
+                    for(int i=0;i<pixels.Length;i++)pixels[i]=(pixels[i]*4).gamma;
+                    view.SetPixels(pixels);view.Apply();File.WriteAllBytes(folder+"/"+save+"-Shafts.png",view.EncodeToPNG());UnityEngine.Object.DestroyImmediate(view);
+                    return shafts;
+                }
+                finally{feature.isolate=false;cameraData.renderPostProcessing=true;}
+            }
+            float Change(float[] a,float[] b){double sum=0,mean=0;for(int i=0;i<a.Length;i++){sum+=Mathf.Abs(a[i]-b[i]);mean+=a[i]+b[i];}return mean<=1e-6?0:(float)(sum/(mean*.5));}
+            for(int index=0;index<ReviewLooks.Length;index++)
+            {
+                var look=ReviewLooks[index];var cycle=fx.cycle;
+                var entry=result.scenarios[index]=new Scenario {name=look.name,time=look.time,weather=look.weather,season=look.season};
+                cycle.grade=library!=null?AeroLightGrade.From(library.Compose(look.time,Weights(look.weather),look.season,look.season,1).look):AeroLightGrade.Identity;
+                cycle.overcast=look.weather==AeroWeatherKind.Rain?1:0;
+                cycle.cloudShade=look.weather==AeroWeatherKind.Rain?.3f:look.weather==AeroWeatherKind.Cloudy?.12f:.06f;
+                cycle.ApplyTime(look.time);
+                // Stand on the lit side of the tower and look along the colonnade, the arches on one side.
+                var key=RenderSettings.sun!=null?RenderSettings.sun:cycle.sun;
+                var toward=-key.transform.forward;toward.y=0;toward=toward.sqrMagnitude<.001f?Vector3.right:toward.normalized;
+                float r=fx.WallRadius(floor);var radial=Quaternion.Euler(0,-18,0)*toward;var tangent=new Vector3(-radial.z,0,radial.x);
+                camera.transform.position=radial*(r-9)+Vector3.up*(floor*6+1.75f);
+                camera.transform.LookAt(radial*(r-5)+tangent*22+Vector3.up*(floor*6+2.4f));
+                Settle();
+                var added=Added(look.name);
+                double mean=0;foreach(float v in added)mean+=v;mean/=added.Length;
+                double variance=0;foreach(float v in added)variance+=(v-mean)*(v-mean);
+                var sorted=(float[])added.Clone();Array.Sort(sorted);double peak=0;int top=sorted.Length/10;for(int i=sorted.Length-top;i<sorted.Length;i++)peak+=sorted[i];
+                entry.added=(float)mean;entry.addedPeak=(float)(peak/top);entry.contrast=mean<=1e-6?0:(float)(Math.Sqrt(variance/added.Length)/mean);
+                if(!motion||index>1)continue;
+                // Still camera: only the clock, the mist and the sun (one 60 Hz frame of the day cycle) move.
+                // Flicker is each frame against the average of its neighbours, so steady motion cancels out.
+                const int frames=7;var sequence=new float[frames][];
+                float Flicker()
+                {
+                    float sum=0;
+                    for(int frame=1;frame<frames-1;frame++)
+                    {
+                        var between=new float[sequence[frame].Length];
+                        for(int i=0;i<between.Length;i++)between[i]=(sequence[frame-1][i]+sequence[frame+1][i])*.5f;
+                        sum+=Change(sequence[frame],between);
+                    }
+                    return sum/(frames-2);
+                }
+                for(int frame=0;frame<frames;frame++)
+                {
+                    clock+=1f/60;feature.previewTime=clock;cycle.ApplyTime(cycle.timeOfDay+1f/(60*cycle.CycleSeconds));fx.Sample(camera.transform.position,clock);
+                    sequence[frame]=Added(null);
+                }
+                entry.stillFlicker=Flicker();
+                var start=camera.transform.position;
+                for(int frame=0;frame<frames;frame++)
+                {
+                    clock+=1f/60;feature.previewTime=clock;camera.transform.position=start+tangent*(frame+1)*.03f;camera.transform.Rotate(0,1,0,Space.World);fx.Sample(camera.transform.position,clock);
+                    sequence[frame]=Added(null);
+                }
+                entry.walkFlicker=Flicker();
+            }
+            File.WriteAllText(folder+"/Diagnosis.json",JsonUtility.ToJson(result,true));
+            return result;
+        }
+        finally
+        {
+            feature.SetActive(wasActive);feature.previewTime=-1;feature.isolate=false;ShaderUtil.allowAsyncCompilation=async;RenderTexture.active=oldTarget;
+            if(root!=null)foreach(var filter in root.GetComponentsInChildren<MeshFilter>()){UnityEngine.Object.DestroyImmediate(filter.sharedMesh);UnityEngine.Object.DestroyImmediate(filter.GetComponent<Renderer>().sharedMaterial);}
+            EditorSceneManager.CloseScene(scene,true);UnityEngine.Object.DestroyImmediate(rt);UnityEngine.Object.DestroyImmediate(image);SceneManager.SetActiveScene(original);
+            for(int i=0;i<lights.Length;i++)if(lights[i]!=null)lights[i].enabled=enabled[i];
+            RenderSettings.sun=oldSun;RenderSettings.skybox=sky;RenderSettings.ambientProbe=ambient;RenderSettings.fog=fog;RenderSettings.fogColor=fogColor;RenderSettings.fogDensity=fogDensity;RenderSettings.reflectionIntensity=reflection;
+            RenderSettings.ambientMode=ambientMode;RenderSettings.ambientSkyColor=ambientSky;RenderSettings.ambientEquatorColor=ambientEquator;RenderSettings.ambientGroundColor=ambientGround;
+            Shader.SetGlobalFloat("_AeroDaylight",daylight);
+        }
+    }
+    private static float[] Weights(AeroWeatherKind weather){var w=new float[AeroAtmospherePresetLibrary.WeatherCount];w[(int)weather]=1;return w;}
     public static string Capture(int floor=0)
     {
         if(EditorApplication.isPlaying)throw new InvalidOperationException("Review in Edit Mode.");

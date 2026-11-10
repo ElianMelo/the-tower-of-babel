@@ -158,6 +158,60 @@ namespace TowerOfBabel.Rendering.Tests
         }
 
         [Test]
+        public void SunRays_SunStrengthScalesOnlyTheSunAndTheShoulderBoundsIt()
+        {
+            WithShaftScene((camera,sun,blocker,capture)=>
+            {
+                var fx=camera.scene.GetRootGameObjects().SelectMany(x=>x.GetComponentsInChildren<AeroTowerAtmosphere>()).Single();
+                var profile=UnityEngine.Object.Instantiate(fx.raySettings);fx.raySettings=profile;profile.interiorHaze=0;
+                try
+                {
+                    Shafts.SetActive(true);Shafts.isolate=true;
+                    profile.sunStrength=0;var none=capture();
+                    Assert.That(Mean(none),Is.LessThan(.002f),"Without sun strength, fills or haze there is no shaft light.");
+                    // Low strengths: this fixture's long lit path reaches the shoulder quickly.
+                    profile.sunStrength=.1f;var one=capture();profile.sunStrength=.3f;var two=capture();
+                    Assert.That(Mean(one),Is.GreaterThan(.01f),"Sun shafts must be clearly measurable.");
+                    Assert.That(Mean(two),Is.GreaterThan(Mean(one)*1.3f),"Sun strength is the visibility control.");
+                    profile.sunDensity=.02f;var thin=capture();
+                    Assert.That(Mean(thin),Is.LessThan(Mean(two)*.8f),"Thinner sun air shows less of a near beam.");
+                    profile.sunDensity=.1f;profile.sunStrength=6;sun.intensity=3;var extreme=capture();
+                    float peak=extreme.Max(c=>Mathf.Max(c.r,Mathf.Max(c.g,c.b)));
+                    Assert.That(Mean(extreme),Is.GreaterThan(Mean(two)));
+                    // The shoulder tops out at 0.8 linear (0.906 in the sRGB target): never a burnt-out white.
+                    Assert.That(peak,Is.LessThan(.93f),"Facing the sun through an arch must not burn out.");
+                }
+                finally{Shafts.isolate=false;fx.raySettings=Shafts.raySettings;UnityEngine.Object.DestroyImmediate(profile);}
+            });
+        }
+
+        [Test]
+        public void SunRays_IsolatedViewMatchesTheAddedLightAndHasNoDitherPattern()
+        {
+            WithShaftScene((camera,sun,blocker,capture)=>
+            {
+                try
+                {
+                    // Half the view's air lies in shadow, so each ray crosses a shadow edge: the worst case for step dither.
+                    blocker.transform.position=new Vector3(14,6,12);blocker.SetActive(true);
+                    Shafts.SetActive(true);var added=capture();
+                    Shafts.isolate=true;var alone=capture();
+                    Assert.That(Mean(alone),Is.GreaterThan(.005f));
+                    Assert.That(Difference(added,alone),Is.LessThan(.004f),"Over a black scene the isolated view is exactly the added light.");
+                    // Neighbouring pixels differ only by the smooth light gradient once the ordered dither is filtered out.
+                    int size=160;double rough=0,total=0;
+                    for(int y=4;y<size-4;y++)for(int x=4;x<size-5;x++)
+                    {
+                        float here=alone[y*size+x].g,next=alone[y*size+x+1].g,after=alone[y*size+x+2].g;
+                        rough+=Mathf.Abs(next-(here+after)*.5f);total+=next;
+                    }
+                    Assert.That(rough/total,Is.LessThan(.01),"A leftover dither pattern crawls and flickers when the camera turns.");
+                }
+                finally{Shafts.isolate=false;}
+            });
+        }
+
+        [Test]
         public void SunRays_ZeroIntensityAndMissingSunAreNoOps()
         {
             float intensity=Shafts.settings.intensity;
