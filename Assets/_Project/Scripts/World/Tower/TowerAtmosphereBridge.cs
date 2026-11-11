@@ -19,7 +19,8 @@ namespace TowerOfBabel.World.Tower
         private readonly List<AeroArchOpening> openings = new();
         private readonly Dictionary<TowerAssetType, Mesh[]> stages = new();
         private readonly RadialFloorMeshCache bentMeshes = new();
-        private Material shadowMaterial;
+        private Material shadowMaterial, glassShadowMaterial;
+        private MaterialPropertyBlock glassProperties;
         private Mesh slab, pillar;
         private float nextRefresh;
         private int floor = -100, previous = -100;
@@ -34,7 +35,8 @@ namespace TowerOfBabel.World.Tower
         /// <summary>True while a time-sliced refresh still has chunks to build.</summary>
         public bool RefreshPending => dirty;
         public int ShadowMeshBuilds { get; private set; }
-        private sealed class Proxy { public GameObject Object; public Mesh Mesh; public int Version; }
+        public int GlassShadowRenderers { get; private set; }
+        private sealed class Proxy { public GameObject Object; public Mesh Mesh, GlassMesh; public int Version; }
 
         private void OnEnable()
         {
@@ -50,7 +52,9 @@ namespace TowerOfBabel.World.Tower
             if (!Application.isPlaying || atmosphere == null || chunks == null) return;
             // The floor under construction is not a roof yet; every floor below it is (rain shelter).
             atmosphere.BuiltFloors = chunks.ActiveConstructionFloor ?? int.MaxValue;
-            if (Time.unscaledTime < nextRefresh && !dirty) return;
+            // The near pool moved this frame (its Update): hand shadows over now, never a tenth of a second later,
+            // or a chunk leaving the pool spends frames with no caster at all and its sunlight flashes on.
+            if (Time.unscaledTime < nextRefresh && !dirty) { SyncNearPool(); return; }
             nextRefresh = Time.unscaledTime + .1f;
             // At most ~3 ms of mesh combining per frame; floor changes used to stall 45-60 ms.
             Refresh(atmosphere.CurrentFloor, atmosphere.PreviousFloor, 3);
@@ -116,8 +120,16 @@ namespace TowerOfBabel.World.Tower
                 atmosphere.SetConstructionContext(chunks.IsFloorVisible(floor), openings);
                 dirty = pending;
             }
-            // No mesh rebuilding when the near pool moves: activate cached distant shadows only.
-            foreach (var entry in cache) entry.Value.Object.SetActive(near == null || !near.HasActiveChunk(entry.Key));
+            SyncNearPool();
+        }
+        /// <summary>No mesh rebuilding when the near pool moves: activate cached distant shadows only.</summary>
+        public void SyncNearPool()
+        {
+            foreach (var entry in cache)
+            {
+                bool distant = near == null || !near.HasActiveChunk(entry.Key);
+                if (entry.Value.Object.activeSelf != distant) entry.Value.Object.SetActive(distant);
+            }
         }
         private bool Selected(int f) => f == floor || f == floor + 1 || f == previous || f == previous + 1;
         private void EnsureTemplates()
@@ -133,12 +145,25 @@ namespace TowerOfBabel.World.Tower
             }
             // Closed 12-triangle deck proxy; bent corners keep the same sector footprint.
             slab = Box(new Bounds(new Vector3(2, -.1f, -2), new Vector3(4, .2f, 4)));
+            // Completed river tiles keep their water channel open to light, exactly as the near tiles do: the same
+            // shader clips the same world-space channel in its shadow pass. A solid proxy here made the shafts under
+            // the river exist only inside the near pool and pop as the player crossed a chunk line.
+            var glassPrefab = chunks.AssetPrefabs.GetPrefab(TowerAssetType.GlassWaterFloor);
+            var glassRenderer = glassPrefab != null ? glassPrefab.GetComponent<Renderer>() : null;
+            if (glassRenderer != null && glassRenderer.sharedMaterial != null && glassRenderer.sharedMaterial.HasProperty("_RiverStage"))
+            {
+                glassShadowMaterial = new Material(glassRenderer.sharedMaterial) { name = "River tile shadow proxy", hideFlags = HideFlags.HideAndDontSave, enableInstancing = false };
+                // Proxy vertices are already bent and in world space.
+                TowerFloorLayout.ConfigureMaterial(glassShadowMaterial, false, chunks.FloorCenter);
+                glassShadowMaterial.SetFloat("_RiverStage", ChunkAssetData.CompletedStage);
+            }
             var bounds = stages[TowerAssetType.Pillar][10].bounds;
             pillar = Cylinder(bounds);
         }
         private Proxy Build(ChunkSceneCache chunk)
         {
             var instances = new List<CombineInstance>(chunk.Assets.Count);
+            List<CombineInstance> glass = null;
             foreach (var asset in chunk.Assets)
             {
                 if (asset.Stage == 0 || !stages.TryGetValue(asset.AssetType, out var models)) continue;
@@ -148,7 +173,10 @@ namespace TowerOfBabel.World.Tower
                 if (asset.AssetType.IsFloor() && chunks.RadialFloors)
                     mesh = bentMeshes.Get(mesh, Vector2.Distance(new Vector2(asset.Position.x, asset.Position.z), chunks.FloorCenter), asset.Scale);
                 // Partial stages use their actual render mesh; completed walking colliders are never occluders.
-                instances.Add(new CombineInstance { mesh = mesh, transform = asset.ObjectToWorld });
+                var instance = new CombineInstance { mesh = mesh, transform = asset.ObjectToWorld };
+                if (asset.Stage == ChunkAssetData.CompletedStage && asset.AssetType == TowerAssetType.GlassWaterFloor && glassShadowMaterial != null)
+                    (glass ??= new List<CombineInstance>()).Add(instance);
+                else instances.Add(instance);
             }
             var result = new Mesh { name = "Cached structural shadows " + chunk.Key, indexFormat = IndexFormat.UInt32, hideFlags = HideFlags.DontSave };
             if (instances.Count > 0) result.CombineMeshes(instances.ToArray(), true, true);
@@ -161,8 +189,25 @@ namespace TowerOfBabel.World.Tower
             var renderer = go.GetComponent<MeshRenderer>(); renderer.sharedMaterial = shadowMaterial;
             renderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly; renderer.receiveShadows = false;
             renderer.lightProbeUsage = LightProbeUsage.Off; renderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            Mesh glassMesh = null;
+            if (glass != null)
+            {
+                glassMesh = new Mesh { name = "Cached river tile shadows " + chunk.Key, indexFormat = IndexFormat.UInt32, hideFlags = HideFlags.DontSave };
+                glassMesh.CombineMeshes(glass.ToArray(), true, true);
+                var child = new GameObject(glassMesh.name, typeof(MeshFilter), typeof(MeshRenderer)) { hideFlags = HideFlags.DontSave, layer = gameObject.layer };
+                child.transform.SetParent(go.transform, false);
+                child.GetComponent<MeshFilter>().sharedMesh = glassMesh;
+                var glassRenderer = child.GetComponent<MeshRenderer>(); glassRenderer.sharedMaterial = glassShadowMaterial;
+                glassRenderer.shadowCastingMode = ShadowCastingMode.ShadowsOnly; glassRenderer.receiveShadows = false;
+                glassRenderer.lightProbeUsage = LightProbeUsage.Off; glassRenderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+                // The channel layout depends on the floor; a chunk holds one floor.
+                glassProperties ??= new MaterialPropertyBlock();
+                glassProperties.SetFloat("_RiverFloorIndex", chunk.Key.FloorIndex); glassProperties.SetFloat("_RiverStage", ChunkAssetData.CompletedStage);
+                glassRenderer.SetPropertyBlock(glassProperties);
+                GlassShadowRenderers++;
+            }
             ShadowMeshBuilds++;
-            return new Proxy { Object = go, Mesh = result, Version = chunk.Version };
+            return new Proxy { Object = go, Mesh = result, GlassMesh = glassMesh, Version = chunk.Version };
         }
         private static Mesh Box(Bounds bounds)
         {
@@ -204,7 +249,7 @@ namespace TowerOfBabel.World.Tower
         {
             // Destroy is deferred in Play Mode; hide immediately so rollback cannot leave a one-frame solid ceiling.
             if (proxy.Object != null) proxy.Object.SetActive(false);
-            Delete(proxy.Object); Delete(proxy.Mesh);
+            Delete(proxy.Object); Delete(proxy.Mesh); Delete(proxy.GlassMesh);
         }
         private void OnDisable()
         {
@@ -213,7 +258,7 @@ namespace TowerOfBabel.World.Tower
             foreach (var item in cache.Values) Release(item); cache.Clear();
             foreach (var item in parked.Values) Release(item); parked.Clear(); parkedOrder.Clear();
             stages.Clear(); bentMeshes.Dispose();
-            Delete(shadowMaterial); Delete(slab); Delete(pillar); shadowMaterial=null;
+            Delete(shadowMaterial); Delete(glassShadowMaterial); Delete(slab); Delete(pillar); shadowMaterial=null; glassShadowMaterial=null;
             atmosphere?.SetConstructionContext(false, null);
         }
     }

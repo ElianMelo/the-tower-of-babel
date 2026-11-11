@@ -106,7 +106,9 @@ namespace TowerOfBabel.Rendering.Tests
                 var bridge=geometry.Bridge;var chunk=bridge.chunks.CachedChunks.First(c=>c.Key.FloorIndex==0&&c.Assets.Any(a=>a.AssetType==TowerOfBabel.World.Tower.TowerAssetType.Floor));
                 int deck=chunk.Assets.First(a=>a.AssetType==TowerOfBabel.World.Tower.TowerAssetType.Floor).LocalIndex;
                 bridge.chunks.SetAssetStage(chunk.Key,deck,9);bridge.Refresh(0,0);
-                Assert.That(bridge.GetComponentsInChildren<MeshRenderer>().Length,Is.EqualTo(bridge.CachedShadowChunks),"Retired/hidden-floor shadows must disappear before deferred Destroy runs.");
+                // One structural proxy per cached chunk; a chunk with completed river tiles adds one child for their open channels.
+                Assert.That(bridge.GetComponentsInChildren<MeshRenderer>().Count(r=>r.transform.parent==bridge.transform),Is.EqualTo(bridge.CachedShadowChunks),"Retired/hidden-floor shadows must disappear before deferred Destroy runs.");
+                Assert.That(bridge.GetComponentsInChildren<MeshRenderer>().Where(r=>r.transform.parent!=bridge.transform).All(r=>r.transform.parent.parent==bridge.transform&&r.shadowCastingMode==UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly),Is.True,"River tile proxies live under their chunk and only cast shadows.");
                 bridge.enabled=false;Assert.That(bridge.GetComponentsInChildren<MeshRenderer>().Length,Is.Zero,"Disabling the cache must stop all occlusion immediately.");
             }
             finally

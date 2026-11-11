@@ -27,11 +27,17 @@ namespace TowerOfBabel.World.Tests
             try
             {
                 RiverGlassRenderRegistry.RegisterProjection(light);
-                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.up*6,Vector3.one),camera,0),Is.True);
-                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.up*120,Vector3.one*4),camera,0),Is.False,
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.down*6,Vector3.one),camera,0),Is.True,
+                    "The deck below stops the downward light reaching the floors beneath it.");
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.up*6,Vector3.one),camera,0),Is.False,
+                    "A deck above a river light must never start casting: it would switch the sun off under it for the length of a burst.");
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.up*12,Vector3.one),camera,0),Is.False);
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.zero,new Vector3(4,.2f,4)),camera,0),Is.False,
+                    "The light's own deck is cast by the tower shadow cache.");
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.down*120,Vector3.one*4),camera,0),Is.False,
                     "Completing distant floors must not add them to a local river light's shadow workload.");
                 light.enabled=false;
-                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.zero,Vector3.one),camera,0),Is.False);
+                Assert.That(RiverGlassRenderRegistry.NeedsProjectionShadows(new Bounds(Vector3.down*6,Vector3.one),camera,0),Is.False);
             }
             finally {RiverGlassRenderRegistry.UnregisterProjection(light);Object.DestroyImmediate(root);Object.DestroyImmediate(view);}
         }

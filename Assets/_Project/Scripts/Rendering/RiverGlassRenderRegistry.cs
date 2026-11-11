@@ -46,15 +46,25 @@ namespace TowerOfBabel.Rendering
         private static readonly HashSet<IRiverGlassDrawSource> far = new();
         private static readonly List<RiverGlassDraw> nearBatches = new();
         private static readonly HashSet<Light> projectionLights = new();
+        /// <summary>A deck counts as below a projection light from this many metres under it (floors are 6 m apart).</summary>
+        public const float BelowLightMargin = 1;
         public static void RegisterProjection(Light light) => projectionLights.Add(light);
         public static void UnregisterProjection(Light light) => projectionLights.Remove(light);
 
+        /// <summary>
+        /// True when a far floor page must cast shadows for a river projection light. A caster shadows every light,
+        /// the sun included, and these lights come and go (burst windows, the camera shadow distance), so a page
+        /// above a light would switch the sun on and off underneath it: that toggled the sunlight falling through
+        /// the river rings (2026-11-10). Only decks below a light qualify. They stop its downward light leaking to
+        /// the floors beneath; the light's own deck and its ceiling are already cast by TowerAtmosphereBridge.
+        /// </summary>
         public static bool NeedsProjectionShadows(Bounds bounds, Camera camera, int layer)
         {
             foreach (var light in projectionLights)
                 if (light != null && light.isActiveAndEnabled && light.shadows != UnityEngine.LightShadows.None &&
                     (light.cullingMask & (1 << layer)) != 0 &&
                     (!camera.scene.IsValid() || light.gameObject.scene == camera.scene) &&
+                    bounds.center.y < light.transform.position.y - BelowLightMargin &&
                     bounds.SqrDistance(light.transform.position) < light.range * light.range) return true;
             return false;
         }
