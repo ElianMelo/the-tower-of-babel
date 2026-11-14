@@ -40,6 +40,8 @@ namespace TowerOfBabel.Settings
         public int clouds = 2;
         public bool riverRefraction = true;
         public int lampLights = 96;
+        // Introduced with the soft sun glow (2026-11-14): distant ground on the sun's side fades into its glow.
+        public bool sunHaze = true;
 
         // Audio, 0 to 1.
         public float masterVolume = 1, musicVolume = 1, uiVolume = 1, vfxVolume = 1;
@@ -92,7 +94,7 @@ namespace TowerOfBabel.Settings
                     data.grassDistance = scene.grassDistance; data.grassDensity = scene.grassDensity;
                     data.cameraFar = scene.cameraFar; data.renderScale = 1;
                     data.towerDetailDistance = HighDetailDistance; data.towerLodScale = 1; data.occlusionCulling = true;
-                    data.liveReflections = true; data.sunShafts = 2; data.clouds = 2; data.riverRefraction = true;
+                    data.liveReflections = true; data.sunShafts = 2; data.clouds = 2; data.riverRefraction = true; data.sunHaze = true;
                     data.lampLights = scene.lampLights;
                     break;
                 case GraphicsQuality.Medium:
@@ -101,7 +103,7 @@ namespace TowerOfBabel.Settings
                     data.grassDistance = Mathf.Min(scene.grassDistance, 65); data.grassDensity = scene.grassDensity * .7f;
                     data.cameraFar = Mathf.Min(scene.cameraFar, 6000); data.renderScale = 1;
                     data.towerDetailDistance = MediumDetailDistance; data.towerLodScale = .7f; data.occlusionCulling = true;
-                    data.liveReflections = true; data.sunShafts = 1; data.clouds = 1; data.riverRefraction = true;
+                    data.liveReflections = true; data.sunShafts = 1; data.clouds = 1; data.riverRefraction = true; data.sunHaze = true;
                     data.lampLights = Mathf.Min(scene.lampLights, 40);
                     break;
                 default:
@@ -110,7 +112,7 @@ namespace TowerOfBabel.Settings
                     data.grassDistance = Mathf.Min(scene.grassDistance, 30); data.grassDensity = scene.grassDensity * .3f;
                     data.cameraFar = Mathf.Min(scene.cameraFar, 1500); data.renderScale = .75f;
                     data.towerDetailDistance = LowDetailDistance; data.towerLodScale = .35f; data.occlusionCulling = true;
-                    data.liveReflections = false; data.sunShafts = 0; data.clouds = 0; data.riverRefraction = false;
+                    data.liveReflections = false; data.sunShafts = 0; data.clouds = 0; data.riverRefraction = false; data.sunHaze = false;
                     data.lampLights = Mathf.Min(scene.lampLights, 12);
                     break;
             }
@@ -130,6 +132,7 @@ namespace TowerOfBabel.Settings
                     Same(probe.towerDetailDistance, data.towerDetailDistance) && Same(probe.towerLodScale, data.towerLodScale) &&
                     probe.occlusionCulling == data.occlusionCulling && probe.liveReflections == data.liveReflections &&
                     probe.sunShafts == data.sunShafts && probe.clouds == data.clouds && probe.riverRefraction == data.riverRefraction &&
+                    probe.sunHaze == data.sunHaze &&
                     probe.lampLights == data.lampLights)
                     return quality;
             }

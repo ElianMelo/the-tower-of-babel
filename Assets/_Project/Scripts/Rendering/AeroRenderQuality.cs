@@ -18,11 +18,13 @@ namespace TowerOfBabel.Rendering
         public static bool LiveReflections = true;
         /// <summary>River glass refracts one floor at half resolution instead of up to three.</summary>
         public static bool ReducedRiverRefraction;
+        /// <summary>Distant ground on the sun's side fades into the sun's glow (AeroSunHazeRendererFeature).</summary>
+        public static bool SunHaze = true;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         public static void Reset()
         {
-            SunShafts = Full; Clouds = Full; LiveReflections = true; ReducedRiverRefraction = false;
+            SunShafts = Full; Clouds = Full; LiveReflections = true; ReducedRiverRefraction = false; SunHaze = true;
         }
     }
 

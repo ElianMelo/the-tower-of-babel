@@ -33,3 +33,167 @@ MonoBehaviour:
   fireflyPopulationMultiplier: 2.2
   fireflyCoverageAreaMultiplier: 1.15
   sunFlareIntensity: 0.85
+  sunGlow:
+    highSun:
+      coreRadius: 0.9
+      coreSoftness: 0.75
+      glowRadius: 3.5
+      haloRadius: 11
+      coreIntensity: 3
+      glowIntensity: 0.8
+      haloIntensity: 0.2
+      horizonWash: 0
+      haloTint: {r: 1, g: 0.97, b: 0.92, a: 1}
+      skyVeil: 0.1
+      skySpread: 0.03
+      skyTint: 0
+      rays: 0.6
+    lowSun:
+      coreRadius: 1.6
+      coreSoftness: 0.8
+      glowRadius: 6.5
+      haloRadius: 22
+      coreIntensity: 3
+      glowIntensity: 1.4
+      haloIntensity: 0.55
+      horizonWash: 0.4
+      haloTint: {r: 1, g: 0.82, b: 0.55, a: 1}
+      skyVeil: 0.6
+      skySpread: 0.18
+      skyTint: 0.32
+      rays: 1.4
+    highSunFocused:
+      coreRadius: 1.1
+      coreSoftness: 0.8
+      glowRadius: 5
+      haloRadius: 16
+      coreIntensity: 4
+      glowIntensity: 1.2
+      haloIntensity: 0.3
+      horizonWash: 0
+      haloTint: {r: 1, g: 0.97, b: 0.92, a: 1}
+      skyVeil: 0.15
+      skySpread: 0.04
+      skyTint: 0
+      rays: 0.6
+    lowSunFocused:
+      coreRadius: 2.6
+      coreSoftness: 0.85
+      glowRadius: 11
+      haloRadius: 36
+      coreIntensity: 3.5
+      glowIntensity: 2.4
+      haloIntensity: 0.9
+      horizonWash: 0.55
+      haloTint: {r: 1, g: 0.82, b: 0.55, a: 1}
+      skyVeil: 0.8
+      skySpread: 0.35
+      skyTint: 0.45
+      rays: 1.4
+    lowSunRange: {x: 0.08, y: 0.8}
+    coreWhiteness: 0.45
+    washHeight: 0.22
+    hazeResponse: 0.6
+    spreadPower: 2.5
+    overcastGlow: 0.5
+    overcastHalo: 0.6
+    overcastGlowWiden: 1.6
+    overcastHaloWiden: 1.4
+    overcastRays: 0.4
+    focusCentre: 0.1
+    focusEdge: 1
+    hazeDensity: 0.003
+    lowSunHaze: 0.85
+    highSunHaze: 0.35
+    hazeBaseHeight: 0
+    hazeHeightFalloff: 0.0025
+    shaftGaps: 0.6
+    shaftWidth: 8
+    shaftLength: 120
+    shaftRange: 110
+    shaftHeightFalloff: 0.02
+    shaftDrift: 0.35
+    highSunBloomScatter: 0.68
+    lowSunBloomScatter: 0.8
+  moonGlow:
+    highSun:
+      coreRadius: 0.6
+      coreSoftness: 0.5
+      glowRadius: 2
+      haloRadius: 6
+      coreIntensity: 2
+      glowIntensity: 0.35
+      haloIntensity: 0.08
+      horizonWash: 0
+      haloTint: {r: 1, g: 1, b: 1, a: 1}
+      skyVeil: 0
+      skySpread: 0.02
+      skyTint: 0
+      rays: 0.25
+    lowSun:
+      coreRadius: 0.7
+      coreSoftness: 0.5
+      glowRadius: 2.6
+      haloRadius: 8
+      coreIntensity: 2
+      glowIntensity: 0.4
+      haloIntensity: 0.1
+      horizonWash: 0.05
+      haloTint: {r: 1, g: 1, b: 1, a: 1}
+      skyVeil: 0
+      skySpread: 0.03
+      skyTint: 0
+      rays: 0.25
+    highSunFocused:
+      coreRadius: 0.6
+      coreSoftness: 0.5
+      glowRadius: 2
+      haloRadius: 6
+      coreIntensity: 2
+      glowIntensity: 0.35
+      haloIntensity: 0.08
+      horizonWash: 0
+      haloTint: {r: 1, g: 1, b: 1, a: 1}
+      skyVeil: 0
+      skySpread: 0.02
+      skyTint: 0
+      rays: 0.25
+    lowSunFocused:
+      coreRadius: 0.7
+      coreSoftness: 0.5
+      glowRadius: 2.6
+      haloRadius: 8
+      coreIntensity: 2
+      glowIntensity: 0.4
+      haloIntensity: 0.1
+      horizonWash: 0.05
+      haloTint: {r: 1, g: 1, b: 1, a: 1}
+      skyVeil: 0
+      skySpread: 0.03
+      skyTint: 0
+      rays: 0.25
+    lowSunRange: {x: 0.08, y: 0.8}
+    coreWhiteness: 0.45
+    washHeight: 0.22
+    hazeResponse: 0.3
+    spreadPower: 2.5
+    overcastGlow: 0.5
+    overcastHalo: 0.6
+    overcastGlowWiden: 1.6
+    overcastHaloWiden: 1.4
+    overcastRays: 0.4
+    focusCentre: 0.1
+    focusEdge: 1
+    hazeDensity: 0.003
+    lowSunHaze: 0
+    highSunHaze: 0
+    hazeBaseHeight: 0
+    hazeHeightFalloff: 0.0025
+    shaftGaps: 0.6
+    shaftWidth: 8
+    shaftLength: 120
+    shaftRange: 110
+    shaftHeightFalloff: 0.02
+    shaftDrift: 0.35
+    highSunBloomScatter: 0.68
+    lowSunBloomScatter: 0.68

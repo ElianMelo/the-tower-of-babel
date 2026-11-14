@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroSunShaftRendererFeature
   m_Active: 1
   shaftShader: {fileID: 4800000, guid: 072f38b0d8c6abf498a47b2a8d59d40a, type: 3}
+  raysShader: {fileID: 4800000, guid: 0ba877c3839547f43a0cdaf47e64867d, type: 3}
   settings:
     intensity: 0.85
     density: 0.035
@@ -104,7 +105,8 @@ MonoBehaviour:
   - {fileID: -3769485875767993071}
   - {fileID: 5114573714426461207}
   - {fileID: 3149411639748435993}
-  m_RendererFeatureMap: ad6b866f10d7b46c0a00da493b717d0c3835704d339485d2d0c8b4d5d6bf85e2111dff4c9118b0cb177cf0f1b19dfa4619a0af3633f5b42b
+  - {fileID: 7278578242497587792}
+  m_RendererFeatureMap: ad6b866f10d7b46c0a00da493b717d0c3835704d339485d2d0c8b4d5d6bf85e2111dff4c9118b0cb177cf0f1b19dfa4619a0af3633f5b42b50aaf41559b40265
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -191,6 +193,20 @@ MonoBehaviour:
   profile: {fileID: 11400000, guid: 7169c53ac1ccf92408875f5d165e6309, type: 2}
   surfaceShader: {fileID: 4800000, guid: b81fbb7a311d7654db6d0b494e941445, type: 3}
   reducedRefraction: 0
+--- !u!114 &7278578242497587792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7ec0608e695c9849a61b419c8404fa0, type: 3}
+  m_Name: Aero sun haze
+  m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroSunHazeRendererFeature
+  m_Active: 1
+  hazeShader: {fileID: 4800000, guid: 75122a7d5023a724cb76e48cc02e0aad, type: 3}
 --- !u!114 &7833122117494664109
 MonoBehaviour:
   m_ObjectHideFlags: 0

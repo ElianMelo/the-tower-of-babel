@@ -7,6 +7,11 @@ using UnityEngine.Rendering.Universal;
 
 namespace TowerOfBabel.Rendering
 {
+    /// <summary>
+    /// Sun shafts. Inside the tower: shadow-mapped light shafts through the arches (Sun Shafts shader). Outdoors:
+    /// separate beams of sunlight in the air near the camera, cut by the sun's shadows and strongest looking towards
+    /// the sun (Sun Rays shader, driven by AeroSunGlow). Both follow the Sun shafts graphics setting.
+    /// </summary>
     public sealed class AeroSunShaftRendererFeature : ScriptableRendererFeature
     {
         [Serializable]
@@ -19,28 +24,141 @@ namespace TowerOfBabel.Rendering
             public Color tint = new(1, .96f, .86f);
         }
         public Shader shaftShader;
+        [Tooltip("Outdoor light shafts in the air towards the sun (Hidden/TowerOfBabel/Sun Rays).")]
+        public Shader raysShader;
         public ShaftSettings settings = new();
         public AeroRaySettings raySettings;
         [NonSerialized] public float previewTime = -1;
         /// <summary>Review and tests: draw the shaft light alone instead of adding it to the frame.</summary>
         [NonSerialized] public bool isolate;
+        /// <summary>Review and tests: draw the outdoor light shafts alone instead of adding them to the frame.</summary>
+        [NonSerialized] public bool isolateRays;
         private Material material;
+        // Separate materials for the scatter and the composite: values set on a material apply when the recorded frame
+        // runs, so two steps sharing one would both see the last step's values.
+        private Material raysScatter, raysComposite;
         private ShaftPass pass;
+        private OutdoorShaftPass rayPass;
 
         public override void Create()
         {
-            CoreUtils.Destroy(material);
+            CoreUtils.Destroy(material); CoreUtils.Destroy(raysScatter); CoreUtils.Destroy(raysComposite);
             material = shaftShader != null ? CoreUtils.CreateEngineMaterial(shaftShader) : null;
+            raysScatter = raysShader != null ? CoreUtils.CreateEngineMaterial(raysShader) : null;
+            raysComposite = raysShader != null ? CoreUtils.CreateEngineMaterial(raysShader) : null;
             pass = new ShaftPass(this) { renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing };
             pass.ConfigureInput(ScriptableRenderPassInput.Depth);
+            // After the sun haze (same event), so far ground fades into the glow before the shafts cross it.
+            rayPass = new OutdoorShaftPass(this) { renderPassEvent = RenderPassEvent.BeforeRenderingPostProcessing + 1 };
+            rayPass.ConfigureInput(ScriptableRenderPassInput.Depth);
         }
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData data)
         {
-            if (material != null && settings.intensity > 0 && AeroRenderQuality.SunShafts > AeroRenderQuality.Off &&
-                AeroLightRendererFeature.SupportsCamera(data.cameraData.camera) &&
-                data.cameraData.renderType == CameraRenderType.Base) renderer.EnqueuePass(pass);
+            if (AeroRenderQuality.SunShafts <= AeroRenderQuality.Off || data.cameraData.renderType != CameraRenderType.Base) return;
+            var camera = data.cameraData.camera;
+            if (material != null && settings.intensity > 0 && AeroLightRendererFeature.SupportsCamera(camera)) renderer.EnqueuePass(pass);
+            if (raysScatter != null && AeroSunHazeRendererFeature.SupportsCamera(camera) && OutdoorStrength(camera, AeroSunGlow.Current) > .001f)
+                renderer.EnqueuePass(rayPass);
         }
-        protected override void Dispose(bool disposing) { CoreUtils.Destroy(material); material = null; }
+        protected override void Dispose(bool disposing)
+        {
+            CoreUtils.Destroy(material); material = null;
+            CoreUtils.Destroy(raysScatter); raysScatter = null; CoreUtils.Destroy(raysComposite); raysComposite = null;
+        }
+
+        /// <summary>
+        /// Strength of the outdoor light shafts for a camera: none with the sun well behind it (they scatter forwards and
+        /// would barely show), and fading inside the tower, where the interior shafts carry the light.
+        /// </summary>
+        public static float OutdoorStrength(Camera camera, in AeroSunGlowState glow)
+        {
+            if (camera == null || !glow.RaysVisible) return 0;
+            float facing = Vector3.Dot(camera.transform.forward, glow.direction);
+            float strength = glow.rays.x * AeroSunGlow.SmoothStep(-.35f, .1f, facing);
+            var context = AeroTowerLightContext.ForCamera(camera);
+            if (context != null) strength *= 1 - .85f * Mathf.Clamp01(context.InteriorWeight);
+            return strength;
+        }
+
+        private sealed class OutdoorShaftPass : ScriptableRenderPass
+        {
+            private readonly AeroSunShaftRendererFeature owner;
+            private readonly ProfilingSampler scatterSampler = new("Aero outdoor light shafts");
+            private readonly ProfilingSampler compositeSampler = new("Aero outdoor light shaft composite");
+            private static readonly int ParamsId = Shader.PropertyToID("_AeroRaysParams");
+            private static readonly int VolumeId = Shader.PropertyToID("_AeroRaysVolume");
+            private static readonly int MarchId = Shader.PropertyToID("_AeroRaysMarch");
+            private static readonly int TexelId = Shader.PropertyToID("_AeroRaysTexelSize");
+            private static readonly int ShadowId = Shader.PropertyToID("_AeroSunShadow");
+            private static readonly int DepthId = Shader.PropertyToID("_AeroFullDepth");
+            private sealed class ScatterData
+            {
+                public Material material;
+                public TextureHandle depth, shadow;
+                public Vector4 parameters, volume, march;
+            }
+            private sealed class CompositeData
+            {
+                public Material material;
+                public TextureHandle depth, shafts;
+                public Vector4 texel;
+                public int pass;
+            }
+            public OutdoorShaftPass(AeroSunShaftRendererFeature owner) { this.owner = owner; }
+
+            public override void RecordRenderGraph(RenderGraph graph, ContextContainer frameData)
+            {
+                var resources = frameData.Get<UniversalResourceData>();
+                var lights = frameData.Get<UniversalLightData>();
+                var camera = frameData.Get<UniversalCameraData>().camera;
+                var glow = AeroSunGlow.Current;
+                if (owner.raysScatter == null || owner.raysComposite == null || !resources.cameraDepthTexture.IsValid()) return;
+                float strength = OutdoorStrength(camera, glow);
+                if (strength <= .001f) return;
+                bool low = AeroRenderQuality.SunShafts <= AeroRenderQuality.Low;
+                int downsample = low ? 4 : 2, steps = low ? 12 : 24;
+                var descriptor = resources.activeColorTexture.GetDescriptor(graph);
+                descriptor.name = "Aero outdoor light shafts";
+                descriptor.width = Mathf.Max(1, (descriptor.width + downsample - 1) / downsample);
+                descriptor.height = Mathf.Max(1, (descriptor.height + downsample - 1) / downsample);
+                descriptor.colorFormat = GraphicsFormat.R16G16B16A16_SFloat;
+                descriptor.depthBufferBits = DepthBits.None; descriptor.msaaSamples = MSAASamples.None; descriptor.clearBuffer = false;
+                var shafts = graph.CreateTexture(descriptor);
+                bool shadows = resources.mainShadowsTexture.IsValid() && lights.mainLightIndex >= 0;
+                using (var builder = graph.AddRasterRenderPass<ScatterData>("Aero outdoor light shafts", out var d, scatterSampler))
+                {
+                    d.material = owner.raysScatter; d.depth = resources.cameraDepthTexture;
+                    d.shadow = shadows ? resources.mainShadowsTexture : TextureHandle.nullHandle;
+                    d.parameters = new Vector4(strength, glow.rays.y, glow.rays.z, glow.rays.w);
+                    d.volume = glow.shafts;
+                    float hasCasters = shadows && frameData.Get<UniversalRenderingData>().cullResults.GetShadowCasterBounds(lights.mainLightIndex, out _) ? 1 : 0;
+                    d.march = new Vector4(steps, owner.previewTime >= 0 ? owner.previewTime : Time.realtimeSinceStartup, hasCasters, 0);
+                    builder.UseTexture(d.depth, AccessFlags.Read);
+                    if (d.shadow.IsValid()) builder.UseTexture(d.shadow, AccessFlags.Read);
+                    builder.SetRenderAttachment(shafts, 0, AccessFlags.WriteAll);
+                    builder.SetRenderFunc(static (ScatterData data, RasterGraphContext ctx) =>
+                    {
+                        data.material.SetVector(ParamsId, data.parameters); data.material.SetVector(VolumeId, data.volume);
+                        data.material.SetVector(MarchId, data.march);
+                        if (data.shadow.IsValid()) data.material.SetTexture(ShadowId, data.shadow);
+                        Blitter.BlitTexture(ctx.cmd, data.depth, new Vector4(1, 1, 0, 0), data.material, 0);
+                    });
+                }
+                using (var builder = graph.AddRasterRenderPass<CompositeData>("Aero outdoor light shaft composite", out var d, compositeSampler))
+                {
+                    d.material = owner.raysComposite; d.depth = resources.cameraDepthTexture; d.shafts = shafts;
+                    d.texel = new Vector4(1f / descriptor.width, 1f / descriptor.height, descriptor.width, descriptor.height);
+                    d.pass = owner.isolateRays ? 2 : 1;
+                    builder.UseTexture(d.depth, AccessFlags.Read); builder.UseTexture(d.shafts, AccessFlags.Read);
+                    builder.SetRenderAttachment(resources.activeColorTexture, 0, owner.isolateRays ? AccessFlags.Write : AccessFlags.ReadWrite);
+                    builder.SetRenderFunc(static (CompositeData data, RasterGraphContext ctx) =>
+                    {
+                        data.material.SetTexture(DepthId, data.depth); data.material.SetVector(TexelId, data.texel);
+                        Blitter.BlitTexture(ctx.cmd, data.shafts, new Vector4(1, 1, 0, 0), data.material, data.pass);
+                    });
+                }
+            }
+        }
 
         private sealed class ShaftPass : ScriptableRenderPass
         {

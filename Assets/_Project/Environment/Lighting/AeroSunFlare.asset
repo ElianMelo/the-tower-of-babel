@@ -73,7 +73,7 @@ MonoBehaviour:
     blendMode: 0
     autoRotate: 0
     flareType: 0
-    modulateByLightColor: 0
+    modulateByLightColor: 1
     isFoldOpened: 1
     distribution: 0
     lengthSpread: 1
@@ -230,7 +230,7 @@ MonoBehaviour:
     noiseSpeed: 0
     shapeCutOffSpeed: 0
     shapeCutOffRadius: 10
-    m_LocalIntensity: 0.32
+    m_LocalIntensity: 0.1
     lensFlareTexture: {fileID: 2800000, guid: d89994515b2a0ed40a9c3bb635fdefaf, type: 2}
     uniformScale: 1
     sizeXY: {x: 0.9, y: 0.9}
@@ -277,7 +277,7 @@ MonoBehaviour:
     blendMode: 0
     autoRotate: 0
     flareType: 0
-    modulateByLightColor: 0
+    modulateByLightColor: 1
     isFoldOpened: 1
     distribution: 0
     lengthSpread: 1

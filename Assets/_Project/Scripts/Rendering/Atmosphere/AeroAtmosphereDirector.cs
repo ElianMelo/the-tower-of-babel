@@ -124,7 +124,7 @@ namespace TowerOfBabel.Rendering
             color = gradeProfile.Add<ColorAdjustments>(true);
             white = gradeProfile.Add<WhiteBalance>(true);
             bloom = gradeProfile.Add<Bloom>(false);
-            bloom.threshold.overrideState = bloom.intensity.overrideState = bloom.tint.overrideState = true;
+            bloom.threshold.overrideState = bloom.intensity.overrideState = bloom.tint.overrideState = bloom.scatter.overrideState = true;
             vignette = gradeProfile.Add<Vignette>(false);
             vignette.intensity.overrideState = true;
             split = gradeProfile.Add<SplitToning>(true);
@@ -212,7 +212,7 @@ namespace TowerOfBabel.Rendering
 
             library.Compose(TimeOfDay, weights, fromSeason, season, seasonBlend, ref current);
             var frame = current;
-            ApplyVolume(frame.look);
+            ApplyVolume(frame.look, dayNight != null ? dayNight.BloomScatterAt(TimeOfDay) : DefaultBloomScatter);
             if (dayNight != null)
             {
                 dayNight.grade = AeroLightGrade.From(frame.look);
@@ -227,9 +227,16 @@ namespace TowerOfBabel.Rendering
             }
         }
 
-        private void ApplyVolume(in AeroAtmosphereLook look)
+        /// <summary>The accepted Restrained bloom scatter (AeroAtmosphere.asset).</summary>
+        public const float DefaultBloomScatter = .68f;
+
+        /// <summary>Bloom scatter currently applied: wider at low sun so the soft sun's glow spills over silhouettes.</summary>
+        public float BloomScatter => bloom != null ? bloom.scatter.value : DefaultBloomScatter;
+
+        private void ApplyVolume(in AeroAtmosphereLook look, float scatter)
         {
             if (gradeProfile == null) return;
+            bloom.scatter.Override(Mathf.Clamp01(scatter));
             color.postExposure.Override(look.exposure); color.contrast.Override(look.contrast);
             color.saturation.Override(look.saturation); color.colorFilter.Override(look.colorFilter);
             white.temperature.Override(look.temperature); white.tint.Override(look.tint);

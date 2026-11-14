@@ -4,6 +4,8 @@ Accepted by the user on **2026-10-24** as the current tower interior lighting ba
 
 **Visible sun shafts by time, weather and season (2026-11-10):** after the calmer interior, the 120 m shadows, the volumetric clouds and the atmosphere presets, the shaft pass added only about 1% brightness (a third of the 2026-10-25 level) and its dither shimmered when the camera turned. The sun and moon shafts now have their own strength and air density, separate from the fills and interior haze, which keep the calm 2026-10-31 values. See [sun shaft look](#sun-shaft-look).
 
+**Outdoor light shafts (2026-11-14):** the same `AeroSunShaftRendererFeature` now also draws world-space light shafts in the open air near the camera: separate beams along the sunlight, cut by the sun's shadow map, strongest looking toward the sun. They fade by 85% at full interior weight, so the interior keeps the accepted shadow-mapped shafts as its main light. See [soft golden sun glow](SUN_GLOW.md).
+
 The tower uses sun-shadow scattering inside its viewed floor volume. Pillars split the shafts, completed decks block light between floors, and the existing day/night cycle supplies the sun/moon direction and color. The fixed crossed particle sheets have been removed from Tower. Fireflies remain a separate system.
 
 ## Settings

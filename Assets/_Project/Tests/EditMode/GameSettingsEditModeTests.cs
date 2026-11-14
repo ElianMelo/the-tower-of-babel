@@ -58,7 +58,7 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(data.renderScale, Is.EqualTo(1));
             Assert.That(data.towerLodScale, Is.EqualTo(1), "High keeps the authored, sub-pixel mesh LOD distances.");
             Assert.That(data.towerDetailDistance, Is.GreaterThan(140), "High draws tower detail past the authored 140 m, about as far as whole pages used to reach.");
-            Assert.That(data.occlusionCulling && data.liveReflections && data.riverRefraction, Is.True);
+            Assert.That(data.occlusionCulling && data.liveReflections && data.riverRefraction && data.sunHaze, Is.True);
             Assert.That(new[] { data.sunShafts, data.clouds }, Is.All.EqualTo(AeroRenderQuality.Full));
             Assert.That(data.lampLights, Is.EqualTo(scene.lampLights));
             Assert.That(GraphicsPresets.Detect(data, scene), Is.EqualTo(GraphicsQuality.High));
@@ -87,7 +87,8 @@ namespace TowerOfBabel.Resources.Tests
                 Assert.That(b.clouds, Is.LessThan(a.clouds));
                 Assert.That(b.lampLights, Is.LessThan(a.lampLights));
             }
-            Assert.That(low.renderScale, Is.LessThan(1)); Assert.That(low.liveReflections || low.riverRefraction, Is.False);
+            Assert.That(low.renderScale, Is.LessThan(1)); Assert.That(low.liveReflections || low.riverRefraction || low.sunHaze, Is.False);
+            Assert.That(medium.sunHaze, Is.True, "Medium keeps the cheap sun haze.");
             Assert.That(medium.renderScale, Is.EqualTo(1), "Medium keeps the full resolution.");
             Assert.That(GraphicsPresets.Detect(medium, scene), Is.EqualTo(GraphicsQuality.Medium));
             Assert.That(GraphicsPresets.Detect(low, scene), Is.EqualTo(GraphicsQuality.Low));

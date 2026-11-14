@@ -208,9 +208,27 @@ public static class AeroIslandAtmosphereAuthoring
         mat.SetFloat("_Beam",0); mat.SetColor("_Color",new Color(5,5,5,1)); EditorUtility.SetDirty(mat);
         var r=ps.GetComponent<ParticleSystemRenderer>(); r.renderMode=ParticleSystemRenderMode.Billboard; r.sharedMaterial=mat; r.shadowCastingMode=ShadowCastingMode.Off; r.receiveShadows=false;
     }
+    public const string SunFlarePath = Folder + "/AeroSunFlare.asset";
+    public const string SunFlareHaloPath = Folder + "/AeroSunFlareSoftHalo.asset";
+
+    /// <summary>
+    /// The sun flare's four elements: white core, warm halo, horizontal streak and cyan ghost. The sky now draws the soft
+    /// sun's own halo (AeroSunGlowSky), so the flare halo stays faint; core and halo take the light's colour so they warm
+    /// at sunset. Element 0 is the core, 1 the halo.
+    /// </summary>
+    public static void ConfigureSunFlareData(LensFlareDataSRP data, Texture2D halo)
+    {
+        data.elements=new[]{new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=4,uniformScale=1,sizeXY=new Vector2(.1f,.1f),tint=new Color(1,.98f,.9f),position=0,fallOff=.65f,modulateByLightColor=true},
+            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.1f,uniformScale=1,sizeXY=new Vector2(.9f,.9f),tint=new Color(1,.86f,.63f),position=0,fallOff=.5f,modulateByLightColor=true},
+            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.25f,uniformScale=1,sizeXY=new Vector2(2.4f,.025f),tint=new Color(1,.94f,.8f),position=0,fallOff=.6f},
+            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.12f,uniformScale=1,sizeXY=new Vector2(.07f,.07f),tint=new Color(.5f,.82f,1),position=.55f,fallOff=.9f}};
+        foreach(var element in data.elements){element.flareType=SRPLensFlareType.Image;element.lensFlareTexture=halo;}
+        EditorUtility.SetDirty(data);
+    }
+
     private static void ConfigureFlares(Light sun)
     {
-        var halo=Asset<Texture2D>(Folder+"/AeroSunFlareSoftHalo.asset",()=>
+        var halo=Asset<Texture2D>(SunFlareHaloPath,()=>
         {
             const int size=128;
             var texture=new Texture2D(size,size,TextureFormat.RGBA32,true,true) {name="Soft sun flare halo",wrapMode=TextureWrapMode.Clamp,filterMode=FilterMode.Trilinear};
@@ -223,13 +241,8 @@ public static class AeroIslandAtmosphereAuthoring
             }
             texture.SetPixels(pixels);texture.Apply(true,false);return texture;
         });
-        var data=Asset<LensFlareDataSRP>(Folder+"/AeroSunFlare.asset",ScriptableObject.CreateInstance<LensFlareDataSRP>);
-        data.elements=new[]{new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=4,uniformScale=1,sizeXY=new Vector2(.1f,.1f),tint=new Color(1,.98f,.9f),position=0,fallOff=.65f},
-            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.32f,uniformScale=1,sizeXY=new Vector2(.9f,.9f),tint=new Color(1,.86f,.63f),position=0,fallOff=.5f},
-            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.25f,uniformScale=1,sizeXY=new Vector2(2.4f,.025f),tint=new Color(1,.94f,.8f),position=0,fallOff=.6f},
-            new LensFlareDataElementSRP {flareType=SRPLensFlareType.Circle,visible=true,localIntensity=.12f,uniformScale=1,sizeXY=new Vector2(.07f,.07f),tint=new Color(.5f,.82f,1),position=.55f,fallOff=.9f}};
-        foreach(var element in data.elements){element.flareType=SRPLensFlareType.Image;element.lensFlareTexture=halo;}
-        EditorUtility.SetDirty(data);
+        var data=Asset<LensFlareDataSRP>(SunFlarePath,ScriptableObject.CreateInstance<LensFlareDataSRP>);
+        ConfigureSunFlareData(data,halo);
         var flare=sun.GetComponent<LensFlareComponentSRP>() ?? sun.gameObject.AddComponent<LensFlareComponentSRP>();
         flare.lensFlareData=data; flare.intensity=.85f; flare.useOcclusion=true; flare.sampleCount=32; flare.occlusionRadius=.02f; flare.allowOffScreen=false;
         flare.radialScreenAttenuationCurve=new AnimationCurve(new Keyframe(0,1),new Keyframe(.25f,.9f),new Keyframe(.7f,.12f),new Keyframe(1,0)); EditorUtility.SetDirty(flare);

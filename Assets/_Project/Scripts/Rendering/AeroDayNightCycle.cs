@@ -35,7 +35,7 @@ namespace TowerOfBabel.Rendering
             if (profile != null && sun != null) ApplyTime(timeOfDay);
         }
 
-        private void OnEnable() { initialized = false; }
+        private void OnEnable() { initialized = false; AeroSunGlow.TrackCameras(true); }
         private void Update()
         {
             if (gameObject.scene != UnityEngine.SceneManagement.SceneManager.GetActiveScene()) return;
@@ -73,13 +73,15 @@ namespace TowerOfBabel.Rendering
             else if (baseShadowStrength >= 0) { sun.shadowStrength = baseShadowStrength; baseShadowStrength = -1; }
             sun.enabled = day > .001f;
             var flare = sun.GetComponent<LensFlareComponentSRP>();
-            if (flare != null) flare.intensity = profile.sunFlareIntensity * day;
+            // The flare is drawn over the clouds, so it fades when they or rain clouds cover the sun.
+            if (flare != null) flare.intensity = profile.sunFlareIntensity * day * (1 - Mathf.Clamp01(cloudShade)) * (1 - cloud);
             if (moon != null)
             {
                 moon.transform.rotation = Quaternion.Euler(timeOfDay * 360 + 90, profile.sunAzimuth + 25, 0);
                 moon.color = profile.moonColor; moon.intensity = profile.moonIntensity * (1 - day); moon.enabled = day < .999f;
             }
             RenderSettings.sun = day > .1f || moon == null ? sun : moon;
+            PushSunGlow(day, cloud);
             RenderSettings.ambientMode = AmbientMode.Trilight;
             Color sky = Color.Lerp(profile.nightSky, profile.daySky, day);
             if (grade.active) sky *= grade.ambientTint * grade.ambientScale;
@@ -101,8 +103,42 @@ namespace TowerOfBabel.Rendering
             Shader.SetGlobalFloat("_AeroDaylight", day);
         }
 
+        /// <summary>
+        /// The soft sun glow (sky, distant haze, cloud haze) follows the sun by day and the moon by night. The sun's glow
+        /// fades out as daylight drops to the moon switch, and the moon's fades in after it, so nothing pops.
+        /// </summary>
+        private void PushSunGlow(float day, float cloud)
+        {
+            bool moonLit = RenderSettings.sun == moon && moon != null;
+            Light source = moonLit ? moon : sun;
+            float visibility = moonLit ? Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.1f, 0, day)) : day * Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.1f, .2f, day));
+            var settings = moonLit ? profile.moonGlow : profile.sunGlow;
+            float haze = grade.active ? grade.fogDensityScale : 1;
+            Vector3 toward = -source.transform.forward;
+            SunGlowEdge = AeroSunGlow.Evaluate(settings, toward, source.color, visibility, cloud, haze, cloudShade, 0);
+            SunGlow = AeroSunGlow.Evaluate(settings, toward, source.color, visibility, cloud, haze, cloudShade, 1);
+            AeroSunGlow.Push(SunGlowEdge, SunGlow);
+        }
+
+        /// <summary>The glow from the last <see cref="ApplyTime"/>, looked at straight on.</summary>
+        public AeroSunGlowState SunGlow { get; private set; }
+        /// <summary>The same with the sun at the edge of the screen: small and calm.</summary>
+        public AeroSunGlowState SunGlowEdge { get; private set; }
+
+        /// <summary>Bloom scatter for a time of day: wider when the sun (or moon) is low.</summary>
+        public float BloomScatterAt(float normalizedTime)
+        {
+            if (profile == null) return .68f;
+            float day = AeroDayNightProfile.DaylightAt(normalizedTime);
+            bool moonLit = day <= .1f && moon != null;
+            float elevation = Mathf.Sin((Mathf.Repeat(normalizedTime, 1) - .25f) * Mathf.PI * 2) * (moonLit ? -1 : 1);
+            var settings = moonLit ? profile.moonGlow : profile.sunGlow;
+            return AeroSunGlow.BloomScatter(settings, AeroSunGlow.LowSun(settings, elevation));
+        }
+
         private void OnDisable()
         {
+            AeroSunGlow.TrackCameras(false);
             if (ownedSky != null)
             {
                 if (RenderSettings.skybox == ownedSky) RenderSettings.skybox = originalSky;

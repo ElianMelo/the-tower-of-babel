@@ -168,9 +168,9 @@ public static class AeroCloudAuthoring
     {
         var sky = AssetDatabase.LoadAssetAtPath<Material>(SkyPath);
         if (sky != null) return sky;
-        sky = new Material(Shader.Find("Skybox/Procedural")) { name = "AeroClearSky" };
-        // A clean, saturated Frutiger blue with a soft sun; the clouds are drawn on top by the renderer feature.
-        sky.SetFloat("_SunDisk", 2); sky.SetFloat("_SunSize", .035f); sky.SetFloat("_SunSizeConvergence", 6);
+        sky = new Material(Shader.Find(AeroSunGlowAuthoring.SkyShaderName)) { name = "AeroClearSky" };
+        // A clean, saturated Frutiger blue with a soft glowing sun (AeroSunGlowSky); the clouds are drawn on top by the
+        // renderer feature. Existing materials are switched to the soft sun by AeroSunGlowAuthoring.UpgradeSky.
         sky.SetFloat("_AtmosphereThickness", .78f);
         sky.SetColor("_SkyTint", new Color(.38f, .56f, .86f));
         sky.SetColor("_GroundColor", new Color(.33f, .42f, .52f));

@@ -128,6 +128,7 @@ namespace TowerOfBabel.Settings
             AeroRenderQuality.Clouds = data.clouds;
             AeroRenderQuality.LiveReflections = data.liveReflections;
             AeroRenderQuality.ReducedRiverRefraction = !data.riverRefraction;
+            AeroRenderQuality.SunHaze = data.sunHaze;
             if (lamps == null) lamps = FindFirstObjectByType<TowerLavaLamps>();
             if (lamps != null) lamps.LightBudget = data.lampLights;
             AudioListener.volume = data.masterVolume;

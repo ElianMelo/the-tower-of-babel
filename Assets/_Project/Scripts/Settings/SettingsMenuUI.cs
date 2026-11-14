@@ -310,10 +310,12 @@ namespace TowerOfBabel.Settings
                 () => data.occlusionCulling, value => { data.occlusionCulling = value; Changed(true); });
             ToggleRow("Floor reflections", "Live reflection of the surroundings on polished floors",
                 () => data.liveReflections, value => { data.liveReflections = value; Changed(true); });
-            ChoiceRow("Sun shafts", "Light shafts inside the tower", 3,
+            ChoiceRow("Sun shafts", "Light shafts inside the tower and god rays towards the sun outdoors", 3,
                 () => data.sunShafts, index => { data.sunShafts = index; Changed(true); }, index => index == 0 ? "Off" : index == 1 ? "Low" : "High");
             ChoiceRow("Clouds", "Volumetric cloud resolution and samples", 3,
                 () => data.clouds, index => { data.clouds = index; Changed(true); }, index => QualityNames[index]);
+            ToggleRow("Sun haze", "Distant ground towards a low sun fades into its glow",
+                () => data.sunHaze, value => { data.sunHaze = value; Changed(true); });
             ToggleRow("River refraction", "Water under glass refracts every nearby floor at full resolution",
                 () => data.riverRefraction, value => { data.riverRefraction = value; Changed(true); });
             SliderRow("Lava lamp lights", "Most lava lamps that cast real light at once; with fewer, the lit area around you is smaller",

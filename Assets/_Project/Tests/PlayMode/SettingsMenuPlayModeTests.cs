@@ -159,6 +159,7 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(InstancedFarChunkRenderer.OcclusionCulling, Is.True);
             Assert.That(new[] { AeroRenderQuality.SunShafts, AeroRenderQuality.Clouds }, Is.All.EqualTo(AeroRenderQuality.Full));
             Assert.That(AeroRenderQuality.LiveReflections, Is.True); Assert.That(AeroRenderQuality.ReducedRiverRefraction, Is.False);
+            Assert.That(AeroRenderQuality.SunHaze, Is.True);
             yield return null;
             Assert.That(view.farClipPlane, Is.EqualTo(scene.cameraFar)); Assert.That(view.fieldOfView, Is.EqualTo(scene.cameraFov).Within(.01f));
             Assert.That(Application.targetFrameRate, Is.EqualTo(-1), "No frame-rate target: the game renders as fast as it can.");
@@ -173,6 +174,7 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(terrain.basemapDistance, Is.EqualTo(data.baseMapDistance));
             Assert.That(far.DetailDrawDistance, Is.EqualTo(GraphicsPresets.LowDetailDistance)); Assert.That(far.LodDistanceScale, Is.LessThan(.5f));
             Assert.That(AeroRenderQuality.SunShafts, Is.EqualTo(AeroRenderQuality.Off)); Assert.That(AeroRenderQuality.LiveReflections, Is.False);
+            Assert.That(AeroRenderQuality.SunHaze, Is.False);
             Assert.That(view.farClipPlane, Is.EqualTo(data.cameraFar));
 
             menu.Sliders["Camera field of view"].value = 1;
@@ -190,7 +192,7 @@ namespace TowerOfBabel.Resources.Tests
             Assert.That(AeroPipelineQuality.CurrentShadowDistance, Is.EqualTo(scene.shadowDistance)); Assert.That(AeroPipelineQuality.CurrentRenderScale, Is.EqualTo(1));
             Assert.That(terrain.detailObjectDistance, Is.EqualTo(scene.grassDistance));
             Assert.That(view.farClipPlane, Is.EqualTo(scene.cameraFar)); Assert.That(view.fieldOfView, Is.EqualTo(scene.cameraFov).Within(.01f));
-            Assert.That(AeroRenderQuality.SunShafts, Is.EqualTo(AeroRenderQuality.Full));
+            Assert.That(AeroRenderQuality.SunShafts, Is.EqualTo(AeroRenderQuality.Full)); Assert.That(AeroRenderQuality.SunHaze, Is.True);
             menu.Hide();
         }
 

@@ -131,7 +131,11 @@ namespace TowerOfBabel.Rendering.Tests
         public void SunFlare_UsesOcclusionAndRendererSupportsBothFlarePaths()
         {
             var data=AssetDatabase.LoadAssetAtPath<LensFlareDataSRP>("Assets/_Project/Environment/Lighting/AeroSunFlare.asset");
-            Assert.That(data.elements.Length,Is.EqualTo(2));
+            // Core, halo, streak and ghost; the sky draws the soft sun's own halo, so the flare halo stays faint and both
+            // core and halo take the light's colour to warm at sunset (SUN_GLOW.md).
+            Assert.That(data.elements.Length,Is.EqualTo(4));
+            Assert.That(data.elements[0].modulateByLightColor && data.elements[1].modulateByLightColor,Is.True);
+            Assert.That(data.elements[1].localIntensity,Is.LessThanOrEqualTo(.15f));
             var rp=(UniversalRenderPipelineAsset)GraphicsSettings.currentRenderPipeline;
             Assert.That(rp.supportDataDrivenLensFlare,Is.True); Assert.That(rp.supportScreenSpaceLensFlare,Is.True);
             var profile=AssetDatabase.LoadAssetAtPath<VolumeProfile>("Assets/_Project/UI/FrutigerAero/AeroAtmosphere.asset");

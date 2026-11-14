@@ -6,7 +6,9 @@
 // integration, dual-lobe Henyey-Greenstein with multi-scattering octaves (Wrenninge), powder term (Schneider,
 // Horizon Zero Dawn). Density after Schneider's Nubis talks and Sebastian Lague's Clouds (MIT): coverage map,
 // height gradient, Perlin-Worley shape eroded by Worley detail. Independent implementation.
-// All parameters arrive through a MaterialPropertyBlock (see AeroVolumetricCloudsRendererFeature).
+// All parameters arrive through a MaterialPropertyBlock (see AeroVolumetricCloudsRendererFeature), except the soft
+// sun glow globals (AeroSunGlow.hlsl): far clouds near the sun melt into its halo instead of a flat fog colour.
+#include "AeroSunGlow.hlsl"
 
 TEXTURE3D(_AeroCloudShapeNoise);
 TEXTURE3D(_AeroCloudDetailNoise);
@@ -283,7 +285,9 @@ float4 AeroTraceClouds(float2 uv, float2 pixel, float sceneDistance)
     float3 ray = AeroCloudRay(uv);
     float2 range = AeroCloudInterval(ray);
     float wall = AeroHazeWall(ray, sceneDistance);
-    if (range.x < 0 || range.x >= sceneDistance) return float4(_AeroCloudFogColor.rgb * wall, 1 - wall);
+    // The haze takes on the sun's glow in its direction, as the sky behind it does (cloud-shaded like the ground haze).
+    float3 hazeColor = _AeroCloudFogColor.rgb + AeroSunGlowRadiance(ray, false) * _AeroSunHaze.w;
+    if (range.x < 0 || range.x >= sceneDistance) return float4(hazeColor * wall, 1 - wall);
     range.y = min(range.y, sceneDistance);
 
     int steps = (int)_AeroCloudMarch.x;
@@ -349,14 +353,14 @@ float4 AeroTraceClouds(float2 uv, float2 pixel, float sceneDistance)
         }
         t += step;
     }
-    if (meanWeight <= 0) return float4(_AeroCloudFogColor.rgb * wall, 1 - wall);
+    if (meanWeight <= 0) return float4(hazeColor * wall, 1 - wall);
     meanDistance /= meanWeight;
     float3 color = sun * _AeroCloudSunColor.rgb * _AeroCloudTone.x + ambient * _AeroCloudTone.y;
     // Aerial perspective: distant clouds melt into the horizon haze, then fade out.
     float haze = (1 - exp(-meanDistance / _AeroCloudHaze.x)) * _AeroCloudHaze.y;
-    color = lerp(color, _AeroCloudFogColor.rgb * (1 - transmittance), haze);
+    color = lerp(color, hazeColor * (1 - transmittance), haze);
     float fade = 1 - smoothstep(_AeroCloudHaze.z, _AeroCloudHaze.w, meanDistance);
-    return float4(lerp(_AeroCloudFogColor.rgb * wall, color, fade), lerp(1 - wall, transmittance, fade));
+    return float4(lerp(hazeColor * wall, color, fade), lerp(1 - wall, transmittance, fade));
 }
 
 #endif

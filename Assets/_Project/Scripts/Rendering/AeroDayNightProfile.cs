@@ -26,6 +26,9 @@ namespace TowerOfBabel.Rendering
         [Min(0)] public float fireflyPopulationMultiplier = 2.2f;
         [Min(.01f)] public float fireflyCoverageAreaMultiplier = 1.15f;
         [Range(0, 1)] public float sunFlareIntensity = .85f;
+        [Header("Soft sun glow (sky, distant haze, clouds)")]
+        public AeroSunGlowSettings sunGlow = AeroSunGlowSettings.Sun();
+        public AeroSunGlowSettings moonGlow = AeroSunGlowSettings.Moon();
 
         public static float DaylightAt(float time)
             => Mathf.SmoothStep(0, 1, Mathf.InverseLerp(-.06f, .22f, Mathf.Sin((Mathf.Repeat(time, 1) - .25f) * Mathf.PI * 2)));

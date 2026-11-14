@@ -35,7 +35,7 @@ Noise is baked by `AeroCloudNoise` (tiling Perlin, Worley, histogram equalizatio
 
 ## Sky
 
-The old `Epic_BlueSunset` skybox has photographed clouds in it, which doubled with the volumetric layer and never changed with rain. The Tower scene now uses `Environment/Clouds/AeroClearSky.mat` (`Skybox/Procedural`: Frutiger blue tint, soft sun disk). Its sunrise and sunset colours follow the sun. The day/night cycle still drives its exposure. To go back, set *Lighting → Environment → Skybox Material* to `Assets/AllSkyFree/Epic_BlueSunset/Epic_BlueSunset.mat`.
+The old `Epic_BlueSunset` skybox has photographed clouds in it, which doubled with the volumetric layer and never changed with rain. The Tower scene now uses `Environment/Clouds/AeroClearSky.mat`, with Frutiger blue tint. Its sunrise and sunset colours follow the sun. The day/night cycle still drives its exposure. Since 2026-11-14 it uses the soft sun shader (`AeroSunGlowSky`, the same atmosphere as `Skybox/Procedural`), which replaces the point sun with a glowing inner circle and halo; see [soft golden sun glow](SUN_GLOW.md). Distant cloud haze near the sun takes on the same glow. To go back, set *Lighting → Environment → Skybox Material* to `Assets/AllSkyFree/Epic_BlueSunset/Epic_BlueSunset.mat`.
 
 ## Day/night and weather wiring
 
