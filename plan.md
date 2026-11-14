@@ -4,7 +4,7 @@
 **Scope:** MVP-to-launch architecture only  
 **Team:** Solo developer  
 **Primary target:** 1,000+ concurrent connected users per regional dedicated server  
-**Client target:** 1080p / 60 FPS  
+**Client target:** 1080p, no frame-rate target: as many frames as the hardware delivers (uncapped)  
 **Engine:** Unity 6.3 LTS — 6000.3.11f1, URP  
 **Networking:** FishNet Networking Evolved 4.7.2R  
 **Database:** SQLite  
@@ -796,7 +796,7 @@ Player network-state replication:
 Client render/interpolation:
 
 ```text
-60 FPS target
+Every rendered frame (no frame-rate target)
 ```
 
 Not every system must run work every tick.
@@ -1105,7 +1105,7 @@ snapshot buffer
    ↓
 interpolation
    ↓
-60 FPS Transform presentation
+Transform presentation every rendered frame
    ↓
 Animator state mapping
 ```
@@ -2777,27 +2777,21 @@ with ~1 byte/stage before container overhead.
 
 No per-asset server GameObjects.
 
-## 40.9 Client frame budget
+## 40.9 Client frame time
 
-Target:
+There is no client frame-rate target and no frame budget. The client renders uncapped, and the goal is the highest
+frame rate each machine can deliver at the chosen graphics quality (Low, Medium or High in the settings menu).
+
+Reference workload for measurements:
 
 ```text
 1920×1080
-60 FPS
-16.67 ms/frame
 100 watched remote players
 3×3×3 high-detail chunks
 ```
 
-Provisional split:
-
-```text
-Main CPU frame       < 8 ms typical
-GPU frame            < 12 ms typical
-Total frame          < 16.67 ms target
-```
-
-Do not require both CPU and GPU numbers to add linearly; they overlap.
+Measure main-thread, render-thread and GPU time separately (`Documentation/Performance/PERFORMANCE.md`); they overlap
+and do not add linearly. Every change is judged by the frame time it removes, not against a fixed number.
 
 ## 40.10 Client rendering stress case
 
@@ -3024,7 +3018,7 @@ Success:
 no NetworkTransform
 no NetworkAnimator
 stable observer membership
-60 FPS interpolation presentation
+interpolated presentation every rendered frame
 ```
 
 ## Phase 3 — Chunk Workers and High-detail Streaming

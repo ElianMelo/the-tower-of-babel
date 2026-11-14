@@ -93,9 +93,20 @@ namespace TowerOfBabel.World.Tests
                 }
                 var draws = new List<RiverGlassDraw>(); far.CollectRiverGlass(camera, null, draws);
                 Assert.That(draws.Sum(d=>d.count), Is.EqualTo(2046));
-                Assert.That(draws.All(d=>d.count <= 511), Is.True);
                 Assert.That(draws.Select(d=>d.floor).Distinct().Count(), Is.EqualTo(2));
-                foreach (var draw in draws) Assert.That(draw.matrices.All(m=>Mathf.Abs(m.m13-draw.floor*6)<.001f), Is.True);
+                if (far.IsGpuCulled)
+                {
+                    // One indirect draw per floor, straight from the far tower's GPU-culled instance list.
+                    Assert.That(draws.Count, Is.EqualTo(2));
+                    Assert.That(draws.All(d=>d.indirectArguments != null && d.matrices == null), Is.True);
+                    Assert.That(draws.Select(d=>d.indirectOffset).Distinct().Count(), Is.EqualTo(2), "Each floor has its own command.");
+                    Assert.That(draws.All(d=>Mathf.Abs(d.height-d.floor*6)<.001f), Is.True);
+                }
+                else
+                {
+                    Assert.That(draws.All(d=>d.count <= 511), Is.True);
+                    foreach (var draw in draws) Assert.That(draw.matrices.All(m=>Mathf.Abs(m.m13-draw.floor*6)<.001f), Is.True);
+                }
                 far.RemoveChunk(new ChunkKey(0,0,0)); draws.Clear(); far.CollectRiverGlass(camera,null,draws);
                 Assert.That(draws.Sum(d=>d.count), Is.EqualTo(1023));
                 far.SetVisible(false); draws.Clear(); far.CollectRiverGlass(camera,null,draws); Assert.That(draws, Is.Empty);

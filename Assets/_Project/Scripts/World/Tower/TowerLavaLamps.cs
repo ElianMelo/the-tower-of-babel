@@ -13,15 +13,32 @@ namespace TowerOfBabel.World.Tower
     /// plus lamps scattered on the outside of free pillars. A pillar carries at most one lamp (inside or outside), and
     /// two lamps never hang on neighbouring pillars. Each lamp is a buildable detail asset (TowerAssetType.LavaLamp):
     /// the tower draws its chrome sconce stage by stage, and once it is fully built this component adds the lava glass
-    /// and its light. Lamps are drawn instanced, so the tower carries no lamp objects. Every lamp in view, up to a
-    /// budget, carries a real spotlight projecting one shared, animated caustics cookie.
+    /// and its light. Lamps are drawn instanced, so the tower carries no lamp objects. Every lamp whose light the
+    /// player can see, up to a budget, carries a real spotlight projecting one shared, animated caustics cookie.
+    ///
+    /// The lights never switch at full brightness. The nearest lamps win; when there are more lamps than lights the
+    /// lit radius shrinks to what the budget covers and lights fade out toward its edge, a light that is handed to
+    /// another lamp fades out first and fades in there, and lamps hidden behind the tower's decks take no light.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class TowerLavaLamps : MonoBehaviour
     {
         /// <summary>A lamp on one pillar, then three pillars without.</summary>
         public const int PillarInterval = 4;
-        public const float SelectionInterval = .25f;
+        /// <summary>Seconds between light selections while the camera is still; a moving camera selects at once.</summary>
+        public const float SelectionInterval = .1f;
+        /// <summary>Most light rigs the budget can ask for. Each is a spotlight, plus a small glow near the player.</summary>
+        public const int MaximumLights = 128;
+        /// <summary>Seconds a light takes to fade in on a lamp, or out before it moves to another.</summary>
+        public const float FadeSeconds = .3f;
+        /// <summary>The small glow under a lamp is only lit this close; beyond it only the spotlight shows.</summary>
+        public const float GlowReach = 40;
+        /// <summary>Degrees added to the camera's field of view when choosing lamps, so turning finds them already lit.</summary>
+        public const float ViewPadding = 30;
+        // The camera moved or turned this much since the last selection: select again now.
+        private const float ReselectDistance = 1.5f, ReselectAngle = 3, TeleportDistance = 25;
+        // How fast the lit radius follows the budget, per second.
+        private const float ReachRate = 5;
         public const int CookieResolution = 512;
         public const float CookieInterval = 1 / 30f;
 
@@ -37,9 +54,10 @@ namespace TowerOfBabel.World.Tower
         [SerializeField, Min(10)] private float visibleDistance = 260;
         [Tooltip("Lamps in view within this distance carry a live spotlight; the light fades out over the last quarter.")]
         [SerializeField, Min(1)] private float lightReach = 90;
-        [Tooltip("Most lamp spotlights at once. Forward+ has no per-object light limit; the nearest lamps in view win.")]
-        [SerializeField, Range(0, 64)] private int maxLights = 24;
-        [Tooltip("The nearest lamp within this distance casts spotlight shadows.")]
+        [Tooltip("Most lamp spotlights at once. Forward+ has no per-object light limit; the nearest lamps in view win. " +
+                 "With more lamps in view than lights, the lit radius shrinks and the lights fade out toward its edge.")]
+        [SerializeField, Range(0, MaximumLights)] private int maxLights = 96;
+        [Tooltip("The nearest lamp within this distance casts spotlight shadows; they fade out over the last quarter.")]
         [SerializeField, Min(0)] private float shadowDistance = 20;
         [Tooltip("Chance that a free pillar (no lamp on it or on either neighbour) gets a lamp on its other face.")]
         [SerializeField, Range(0, 1)] private float exteriorChance = .5f;
@@ -89,7 +107,20 @@ namespace TowerOfBabel.World.Tower
         private sealed class Rig
         {
             public GameObject root; public Light[] lights; public float[] intensities; public int placement = -1;
-            public Light spot; public Quaternion spotRotation; public float fade = 1;
+            public Light spot; public Quaternion spotRotation;
+            /// <summary>Distance fade toward the edge of the lit radius, and of the glow's own reach.</summary>
+            public float fade = 1, glow = 1;
+            /// <summary>Fade in time: 0 when the rig arrives on a lamp, 1 once it is fully lit.</summary>
+            public float presence;
+            /// <summary>The lamp lost its light; the rig fades out, then is free.</summary>
+            public bool leaving;
+            /// <summary>Shadow strength now (0 to 1) and as authored.</summary>
+            public float shadow, shadowStrength = 1;
+            /// <summary>The lamp's position while the rig sits on one.</summary>
+            public Vector3 position;
+            // What the lights were last set to: a frame that changes nothing touches no light.
+            public float[] applied; public bool[] switchedOn;
+            public LightShadows shadowMode = LightShadows.None; public float appliedShadowStrength = -1;
         }
 
         private readonly List<Placement> placements = new();
@@ -98,7 +129,16 @@ namespace TowerOfBabel.World.Tower
         private readonly List<FloorBatch> batchList = new();
         private readonly List<Rig> rigs = new();
         private readonly Plane[] planes = new Plane[6];
-        private readonly List<int> nearest = new();
+        // Light selection scratch: lamps whose light can be seen, sorted by distance; chosen lamps still without a rig.
+        private float[] candidateDistances = new float[64];
+        private int[] candidates = new int[64];
+        private int candidateCount;
+        private readonly List<int> pending = new();
+        [NonSerialized] private float reach, targetReach;
+        [NonSerialized] private int shadowLamp = -1;
+        [NonSerialized] private bool selectedOnce;
+        [NonSerialized] private Vector3 selectedEye;
+        [NonSerialized] private Quaternion selectedLook = Quaternion.identity;
         // Runtime state only: an editor script reload must not restore "already built" without the lists.
         [NonSerialized] private Bounds lampBounds;
         [NonSerialized] private int builtFromChunks = -1;
@@ -117,11 +157,34 @@ namespace TowerOfBabel.World.Tower
         public int PlacementSeed => placementSeed;
         public float LightReach => lightReach;
         public int MaxLights => maxLights;
+        /// <summary>Most lamp spotlights at once (graphics settings). Extra rigs are released; missing ones are created on the next selection.</summary>
+        public int LightBudget
+        {
+            get => maxLights;
+            set
+            {
+                value = Mathf.Clamp(value, 0, MaximumLights);
+                if (value == maxLights) return;
+                maxLights = value;
+                for (int i = rigs.Count - 1; i >= maxLights; i--)
+                {
+                    if (rigs[i].root != null) { if (Application.isPlaying) Destroy(rigs[i].root); else DestroyImmediate(rigs[i].root); }
+                    rigs.RemoveAt(i);
+                }
+                nextSelection = 0;
+            }
+        }
         /// <summary>The one animated caustics cookie every lamp spotlight projects.</summary>
         public RenderTexture SharedCookie => cookie;
         public int DrawnBatchCount { get; private set; }
         public int VisibleLampCount { get { int n = 0; foreach (var b in batchList) { Refresh(b); n += b.visible; } return n; } }
         public int ActiveLightCount { get { int n = 0; foreach (var r in rigs) if (r.root != null && r.root.activeSelf) n++; return n; } }
+        /// <summary>
+        /// The lit radius now: the light reach, or less while more lamps are in view than the budget has lights.
+        /// </summary>
+        public float EffectiveReach => reach > 0 ? reach : lightReach;
+        /// <summary>Lamps the last selection found lit-worthy (in reach, in view, not behind a deck), before the budget.</summary>
+        public int CandidateCount => candidateCount;
         public IEnumerable<Light> Lights { get { foreach (var r in rigs) foreach (var l in r.lights) if (l != null) yield return l; } }
 
         public void Configure(ChunkManager manager, GameObject prefab, float height, float radius)
@@ -139,7 +202,7 @@ namespace TowerOfBabel.World.Tower
             if (chunks != null) { Subscribe(); Rebuild(); }
         }
 
-        private void OnEnable() { Subscribe(); builtFromChunks = -1; }
+        private void OnEnable() { Subscribe(); builtFromChunks = -1; selectedOnce = false; reach = targetReach = 0; }
         private void OnDisable() { Unsubscribe(); ReleaseRigs(); }
 
         private void Subscribe()
@@ -196,6 +259,9 @@ namespace TowerOfBabel.World.Tower
         public void Rebuild()
         {
             placements.Clear(); floors.Clear(); batchList.Clear(); parts.Clear(); UsesLampAssets = false;
+            // The lights point at placements by index: hand them all back.
+            foreach (var rig in rigs) if (rig.root != null) Release(rig);
+            pending.Clear(); candidateCount = 0; shadowLamp = -1; selectedOnce = false;
             builtFromChunks = chunks != null ? chunks.CachedChunks.Count : -1;
             if (chunks == null || lampPrefab == null) return;
             CollectParts();
@@ -454,15 +520,21 @@ namespace TowerOfBabel.World.Tower
             if (camera == null) return;
             EnsureBuilt();
             Vector3 eye = camera.transform.position;
-            if (Time.unscaledTime >= nextSelection)
+            Quaternion look = camera.transform.rotation;
+            float travelled = (eye - selectedEye).magnitude;
+            // A moving or turning camera selects twice as often; the padded view covers the turn in between.
+            bool moved = travelled > ReselectDistance || Quaternion.Angle(look, selectedLook) > ReselectAngle;
+            if (!selectedOnce || travelled > TeleportDistance || Time.unscaledTime >= nextSelection - (moved ? SelectionInterval * .5f : 0))
             {
-                GeometryUtility.CalculateFrustumPlanes(camera, planes);
-                SelectLights(eye, planes);
+                LightFrustum(camera, lightReach, planes);
+                // The first selection and a teleport light the lamps at once; from then on lights fade.
+                SelectLights(eye, planes, selectedOnce && travelled < TeleportDistance, chunks != null ? chunks.FarOccluders : null);
                 nextSelection = Time.unscaledTime + SelectionInterval;
+                selectedOnce = true; selectedEye = eye; selectedLook = look;
             }
-            UpdateFades(eye);
+            Advance(eye, Time.unscaledDeltaTime);
             ApplyDaylight(Shader.GetGlobalFloat("_AeroDaylight"));
-            if (ActiveLightCount > 0 && Time.time >= nextCookie)
+            if (AnyLit() && Time.time >= nextCookie)
             {
                 RenderCookie(Time.time);
                 nextCookie = Time.time + CookieInterval;
@@ -504,12 +576,16 @@ namespace TowerOfBabel.World.Tower
         /// Moves the light rigs onto the nearest shown lamps within reach whose light could be seen: inside the view
         /// frustum when one is given (the spotlight's wash above the lamp counts), up to the light budget.
         /// </summary>
-        public void SelectLights(Vector3 view, Plane[] frustum = null)
+        /// <remarks>
+        /// With <paramref name="smooth"/> (the game), a lamp that gains a light fades in and a light that leaves a
+        /// lamp fades out first (see <see cref="Advance"/>); without it the lights are in place at once.
+        /// Lamps whose light <paramref name="decks"/> hide from the view take no light.
+        /// </remarks>
+        public void SelectLights(Vector3 view, Plane[] frustum = null, bool smooth = false, FarOccluderSet decks = null)
         {
             EnsureBuilt();
             EnsureRigs();
-            nearest.Clear();
-            var distances = new List<float>();
+            candidateCount = 0;
             float limit = lightReach * lightReach;
             foreach (var batch in batchList)
             {
@@ -517,48 +593,129 @@ namespace TowerOfBabel.World.Tower
                 if (frustum != null && !GeometryUtility.TestPlanesAABB(frustum, Expand(batch.bounds))) continue;
                 foreach (int index in batch.placements)
                 {
-                    float d = (placements[index].Position - view).sqrMagnitude;
+                    var placement = placements[index];
+                    float d = (placement.Position - view).sqrMagnitude;
                     if (d > limit || !IsShown(index)) continue;
-                    if (frustum != null && !GeometryUtility.TestPlanesAABB(frustum, LightBounds(placements[index]))) continue;
-                    int at = distances.Count;
-                    while (at > 0 && distances[at - 1] > d) at--;
-                    if (at >= rigs.Count) continue;
-                    distances.Insert(at, d); nearest.Insert(at, index);
-                    if (nearest.Count > rigs.Count) { nearest.RemoveAt(nearest.Count - 1); distances.RemoveAt(distances.Count - 1); }
+                    Bounds light = LightBounds(placement);
+                    if (frustum != null && !GeometryUtility.TestPlanesAABB(frustum, light)) continue;
+                    if (decks != null && decks.Hides(view, light)) continue;
+                    if (candidateCount == candidates.Length)
+                    {
+                        Array.Resize(ref candidates, candidateCount * 2);
+                        Array.Resize(ref candidateDistances, candidateCount * 2);
+                    }
+                    candidates[candidateCount] = index; candidateDistances[candidateCount++] = d;
                 }
             }
+            Array.Sort(candidateDistances, candidates, 0, candidateCount);
+
+            // The nearest lamps get the lights. With more lamps than lights, the lit radius ends at the first lamp
+            // left out, so the farthest lit lamp is already faded out when it loses its light.
+            int budget = rigs.Count, chosen = Mathf.Min(budget, candidateCount);
+            targetReach = candidateCount > budget ? Mathf.Min(lightReach, Mathf.Sqrt(candidateDistances[budget])) : lightReach;
+            pending.Clear();
+            for (int i = 0; i < chosen; i++) pending.Add(candidates[i]);
             // Rigs that already sit on a chosen lamp stay put, so their light does not jump.
-            var free = new List<int>(nearest);
-            foreach (var rig in rigs) if (rig.placement >= 0 && !free.Remove(rig.placement)) rig.placement = -1;
             foreach (var rig in rigs)
             {
-                if (rig.placement < 0 && free.Count > 0) { rig.placement = free[0]; free.RemoveAt(0); }
-                bool active = rig.placement >= 0;
-                if (active)
-                {
-                    var p = placements[rig.placement];
-                    rig.root.transform.SetPositionAndRotation(p.mount.GetColumn(3), p.mount.rotation);
-                    // Each lamp turns the shared cookie by its own angle, so neighbouring washes never repeat.
-                    if (rig.spot != null)
-                        rig.spot.transform.localRotation = rig.spotRotation * Quaternion.AngleAxis(Hash01(p.floor, p.ringIndex, placementSeed + 7) * 360, Vector3.forward);
-                }
-                if (rig.root.activeSelf != active) rig.root.SetActive(active);
-                if (rig.spot != null) rig.spot.shadows = LightShadows.None;
+                if (rig.placement < 0) continue;
+                if (pending.Remove(rig.placement)) rig.leaving = false;
+                else if (smooth) rig.leaving = true;
+                else Release(rig);
+            }
+            foreach (var rig in rigs)
+            {
+                if (rig.placement >= 0 || pending.Count == 0) continue;
+                Assign(rig, pending[0], smooth ? 0 : 1);
+                pending.RemoveAt(0);
             }
             // Only the nearest lamp casts spotlight shadows, as with the aqua lamps.
-            if (nearest.Count > 0 && distances[0] <= shadowDistance * shadowDistance)
-                foreach (var rig in rigs) if (rig.placement == nearest[0] && rig.spot != null) rig.spot.shadows = LightShadows.Hard;
-            UpdateFades(view);
+            shadowLamp = chosen > 0 && candidateDistances[0] <= shadowDistance * shadowDistance ? candidates[0] : -1;
+            if (smooth) UpdateFades(view);
+            else Advance(view, float.PositiveInfinity);
         }
 
-        /// <summary>Lights fade out over the last quarter of their reach, so lamps never pop at the edge.</summary>
-        public void UpdateFades(Vector3 view)
+        private void Assign(Rig rig, int placement, float presence)
         {
+            rig.placement = placement; rig.presence = presence; rig.leaving = false; rig.shadow = 0;
+            var p = placements[placement];
+            rig.position = p.Position;
+            rig.root.transform.SetPositionAndRotation(rig.position, p.mount.rotation);
+            // Each lamp turns the shared cookie by its own angle, so neighbouring washes never repeat.
+            if (rig.spot != null)
+                rig.spot.transform.localRotation = rig.spotRotation * Quaternion.AngleAxis(Hash01(p.floor, p.ringIndex, placementSeed + 7) * 360, Vector3.forward);
+            SetShadows(rig, LightShadows.None);
+            if (!rig.root.activeSelf) rig.root.SetActive(true);
+        }
+
+        private static void Release(Rig rig)
+        {
+            rig.placement = -1; rig.presence = 0; rig.leaving = false; rig.shadow = 0; rig.fade = 0; rig.glow = 0;
+            SetShadows(rig, LightShadows.None);
+            if (rig.root.activeSelf) rig.root.SetActive(false);
+        }
+
+        private static void SetShadows(Rig rig, LightShadows mode)
+        {
+            if (rig.spot == null || rig.shadowMode == mode) return;
+            rig.spot.shadows = mode; rig.shadowMode = mode;
+        }
+
+        private bool AnyLit()
+        {
+            foreach (var rig in rigs) if (rig.placement >= 0) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Moves the fades on by <paramref name="deltaTime"/> seconds: lights fade in on their lamp, fade out before
+        /// they are handed to a lamp that waits, the lit radius follows the budget and the nearest lamp's shadows
+        /// fade with its distance. An infinite time settles everything at once.
+        /// </summary>
+        public void Advance(Vector3 view, float deltaTime)
+        {
+            if (targetReach <= 0) targetReach = lightReach;
+            bool settle = float.IsPositiveInfinity(deltaTime);
+            float step = settle ? 1 : Mathf.Max(0, deltaTime) / FadeSeconds;
+            reach = settle || reach <= 0 ? targetReach : Mathf.Lerp(reach, targetReach, 1 - Mathf.Exp(-Mathf.Max(0, deltaTime) * ReachRate));
             foreach (var rig in rigs)
             {
-                if (rig.placement < 0) { rig.fade = 0; continue; }
-                float d = Vector3.Distance(placements[rig.placement].Position, view);
-                rig.fade = 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(lightReach * .75f, lightReach, d));
+                if (rig.placement < 0 || rig.root == null) continue;
+                rig.presence = Mathf.MoveTowards(rig.presence, rig.leaving ? 0 : 1, step);
+                if (!rig.leaving || rig.presence > 0) continue;
+                Release(rig);
+                if (pending.Count > 0) { Assign(rig, pending[0], 0); pending.RemoveAt(0); }
+            }
+            UpdateFades(view);
+            foreach (var rig in rigs)
+            {
+                if (rig.placement < 0 || rig.spot == null) continue;
+                bool nearest = rig.placement == shadowLamp && !rig.leaving;
+                if (!nearest && rig.shadow <= 0) continue;
+                float wanted = nearest
+                    ? 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(shadowDistance * .75f, shadowDistance, Vector3.Distance(rig.position, view)))
+                    : 0;
+                rig.shadow = Mathf.MoveTowards(rig.shadow, wanted, step);
+                SetShadows(rig, rig.shadow > .01f ? LightShadows.Hard : LightShadows.None);
+                float strength = rig.shadowStrength * rig.shadow;
+                if (rig.shadowMode == LightShadows.None || strength == rig.appliedShadowStrength) continue;
+                rig.spot.shadowStrength = strength; rig.appliedShadowStrength = strength;
+            }
+        }
+
+        /// <summary>
+        /// Lights fade out over the last quarter of the lit radius, so lamps never pop at its edge; the glow under
+        /// a lamp fades the same way toward its own, shorter reach.
+        /// </summary>
+        public void UpdateFades(Vector3 view)
+        {
+            float radius = EffectiveReach;
+            foreach (var rig in rigs)
+            {
+                if (rig.placement < 0) { rig.fade = 0; rig.glow = 0; continue; }
+                float d = Vector3.Distance(rig.position, view);
+                rig.fade = 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(radius * .75f, radius, d));
+                rig.glow = 1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(GlowReach * .75f, GlowReach, d));
             }
         }
 
@@ -567,7 +724,33 @@ namespace TowerOfBabel.World.Tower
         {
             float scale = Mathf.Lerp(1, daytimeLight, Mathf.Clamp01(daylight));
             foreach (var rig in rigs)
-                for (int i = 0; i < rig.lights.Length; i++) if (rig.lights[i] != null) rig.lights[i].intensity = rig.intensities[i] * scale * rig.fade;
+            {
+                if (rig.placement < 0) continue;
+                float lit = scale * rig.fade * rig.presence;
+                for (int i = 0; i < rig.lights.Length; i++)
+                {
+                    Light light = rig.lights[i];
+                    if (light == null) continue;
+                    bool main = rig.spot == null || light == rig.spot;
+                    // The glow is a second light per lamp: far lamps do without it, so the budget goes to spotlights.
+                    float value = rig.intensities[i] * lit * (main ? 1 : rig.glow);
+                    if (value != rig.applied[i]) { light.intensity = value; rig.applied[i] = value; }
+                    if (main || rig.switchedOn[i] == value > 0) continue;
+                    light.enabled = value > 0; rig.switchedOn[i] = value > 0;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The view the lights are chosen for: the camera's, widened by <see cref="ViewPadding"/> and cut at the light
+        /// reach, so a lamp just outside the picture is lit before the camera turns to it.
+        /// </summary>
+        public static void LightFrustum(Camera camera, float reach, Plane[] into)
+        {
+            if (camera.orthographic) { GeometryUtility.CalculateFrustumPlanes(camera, into); return; }
+            float near = Mathf.Max(.01f, camera.nearClipPlane);
+            var projection = Matrix4x4.Perspective(Mathf.Min(camera.fieldOfView + ViewPadding, 170), camera.aspect, near, Mathf.Max(near + 1, reach + LightWash * 2));
+            GeometryUtility.CalculateFrustumPlanes(projection * camera.worldToCameraMatrix, into);
         }
 
         /// <summary>Draws the animated caustics into the cookie every lamp spotlight shares.</summary>
@@ -621,7 +804,9 @@ namespace TowerOfBabel.World.Tower
                 rigs.Add(new Rig
                 {
                     root = instance, lights = lights, intensities = Array.ConvertAll(lights, l => l.intensity),
-                    spot = spot, spotRotation = spot != null ? spot.transform.localRotation : Quaternion.identity
+                    spot = spot, spotRotation = spot != null ? spot.transform.localRotation : Quaternion.identity,
+                    shadowStrength = spot != null ? spot.shadowStrength : 1,
+                    applied = Array.ConvertAll(lights, _ => -1f), switchedOn = Array.ConvertAll(lights, _ => true)
                 });
             }
         }
@@ -631,6 +816,7 @@ namespace TowerOfBabel.World.Tower
             foreach (var rig in rigs)
                 if (rig.root != null) { if (Application.isPlaying) Destroy(rig.root); else DestroyImmediate(rig.root); }
             rigs.Clear();
+            pending.Clear(); candidateCount = 0; shadowLamp = -1; selectedOnce = false;
             if (cookie != null) { cookie.Release(); DestroyOwned(cookie); cookie = null; }
             if (cookieAnimation != null) { DestroyOwned(cookieAnimation); cookieAnimation = null; }
         }

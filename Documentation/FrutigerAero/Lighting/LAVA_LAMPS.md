@@ -56,10 +56,17 @@ The stair ramp is 4 m wide, runs against the inside of the pillar ring all the w
 
 - A lamp shows once **its lamp asset is fully built** and its floor's detail is released, on floors the player can see; stage changes, detail releases and floor unlocks refresh only the affected floor. (A tower without lamp assets falls back to showing each lamp with its pillar.)
 - Lamps draw with `Graphics.RenderMeshInstanced` per floor, culled by frustum and a 260 m distance; the tower carries no lamp GameObjects.
-- Up to **24 light rigs** (prefab instances with their renderers off and their `AeroProjectionLamp` removed) move every 0.25 s to the nearest built lamps **in view** within 90 m. A lamp counts as in view when the camera frustum sees the wall its spotlight washes (about 6 m above it), so lamps just below the screen edge still light the arches in shot. Rigs that stay on a chosen lamp are not moved. The renderer is Forward+, which has no per-object light limit.
-- Only the nearest lamp within 20 m casts spotlight shadows.
-- Lights fade out over the last quarter of their reach (67–90 m), so lamps never pop on or off.
+- Up to **96 light rigs** (prefab instances with their renderers off and their `AeroProjectionLamp` removed; the Graphics setting "Lava lamp lights", 0 to 128) sit on the nearest built lamps **whose light the player can see** within 90 m. The renderer is Forward+, which has no per-object light limit. Until 2026-11-14 there were 24: around the tower 100 to 300 lamps are in view within 90 m, so only a patch near the player was lit and the lights jumped from lamp to lamp, at full brightness, with every step.
+- A lamp counts as seen when the wall its spotlight washes (about 6 m above it) is in the camera's view **widened by 30°**, so lamps beside the picture are already lit when the camera turns, and when the tower's decks do not hide that wall (`FarOccluderSet.Hides`, the far renderer's deck test on the CPU). Inside the tower this leaves the lights to the player's own floor instead of the floors above and below.
+- The choice is made every 0.1 s, and at twice that rate while the camera moves or turns. Rigs that stay on a chosen lamp are not moved.
+- **Lights never switch at full brightness:**
+  - With more lamps than lights, the lit radius shrinks to the first lamp left without a light, and lights fade out over the last quarter of that radius. The lamp that loses its light is already dark; the radius follows the budget over about a fifth of a second.
+  - With lights to spare the radius is the full 90 m (fade from 67 m).
+  - A light that leaves a lamp for any other reason (the lamp left the view, was hidden by a deck or was rolled back) fades out over 0.3 s before the rig is used again, and fades in over 0.3 s on its new lamp. The first selection after loading and a teleport light the lamps at once.
+- Only the nearest lamp within 20 m casts spotlight shadows; their strength fades out between 15 and 20 m instead of switching.
+- The small lava glow light is lit within 40 m only (fading from 30 m); farther lamps keep the spotlight alone, so a rig costs one light, not two.
 - Rig lights are full strength at night and 30% by day.
+- Cost, measured 2026-11-14 on High in the Editor: 96 lights instead of 24 add about 0.6 ms inside the tower and 1.2 ms outside at 160 m (109 to 97 fps). The new selection and fades cost nothing measurable at the same light count.
 
 Runtime lighting is local presentation; it changes no construction state.
 
@@ -67,6 +74,7 @@ Runtime lighting is local presentation; it changes no construction state.
 
 `LavaLampPreview.Capture()` rebuilds a real section of the cached tower (floor 4), stairs included, around one lamp in a disposable additive scene with the Tower sky and reflections. All lamps within 26 m are lit with the shared cookie, as in the game. It writes sconce, fluid, arcade, projection (two moments) and other-face shots for day and night to `_Screenshots-and-previews-to-delete/LavaLamps/`.
 
+- EditMode `TowerLavaLampEditModeTests` for the lights (2026-11-14): with more lamps than lights the lit radius ends at the first lamp left out and, along a walk, no lamp gains or loses its light above 10% brightness; in the game a light fades in, fades out before it moves and comes back up when its lamp returns to view; lamps behind a solid deck take no light; far lamps keep the spotlight without the glow, and the nearest lamp's shadows fade with distance. `FarGpuCullingEditModeTests.DeckTestOnTheCpu_HidesOnlyWhatLiesBehindSolidDeck` covers the deck test (stair hole, deck rim, glass).
 - EditMode `TowerLavaLampEditModeTests`: outside lamps only on free pillars and facing out, never neighbours or two per pillar, stable random scatter, the ring-seam rule, every lamp in view lit (more than four) with one shared 512 px cookie turned per lamp, distance fade; and the earlier checks: one-in-four pattern and inward mount transform, pillar-built visibility and rollback, hidden upper floors, stair rejection keeping the pattern, the headroom option, nearest-light selection and release, day dimming, prefab wiring (cookie reuse, upward spot, instancing, mesh/shader dimensions), and the Tower scene placement.
 - EditMode `LavaLampShaderEditModeTests`: blue fluid with green wax, wax motion over time, night glow much brighter than day and over the bloom threshold.
 - EditMode `AeroCausticsFlipbookEditModeTests`: flipbook imports, cookie sharpness, colour split, motion and aperture.

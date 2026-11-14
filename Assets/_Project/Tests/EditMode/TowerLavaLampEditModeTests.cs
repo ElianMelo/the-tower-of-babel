@@ -16,7 +16,8 @@ namespace TowerOfBabel.World.Tests
     /// Lava lamps hang inside the tower on one pillar, skip three, around every ring, with random lamps outside free
     /// pillars; never two on one pillar or on neighbouring pillars. Each lamp is a buildable detail asset made from iron
     /// ingots: it lights up once fully built (without lamp assets, a lamp shows with its pillar), and every lamp in view
-    /// (up to the budget) lights its wall with one shared caustics cookie.
+    /// (up to the budget) lights its wall with one shared caustics cookie. Lights never switch at full brightness:
+    /// they fade in and out, the lit radius shrinks to the budget, and lamps behind a deck take no light.
     /// </summary>
     public sealed class TowerLavaLampEditModeTests
     {
@@ -347,6 +348,7 @@ namespace TowerOfBabel.World.Tests
         {
             Build(exterior: 1, ringPillars: 40);
             CompletePillars(0);
+            lamps.LightBudget = 24;
             int shown = Enumerable.Range(0, lamps.Placements.Count).Count(lamps.IsShown);
             Assert.That(shown, Is.GreaterThan(lamps.MaxLights / 2));
             cameraObject = new GameObject("Lava lamp view");
@@ -396,6 +398,200 @@ namespace TowerOfBabel.World.Tests
             float full = spot.intensity;
             lamps.UpdateFades(lamp + away * (lamps.LightReach * .95f)); lamps.ApplyDaylight(0);
             Assert.That(spot.intensity, Is.LessThan(full * .25f).And.GreaterThan(0), "Nearly faded just inside the reach.");
+        }
+
+        private Light[] LitSpots() => lamps.Lights.Where(l => l.gameObject.activeInHierarchy && l.type == LightType.Spot).ToArray();
+
+        private float FullIntensity => prefab.GetComponent<AeroProjectionLamp>().projection.intensity;
+
+        // With 24 lights and a hundred lamps in view, the nearest 24 were lit at full strength and the 25th was dark:
+        // every step swapped a light from one lamp to another at full brightness.
+        [Test]
+        public void MoreLampsThanLights_ShrinkTheLitRadius_SoNoLightSwitchesAtFullBrightness()
+        {
+            Build(exterior: 1, ringPillars: 40);
+            CompletePillars(0);
+            lamps.LightBudget = 6;
+            int[] shown = Enumerable.Range(0, lamps.Placements.Count).Where(lamps.IsShown).ToArray();
+            Assert.That(shown.Length, Is.GreaterThan(12));
+            float full = FullIntensity;
+
+            Dictionary<Vector3, float> Lit(Vector3 view)
+            {
+                lamps.SelectLights(view);
+                lamps.ApplyDaylight(0);
+                return LitSpots().ToDictionary(l => l.transform.parent.position, l => l.intensity);
+            }
+
+            var view = new Vector3(RingRadius - 2, 3, 0);
+            var lit = Lit(view);
+            Assert.That(lamps.CandidateCount, Is.EqualTo(shown.Length), "Every built lamp is within reach.");
+            Assert.That(lit.Count, Is.EqualTo(6), "The budget.");
+            float[] distances = shown.Select(i => Vector3.Distance(lamps.Placements[i].Position, view)).OrderBy(d => d).ToArray();
+            Assert.That(lamps.EffectiveReach, Is.EqualTo(distances[6]).Within(.001f), "The lit radius ends at the first lamp left without a light.");
+            Assert.That(lamps.EffectiveReach, Is.LessThan(lamps.LightReach));
+            Assert.That(lit.Values.Max(), Is.EqualTo(full).Within(.001f), "The nearest lamp is fully lit.");
+            foreach (var pair in lit)
+            {
+                float d = Vector3.Distance(pair.Key, view), radius = lamps.EffectiveReach;
+                float expected = full * (1 - Mathf.SmoothStep(0, 1, Mathf.InverseLerp(radius * .75f, radius, d)));
+                Assert.That(pair.Value, Is.EqualTo(expected).Within(.01f), "Lights fade out over the last quarter of the lit radius.");
+            }
+
+            // Walk a quarter of the ring: a lamp only ever gains or loses its light while it is all but dark.
+            int handed = 0;
+            for (float angle = .01f; angle < Mathf.PI * .5f; angle += .01f)
+            {
+                var next = Lit(new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * (RingRadius - 2) + Vector3.up * 3);
+                foreach (var pair in lit)
+                    if (!next.ContainsKey(pair.Key))
+                    {
+                        handed++;
+                        Assert.That(pair.Value, Is.LessThan(full * .1f), $"The lamp at {pair.Key} lost its light while still bright.");
+                    }
+                foreach (var pair in next)
+                    if (!lit.ContainsKey(pair.Key))
+                        Assert.That(pair.Value, Is.LessThan(full * .1f), $"The lamp at {pair.Key} came on bright.");
+                lit = next;
+            }
+            Assert.That(handed, Is.GreaterThan(2), "Lights did move from lamp to lamp along the walk.");
+
+            // With lights to spare the radius is the full reach again.
+            lamps.LightBudget = 64;
+            Lit(view);
+            Assert.That(lamps.EffectiveReach, Is.EqualTo(lamps.LightReach));
+            Assert.That(lamps.ActiveLightCount, Is.EqualTo(shown.Length));
+        }
+
+        [Test]
+        public void InTheGame_LightsFadeInOnALamp_AndFadeOutBeforeTheyMove()
+        {
+            Build();
+            CompletePillars(0);
+            float full = FullIntensity;
+            cameraObject = new GameObject("Lava lamp view");
+            var camera = cameraObject.AddComponent<Camera>();
+            // A square picture, 30 degrees to each side: one lamp of the three around the ring at a time.
+            camera.fieldOfView = 60; camera.aspect = 1; camera.farClipPlane = 400;
+            var eye = new Vector3(0, 3, 0);
+            Vector3 first = lamps.Placements.First(p => p.floor == 0 && p.ringIndex == 0).Position;
+            Vector3 second = lamps.Placements.First(p => p.floor == 0 && p.ringIndex == 4).Position;
+            Light SpotAt(Vector3 lamp) => LitSpots().SingleOrDefault(l => Vector3.Distance(l.transform.parent.position, lamp) < .001f);
+            void Look(Vector3 lamp, bool smooth)
+            {
+                camera.transform.SetPositionAndRotation(eye, Quaternion.LookRotation(new Vector3(lamp.x, 0, lamp.z)));
+                lamps.SelectLights(eye, GeometryUtility.CalculateFrustumPlanes(camera), smooth);
+                lamps.ApplyDaylight(0);
+            }
+            void Wait(float seconds) { lamps.Advance(eye, seconds); lamps.ApplyDaylight(0); }
+
+            // Lights to spare: the lamp coming into view fades in while the one that left fades out.
+            lamps.LightBudget = 4;
+            Look(first, true);
+            Assert.That(LitSpots().Length, Is.EqualTo(1), "Only the lamp ahead is in view.");
+            Assert.That(SpotAt(first).intensity, Is.Zero, "A light arrives dark.");
+            Wait(TowerLavaLamps.FadeSeconds * .5f);
+            Assert.That(SpotAt(first).intensity, Is.EqualTo(full * .5f).Within(full * .02f), "Half way in after half the fade time.");
+            Wait(TowerLavaLamps.FadeSeconds);
+            Assert.That(SpotAt(first).intensity, Is.EqualTo(full).Within(.001f));
+
+            Look(second, true);
+            Assert.That(SpotAt(first).intensity, Is.EqualTo(full).Within(.001f), "The lamp that left the view is not switched off.");
+            Assert.That(SpotAt(second).intensity, Is.Zero);
+            Wait(TowerLavaLamps.FadeSeconds * .5f);
+            Assert.That(SpotAt(first).intensity, Is.EqualTo(full * .5f).Within(full * .02f), "It fades out");
+            Assert.That(SpotAt(second).intensity, Is.EqualTo(full * .5f).Within(full * .02f), "while the new one fades in.");
+            Wait(TowerLavaLamps.FadeSeconds);
+            Assert.That(SpotAt(first), Is.Null, "Faded out, the light is handed back.");
+            Assert.That(SpotAt(second).intensity, Is.EqualTo(full).Within(.001f));
+            Assert.That(lamps.ActiveLightCount, Is.EqualTo(1));
+
+            // Back in view before it is gone: it comes back up from where it was.
+            Look(first, true);
+            Wait(TowerLavaLamps.FadeSeconds * .5f);
+            Look(second, true);
+            Assert.That(SpotAt(second).intensity, Is.EqualTo(full * .5f).Within(full * .02f));
+            Wait(TowerLavaLamps.FadeSeconds);
+            Assert.That(SpotAt(second).intensity, Is.EqualTo(full).Within(.001f));
+            Assert.That(SpotAt(first), Is.Null);
+
+            // One light only: it fades out where it is, then appears dark on the lamp that waits.
+            lamps.LightBudget = 1;
+            Look(second, false);
+            Assert.That(SpotAt(second).intensity, Is.EqualTo(full).Within(.001f), "Outside the game the lights are in place at once.");
+            Look(first, true);
+            Assert.That(SpotAt(second).intensity, Is.EqualTo(full).Within(.001f));
+            Assert.That(SpotAt(first), Is.Null, "The only light is still busy.");
+            Wait(TowerLavaLamps.FadeSeconds * 1.01f);
+            Assert.That(SpotAt(second), Is.Null);
+            Assert.That(SpotAt(first), Is.Not.Null, "The light moved once it was dark.");
+            Assert.That(SpotAt(first).intensity, Is.Zero);
+            Wait(TowerLavaLamps.FadeSeconds);
+            Assert.That(SpotAt(first).intensity, Is.EqualTo(full).Within(.001f));
+        }
+
+        [Test]
+        public void LampsBehindADeck_TakeNoLight()
+        {
+            Build();
+            CompletePillars(0); CompletePillars(1);
+            var view = new Vector3(0, 1.5f, 0);
+            lamps.SelectLights(view);
+            Assert.That(lamps.ActiveLightCount, Is.EqualTo(6), "Three lamps on each of the two floors are within reach.");
+
+            // A solid deck under the upper floor: an 80 m slab around the ring.
+            var decks = new FarOccluderSet();
+            decks.Configure(false, Vector2.zero);
+            decks.SetChunk(new ChunkKey(1, 0, 0), new List<ChunkAssetData>
+            {
+                new(0, TowerAssetType.Floor, new Vector3(-40, 6, 40), Quaternion.identity, new Vector3(20, 1, 20), ChunkAssetData.CompletedStage)
+            }, 1, 0, false);
+            decks.Update(0);
+            Assert.That(decks.SolidTexelCount, Is.GreaterThan(10000));
+            lamps.SelectLights(view, null, false, decks);
+            Assert.That(lamps.ActiveLightCount, Is.EqualTo(3), "The lamps above the deck cannot be seen from under it.");
+            Assert.That(lamps.CandidateCount, Is.EqualTo(3));
+            Assert.That(LitSpots().All(l => l.transform.parent.position.y < 6), "The lit lamps are the ones on the player's floor.");
+
+            // From the upper floor it is the other way round, except that a ground lamp's light reaches up to the deck.
+            lamps.SelectLights(new Vector3(0, 7.5f, 0), null, false, decks);
+            Assert.That(LitSpots().Count(l => l.transform.parent.position.y > 6), Is.EqualTo(3), "The player's own floor is lit.");
+        }
+
+        [Test]
+        public void FarLamps_KeepTheirSpotlight_WithoutTheGlowOrShadows()
+        {
+            Build();
+            CompletePillars(0);
+            float shadowDistance = new SerializedObject(lamps).FindProperty("shadowDistance").floatValue;
+            Assert.That(shadowDistance, Is.LessThan(TowerLavaLamps.GlowReach));
+            Vector3 lamp = lamps.Placements.First(p => p.floor == 0 && p.ringIndex == 0).Position;
+            var away = new Vector3(lamp.x, 0, lamp.z).normalized;
+            Light Spot() => LitSpots().Single(l => Vector3.Distance(l.transform.parent.position, lamp) < .001f);
+            Light Glow() => Spot().transform.parent.GetComponentsInChildren<Light>(true).Single(l => l.type == LightType.Point);
+            void From(float distance) { lamps.SelectLights(lamp + away * distance); lamps.ApplyDaylight(0); }
+
+            From(3);
+            float strength = Spot().shadowStrength;
+            Assert.That(Glow().enabled && Glow().intensity > 0, "Close by, the glow under the lamp is lit.");
+            Assert.That(Spot().shadows, Is.Not.EqualTo(LightShadows.None), "The nearest lamp casts shadows.");
+            Assert.That(LitSpots().Count(l => l.shadows != LightShadows.None), Is.EqualTo(1));
+
+            From(shadowDistance * .9f);
+            Assert.That(Spot().shadows, Is.Not.EqualTo(LightShadows.None));
+            Assert.That(Spot().shadowStrength, Is.LessThan(strength * .5f).And.GreaterThan(0), "Its shadows fade out with distance instead of switching off.");
+
+            From(shadowDistance * 1.2f);
+            Assert.That(Spot().shadows, Is.EqualTo(LightShadows.None));
+            Assert.That(Glow().enabled && Glow().intensity > 0);
+
+            From(TowerLavaLamps.GlowReach * 1.5f);
+            Assert.That(Spot().intensity, Is.EqualTo(FullIntensity).Within(.001f), "The spotlight is what shows from afar.");
+            Assert.That(Glow().enabled, Is.False, "The small glow would only spend a light.");
+
+            From(3);
+            Assert.That(Glow().enabled && Glow().intensity > 0, "It comes back when the player does.");
+            Assert.That(Spot().shadowStrength, Is.EqualTo(strength).Within(.001f));
         }
 
         [Test]
@@ -456,6 +652,8 @@ namespace TowerOfBabel.World.Tests
                 var center = tower.Chunks.FloorCenter;
                 Assert.That(tower.ExteriorChance, Is.GreaterThan(0));
                 Assert.That(tower.MaxLights, Is.GreaterThan(AeroProjectionLamp.MaximumActiveLamps));
+                // A hundred to three hundred lamps are in view around the tower: a couple of dozen lights lit only a patch.
+                Assert.That(tower.MaxLights, Is.GreaterThanOrEqualTo(64).And.LessThanOrEqualTo(TowerLavaLamps.MaximumLights));
                 Assert.That(tower.Placements.Count(p => p.exterior), Is.GreaterThan(pillars / 40), "Lamps scattered outside free pillars.");
                 var ringSize = tower.Chunks.CachedChunks.GroupBy(c => c.Key.FloorIndex)
                     .ToDictionary(g => g.Key, g => g.Sum(c => c.Assets.Count(a => a.AssetType == TowerAssetType.Pillar)));

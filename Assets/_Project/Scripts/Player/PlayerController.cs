@@ -3,6 +3,7 @@ using TowerOfBabel;
 using TowerOfBabel.Resources.Interaction;
 using TowerOfBabel.Cheats;
 using TowerOfBabel.Networking.Upgrades;
+using TowerOfBabel.Settings;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour, IPlayerControlLock
@@ -113,7 +114,8 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         AlignForwardWithCamera();
         UpdatePlayerVisuals();
 
-        if (Input.GetKeyDown(KeyCode.Escape) && !TowerOfBabel.Cheats.CheatMenuUI.ConsumedEscapeThisFrame)
+        // Escape opens the settings; the mouse cursor has its own remappable key (the key left of 1 by default).
+        if (GameInput.ToggleCursorPressed)
             ToggleCursorLock();
     }
 
@@ -163,8 +165,9 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
 
     private void HandleMovement()
     {
-        float inputX = Input.GetAxisRaw("Horizontal");
-        float inputZ = Input.GetAxisRaw("Vertical");
+        Vector2 move = GameInput.Move;
+        float inputX = move.x;
+        float inputZ = move.y;
 
         // Use playerCamera instead of Camera.main for consistency
         Transform camTransform = playerCamera != null ? playerCamera.transform : Camera.main.transform;
@@ -178,7 +181,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
         isSprinting = false;
         if (isCrouching)
             targetSpeed = crouchSpeed * Stat(CheatStat.CrouchSpeed);
-        else if (Input.GetKey(KeyCode.LeftShift) && inputZ > 0f)
+        else if (GameInput.SprintHeld && inputZ > 0f)
         {
             targetSpeed = sprintSpeed * Stat(CheatStat.SprintSpeed);
             isSprinting = true;
@@ -206,7 +209,7 @@ public class PlayerController : MonoBehaviour, IPlayerControlLock
             coyoteTimeCounter -= Time.deltaTime;
 
         // Buffer jump input
-        if (Input.GetButtonDown("Jump"))
+        if (GameInput.JumpPressed)
             jumpBufferCounter = jumpBufferTime;
         else
             jumpBufferCounter -= Time.deltaTime;

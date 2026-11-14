@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 
 namespace TowerOfBabel.Interface
 {
@@ -10,7 +9,7 @@ namespace TowerOfBabel.Interface
         [SerializeField] private UnityEvent close = new();
         private void Update()
         {
-            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            if (TowerOfBabel.Settings.GameInput.SettingsPressed)
                 close.Invoke();
         }
         public void Close() => close.Invoke();

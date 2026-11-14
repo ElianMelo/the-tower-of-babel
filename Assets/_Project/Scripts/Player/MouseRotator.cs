@@ -27,7 +27,9 @@ public class MouseRotator : MonoBehaviour, IPlayerControlLock
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void FixedUpdate()
+    // Once per rendered frame: a mouse delta read in FixedUpdate is dropped on frames without a physics step and
+    // applied twice on frames with two, so the look speed changed with the frame rate.
+    private void Update()
     {
         if (controlsLocked)
             return;
@@ -38,10 +40,12 @@ public class MouseRotator : MonoBehaviour, IPlayerControlLock
         //{
         //    Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
         //}
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
+        var settings = TowerOfBabel.Settings.GameSettings.Current;
+        float mouseX = Input.GetAxis("Mouse X") * (settings.invertX ? -1f : 1f);
+        float mouseY = Input.GetAxis("Mouse Y") * (settings.invertY ? -1f : 1f);
         float sensitivity = TowerOfBabel.Networking.Upgrades.NetworkUpgradeService.Instance != null
             ? TowerOfBabel.Networking.Upgrades.NetworkUpgradeService.Instance.GetLocalCheatStat(TowerOfBabel.Cheats.CheatStat.MouseSensitivity) : 1;
+        sensitivity *= settings.lookSensitivity;
         _look = new Vector2(mouseX, mouseY * -1) * sensitivity;
         #region Player Based Rotation
 

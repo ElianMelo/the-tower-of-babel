@@ -36,7 +36,7 @@ namespace TowerOfBabel.Interface
         }
         private void Update()
         {
-            if (IsExpanded && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) Close();
+            if (IsExpanded && TowerOfBabel.Settings.GameInput.SettingsPressed) Close();
             visibility = Mathf.MoveTowards(visibility, IsExpanded ? 1 : 0, Time.unscaledDeltaTime / Mathf.Max(.01f, transitionDuration));
             ApplyVisibility(visibility);
         }
@@ -46,6 +46,7 @@ namespace TowerOfBabel.Interface
             if (IsExpanded) { Close(); return; }
             var manager = InterfaceManager.Instance;
             TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
+            TowerOfBabel.Settings.SettingsMenuUI.Instance?.Hide();
             manager?.HideInventory(); manager?.HideUpgrade(); manager?.HideEmotes();
             previousCursor = CursorStateConfig.Current;
             CursorStateConfig.UnlockedVisible.Apply();

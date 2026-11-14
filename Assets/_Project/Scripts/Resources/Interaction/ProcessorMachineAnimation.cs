@@ -226,7 +226,7 @@ namespace TowerOfBabel.Resources.Interaction
             StopWork();
             confirmed = true; progress = 1; celebration = OutputDuration; CompletionCount++;
             foreach (var effect in completionEffects) if (effect != null) { effect.Play(); effect.Emit(18); }
-            if (accents != null && completionClip != null && Application.isPlaying) accents.PlayOneShot(completionClip, .45f);
+            if (accents != null && completionClip != null && Application.isPlaying) accents.PlayOneShot(completionClip, .45f * TowerOfBabel.Rendering.AeroAudio.Vfx);
             ApplyPose();
         }
 
@@ -356,7 +356,7 @@ namespace TowerOfBabel.Resources.Interaction
             }
             if (loop != null)
             {
-                loop.volume = .13f * blend; loop.pitch = .72f + charge * .45f;
+                loop.volume = .13f * blend * TowerOfBabel.Rendering.AeroAudio.Vfx; loop.pitch = .72f + charge * .45f;
                 if (!working && blend <= 0) loop.Stop();
             }
         }
@@ -387,7 +387,7 @@ namespace TowerOfBabel.Resources.Interaction
             if (accents != null && strikeClip != null && Application.isPlaying)
             {
                 accents.pitch = UnityEngine.Random.Range(.92f, 1.08f);
-                accents.PlayOneShot(strikeClip, .3f);
+                accents.PlayOneShot(strikeClip, .3f * TowerOfBabel.Rendering.AeroAudio.Vfx);
             }
         }
 

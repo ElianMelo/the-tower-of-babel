@@ -104,7 +104,8 @@ namespace TowerOfBabel.World.Tests
                     far.CollectRiverGlass(view,null,transparentDraws);
                     Assert.That(transparentDraws.Sum(d=>d.count),Is.EqualTo(1024),"Transparent panels must submit every instance even over a black background.");
                 }
-                Assert.That(far.VisiblePageCount,Is.EqualTo(3),"1024 non-uniform transforms require three safe draw pages.");
+                // The page fallback needs three safe 511-instance pages; the GPU-culled path draws the piece in one command.
+                Assert.That(far.VisiblePageCount,Is.EqualTo(far.IsGpuCulled?1:3),"1024 non-uniform transforms require three safe draw pages.");
             }
             finally
             {

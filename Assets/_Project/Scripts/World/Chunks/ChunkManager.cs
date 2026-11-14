@@ -98,6 +98,8 @@ namespace TowerOfBabel.World.Chunks
         private bool hasCurrentChunk;
         private bool visibilityInitialized;
         private IFarChunkRenderer farChunkRenderer;
+        // The far renderer culls against the solid decks of every visible floor, near chunks included.
+        private IFarOccluderSink occluderSink;
 
         public float ChunkSizeMeters => chunkSizeMeters;
         public float FloorHeight => floorHeight;
@@ -243,6 +245,7 @@ namespace TowerOfBabel.World.Chunks
 
             RebuildChunkLookup();
             visibilityInitialized = false;
+            occluderSink?.ClearOccluders();
             if (Application.isPlaying && hasCurrentChunk)
                 ApplyTowerVisibility(currentChunk, true);
 
@@ -306,6 +309,7 @@ namespace TowerOfBabel.World.Chunks
                 cachedChunks.Add(new ChunkSceneCache(key, list));
             }
             RebuildChunkLookup(); visibilityInitialized = false;
+            occluderSink?.ClearOccluders();
             UnityEditor.EditorUtility.SetDirty(this);
             UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(gameObject.scene);
         }
@@ -347,6 +351,7 @@ namespace TowerOfBabel.World.Chunks
                 SetFarChunkVisible(chunk, false);
                 SetFarChunkVisible(chunk, true);
             }
+            FeedOccluders(chunk);
             if (releaseChanged) ApplyDetailRelease(key.FloorIndex);
             AssetStageChanged?.Invoke(key, localIndex, appliedStage);
             return true;
@@ -435,6 +440,7 @@ namespace TowerOfBabel.World.Chunks
                     for (int i = 0; i < chunk.Assets.Count; i++) nearAssetPool?.ApplyAssetStage(chunk, i, false);
                 }
                 else { SetFarChunkVisible(chunk, false); SetFarChunkVisible(chunk, true); }
+                FeedOccluders(chunk);
             }
             foreach (var pair in releasedBefore)
                 if (pair.Value != IsStructureComplete(pair.Key)) ApplyDetailRelease(pair.Key);
@@ -662,6 +668,7 @@ namespace TowerOfBabel.World.Chunks
                     ChunkSceneCache chunk = cachedChunks[i];
                     bool isNear = desiredChunks.Contains(chunk.Key);
                     SetFarChunkVisible(chunk, !isNear);
+                    FeedOccluders(chunk);
                 }
             }
             else
@@ -781,6 +788,22 @@ namespace TowerOfBabel.World.Chunks
                     return;
                 }
             }
+        }
+
+        /// <summary>
+        /// The solid deck maps the far renderer culls with, while it keeps them current (GPU culling with deck
+        /// occlusion on); null otherwise.
+        /// </summary>
+        public FarOccluderSet FarOccluders =>
+            InstancedFarChunkRenderer.OcclusionCulling && farChunkRenderer is InstancedFarChunkRenderer far && far != null && far.IsGpuCulled
+                ? far.Occluders : null;
+
+        // Solid decks hide what lies behind them. Hidden floors occlude nothing; the sink ignores unchanged chunks.
+        private void FeedOccluders(ChunkSceneCache chunk)
+        {
+            occluderSink ??= farChunkRenderer as IFarOccluderSink;
+            if (occluderSink == null || chunk == null) return;
+            occluderSink.SetOccluderChunk(chunk.Key, IsFloorVisible(chunk.Key.FloorIndex) ? chunk.Assets : null, chunk.Version);
         }
 
         private void ResolveNearAssetPool()

@@ -29,6 +29,13 @@ namespace TowerOfBabel.Rendering
         public Vector2 center;
         public MaterialPropertyBlock properties;
         public Bounds bounds;
+        /// <summary>
+        /// Set by the far tower's GPU-culled path: the draw's instances come from its visible list, and this buffer
+        /// holds the indirect command at <see cref="indirectOffset"/> bytes. <see cref="matrices"/> is then unused and
+        /// <see cref="count"/> is only the most the draw can hold.
+        /// </summary>
+        public GraphicsBuffer indirectArguments;
+        public int indirectOffset;
 
         public void Configure()
         {
@@ -67,6 +74,16 @@ namespace TowerOfBabel.Rendering
                     bounds.center.y < light.transform.position.y - BelowLightMargin &&
                     bounds.SqrDistance(light.transform.position) < light.range * light.range) return true;
             return false;
+        }
+        /// <summary>True while any projection light can cast shadows (the far decks then check which of them must).</summary>
+        public static bool HasProjectionShadowLights
+        {
+            get
+            {
+                foreach (var light in projectionLights)
+                    if (light != null && light.isActiveAndEnabled && light.shadows != UnityEngine.LightShadows.None) return true;
+                return false;
+            }
         }
         public static void Register(IRiverGlassNearSource source) => near.Add(source);
         public static void Unregister(IRiverGlassNearSource source) => near.Remove(source);

@@ -36,7 +36,8 @@ namespace TowerOfBabel.Rendering
         }
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData data)
         {
-            if (material != null && settings.intensity > 0 && AeroLightRendererFeature.SupportsCamera(data.cameraData.camera) &&
+            if (material != null && settings.intensity > 0 && AeroRenderQuality.SunShafts > AeroRenderQuality.Off &&
+                AeroLightRendererFeature.SupportsCamera(data.cameraData.camera) &&
                 data.cameraData.renderType == CameraRenderType.Base) renderer.EnqueuePass(pass);
         }
         protected override void Dispose(bool disposing) { CoreUtils.Destroy(material); material = null; }

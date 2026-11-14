@@ -67,8 +67,14 @@ public class InterfaceManager : MonoBehaviour
         else ShowInventory();
     }
 
+    /// <summary>True while the inventory, the upgrade board or the emote wheel is open.</summary>
+    public bool IsAnyWindowOpen =>
+        (inventoryUI != null && inventoryUI.IsVisible) || (upgradeUI != null && upgradeUI.IsVisible) ||
+        (animationEmoteUI != null && animationEmoteUI.IsVisible);
+
     public void ShowInventory()
     {
+        TowerOfBabel.Settings.SettingsMenuUI.Instance?.Hide();
         TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
         menuLauncher?.Close();
         upgradeUI?.Hide();
@@ -89,6 +95,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ShowUpgrade()
     {
+        TowerOfBabel.Settings.SettingsMenuUI.Instance?.Hide();
         TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
         menuLauncher?.Close();
         inventoryUI?.Hide();
@@ -103,6 +110,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void ToggleEmotes()
     {
+        TowerOfBabel.Settings.SettingsMenuUI.Instance?.Hide();
         TowerOfBabel.Cheats.CheatMenuUI.Instance?.Hide();
         menuLauncher?.Close();
         if (animationEmoteUI == null) return;

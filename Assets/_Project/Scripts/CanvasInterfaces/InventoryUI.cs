@@ -36,6 +36,8 @@ namespace TowerOfBabel
             if (wallet != null)
                 wallet.ResourceAmountChanged += HandleResourceAmountChanged;
 
+            // The project's input asset carries every remappable key; the settings apply the player's keys to it.
+            if (inputActions != null) TowerOfBabel.Settings.GameInput.Use(inputActions);
             toggleAction = inputActions?.FindAction(toggleActionName, false);
             if (toggleAction != null)
             {

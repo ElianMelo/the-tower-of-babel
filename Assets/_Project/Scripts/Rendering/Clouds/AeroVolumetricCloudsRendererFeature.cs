@@ -111,7 +111,7 @@ namespace TowerOfBabel.Rendering
             p.SetVector(Ids.AmbientTop, (Vector4)clouds.AmbientTop);
             p.SetVector(Ids.AmbientBottom, (Vector4)clouds.AmbientBottom);
             p.SetVector(Ids.FogColor, (Vector4)clouds.FogColor);
-            p.SetVector(Ids.March, new Vector4(quality.primarySteps, quality.lightSteps, Time.frameCount % JitterCycle, quality.maxStep));
+            p.SetVector(Ids.March, new Vector4(quality.PrimarySteps, quality.LightSteps, Time.frameCount % JitterCycle, quality.maxStep));
             p.SetVector(Ids.Tone, new Vector4(sunExposure, skyExposure, 0, 0));
         }
 

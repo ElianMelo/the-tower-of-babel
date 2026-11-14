@@ -16,6 +16,11 @@ namespace TowerOfBabel.Rendering.Tests
     public sealed class FarResidentInstancingEditModeTests
     {
         const BindingFlags Private = BindingFlags.Instance | BindingFlags.NonPublic;
+        private bool gpuCulling;
+
+        // These tests cover the page paths, now the fallback of the GPU-culled path (FarGpuCullingEditModeTests).
+        [SetUp] public void UsePagePaths() { gpuCulling = InstancedFarChunkRenderer.GpuCulling; InstancedFarChunkRenderer.GpuCulling = false; }
+        [TearDown] public void RestoreCulling() => InstancedFarChunkRenderer.GpuCulling = gpuCulling;
 
         [TestCase(TowerAssetType.Pillar, "Pillar")]
         [TestCase(TowerAssetType.Arch, "Arch")]

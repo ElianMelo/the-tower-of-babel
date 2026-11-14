@@ -107,7 +107,7 @@ namespace TowerOfBabel.Rendering
             shelterVolume = Mathf.MoveTowards(shelterVolume, sheltered ? profile.shelteredVolume : profile.outsideVolume, dt * .8f);
             if (audioSource != null)
             {
-                audioSource.volume = shelterVolume * Amount;
+                audioSource.volume = shelterVolume * Amount * AeroAudio.Vfx;
                 if (Amount > 0 && !audioSource.isPlaying && Application.isPlaying) audioSource.Play();
                 else if (Amount <= 0 && audioSource.isPlaying) audioSource.Stop();
             }

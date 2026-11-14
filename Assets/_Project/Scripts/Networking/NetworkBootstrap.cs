@@ -1,6 +1,5 @@
 using FishNet.Managing;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace TowerOfBabel.Networking
 {
@@ -22,12 +21,10 @@ namespace TowerOfBabel.Networking
 
         private void Update()
         {
-            if (Keyboard.current == null)
-                return;
-
-            if (Keyboard.current.f1Key.wasPressedThisFrame)
+            // Remappable keys (F1 and F2 by default).
+            if (TowerOfBabel.Settings.GameInput.StartHostPressed)
                 StartHost();
-            else if (Keyboard.current.f2Key.wasPressedThisFrame)
+            else if (TowerOfBabel.Settings.GameInput.JoinGamePressed)
                 StartLocalClient();
         }
 

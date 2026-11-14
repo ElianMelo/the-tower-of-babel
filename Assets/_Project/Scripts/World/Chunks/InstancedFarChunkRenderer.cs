@@ -20,14 +20,17 @@ namespace TowerOfBabel.World.Chunks
     }
 
     /// <summary>
-    /// Renders every construction stage in spatially-cullable instance pages.
-    /// Pages are rebuilt only when their member chunks change. Each cell's transforms live in GPU buffers, uploaded
-    /// only when the cell rebuilds, and pages draw with Graphics.RenderMeshIndirect (procedural:AeroFarSetup in the
-    /// tower shaders): nothing per instance is copied per frame. With the whole tower in view, re-uploading ~64k
-    /// instances every frame through RenderMeshInstanced cost ~20 ms of CPU (performance pass 2026-11-03).
+    /// Renders every construction stage of the far tower from GPU-resident instance transforms.
+    /// Default path (InstancedFarChunkRenderer.Culling.cs): every far instance lives in one set of GPU buffers,
+    /// uploaded only when a chunk changes. Each camera render, a compute pass culls every instance by frustum, draw
+    /// distance and deck occlusion, picks its mesh level, and each mesh level of each piece draws with one indirect
+    /// command (procedural:AeroFarSetup in the tower shaders). Nothing per instance is copied or tested on the CPU.
+    /// Fallback path (this file): spatially-cullable 511-instance pages, drawn as resident runs or re-sent with
+    /// RenderMeshInstanced; used without compute support, with baked light probes, and for shaders without the
+    /// procedural variant.
     /// </summary>
     [DisallowMultipleComponent]
-    public sealed class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer, IRiverGlassDrawSource, IAeroReflectionDrawSource
+    public sealed partial class InstancedFarChunkRenderer : MonoBehaviour, IFarChunkRenderer, IRiverGlassDrawSource, IAeroReflectionDrawSource, IFarOccluderSink
     {
         // Both object-to-world and world-to-object are required by our non-uniform
         // radial transforms. Unity's default instancing layout fits 511, not 1023.
@@ -68,6 +71,8 @@ namespace TowerOfBabel.World.Chunks
         private readonly Dictionary<RenderBatchKey, TypeBatch> batches = new();
         private readonly HashSet<ChunkKey> loadedChunks = new();
         private readonly Dictionary<ChunkKey, PreparedChunk> preparedChunks = new();
+        // The batches each loaded chunk currently has instances in.
+        private readonly Dictionary<ChunkKey, List<RenderBatchKey>> routedBatches = new();
         private readonly Plane[] frustumPlanes = new Plane[6];
         private bool isVisible = true;
 
@@ -108,7 +113,9 @@ namespace TowerOfBabel.World.Chunks
             lod1Distance = lod1; lod2Distance = lod2;
             foreach (var pair in batches)
                 if (pair.Key.Stage == ChunkAssetData.CompletedStage && (int)pair.Key.AssetType * 2 + 1 < meshLods.Length)
-                    pair.Value.SetLods(meshLods[LodSlot(pair.Key.AssetType, 1)], meshLods[LodSlot(pair.Key.AssetType, 2)], lod1Distance, lod2Distance);
+                    pair.Value.SetLods(meshLods[LodSlot(pair.Key.AssetType, 1)], meshLods[LodSlot(pair.Key.AssetType, 2)],
+                        lod1Distance * lodDistanceScale, lod2Distance * lodDistanceScale);
+            culled?.MarkLayoutDirty();
         }
         public static bool GpuResidentSupported => SystemInfo.supportsComputeShaders && SystemInfo.supportsIndirectArgumentsBuffer;
         /// <summary>Pages drawn through the resident indirect path in the last frame.</summary>
@@ -166,7 +173,7 @@ namespace TowerOfBabel.World.Chunks
         {
             get
             {
-                int count = 0;
+                int count = culled != null ? culled.InstanceCount : 0;
                 foreach (TypeBatch batch in batches.Values)
                     count += batch.Count;
                 return count;
@@ -192,6 +199,7 @@ namespace TowerOfBabel.World.Chunks
 
             using (RenderMarker.Auto())
             {
+                EnsureMode();
                 ResolveCamera();
                 bool canCull = enableFrustumCulling && renderCamera != null;
                 if (canCull)
@@ -214,6 +222,7 @@ namespace TowerOfBabel.World.Chunks
                 RebuildDirtyCells(cameraPosition);
                 foreach (TypeBatch batch in batches.Values)
                 {
+                    if (BatchCulled(batch)) continue;
                     BatchRenderStats stats = batch.Render(
                         gameObject.layer,
                         renderCamera,
@@ -227,6 +236,8 @@ namespace TowerOfBabel.World.Chunks
                     ResidentDrawCount += stats.ResidentDraws;
                     LodPageCount += stats.LodPages;
                 }
+                if (culledMode)
+                    SubmitCulled(canCull ? frustumPlanes : null, cameraPosition, maximumDistanceSquared, detailDistanceSquared);
             }
         }
 
@@ -262,6 +273,7 @@ namespace TowerOfBabel.World.Chunks
             RiverGlassRenderRegistry.Register(this);
             AeroBuildingReflectionRegistry.Register(this);
             EnsureModelBatches();
+            EnsureMode();
             // Reloading replaces the chunk inside its cell rather than removing it first: a cell that would empty and
             // be recreated would draw nothing until its budgeted rebuild.
             loadedChunks.Add(snapshot.Key);
@@ -273,13 +285,37 @@ namespace TowerOfBabel.World.Chunks
                 preparedChunks[snapshot.Key] = prepared;
             }
 
-            foreach (KeyValuePair<RenderBatchKey, TypeBatch> pair in batches)
+            RouteChunk(snapshot.Key, prepared);
+        }
+
+        // Hands one prepared chunk to each batch's active path (GPU-culled store or legacy cells). Only the batches the
+        // chunk holds, or held before, are visited: there is one batch per piece and stage (about two hundred), and a
+        // chunk uses a handful.
+        private void RouteChunk(ChunkKey key, PreparedChunk prepared)
+        {
+            if (routedBatches.TryGetValue(key, out List<RenderBatchKey> previous))
             {
-                if (prepared.MatricesByModel.TryGetValue(pair.Key, out List<Matrix4x4> matrices) &&
-                    matrices.Count > 0)
-                    pair.Value.SetChunk(snapshot.Key, pair.Key.IsRiver ? RenderCellKey.From(snapshot.Key, 1, cellHorizontalSpan) : prepared.CellKey, matrices);
-                else
-                    pair.Value.RemoveChunk(snapshot.Key);
+                for (int i = 0; i < previous.Count; i++)
+                {
+                    RenderBatchKey batchKey = previous[i];
+                    if (prepared.MatricesByModel.TryGetValue(batchKey, out List<Matrix4x4> kept) && kept.Count > 0) continue;
+                    if (!batches.TryGetValue(batchKey, out TypeBatch emptied)) continue;
+                    emptied.RemoveChunk(key);
+                    culled?.RemoveChunk(emptied, key);
+                }
+                previous.Clear();
+            }
+            else
+            {
+                previous = new List<RenderBatchKey>(prepared.MatricesByModel.Count);
+                routedBatches.Add(key, previous);
+            }
+            foreach (KeyValuePair<RenderBatchKey, List<Matrix4x4>> pair in prepared.MatricesByModel)
+            {
+                if (pair.Value.Count == 0 || !batches.TryGetValue(pair.Key, out TypeBatch batch)) continue;
+                previous.Add(pair.Key);
+                if (BatchCulled(batch)) culled.SetChunk(batch, key, pair.Value);
+                else batch.SetChunk(key, pair.Key.IsRiver ? RenderCellKey.From(key, 1, cellHorizontalSpan) : prepared.CellKey, pair.Value);
             }
         }
 
@@ -319,8 +355,13 @@ namespace TowerOfBabel.World.Chunks
             if (!loadedChunks.Remove(key))
                 return;
 
-            foreach (TypeBatch batch in batches.Values)
+            if (!routedBatches.Remove(key, out List<RenderBatchKey> routed)) return;
+            for (int i = 0; i < routed.Count; i++)
+            {
+                if (!batches.TryGetValue(routed[i], out TypeBatch batch)) continue;
                 batch.RemoveChunk(key);
+                culled?.RemoveChunk(batch, key);
+            }
         }
 
         public void SetVisible(bool visible)
@@ -405,21 +446,24 @@ namespace TowerOfBabel.World.Chunks
                 Mesh mesh = building != null ? building.GetStageMesh(stage) : meshFilter.sharedMesh;
                 if (mesh == null) continue;
                 var batch = new TypeBatch(mesh, meshRenderer, assetType.IsDetail(), assetType.IsFloor() ? chunkManager : null,
-                    assetType == TowerAssetType.GlassWaterFloor, stage);
+                    assetType == TowerAssetType.GlassWaterFloor, stage, FarLitShader);
                 // Simplified meshes match the finished piece; part-built stages keep their own mesh.
                 if (stage == ChunkAssetData.CompletedStage && (int)assetType * 2 + 1 < (meshLods?.Length ?? 0))
-                    batch.SetLods(meshLods[LodSlot(assetType, 1)], meshLods[LodSlot(assetType, 2)], lod1Distance, lod2Distance);
+                    batch.SetLods(meshLods[LodSlot(assetType, 1)], meshLods[LodSlot(assetType, 2)],
+                        lod1Distance * lodDistanceScale, lod2Distance * lodDistanceScale);
                 batches.Add(key, batch);
             }
         }
 
         private void DisposeBatches()
         {
+            DisposeCulling();
             foreach (TypeBatch batch in batches.Values)
                 batch.Dispose();
             batches.Clear();
             loadedChunks.Clear();
             preparedChunks.Clear();
+            routedBatches.Clear();
         }
 
         private void OnDisable()
@@ -441,7 +485,13 @@ namespace TowerOfBabel.World.Chunks
             if (!isVisible || (camera.scene.IsValid() && camera.scene != gameObject.scene) ||
                 (camera.cullingMask & (1 << gameObject.layer)) == 0) return;
             foreach (var pair in batches)
-                if (pair.Key.IsCompletedRiver) pair.Value.CollectRiverGlass(camera, planes, draws, maximumDrawDistance);
+            {
+                if (!pair.Key.IsCompletedRiver) continue;
+                if (!BatchCulled(pair.Value)) pair.Value.CollectRiverGlass(camera, planes, draws, maximumDrawDistance);
+                // The culled lists hold the render camera's visible tiles; no other camera may draw from them.
+                else if (renderCamera == null || camera == renderCamera)
+                    culled.CollectRiverGlass(pair.Value, camera, planes, draws, maximumDrawDistance);
+            }
         }
 
         public int SubmitReflection(Camera camera, Camera owner, Plane[] planes, int floor, float range)
@@ -454,7 +504,9 @@ namespace TowerOfBabel.World.Chunks
             // Near chunks are ordinary renderers and never enter these far cells.
             foreach (var batch in batches.Values)
             {
-                count += batch.SubmitReflection(camera, owner.transform.position, planes, floor, range, gameObject.layer);
+                count += BatchCulled(batch)
+                    ? culled.SubmitReflection(batch, camera, owner.transform.position, planes, floor, range, gameObject.layer)
+                    : batch.SubmitReflection(camera, owner.transform.position, planes, floor, range, gameObject.layer);
                 ReflectionDrawCallCount += batch.LastReflectionDrawCalls;
             }
             return count;
@@ -590,7 +642,52 @@ namespace TowerOfBabel.World.Chunks
             private MaterialPropertyBlock reflectionProperties;
 
             public int Count { get; private set; }
-            public int LastReflectionDrawCalls { get; private set; }
+            public int LastReflectionDrawCalls { get; set; }
+            public Mesh Mesh => mesh;
+            public Material Material => material;
+            public Bounds MeshBounds => meshBounds;
+            public bool IsRiver => river;
+            public bool IsFloor => floor;
+            public byte Stage { get; }
+            public Vector2 FloorCenter => floorCenter;
+            public float FloorHeight => floorHeight;
+            public float Radial => radial;
+            /// <summary>Full mesh, LOD1, LOD2 (null when absent).</summary>
+            public Mesh[] Levels { get { levels[0] = mesh; return levels; } }
+            public float Lod1Sq => lod1Sq;
+            public float Lod2Sq => lod2Sq;
+            /// <summary>The shader has the procedural variant the GPU-resident and GPU-culled paths need.</summary>
+            public bool ResidentCapable => residentCapable;
+            /// <summary>
+            /// The material blends (glass steps): overlapping instances show their draw order, so the GPU-culled
+            /// path must draw them in the same order every frame.
+            /// </summary>
+            public bool Ordered => material.renderQueue > (int)RenderQueue.GeometryLast;
+            public Matrix4x4[] ReflectionMatrices => reflectionMatrices;
+            public float[] ReflectionFloors => reflectionFloors;
+
+            /// <summary>Draws one batch of reflected instances (shared by the page and the GPU-culled paths).</summary>
+            public void FlushReflection(Camera camera, int layer, int instances, Bounds worldBounds)
+            {
+                LastReflectionDrawCalls++;
+                reflectionProperties ??= new MaterialPropertyBlock();
+                if (river) reflectionProperties.SetFloatArray("_RiverFloorIndex", reflectionFloors);
+                var parameters = new RenderParams(material)
+                {
+                    camera = camera, layer = layer, worldBounds = worldBounds, matProps = reflectionProperties,
+                    shadowCastingMode = ShadowCastingMode.Off, receiveShadows = false,
+                    reflectionProbeUsage = ReflectionProbeUsage.Off, lightProbeUsage = LightProbeUsage.Off,
+                    motionVectorMode = MotionVectorGenerationMode.ForceNoMotion
+                };
+                Graphics.RenderMeshInstanced(parameters, mesh, 0, reflectionMatrices, instances);
+            }
+
+            /// <summary>Drops every chunk (the batch moves to the other path).</summary>
+            public void ClearChunks()
+            {
+                foreach (var cell in cells.Values) cell.ReleaseGpu();
+                cells.Clear(); cellByChunk.Clear(); Count = 0;
+            }
 
             public int SubmitReflection(Camera camera, Vector3 eye, Plane[] planes, int selectedFloor,
                 float range, int layer)
@@ -613,32 +710,18 @@ namespace TowerOfBabel.World.Chunks
                             if (b.SqrDistance(eye) > range * range || !GeometryUtility.TestPlanesAABB(planes, b)) continue;
                             if (count == 0) bounds = b; else bounds.Encapsulate(b);
                             reflectionMatrices[count] = cell.Matrices[i]; reflectionFloors[count++] = floorIndex;
-                            if (count == MaximumInstancesPerDraw) { Flush(count, bounds); total += count; count = 0; }
+                            if (count == MaximumInstancesPerDraw) { FlushReflection(camera, layer, count, bounds); total += count; count = 0; }
                         }
                     }
                 }
-                if (count > 0) { Flush(count, bounds); total += count; }
+                if (count > 0) { FlushReflection(camera, layer, count, bounds); total += count; }
                 return total;
-
-                void Flush(int instances, Bounds worldBounds)
-                {
-                    LastReflectionDrawCalls++;
-                    reflectionProperties ??= new MaterialPropertyBlock();
-                    if (river) reflectionProperties.SetFloatArray("_RiverFloorIndex", reflectionFloors);
-                    var parameters = new RenderParams(material)
-                    {
-                        camera = camera, layer = layer, worldBounds = worldBounds, matProps = reflectionProperties,
-                        shadowCastingMode = ShadowCastingMode.Off, receiveShadows = false,
-                        reflectionProbeUsage = ReflectionProbeUsage.Off, lightProbeUsage = LightProbeUsage.Off,
-                        motionVectorMode = MotionVectorGenerationMode.ForceNoMotion
-                    };
-                    Graphics.RenderMeshInstanced(parameters, mesh, 0, reflectionMatrices, instances);
-                }
             }
 
-            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, bool detail, ChunkManager floorOwner, bool river, byte stage)
+            public TypeBatch(Mesh mesh, MeshRenderer sourceRenderer, bool detail, ChunkManager floorOwner, bool river, byte stage, Shader farLit = null)
             {
                 this.mesh = mesh;
+                Stage = stage;
                 Detail = detail;
                 this.river = river; floor = floorOwner != null;
                 floorCenter = floorOwner != null ? floorOwner.FloorCenter : Vector2.zero;
@@ -651,6 +734,11 @@ namespace TowerOfBabel.World.Chunks
                     enableInstancing = true,
                     hideFlags = HideFlags.DontSave
                 };
+                // A plain URP Lit piece (the lava lamp chrome) has no procedural variant; the far Lit shader runs the same
+                // passes with it. Only for materials without feature keywords, which the far shader does not compile.
+                if (farLit != null && sourceMaterial.shader != null && sourceMaterial.shader.name == "Universal Render Pipeline/Lit" &&
+                    sourceMaterial.shaderKeywords.Length == 0)
+                    material.shader = farLit;
                 if (material.HasProperty("_ReceiveShadows"))
                     material.SetFloat("_ReceiveShadows", 0f);
                 if (river) material.SetFloat("_RiverStage", stage);
@@ -1035,6 +1123,10 @@ namespace TowerOfBabel.World.Chunks
                     block = pageProperties[run] = new MaterialPropertyBlock();
                     block.SetBuffer(FarObjectToWorld, gpuObjectToWorld);
                     block.SetBuffer(FarWorldToObject, gpuWorldToObject);
+                    // The shader also declares the GPU-culled path's buffers; they are never read here.
+                    block.SetBuffer(FarVisible, UnusedVisible());
+                    block.SetBuffer(FarInstances, UnusedInstances());
+                    block.SetFloat(FarCulled, 0);
                     block.SetFloat(FarFloor, Floor);
                     pageShVersions[run] = -1;
                 }

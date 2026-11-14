@@ -60,8 +60,9 @@ Shader "TowerOfBabel/Buildings/Glass water floor"
         UNITY_DEFINE_INSTANCED_PROP(float,_BuildClock)
         UNITY_DEFINE_INSTANCED_PROP(float,_RiverFloorIndex)
         UNITY_INSTANCING_BUFFER_END(Construction)
-        // Far pages carry their floor identity per draw (GPU-resident far instancing).
-        #define AERO_FAR_SETUP_EXTRA _RiverFloorIndex = _AeroFarFloor;
+        // Far instances carry their floor identity: per draw on legacy pages, per instance on GPU-culled draws.
+        #define AERO_FAR_NEEDS_FLOOR
+        #define AERO_FAR_SETUP_EXTRA _RiverFloorIndex = aeroFarFloor;
         #include "Aero/AeroFarInstancing.hlsl"
         struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float4 tangentOS:TANGENT; float2 uv:TEXCOORD0; float3 floorPatch:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
         struct Varyings { float4 positionCS:SV_POSITION; float3 ws:TEXCOORD0; float3 normal:TEXCOORD1; float3 local:TEXCOORD2; float fog:TEXCOORD3; nointerpolation float floorIndex:TEXCOORD4; UNITY_VERTEX_INPUT_INSTANCE_ID UNITY_VERTEX_OUTPUT_STEREO };

@@ -82,6 +82,7 @@ namespace TowerOfBabel.World.Tests
             Assert.That(spots[0].intensity, Is.LessThan(night * .5f).And.GreaterThan(0), "Still lit by day, but much dimmer.");
 
             camera.transform.position = target + Vector3.up * 300;
+            // A jump this far lights and hands back at once; a walk would fade the lights out first.
             yield return new WaitForSeconds(.35f);
             Assert.That(lamps.ActiveLightCount, Is.Zero, "Far away, the lights are handed back.");
             Assert.That(AeroProjectionLamp.MaximumActiveLamps, Is.EqualTo(4));

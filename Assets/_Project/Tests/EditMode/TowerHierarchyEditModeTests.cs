@@ -11,15 +11,16 @@ namespace TowerOfBabel.Resources.Tests
     {
         private const string TowerPath = "Assets/_Project/Scenes/Tower.unity";
 
-        // NetworkSystem and IngameDebugConsole call DontDestroyOnLoad, which only works on root objects.
+        // NetworkSystem calls DontDestroyOnLoad, which only works on root objects.
         // ResourceAuthority is an in-scene NetworkObject and stays beside the NetworkManager.
+        // The in-game debug console was removed (2026-11-12): its key now shows and hides the mouse cursor.
         private static readonly string[] Roots =
         {
-            "NetworkSystem", "ResourceAuthority", "IngameDebugConsole", "Lighting & Atmosphere", "Player & Camera",
+            "NetworkSystem", "ResourceAuthority", "Lighting & Atmosphere", "Player & Camera",
             "World", "Resources", "Processors", "UI", "Scratch (disabled)",
         };
 
-        private static readonly string[] Groups = Roots.Skip(3).ToArray();
+        private static readonly string[] Groups = Roots.Skip(2).ToArray();
 
         [Test]
         public void TowerScene_GroupsRootObjectsIntoFolders()
@@ -49,7 +50,7 @@ namespace TowerOfBabel.Resources.Tests
                 foreach (var r in roots.SelectMany(g => g.GetComponentsInChildren<Resource>(true))) Assert.That(RootOf(r), Is.EqualTo("Resources"), r.name);
                 foreach (var p in roots.SelectMany(g => g.GetComponentsInChildren<ResourceProcessor>(true))) Assert.That(RootOf(p), Is.EqualTo("Processors"), p.name);
                 foreach (var c in roots.SelectMany(g => g.GetComponentsInChildren<Canvas>(true)).Where(c => c.transform.parent == null || c.transform.parent.GetComponentInParent<Canvas>(true) == null))
-                    Assert.That(new[] { "UI", "IngameDebugConsole" }, Does.Contain(RootOf(c)), c.name);
+                    Assert.That(RootOf(c), Is.EqualTo("UI"), c.name);
                 foreach (var t in roots.SelectMany(g => g.GetComponentsInChildren<Terrain>(true))) Assert.That(RootOf(t), Is.EqualTo("World"), t.name);
                 foreach (var l in roots.SelectMany(g => g.GetComponentsInChildren<Light>(true))) Assert.That(RootOf(l), Is.EqualTo("Lighting & Atmosphere"), l.name);
                 foreach (var cam in roots.SelectMany(g => g.GetComponentsInChildren<Camera>(true))) Assert.That(RootOf(cam), Is.EqualTo("Player & Camera"), cam.name);

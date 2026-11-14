@@ -57,6 +57,8 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
         struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float4 tangentOS:TANGENT; float3 floorPatch:TEXCOORD2; UNITY_VERTEX_INPUT_INSTANCE_ID };
         struct Varyings { float4 positionCS:SV_POSITION; float3 ws:TEXCOORD0; half3 normal:TEXCOORD1; float fog:TEXCOORD2; float3 local:TEXCOORD3; float slab:TEXCOORD4; UNITY_VERTEX_OUTPUT_STEREO };
         #include "BuildingRadialFloor.hlsl"
+        // Far floors draw from the far renderer's GPU-culled instance lists (one indirect draw per floor).
+        #include "Aero/AeroFarInstancing.hlsl"
         // World-space depth nudge: 2 mm near, growing slowly with distance for depth precision; far below the slab.
         float RiverDepthBias(float distance){return .002+distance*.0002;}
         Varyings Vert(Attributes i)
@@ -161,6 +163,7 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
             #pragma vertex Vert
             #pragma fragment Volume
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_fog
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             #pragma multi_compile_fragment _ _SHADOWS_SOFT _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
@@ -312,6 +315,7 @@ Shader "TowerOfBabel/Buildings/Transparent river glass"
             #pragma vertex Vert
             #pragma fragment Simple
             #pragma multi_compile_instancing
+            #pragma instancing_options procedural:AeroFarSetup
             #pragma multi_compile_fog
             half4 Simple(Varyings i):SV_Target
             {

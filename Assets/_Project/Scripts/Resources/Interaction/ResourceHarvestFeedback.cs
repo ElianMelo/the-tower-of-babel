@@ -96,7 +96,7 @@ namespace TowerOfBabel.Resources.Interaction
         {
             if (clip == null || audioSource == null) return;
             audioSource.pitch = pitch + Random.Range(-.045f, .045f);
-            audioSource.PlayOneShot(clip, volume);
+            audioSource.PlayOneShot(clip, volume * TowerOfBabel.Rendering.AeroAudio.Vfx);
         }
         private static void Emit(ParticleSystem particles, int count)
         {

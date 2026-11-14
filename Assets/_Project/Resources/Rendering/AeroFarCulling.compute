@@ -1,0 +1,253 @@
+// GPU culling for the far tower (performance pass 2026-11-12). One dispatch tests every far instance against the
+// camera frustum, its draw distance and the tower's solid decks, picks its mesh level by its own distance and appends
+// its index to the visible list of that level's indirect draw. Nothing visible is ever removed: frustum and distance
+// use the same box tests the CPU pages used, and occlusion only rejects a box when every sight line from the camera
+// to it passes through opaque deck (FarOccluderSet). The occlusion test depends on the camera position alone; it uses
+// no screen-space depth and no data from an earlier frame.
+//
+// Opaque pieces are appended in whatever order the threads finish: the depth buffer sorts them. Transparent pieces
+// (the glass stairs) blend in draw order, so a list whose order changed every frame made overlapping glass flicker.
+// Their batches are "ordered": the cull only marks each instance, and two more kernels write the visible ones in a
+// fixed order (chunk by chunk, floor by floor), the same every frame for the same view.
+#pragma kernel CullInstances
+#pragma kernel CountOrdered
+#pragma kernel WriteOrdered
+
+struct FarInstance
+{
+    float3 center;      // World box centre.
+    uint batch;         // Index into _Batches.
+    float3 extents;     // World box half size; x below zero marks a free slot.
+    float floorIndex;   // Chunk floor of the instance (river composition lists).
+};
+
+struct FarBatch
+{
+    float lod1Sq;
+    float lod2Sq;
+    float maxDistanceSq;    // Zero: no distance limit.
+    uint command0;
+    uint command1;
+    uint command2;
+    int floorCommandBase;   // First per-floor composition command (river glass); unused when floorCount is zero.
+    int floorMin;
+    int floorCount;
+    uint ordered;           // Not zero: transparent, drawn in a fixed order (see CountOrdered and WriteOrdered).
+    uint pad1;
+    uint pad2;
+};
+
+// One chunk's instances of an ordered batch. Ranges are sorted by batch, then by chunk (floor, x, z).
+struct FarRange
+{
+    uint start;     // First instance slot.
+    uint count;
+    uint first;     // Index of the first range of the same batch.
+    uint batch;
+    uint last;      // Not zero on the batch's last range.
+    uint pad0;
+    uint pad1;
+    uint pad2;
+};
+
+struct FarRangeCount
+{
+    uint level0;
+    uint level1;
+    uint level2;
+    uint pad;
+};
+
+struct DrawArgs
+{
+    uint indexCount;
+    uint instanceCount;
+    uint startIndex;
+    uint baseVertex;
+    uint startInstance;
+};
+
+// One deck: a horizontal plane inside the floor slab and its solid map (a slice of _DeckMaps).
+struct FarDeck
+{
+    float planeY;
+    float originX;      // World position of the corner of texel (0, 0).
+    float originZ;
+    float texelsPerMetre;
+    float slice;
+    float pad0;
+    float pad1;
+    float pad2;
+};
+
+StructuredBuffer<FarInstance> _Instances;
+StructuredBuffer<FarBatch> _Batches;
+StructuredBuffer<uint> _CommandBase;
+RWStructuredBuffer<DrawArgs> _Args;
+RWStructuredBuffer<uint> _Visible;
+StructuredBuffer<FarDeck> _Decks;
+// Summed-area tables: texel (x, y) holds the number of solid texels with both coordinates at or below.
+Texture2DArray<float> _DeckMaps;
+// Ordered batches: per instance slot, zero when hidden, otherwise its mesh level plus one.
+RWStructuredBuffer<uint> _Marks;
+StructuredBuffer<FarRange> _Ranges;
+RWStructuredBuffer<FarRangeCount> _RangeCounts;
+
+float4 _Planes[6];
+float4 _CameraPosition;
+float4 _CullParams;         // x: instance slots in use, y: mesh LOD on.
+float4 _OcclusionParams;    // x: deck count (zero: occlusion off), y: map size in texels, z: closest usable deck, metres.
+float4 _OrderedParams;      // x: number of ranges.
+
+float Summed(int x, int y, int slice)
+{
+    if (x < 0 || y < 0) return 0;
+    return _DeckMaps.Load(int4(x, y, slice, 0));
+}
+
+bool Occluded(float3 center, float3 extents)
+{
+    float3 eye = _CameraPosition.xyz;
+    float boxLow = center.y - extents.y, boxHigh = center.y + extents.y;
+    int size = (int)_OcclusionParams.y;
+    uint decks = (uint)_OcclusionParams.x;
+    for (uint index = 0; index < decks; index++)
+    {
+        FarDeck deck = _Decks[index];
+        float rise = deck.planeY - eye.y;
+        // A deck this close to the camera may be cut by the near plane.
+        if (abs(rise) < _OcclusionParams.z) continue;
+        // The whole box must lie beyond the plane.
+        if (rise > 0 ? boxLow < deck.planeY : boxHigh > deck.planeY) continue;
+        float2 low = float2(1e30, 1e30), high = float2(-1e30, -1e30);
+        for (uint corner = 0; corner < 8; corner++)
+        {
+            float3 offset = float3((corner & 1) != 0 ? 1.0 : -1.0, (corner & 2) != 0 ? 1.0 : -1.0, (corner & 4) != 0 ? 1.0 : -1.0);
+            float3 p = center + extents * offset;
+            // Where the sight line to this corner crosses the deck plane.
+            float2 hit = eye.xz + (p.xz - eye.xz) * (rise / (p.y - eye.y));
+            low = min(low, hit); high = max(high, hit);
+        }
+        float2 origin = float2(deck.originX, deck.originZ);
+        int2 p0 = (int2)floor((low - origin) * deck.texelsPerMetre);
+        int2 p1 = (int2)floor((high - origin) * deck.texelsPerMetre);
+        if (p0.x < 0 || p0.y < 0 || p1.x >= size || p1.y >= size) continue;
+        int slice = (int)deck.slice;
+        float solid = Summed(p1.x, p1.y, slice) - Summed(p0.x - 1, p1.y, slice) - Summed(p1.x, p0.y - 1, slice) + Summed(p0.x - 1, p0.y - 1, slice);
+        float area = (float)((p1.x - p0.x + 1) * (p1.y - p0.y + 1));
+        if (solid > area - .5) return true;
+    }
+    return false;
+}
+
+// True when the instance is in the frustum, within its draw distance and not hidden by a deck.
+bool Visible(FarInstance instance, FarBatch batch, out float distanceSq)
+{
+    distanceSq = 0;
+    for (uint plane = 0; plane < 6; plane++)
+    {
+        float4 p = _Planes[plane];
+        if (dot(p.xyz, instance.center) + p.w + dot(abs(p.xyz), instance.extents) < 0) return false;
+    }
+    // Squared distance from the camera to the nearest point of the box (Bounds.SqrDistance).
+    float3 gap = max(abs(_CameraPosition.xyz - instance.center) - instance.extents, 0);
+    distanceSq = dot(gap, gap);
+    if (batch.maxDistanceSq > 0 && distanceSq > batch.maxDistanceSq) return false;
+    if (_OcclusionParams.x > .5 && Occluded(instance.center, instance.extents)) return false;
+    return true;
+}
+
+[numthreads(64, 1, 1)]
+void CullInstances(uint3 id : SV_DispatchThreadID)
+{
+    uint index = id.x;
+    if (index >= (uint)_CullParams.x) return;
+    FarInstance instance = _Instances[index];
+    if (instance.extents.x < 0) return;
+    FarBatch batch = _Batches[instance.batch];
+    float distanceSq;
+    bool visible = Visible(instance, batch, distanceSq);
+
+    uint level = 0;
+    if (_CullParams.y > .5)
+    {
+        if (distanceSq > batch.lod2Sq) level = 2;
+        else if (distanceSq > batch.lod1Sq) level = 1;
+    }
+    uint command = level == 2 ? batch.command2 : level == 1 ? batch.command1 : batch.command0;
+
+    if (batch.ordered != 0)
+    {
+        // A level without its own mesh draws the full mesh, in the full mesh's list.
+        if (command == batch.command0) level = 0;
+        _Marks[index] = visible ? level + 1 : 0;
+        return;
+    }
+    if (!visible) return;
+
+    uint slot;
+    InterlockedAdd(_Args[command].instanceCount, 1, slot);
+    _Visible[_CommandBase[command] + slot] = index;
+
+    if (batch.floorCount > 0)
+    {
+        int floorSlot = (int)round(instance.floorIndex) - batch.floorMin;
+        if (floorSlot >= 0 && floorSlot < batch.floorCount)
+        {
+            uint floorCommand = (uint)(batch.floorCommandBase + floorSlot);
+            InterlockedAdd(_Args[floorCommand].instanceCount, 1, slot);
+            _Visible[_CommandBase[floorCommand] + slot] = index;
+        }
+    }
+}
+
+// Ordered batches, step one: how many instances of each range are visible, per mesh level.
+[numthreads(64, 1, 1)]
+void CountOrdered(uint3 id : SV_DispatchThreadID)
+{
+    uint r = id.x;
+    if (r >= (uint)_OrderedParams.x) return;
+    FarRange range = _Ranges[r];
+    FarRangeCount counts;
+    counts.level0 = 0; counts.level1 = 0; counts.level2 = 0; counts.pad = 0;
+    [loop] for (uint i = 0; i < range.count; i++)
+    {
+        uint mark = _Marks[range.start + i];
+        if (mark == 1) counts.level0++;
+        else if (mark == 2) counts.level1++;
+        else if (mark == 3) counts.level2++;
+    }
+    _RangeCounts[r] = counts;
+}
+
+// Ordered batches, step two: every range writes its visible instances right after those of the ranges before it,
+// so the draw order follows the range order whatever order the threads run in.
+[numthreads(64, 1, 1)]
+void WriteOrdered(uint3 id : SV_DispatchThreadID)
+{
+    uint r = id.x;
+    if (r >= (uint)_OrderedParams.x) return;
+    FarRange range = _Ranges[r];
+    uint next0 = 0, next1 = 0, next2 = 0;
+    [loop] for (uint before = range.first; before < r; before++)
+    {
+        FarRangeCount counts = _RangeCounts[before];
+        next0 += counts.level0; next1 += counts.level1; next2 += counts.level2;
+    }
+    FarBatch batch = _Batches[range.batch];
+    uint base0 = _CommandBase[batch.command0], base1 = _CommandBase[batch.command1], base2 = _CommandBase[batch.command2];
+    [loop] for (uint i = 0; i < range.count; i++)
+    {
+        uint index = range.start + i;
+        uint mark = _Marks[index];
+        if (mark == 1) _Visible[base0 + next0++] = index;
+        else if (mark == 2) _Visible[base1 + next1++] = index;
+        else if (mark == 3) _Visible[base2 + next2++] = index;
+    }
+    if (range.last != 0)
+    {
+        _Args[batch.command0].instanceCount = next0;
+        if (batch.command1 != batch.command0) _Args[batch.command1].instanceCount = next1;
+        if (batch.command2 != batch.command0) _Args[batch.command2].instanceCount = next2;
+    }
+}

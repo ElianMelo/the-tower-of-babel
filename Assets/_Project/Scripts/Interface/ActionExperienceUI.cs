@@ -362,7 +362,7 @@ namespace TowerOfBabel.Interface
             {
                 nextPopSoundAge = age + .045f;
                 audioSource.pitch = Mathf.Lerp(.975f, 1.425f, (float)arrived / activeBubbleCount);
-                audioSource.PlayOneShot(popSound, .1f);
+                audioSource.PlayOneShot(popSound, .1f * TowerOfBabel.Rendering.AeroAudio.Ui);
             }
             if (arrived == activeBubbleCount)
                 CaptionAt(activeReward.Amount > 0 ? $"+{activeReward.Amount} XP  ·  {activeReward.Action}" :

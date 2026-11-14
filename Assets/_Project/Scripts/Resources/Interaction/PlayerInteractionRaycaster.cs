@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Linq;
 using System.Collections.Generic;
 using TowerOfBabel.Buildings;
 using TowerOfBabel.World.Chunks;
@@ -61,7 +60,7 @@ namespace TowerOfBabel.Resources.Interaction
         private void Update()
         {
             RefreshConstructionScan();
-            if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+            if (TowerOfBabel.Settings.GameInput.ScanPressed)
                 ScanNearbyConstruction();
             if (activeInteraction != null)
             {
@@ -81,7 +80,7 @@ namespace TowerOfBabel.Resources.Interaction
             else
                 ClearTarget();
 
-            if (currentInteractable != null && currentInteractable.CanInteract && Input.GetKeyDown(KeyCode.E))
+            if (currentInteractable != null && currentInteractable.CanInteract && TowerOfBabel.Settings.GameInput.InteractPressed)
                 TryBeginCurrentInteraction();
         }
 
@@ -125,15 +124,17 @@ namespace TowerOfBabel.Resources.Interaction
 
         private void SetTarget(GameObject target)
         {
-            MonoBehaviour interactableBehaviour = target.GetComponentsInParent<MonoBehaviour>(true)
-                .FirstOrDefault(component => component is IInteractable);
-            IInteractable interactable = interactableBehaviour as IInteractable;
-
-            if (CurrentTarget == target && ReferenceEquals(currentInteractable, interactable))
+            // The same object under the crosshair as last frame, with its interactable still alive: nothing to look up.
+            // (The lookup used to run every frame and allocated an array, a delegate and an enumerator each time.)
+            if (CurrentTarget == target && (currentInteractable == null || currentInteractableBehaviour != null))
             {
                 RefreshCurrentPresentation();
                 return;
             }
+
+            IInteractable interactable = target.GetComponentInParent<IInteractable>(true);
+            MonoBehaviour interactableBehaviour = interactable as MonoBehaviour;
+            if (interactableBehaviour == null) interactable = null;
 
             ReleaseCurrentPresentation();
 
@@ -246,7 +247,7 @@ namespace TowerOfBabel.Resources.Interaction
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.E))
+            if (TowerOfBabel.Settings.GameInput.InteractPressed)
             {
                 CancelCurrentInteraction();
                 return;

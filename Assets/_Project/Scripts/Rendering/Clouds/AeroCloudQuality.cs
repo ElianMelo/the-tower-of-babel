@@ -19,6 +19,10 @@ namespace TowerOfBabel.Rendering
         [Tooltip("History weight; higher = smoother but slower to react.")]
         [Range(0, .97f)] public float temporalBlend = .9f;
 
-        public int Downsample => Mathf.Clamp(downsample, 1, 4);
+        // Tiers below the authored quality (AeroRenderQuality.Clouds): a coarser trace with fewer samples.
+        private static int Tier => Mathf.Clamp(AeroRenderQuality.Clouds, 0, AeroRenderQuality.Full);
+        public int Downsample => Mathf.Clamp(Tier == AeroRenderQuality.Full ? downsample : Mathf.Max(downsample, Tier == 1 ? 3 : 4), 1, 4);
+        public int PrimarySteps => Tier == AeroRenderQuality.Full ? primarySteps : Mathf.Max(16, Mathf.RoundToInt(primarySteps * (Tier == 1 ? .7f : .45f)));
+        public int LightSteps => Tier == AeroRenderQuality.Full ? lightSteps : Mathf.Max(2, lightSteps - (Tier == 1 ? 2 : 3));
     }
 }

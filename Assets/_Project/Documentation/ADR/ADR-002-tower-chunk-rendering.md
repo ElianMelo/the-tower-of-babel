@@ -164,7 +164,18 @@ Profiler markers cover:
 - `Tower.FarRenderer.Render`;
 - `Tower.FarRenderer.RebuildPages`.
 
-The performance goal for the development workload is more than 100 FPS at 1080p while moving. This is a measured target, not a guarantee of the architecture: it must be validated in both the Editor and a development player build whenever prefab complexity, materials, chunk dimensions, or maximum floor count changes.
+There is no frame-rate target. The goal is the highest frame rate the hardware delivers; frame time must be measured in both the Editor and a development player build whenever prefab complexity, materials, chunk dimensions, or maximum floor count changes (`Documentation/Performance/PERFORMANCE.md`).
+
+### Update 2026-11-12: GPU-culled far rendering
+
+The far tier described above (CPU-culled pages of at most 511 instances) is now the fallback. By default
+`InstancedFarChunkRenderer` keeps every far instance in one set of GPU buffers and, for each camera render, a compute
+pass tests every instance: frustum, draw distance, deck occlusion and mesh level. Each mesh level of each piece then
+draws with a single indirect command. The interface (`IFarChunkRenderer`) and the ownership rules of this decision are
+unchanged; `ChunkManager` additionally feeds the renderer the solid deck tiles of every visible floor (near and far)
+through `IFarOccluderSink`. Pieces that blend (the glass stairs) are written to their draw list in a fixed chunk order,
+because the order the compute threads finish in changes every frame and blended pieces show it (2026-11-14).
+Details and measurements: `Documentation/Performance/PERFORMANCE.md`.
 
 ## Consequences
 

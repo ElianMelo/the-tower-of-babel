@@ -111,7 +111,7 @@ namespace TowerOfBabel.Rendering
             if (profile == null || camera == null) { LastStatus = "No camera or finish profile"; Release(); return; }
             profile.Apply();
             valid = false;
-            if (!liveReflections || failed || !profile.SupportsLive || camera.stereoEnabled || profile.reflectionRendererIndex < 0)
+            if (!liveReflections || !AeroRenderQuality.LiveReflections || failed || !profile.SupportsLive || camera.stereoEnabled || profile.reflectionRendererIndex < 0)
             { LastStatus = "Environment only"; Release(); return; }
             GeometryUtility.CalculateFrustumPlanes(camera, planes);
             if (!AeroBuildingReflectionRegistry.FindDeck(camera, planes, profile.range, out int floor, out float planeHeight, out float pitch))

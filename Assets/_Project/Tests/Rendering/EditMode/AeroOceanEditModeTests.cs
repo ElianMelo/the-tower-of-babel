@@ -86,5 +86,24 @@ namespace TowerOfBabel.Rendering.Tests
                 Object.DestroyImmediate(mesh);Object.DestroyImmediate(mat);Object.DestroyImmediate(rt);Object.DestroyImmediate(pixels);
             }
         }
+
+        [Test]
+        public void PlayerFarClip_ReplacesTheOceanMinimumOnlyWhileTheSettingsAreInForce()
+        {
+            var scene=EditorSceneManager.NewPreviewScene();float before=AeroOceanSurface.PlayerFarClip;
+            try
+            {
+                var water=new GameObject("Ocean far plane fixture",typeof(MeshFilter),typeof(MeshRenderer),typeof(AeroOceanSurface));SceneManager.MoveGameObjectToScene(water,scene);
+                var go=new GameObject("Ocean far plane camera",typeof(Camera));SceneManager.MoveGameObjectToScene(go,scene);go.tag="MainCamera";
+                var camera=go.GetComponent<Camera>();camera.scene=scene;camera.enabled=false;var ocean=water.GetComponent<AeroOceanSurface>();
+                AeroOceanSurface.PlayerFarClip=0;camera.farClipPlane=1000;ocean.PrepareForCamera(camera);
+                Assert.That(camera.farClipPlane,Is.EqualTo(AeroOceanSurface.MinimumFarClip),"Without settings the water reaches the horizon.");
+                AeroOceanSurface.PlayerFarClip=1500;ocean.PrepareForCamera(camera);
+                Assert.That(camera.farClipPlane,Is.EqualTo(1500),"The far plane from the settings wins over the ocean's minimum.");
+                AeroOceanSurface.PlayerFarClip=0;ocean.PrepareForCamera(camera);
+                Assert.That(camera.farClipPlane,Is.EqualTo(AeroOceanSurface.MinimumFarClip),"The ocean's own rule returns with the settings gone.");
+            }
+            finally {AeroOceanSurface.PlayerFarClip=before;EditorSceneManager.ClosePreviewScene(scene);}
+        }
     }
 }

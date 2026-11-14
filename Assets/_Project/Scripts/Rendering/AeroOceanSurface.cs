@@ -12,6 +12,11 @@ namespace TowerOfBabel.Rendering
         public const float NearExtent = 512;
         public const float OuterExtent = 131072;
         public const float MinimumFarClip = 65536;
+        /// <summary>
+        /// The far plane the player chose in the settings. Zero (no settings in force) keeps the ocean's own rule: the main
+        /// camera sees at least <see cref="MinimumFarClip"/>, so the water reaches the horizon.
+        /// </summary>
+        public static float PlayerFarClip;
         private void OnEnable() => RenderPipelineManager.beginCameraRendering += OnCameraRendering;
         private void OnDisable() => RenderPipelineManager.beginCameraRendering -= OnCameraRendering;
         private void LateUpdate() { if (Camera.main != null) PrepareForCamera(Camera.main); }
@@ -25,7 +30,7 @@ namespace TowerOfBabel.Rendering
             var p = camera.transform.position;
             transform.position = new Vector3(Mathf.Floor(p.x/grid)*grid,transform.position.y,Mathf.Floor(p.z/grid)*grid);
             if (camera.cameraType == CameraType.Game && camera.CompareTag("MainCamera"))
-                camera.farClipPlane = Mathf.Max(camera.farClipPlane,MinimumFarClip);
+                camera.farClipPlane = PlayerFarClip > 0 ? PlayerFarClip : Mathf.Max(camera.farClipPlane,MinimumFarClip);
         }
 
         public static Mesh CreateMesh()

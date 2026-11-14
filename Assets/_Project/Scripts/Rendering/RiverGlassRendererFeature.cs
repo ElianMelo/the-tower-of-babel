@@ -17,6 +17,8 @@ namespace TowerOfBabel.Rendering
         public RiverGlassProfile profile;
         public Shader surfaceShader;
         public bool reducedRefraction;
+        /// <summary>The saved switch, or the game's graphics settings asking for the reduced path.</summary>
+        public bool ReducedRefraction => reducedRefraction || AeroRenderQuality.ReducedRiverRefraction;
         [System.NonSerialized] public float previewTime = -1;
         public int LastDrawCalls { get; private set; }
         public int LastRefractedLayers { get; private set; }
@@ -112,7 +114,7 @@ namespace TowerOfBabel.Rendering
                 floors.Sort(static (a, b) => a.distance.CompareTo(b.distance));
                 owner.profile.Apply(owner.material);
                 plainDraws.Clear();
-                int detailedLimit = owner.reducedRefraction ? 1 : Mathf.Clamp(owner.profile.detailedFloorLimit, 1, 3);
+                int detailedLimit = owner.ReducedRefraction ? 1 : Mathf.Clamp(owner.profile.detailedFloorLimit, 1, 3);
                 for (int i = floors.Count - 1; i >= 0; i--)
                 {
                     FloorGroup floor = floors[i];
@@ -130,13 +132,13 @@ namespace TowerOfBabel.Rendering
                     // stacked pools see the water already composited on farther floors.
                     float weight = 1-Mathf.SmoothStep(0,1,Mathf.InverseLerp(owner.profile.refractionDistance*.5f,
                         owner.profile.refractionDistance,floor.distance));
-                    if (owner.reducedRefraction) weight *= .35f;
+                    if (owner.ReducedRefraction) weight *= .35f;
                     TextureHandle background = default;
                     if (weight > .001f)
                     {
                         var description = graph.GetTextureDesc(resources.activeColorTexture);
                         description.name = "River glass accumulated background";
-                        int divisor = i==0 && !owner.reducedRefraction ? 1 : 2;
+                        int divisor = i==0 && !owner.ReducedRefraction ? 1 : 2;
                         description.width = Mathf.Max(1,description.width/divisor);
                         description.height = Mathf.Max(1,description.height/divisor);
                         description.filterMode = FilterMode.Bilinear;
@@ -161,7 +163,7 @@ namespace TowerOfBabel.Rendering
                     data.background = background; data.depth = resources.cameraDepthTexture;
                     data.material = owner.material; data.draws = floorDraws; data.weight = weight;
                     data.detailed=detailed;
-                    data.steps=owner.profile.Steps(owner.reducedRefraction);
+                    data.steps=owner.profile.Steps(owner.ReducedRefraction);
                     data.clock = owner.previewTime >= 0 ? owner.previewTime : Time.time;
                     if (background.IsValid()) builder.UseTexture(background, AccessFlags.Read);
                     builder.UseTexture(data.depth, AccessFlags.Read);
@@ -182,8 +184,13 @@ namespace TowerOfBabel.Rendering
                             draw.properties.SetFloat("_RadialFloor",draw.radial);
                             draw.properties.SetFloat("_RiverSteps",d.steps);
                             // One draw per batch: the volume pass on detailed floors, the cheap tint otherwise.
-                            context.cmd.DrawMeshInstanced(draw.mesh, 0, d.material, d.detailed ? VolumePass : SimplePass,
-                                draw.matrices, draw.count, draw.properties);
+                            // Far floors draw straight from the far tower's GPU-culled instance list.
+                            if (draw.indirectArguments != null)
+                                context.cmd.DrawMeshInstancedIndirect(draw.mesh, 0, d.material, d.detailed ? VolumePass : SimplePass,
+                                    draw.indirectArguments, draw.indirectOffset, draw.properties);
+                            else
+                                context.cmd.DrawMeshInstanced(draw.mesh, 0, d.material, d.detailed ? VolumePass : SimplePass,
+                                    draw.matrices, draw.count, draw.properties);
                         }
                     });
                     owner.LastDrawCalls += data.draws.Count;

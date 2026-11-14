@@ -69,6 +69,11 @@ namespace TowerOfBabel.Cheats
         public static bool ConsumedEscapeThisFrame => consumedEscapeFrame == Time.frameCount;
         private static readonly Color Ink = new(.055f, .20f, .29f, 1);
         private static readonly string[] Categories = { "Quick actions", "Progression", "Construction", "Inventory", "Stats", "World", "Animations" };
+        /// <summary>The shared interface kit this menu is built with (the settings menu reuses it).</summary>
+        public TMP_FontAsset RegularFont => regularFont;
+        public TMP_FontAsset BoldFont => boldFont;
+        public Material GlassMaterial => glassMaterial;
+        public GameObject ButtonPrefab => buttonPrefab;
         public bool IsVisible => visuals != null && visuals.activeSelf;
         /// <summary>The compact top-left visual controls, open while the full menu is hidden so the scene stays visible.</summary>
         public bool IsVisualPanelVisible => visualPanel != null && visualPanel.activeSelf;
@@ -99,10 +104,10 @@ namespace TowerOfBabel.Cheats
         private void Update()
         {
             Bind();
-            var keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.f3Key.wasPressedThisFrame) Toggle();
-            else if (keyboard != null && keyboard.f4Key.wasPressedThisFrame) ToggleVisualPanel();
-            if (IsOpen && keyboard != null && keyboard.escapeKey.wasPressedThisFrame) { consumedEscapeFrame = Time.frameCount; Hide(); }
+            // Keys come from the remappable controls (F3, F4 and Escape by default).
+            if (TowerOfBabel.Settings.GameInput.CheatMenuPressed) Toggle();
+            else if (TowerOfBabel.Settings.GameInput.GraphicsPanelPressed) ToggleVisualPanel();
+            if (IsOpen && TowerOfBabel.Settings.GameInput.SettingsPressed) { consumedEscapeFrame = Time.frameCount; Hide(); }
             UpdateLookAround();
             if (IsOpen && Time.unscaledTime >= refreshTime) { refreshTime = Time.unscaledTime + .2f; RefreshValues(); }
             UpdateFlight();
@@ -137,6 +142,7 @@ namespace TowerOfBabel.Cheats
         {
             if (IsVisible) return;
             if (visuals == null) BuildView();
+            TowerOfBabel.Settings.SettingsMenuUI.Instance?.Hide();
             bool fromVisualPanel = IsVisualPanelVisible;
             if (fromVisualPanel) { EndLookAround(); visualPanel.SetActive(false); }
             ResolvePlayer(); CaptureTarget();
@@ -159,6 +165,7 @@ namespace TowerOfBabel.Cheats
         {
             if (IsVisualPanelVisible) return;
             if (visuals == null) BuildView();
+            TowerOfBabel.Settings.SettingsMenuUI.Instance?.Hide();
             if (IsVisible) visuals.SetActive(false);
             else BeginModal();
             Bind(); visualPanel.SetActive(true); visualPanel.transform.SetAsLastSibling(); RefreshValues();
@@ -649,10 +656,15 @@ namespace TowerOfBabel.Cheats
         }
         private void UpdateFlight()
         {
-            var k = Keyboard.current; if (!flying || IsVisible || player == null || k == null || Camera.main == null) return;
-            float x = (k.dKey.isPressed ? 1 : 0) - (k.aKey.isPressed ? 1 : 0), z = (k.wKey.isPressed ? 1 : 0) - (k.sKey.isPressed ? 1 : 0), y = (k.spaceKey.isPressed ? 1 : 0) - (k.leftCtrlKey.isPressed ? 1 : 0);
-            var direction = Camera.main.transform.right * x + Camera.main.transform.forward * z + Vector3.up * y;
-            player.transform.position += Vector3.ClampMagnitude(direction, 1) * 18 * (k.leftShiftKey.isPressed ? 3 : 1) * Time.unscaledDeltaTime;
+            if (!flying || IsVisible || player == null) return;
+            Camera view = Camera.main; if (view == null) return;
+            if (TowerOfBabel.Settings.SettingsMenuUI.Instance != null && TowerOfBabel.Settings.SettingsMenuUI.Instance.IsVisible) return;
+            // The remappable movement keys: move, jump to rise, descend, sprint to accelerate.
+            Vector2 move = TowerOfBabel.Settings.GameInput.Move;
+            float x = Mathf.Abs(move.x) > .1f ? Mathf.Sign(move.x) : 0, z = Mathf.Abs(move.y) > .1f ? Mathf.Sign(move.y) : 0;
+            float y = (TowerOfBabel.Settings.GameInput.JumpHeld ? 1 : 0) - (TowerOfBabel.Settings.GameInput.DescendHeld ? 1 : 0);
+            var direction = view.transform.right * x + view.transform.forward * z + Vector3.up * y;
+            player.transform.position += Vector3.ClampMagnitude(direction, 1) * 18 * (TowerOfBabel.Settings.GameInput.SprintHeld ? 3 : 1) * Time.unscaledDeltaTime;
         }
         private RectTransform Row(string label, string detail)
         {

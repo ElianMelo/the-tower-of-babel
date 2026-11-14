@@ -38,8 +38,10 @@ namespace TowerOfBabel.Rendering
         [Range(.1f, 4)] public float transitionSeconds = .85f;
         [Range(.05f, .8f)] public float selectionHysteresis = .25f;
         [Range(0, 1)] public float interiorHaze = .12f;
-        public int Downsample => quality == Quality.Low ? 4 : 2;
-        public int Steps => quality == Quality.Low ? 12 : 16;
-        public int FillCount => quality == Quality.Low ? 1 : 2;
+        // The game's graphics settings can drop to the Low tier without editing this asset.
+        private bool LowTier => quality == Quality.Low || AeroRenderQuality.SunShafts <= AeroRenderQuality.Low;
+        public int Downsample => LowTier ? 4 : 2;
+        public int Steps => LowTier ? 12 : 16;
+        public int FillCount => LowTier ? 1 : 2;
     }
 }

@@ -56,7 +56,7 @@ namespace TowerOfBabel.Interface
                 if (Time.unscaledTime - player.lastChange < .1f) return;
                 player.lastChange = Time.unscaledTime;
             }
-            player.source.PlayOneShot(player.clips[(int)cue], player.volume * (cue == AeroUICue.Hover ? .4f : 1));
+            player.source.PlayOneShot(player.clips[(int)cue], player.volume * (cue == AeroUICue.Hover ? .4f : 1) * TowerOfBabel.Rendering.AeroAudio.Ui);
         }
 
         private void OnDestroy()

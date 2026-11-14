@@ -38,7 +38,7 @@ public static class LavaLampAuthoring
     public const float CradleRadius = .15f, CradleHeight = .26f;
     public const float MountHeight = 3.6f;
     public const float ExteriorChance = .5f, LightReach = 90;
-    public const int MaxLights = 24;
+    public const int MaxLights = 96;
     public static Vector3 LampOrigin => new(0, -LampDrop, ArmReach);
     public static Vector3 LightPosition => LampOrigin + Vector3.up * (LampHeight + .045f);
     public static Vector3 GlowPosition => LampOrigin + Vector3.up * (GlassBottom + GlassHeight * .4f);

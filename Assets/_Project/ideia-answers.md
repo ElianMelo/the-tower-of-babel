@@ -30,7 +30,7 @@
 
 1. FishNet Server Model: Keep the dedicated fishnet server and surpass the high limits with interest and custom playerstate replication. Player disconnects → Character disappears
 2. Player Capacity per Chunk: The 20-100 visible players its the limit for local and far chunks, when you hit the limit 100 you stop render and prioritize data, if few players are online you grab far chunks until meet the 100 limit, if a lot of players are connect you stop in the current chunk with 100
-3. Player Update Frequency: 10hz network state, 60fps interpolation
+3. Player Update Frequency: 10hz network state, interpolated every rendered frame (no frame-rate target: uncapped)
 4. Construction Contribution: Theres an limit of much you can carry (avoid exploit the share mechanic) you consume your local baggage and then build, you can fill with totem or gather by yourself, and people that gather can store in totem or use from baggage
 5. Resource Nodes: Regenerate, the resources nodes are OUTSIDE the tower area, the inside are use just for construction
 6. Processing Stations: Shared world stations, Multiple players can use simultaneously
