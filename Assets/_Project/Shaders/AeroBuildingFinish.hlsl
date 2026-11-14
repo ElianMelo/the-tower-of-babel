@@ -38,6 +38,18 @@ half3 AeroEnvironment(half3 normal, half3 view, float mip, float daylight)
     return min(lerp(night, day, saturate(daylight)), half3(3,3,3));
 }
 
+// How much of the live planar image a deck pixel uses. The deck is the mirror plane, so a deck point the camera sees
+// lies inside the captured view at its own screen position: full weight there, fading only past the texture's edges
+// (the capture can trail a camera that turned after it). Nothing fades with distance either: past the capture range
+// the texture already holds the sky the camera clears to, which is what the deck reflects there. Fading toward the
+// screen edges and over 24-32 m back to the environment cubemap left a frame on the floor that followed the player,
+// bright outside and dark inside, because at night the cubemap is far brighter than the real sky (2026-11-14).
+float AeroPlanarCoverage(float2 uv)
+{
+    float2 outside = max(-uv, uv - 1);
+    return saturate(1 - max(outside.x, outside.y) * 24);
+}
+
 half3 AeroFinishReflection(half3 baseColor, float3 positionWS, half3 normal, half3 view,
     half planarSurface, float mip, float daylight)
 {
@@ -53,10 +65,7 @@ half3 AeroFinishReflection(half3 baseColor, float3 positionWS, half3 normal, hal
         #if UNITY_UV_STARTS_AT_TOP
             uv.y = 1 - uv.y;
         #endif
-        float edge = saturate(min(min(uv.x, uv.y), min(1-uv.x, 1-uv.y)) * 24);
-        float range = _AeroPlanarParams.z;
-        live = _AeroPlanarParams.x * edge * step(.001, projected.w) *
-            (1 - smoothstep(range * .75, range, distance(positionWS, GetCameraPositionWS())));
+        live = _AeroPlanarParams.x * AeroPlanarCoverage(uv) * step(.001, projected.w);
         if (live > .001)
             reflected = lerp(reflected, SAMPLE_TEXTURE2D_LOD(_AeroPlanarTexture, sampler_AeroPlanarTexture, saturate(uv), mip).rgb, live);
     }
