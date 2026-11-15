@@ -40,11 +40,12 @@ public static class EssenceWorkshopAuthoring
             FloaterPrefix = "Droplet_", Base = "MossBed", Glass = "WaterGlass", Glow = "WaterFoam", Stroke = "WaterStroke",
             EssenceType = ResourceType.WaterEssence, BlockType = ResourceType.WaterBlock, NodeId = 3002, Style = EssenceHarvestFeedback.EssenceStyle.WaterWobble,
             GlowColor = new Color(.35f, .55f, .8f), MoteColor = new Color(.6f, .85f, 1, .9f), NodeX = 11.8f },
-        // Cloud Dandelions replaced the fallen cloud on 2026-11-04: cloud seed heads on stalks over a leaf rosette.
-        new() { Essence = "Sky Essence", Block = "Sky Block", NodeModel = "SkyDandelions", Container = "SkyEssence", Body = "Bloom",
+        // Cloud Dandelions replaced the fallen cloud on 2026-11-04; the Silk Clock model on 2026-11-15. The body is the
+        // first flower picked (Flowers), so it is the first part to sink.
+        new() { Essence = "Sky Essence", Block = "Sky Block", NodeModel = "SkyDandelions", Container = "SkyEssence", Body = "Stalk_2",
             FloaterPrefix = "Seed_", Base = "Rosette", Glass = "SkyGlass", Glow = "SkyGlow", Stroke = "SkyStroke",
             EssenceType = ResourceType.SkyEssence, BlockType = ResourceType.SkyBlock, NodeId = 3003, Style = EssenceHarvestFeedback.EssenceStyle.SkyBloom,
-            GlowColor = new Color(.75f, .78f, 1), MoteColor = new Color(.92f, .95f, 1, .9f), NodeX = 18.4f },
+            GlowColor = new Color(.9f, .93f, 1), MoteColor = new Color(.92f, .95f, 1, .9f), NodeX = 18.4f },
     };
 
     /// <summary>Which processed material each building consumes per stage.</summary>
@@ -60,7 +61,8 @@ public static class EssenceWorkshopAuthoring
         RequireCleanTowerScene();
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         CreateMaterials();
-        foreach (string model in Families.SelectMany(f => new[] { f.NodeModel, f.BlockModel }).Append("EssenceMote")) ImportModel(model);
+        CreateDandelionMaterials();
+        foreach (string model in Families.SelectMany(f => new[] { f.NodeModel, f.BlockModel }).Append("EssenceMote").Append("DandelionSeed")) ImportModel(model);
         foreach (string name in new[] { "RiverStroke", "WaterStroke", "SkyStroke", "EssenceBurst", "CondenserHum", "BlockChime" }) MakeSound(name);
         var collection = AssetDatabase.LoadAssetAtPath<ResourceDefinitionCollection>(Data + "ResourceDefinitions.asset");
         foreach (var family in Families)
@@ -109,9 +111,12 @@ public static class EssenceWorkshopAuthoring
             node.AddComponent<AeroInteractionMotion>();
             var group = new GameObject("Harvest feedback"); group.transform.SetParent(node.transform, false);
             var mote = Mesh("EssenceMote");
+            bool bloom = f.Style == EssenceHarvestFeedback.EssenceStyle.SkyBloom;
             var motes = Particles(group.transform, "Essence motes", new Vector3(0, .35f, 0), Mat(f.Glow), mote, f.MoteColor, .03f, .07f, -.14f, 1.3f, .7f, 0, .45f);
-            var burst = Particles(group.transform, "Essence burst", new Vector3(0, .25f, 0), Mat(f.Glass), mote, f.MoteColor, .04f, .1f,
-                f.Style is EssenceHarvestFeedback.EssenceStyle.SkyDrift or EssenceHarvestFeedback.EssenceStyle.SkyBloom ? -.05f : .5f, 1.1f, 1.8f, 0, .5f);
+            // Dandelions: loose parachute seeds peel off the head being picked and drift on downwind (EmitSeed).
+            var burst = bloom ? SeedParticles(group.transform, "Essence burst", new Vector3(0, .8f, 0), 2.6f, 0)
+                : Particles(group.transform, "Essence burst", new Vector3(0, .25f, 0), Mat(f.Glass), mote, f.MoteColor, .04f, .1f,
+                    f.Style == EssenceHarvestFeedback.EssenceStyle.SkyDrift ? -.05f : .5f, 1.1f, 1.8f, 0, .5f);
             var audio = SoundSource(group, "Gather sounds");
             var feedback = new SerializedObject(node.AddComponent<EssenceHarvestFeedback>());
             feedback.FindProperty("style").enumValueIndex = (int)f.Style;
@@ -120,9 +125,8 @@ public static class EssenceWorkshopAuthoring
             var floaters = container.Cast<Transform>().Where(t => t.name.StartsWith(f.FloaterPrefix)).OrderBy(t => t.name).ToArray();
             var list = feedback.FindProperty("floaters"); list.arraySize = floaters.Length;
             for (int i = 0; i < floaters.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = floaters[i];
-            bool bloom = f.Style == EssenceHarvestFeedback.EssenceStyle.SkyBloom;
-            // Dandelions: the glowing hearts inside the seed heads (the Receptacle part of each stalk) pulse.
-            var glows = bloom ? new[] { Find(container.gameObject, "Bloom"), Find(container.gameObject, "Stalk_1"), Find(container.gameObject, "Stalk_2") }
+            // Dandelions: the silk of the seed clocks glows softly (Dandelion Seeds shader emission).
+            var glows = bloom ? Flowers.Select(n => Find(container.gameObject, "Seeds_" + n)).ToArray()
                 : f.GlowOnBase ? new[] { Find(model, f.Base) }
                 : f.Style == EssenceHarvestFeedback.EssenceStyle.WaterWobble ? new[] { Find(container.gameObject, f.Body) }
                 : floaters.Append(Find(container.gameObject, f.Spinner)).ToArray();
@@ -134,6 +138,18 @@ public static class EssenceWorkshopAuthoring
             feedback.FindProperty("strokeClip").objectReferenceValue = Clip(f.Stroke);
             feedback.FindProperty("breakClip").objectReferenceValue = Clip("EssenceBurst");
             feedback.FindProperty("respawnClip").objectReferenceValue = Clip("Respawn");
+            if (bloom)
+            {
+                // Picking order: the small left flower, the right one, then the tall centre bloom as the finale.
+                var flowerList = feedback.FindProperty("flowers"); var headList = feedback.FindProperty("seedHeads");
+                flowerList.arraySize = headList.arraySize = Flowers.Length;
+                for (int i = 0; i < Flowers.Length; i++)
+                {
+                    flowerList.GetArrayElementAtIndex(i).objectReferenceValue = Find(container.gameObject, Flowers[i]);
+                    headList.GetArrayElementAtIndex(i).objectReferenceValue = Find(container.gameObject, "Seeds_" + Flowers[i]).GetComponent<Renderer>();
+                }
+                feedback.FindProperty("windDirection").vector3Value = new Vector3(1, 0, -.25f);
+            }
             feedback.ApplyModifiedPropertiesWithoutUndo();
             if (bloom) BloomAmbience(node, container.gameObject, group, mote);
             PrefabUtility.SaveAsPrefabAsset(node, f.NodePrefab);
@@ -141,23 +157,68 @@ public static class EssenceWorkshopAuthoring
         finally { Object.DestroyImmediate(node); }
     }
 
+    /// <summary>Dandelion flowers in picking order (see EssenceHarvestFeedback.PoseFlowers).</summary>
+    public static readonly string[] Flowers = { "Stalk_2", "Stalk_1", "Bloom" };
+
     /// <summary>
-    /// Idle life for the dandelions: the side stalks nod out of step with the centre one (which the harvest feedback
-    /// sways), seeds keep drifting off downwind and sparkles rise; while gathered the seeds stream away in numbers.
+    /// Idle life for the dandelions: seeds keep drifting off downwind and sparkles rise; while gathered they thicken.
+    /// The flowers' own nod and their picking are all EssenceHarvestFeedback's, so no two components turn a stalk.
     /// </summary>
     private static void BloomAmbience(GameObject node, GameObject container, GameObject group, Mesh mote)
     {
-        var drift = Particles(group.transform, "Drifting seeds", new Vector3(0, .95f, 0), Mat("Cloud"), mote, new Color(1, 1, 1, .95f), .02f, .04f, -.025f, 3.2f, .06f, 1, .3f);
-        var wind = drift.velocityOverLifetime; wind.enabled = true; wind.space = ParticleSystemSimulationSpace.World;
-        wind.x = new ParticleSystem.MinMaxCurve(.22f, .45f); wind.y = new ParticleSystem.MinMaxCurve(0, 0); wind.z = new ParticleSystem.MinMaxCurve(-.05f, .08f);
-        var noise = drift.noise; noise.enabled = true; noise.strength = .25f; noise.frequency = .6f; noise.scrollSpeed = .3f;
+        var drift = SeedParticles(group.transform, "Drifting seeds", new Vector3(0, .95f, 0), 3.2f, 1);
         var sparkle = Particles(group.transform, "Sky sparkle", new Vector3(0, .55f, 0), Mat("SkyGlow"), mote, new Color(.8f, .9f, 1), .012f, .026f, -.03f, 2, .05f, 1, .7f);
         var ambient = new SerializedObject(node.AddComponent<AmbientMotion>());
-        ProcessorFamilyAuthoring.AmbientChannel(ambient, Find(container, "Stalk_1"), AmbientMotion.Kind.Sway, Vector3.right, 2.5f, 4.5f, 1.05f, 0, .7f);
-        ProcessorFamilyAuthoring.AmbientChannel(ambient, Find(container, "Stalk_2"), AmbientMotion.Kind.Sway, Vector3.forward, 2.8f, 5, .85f, 2, .7f);
-        ProcessorFamilyAuthoring.AmbientEffects(ambient, (drift, 1.2f, 9), (sparkle, 1.5f, 4));
+        ProcessorFamilyAuthoring.AmbientEffects(ambient, (drift, 1.2f, 6), (sparkle, 1.5f, 4));
         ambient.FindProperty("visibility").objectReferenceValue = Find(container, "Bloom").GetComponent<Renderer>();
         ambient.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>Loose parachute seeds (DandelionSeed.fbx, pappus up) drifting downwind with a slow turn.</summary>
+    private static ParticleSystem SeedParticles(Transform parent, string name, Vector3 position, float lifetime, float rate)
+    {
+        var ps = Particles(parent, name, position, Mat("Cloud"), Mesh("DandelionSeed"), new Color(1, 1, 1, .95f), .55f, .85f, -.02f, lifetime, .05f, rate, .3f);
+        var main = ps.main; main.startRotation3D = true;
+        main.startRotationX = new ParticleSystem.MinMaxCurve(-.3f, .3f); main.startRotationY = new ParticleSystem.MinMaxCurve(0, Mathf.PI * 2);
+        main.startRotationZ = new ParticleSystem.MinMaxCurve(-.3f, .3f);
+        var turn = ps.rotationOverLifetime; turn.enabled = true; turn.separateAxes = true;
+        turn.x = new ParticleSystem.MinMaxCurve(-.15f, .15f); turn.y = new ParticleSystem.MinMaxCurve(.4f, 1.2f); turn.z = new ParticleSystem.MinMaxCurve(-.15f, .15f);
+        var wind = ps.velocityOverLifetime; wind.enabled = true; wind.space = ParticleSystemSimulationSpace.World;
+        wind.x = new ParticleSystem.MinMaxCurve(.22f, .45f); wind.y = new ParticleSystem.MinMaxCurve(0, .05f); wind.z = new ParticleSystem.MinMaxCurve(-.05f, .08f);
+        var noise = ps.noise; noise.enabled = true; noise.strength = .2f; noise.frequency = .5f; noise.scrollSpeed = .25f;
+        ps.GetComponent<ParticleSystemRenderer>().alignment = ParticleSystemRenderSpace.World;
+        return ps;
+    }
+
+    /// <summary>
+    /// The Silk Clock's own materials: the hand-painted green atlas (Tools/BuildingAero/paint_dandelion_greens.py) on
+    /// leaves, stems, bud and crown; the seed clocks' Dandelion Seeds shader; and the white and aqua pebbles (natural
+    /// nodes keep clear of the machine Pearl and Azure).
+    /// </summary>
+    public static void CreateDandelionMaterials()
+    {
+        const string texturePath = Models + "Textures/DandelionGreens.png";
+        AssetDatabase.ImportAsset(texturePath, ImportAssetOptions.ForceSynchronousImport);
+        var importer = (TextureImporter)AssetImporter.GetAtPath(texturePath);
+        importer.textureType = TextureImporterType.Default; importer.sRGBTexture = true; importer.mipmapEnabled = true;
+        importer.wrapMode = TextureWrapMode.Clamp; importer.anisoLevel = 4; importer.maxTextureSize = 1024;
+        importer.textureCompression = TextureImporterCompression.CompressedHQ; importer.SaveAndReimport();
+        Material Make(string name, Shader shader)
+        {
+            string path = Models + "Materials/Workshop_" + name + ".mat"; var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null) { mat = new Material(shader); AssetDatabase.CreateAsset(mat, path); }
+            mat.shader = shader; mat.enableInstancing = true; return mat;
+        }
+        var lit = Shader.Find("Universal Render Pipeline/Lit");
+        var green = Make("DandelionGreen", lit);
+        green.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath)); green.SetColor("_BaseColor", Color.white);
+        green.SetFloat("_Smoothness", .5f); green.SetFloat("_Cull", 0); green.doubleSidedGI = true;      // leaves are single surfaces
+        var seeds = Make("DandelionSeeds", Shader.Find("TowerOfBabel/Foliage/Dandelion Seeds"));
+        seeds.SetFloat("_Flight", EssenceHarvestFeedback.FlowerFlight / EssenceHarvestFeedback.FlowerWave);
+        var aqua = Make("AquaPebble", lit); aqua.SetColor("_BaseColor", new Color(.55f, .86f, .95f)); aqua.SetFloat("_Smoothness", .85f);
+        var white = Make("WhitePebble", lit); white.SetColor("_BaseColor", new Color(.88f, .94f, .97f)); white.SetFloat("_Smoothness", .8f);
+        foreach (var m in new[] { green, seeds, aqua, white }) EditorUtility.SetDirty(m);
+        AssetDatabase.SaveAssets();
     }
 
     private static ResourceDefinition Definition(string name, ResourceType type, int amount, float duration, float cooldown)

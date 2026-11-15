@@ -6,6 +6,8 @@ Requested on 2026-11-04. The user chose two concepts to replace the old sky esse
 
 Both models were enhanced, given idle and activation motion, effects and particles, then reviewed and improved in a second pass. A third pass, after user feedback that both animations shook too much, made all motion smooth and calmer (see [review passes](#review-passes)).
 
+On 2026-11-15 the dandelion node was rebuilt as the **Silk Clock** (design 01 of [sky essence concepts, Round02](SKY_ESSENCE_CONCEPTS.md#round02-frutiger-aero-dandelion-designs)), with a new flower-by-flower gather. See [Cloud Dandelions: Silk Clock](#cloud-dandelions-silk-clock-skyessenceprefab).
+
 Gameplay values are unchanged:
 - **Gathering:** 2 sky essence per gather, 2.8 s, 6 s respawn, node ID 3003.
 - **Processing:** 2 sky essence → 1 sky block in 3.5 s, processor ID `tower-sky-spinner-01`.
@@ -32,7 +34,7 @@ These principles shaped the work:
 | **Clear cause and effect.** | The essence is visible on its way in. A cloud tuft with a cloud trail is swept up from the player's side into the rotor, then drawn down the tower into the orb, which visibly fills with cloud. |
 | **A short, clear reward peak.** | On completion, the orb pops past its rest size and settles with one soft overshoot (a slow, well-damped spring). A puff of cloud and a gust ring roll over the grass, glints play and a bright rising three-note chime sounds (`SkyChime`). The Sky Block appears on the tray only after the server confirms the exchange. |
 | **Proportion and restraint.** Routine actions repeat hundreds of times in an incremental game. | There is no screen shake, hit-stop or vibration. Every motion is a slow, continuous curve: no oscillation runs faster than about 0.6 Hz, and impulses are eased in. Idle motion is subtle, work is medium, and the peak is clear but short (1.1 s). Particle systems are capped at 64 and emit nothing at idle unless they are ambient. |
-| **Natural, not mechanical, gathering.** | The dandelions are not squashed. Each pull bows the stalks a little further downwind, like a gust, and throws seeds. The stalks shrink back whole and lean downwind as the seeds blow away. The leaf rosette, the yellow bloom and the bud stay through cooldown. |
+| **Natural, not mechanical, gathering.** | The dandelions are picked one flower at a time: each bows into the breeze while its own seeds fly off, then its bare stalk sinks into the rosette as the next flower starts. There is no per-pull kick. The leaf rosette, the yellow bloom and the bud stay through cooldown. |
 
 ## Wind Condenser (`WindCondenser.prefab`)
 
@@ -53,17 +55,48 @@ The model is built at 0.75 of the concept scale, so it matches the family footpr
 | **Work (30–70%, then filling to 92%)** | The tuft is drawn down the tower into the orb and shrinks away. The rotor winds up to 320°/s and the cloud ring and ribbons turn faster. Cloud is sucked in around the rotor and motes swirl in the orb. The orb fills with cloud, and its glow ring and the status lights charge. |
 | **Completion** | The rotor coasts down from a burst of speed. The orb pops, and a cloud puff and gust ring burst out. The output glints and `SkyChime` plays. The Sky Block lifts and slides forward on the dish. |
 
-## Cloud Dandelions (`SkyEssence.prefab`, `SkyDandelions.fbx`, about 12.7 k faces)
+## Cloud Dandelions: Silk Clock (`SkyEssence.prefab`)
 
-- **Essence (hides on cooldown):** `Bloom` is the centre stalk; the side stalks `Stalk_1` and `Stalk_2` are its children. Each head has a cloud core, 24–30 pappus seeds and a glowing heart. Five loose cloud seeds (`Seed_0`–`Seed_4`) drift nearby.
-- **Base (stays):** `Rosette` holds nine glossy leaves with ribs, a crown, a bud, a yellow bloom and river pebbles. The `Grass` ring uses the wind shader.
-- **Feedback:** `EssenceHarvestFeedback` uses the new style `SkyBloom`. The value is appended to the enum, so saved values don't change.
-  - **Idle:** the centre stalk nods.
-  - **Each of the six pulls:** an eased 2.5° gust bow, a seed burst, motes and a rising pitch.
-  - **Gathering:** the stalks shrink whole to half size and bow up to 24° downwind. If the gather is cancelled they ease back upright over about half a second instead of snapping.
-  - **Completion:** a seed burst, then the essence hides.
-  - **Respawn:** the stalks regrow.
-- **`AmbientMotion`:** sways the side stalks and runs the ambient drifting seeds and sky sparkles. Their rates rise while gathering, and they stop while the node is on cooldown (`Dormant`).
+Chosen by the user on 2026-11-15 from [Round02](SKY_ESSENCE_CONCEPTS.md#round02-frutiger-aero-dandelion-designs), with three model requests and two animation requests:
+- leaves in different sizes;
+- grass in different sizes;
+- more hand-painted colours on the green parts;
+- each flower picked in turn while its white seeds fly;
+- no shaking or rumbling, with motion that flows from flower to flower.
+
+**Model** (`SkyDandelions.fbx`, about 32 k faces; `build_sky_dandelions.py`):
+- **Flowers:** `Bloom`, `Stalk_1` and `Stalk_2` keep the earlier bases, heights and leans. They are now siblings under `SkyEssence`, so each can be picked on its own. Each has a painted stem, a receptacle, reflexed bracts and a child `Seeds_<flower>`.
+- **Seed clocks:** each `Seeds_<flower>` is a real clock of 84 parachute seeds (aqua achene, thin beak, an umbrella of 10 curled bristles), with its origin at the head centre. Five loose parachute seeds (`Seed_0`–`Seed_4`) float nearby.
+- **Rosette:** twelve toothed "lion's tooth" leaves in three sizes. Four are long, four medium, and four young leaves stand up more. It also holds the crown, the closed bud, the yellow bloom, and white and aqua pebbles.
+- **Grass:** 520 wind-shader blades in three sizes. Short and medium blades are scattered; tall ones grow in six clumps. Each blade has its own tip colour (lime, yellow-green, emerald, teal, blue-green, gold), and its sway weight is in the vertex alpha.
+- **Hand-painted greens:** leaves, stems, bracts, the bud and the crown use `Workshop_DandelionGreen`. It samples `Textures/DandelionGreens.png`, which `paint_dandelion_greens.py` paints stroke by stroke with a bristle brush:
+  - warm yellow-green toward the tips and margins, cool emerald and teal toward the base;
+  - darker margins, loose chevron veins, a pale midrib with a reddish foot, and pinkish stem feet.
+- **Materials:** essence nodes may not use the machine palette, so the pebbles use the new `Workshop_WhitePebble` and `Workshop_AquaPebble` rather than Pearl or Azure. `DandelionSeed.fbx` is one parachute seed for the particle systems.
+
+**Seed shader** (`AeroDandelionSeeds.shader`, *TowerOfBabel/Foliage/Dandelion Seeds*):
+- **Seed data:** each vertex knows its seed's umbrella centre. Blender writes it to the UV maps `SeedPivot` and `SeedInfo`, and Unity reads it as `(x, y, -z)`.
+- **Release:** the feedback sets one `_Release` value per flower. As it rises, seeds leave in a wave, downwind side first with some randomness. Each seed pops out a little, turns pappus-up, rises, drifts downwind on a one-sided arc, and shrinks away near the end of its flight.
+- **Smoothness:** a seed's path is a single smooth curve of its own progress, so nothing oscillates. The silk's emission brightens while it flies.
+
+**Gather, in gather progress p (2.8 s by default):**
+
+| Flower (pick order) | Seeds leave | Seeds land | Bare stalk sinks |
+| --- | --- | --- | --- |
+| `Stalk_2` (small, left) | 0 – 0.22 | by 0.42 | 0.36 – 0.56 |
+| `Stalk_1` (right) | 0.23 – 0.45 | by 0.65 | 0.59 – 0.79 |
+| `Bloom` (tall centre, finale) | 0.46 – 0.68 | by 0.88 | 0.82 – 1.02 |
+
+- **Before and while its seeds go:** each flower bows up to 9° downwind; later flowers start a little before their wave. As its stalk sinks to 6 % scale, it bows 10° more.
+- **Sound and seeds:** an airy whoosh starts each flower, with the pitch rising from flower to flower. A few loose parachute particles peel off the active head and keep drifting after the essence hides.
+- **The loose seeds:** they leave first, downwind, and shrink away by p ≈ 0.42.
+- **No kicks:** there is no per-pull kick, scale pulse or shiver. Every curve is eased.
+- **Completion:** the picked pose is held for up to 1.5 s until cooldown hides the essence, so it never flashes back during the network round trip. The last head's final seeds lift off as particles.
+- **Cancel:** the picture eases back no faster than a gather moves forward (0.35 progress per second), then lands softly. Seeds drift back and stalks rise.
+- **Respawn:** flowers regrow over 0.9 s.
+- **Idle:** each flower nods on its own slow rhythm (under 0.2 Hz), and the silk shimmers softly. After a reset the nod and the loose seeds' bob fade in rather than jump.
+- **One owner:** `AmbientMotion` keeps only the drifting seeds and sparkles; it has no channels on the stalks, so only `EssenceHarvestFeedback` turns them.
+- **Gameplay values:** `PresentationScale` reports the share of the dandelions still standing. It follows the gather itself, so a cancel restores it at once.
 
 ## Runtime pieces
 
@@ -79,7 +112,9 @@ The model is built at 0.75 of the concept scale, so it matches the family footpr
 
 ## Authoring
 
-1. **Blender:** send `Tools/BuildingAero/build_sky_workshop.py` to the Blender MCP socket. It uses `sky_concept_kit.py` and exports both FBX files. The source is `ArtSource/Resources/Sky_Workshop.blend`.
+1. **Blender:**
+   - **Wind Condenser:** send `Tools/BuildingAero/build_sky_workshop.py` to the Blender MCP socket. It uses `sky_concept_kit.py` and exports `WindCondenser.fbx`. The source is `ArtSource/Resources/Sky_Workshop.blend`.
+   - **Dandelions:** run `python paint_dandelion_greens.py` first. Then run `build_sky_dandelions.py`, through the MCP socket or headless with `blender -b --factory-startup --python build_sky_dandelions.py`. It uses `sky_concept_kit.py` and `dandelion_kit.py`, exports `SkyDandelions.fbx` and `DandelionSeed.fbx`, and saves `ArtSource/Resources/Sky_Dandelions.blend`. `REVIEW = True` also renders a Blender still.
 2. **Unity:** from the saved, clean Tower scene, run **Tower of Babel → Resources → Apply processor family**, then **Apply essence nodes, blocks and building costs**. New materials: `Workshop_Meadow`, `FrostBlade`, `WindRibbon`, `Daisy`, `Pollen`, `Leaf`, `Stem`. New sound: `SkyChime`.
 3. **Fix:** `ResourceStationKit.SceneRoot` now finds station instances inside the scene's **Resources** and **Processors** groups. Before, every Apply run added a root-level duplicate of each machine and essence node. The duplicates made by this session's first run were removed.
 
@@ -111,16 +146,36 @@ The model is built at 0.75 of the concept scale, so it matches the family footpr
   - **Snaps.** A cancelled gather snapped the dandelions upright and full size, and the loose seeds back into place. They now ease back.
   - **Calmer values.** Rotor 560 → 320°/s, idle 38 → 30°/s. Cloud ring 80 → 42°/s and wind ribbons 210 → 95°/s at full work. Ribbon breathing is halved and slowed. Daisies sway 3–5° at about 0.15 Hz (was 5–11°). Side stalks sway 2.5–5°. The essence feed's swirl is reduced.
   - **Preview.** The review is now rendered at 30 fps (`Capture("Pass3", 30, 7.6f, 540)`), so the 12 fps strobing no longer hides how the motion looks.
+- **Pass 4 (2026-11-15, Silk Clock)** reviewed the flower-by-flower gather at 30 fps (`Capture("Pass4", 30, 7.6f, 540)`). The dandelion-only key frames and GIF are `Dandelions_Pass4_Keyframes.png` and `Dandelions_Pass4.gif` in `_Screenshots-and-previews-to-delete/SkyWorkshop/Pass4/`. Fixes during the pass:
+  - The flying achenes read as dark dashes, so they were lightened and the silk thickened (2.4 mm bristles) and brightened, with more glow in flight.
+  - A completed gather briefly rewound before cooldown hid it; it is now held.
+  - A cancel rewound twice as fast as the gather; it is now capped.
+  - The first frame after a reset jumped to the idle nod and bob, and the first flower carried a small bow at rest. Both now start from zero.
 - **Remaining notes:**
   - The gust ring reads best in motion, not in stills.
 
 ## Verification
 
-- **EditMode `SkyWorkshopEditModeTests`** (5 tests):
+- **EditMode `SkyWorkshopEditModeTests`** (6 tests):
   - the condenser's parts and idle life: idle spin, cloud ring orbit, daisy nod, ambient rates;
   - work speeding the wind, the anticipation squash, the completion pop and settle, the effect lists and the chime;
-  - the dandelions: style, hierarchy, ambient seeds, nodding and swaying, shrinking whole and leaning when gathered, dormant on cooldown;
-  - smoothness (Pass 3): each station is stepped at 60 fps through a whole cycle. Daisies may not move more than 1° in a frame, and spinning parts may not change their speed by more than 1° per frame. The orb may not change scale by more than 1.2% in a frame. The dandelion stalks may not turn more than 2° per frame through six pulls and a cancelled gather, or change scale by more than 7%.
+  - the condenser's smoothness (Pass 3), stepped at 60 fps through a whole cycle. Daisies may not move more than 1° in a frame, and spinning parts may not change their speed by more than 1° per frame. The orb may not change scale by more than 1.2% in a frame.
+  - Silk Clock model (2026-11-15):
+    - the pick order, sibling stalks, painted stems and seed clocks on the seed shader;
+    - every bristle starting at its seed's stored pivot;
+    - the atlas mixing yellow-green, green and teal-green;
+    - the grass in short, medium and tall sizes with at least 8 tip shades;
+    - no ambient channels on the stalks, and parachute-seed particles.
+  - Picking the flowers one after another:
+    - at p 0.12 only the first flower releases, and it bows downwind;
+    - at p 0.36 the first flower's seeds are all gone and the second's are flying;
+    - at p 0.62 the first stalk has sunk and the centre flower has started;
+    - at p 1 everything is picked and flown;
+    - idle nod, dormant on cooldown, and a clean reset.
+  - Silk Clock smoothness, stepped at 60 fps through a gather, the completion hold, cooldown, respawn and a cancelled gather:
+    - stalks turn less than 0.8° per frame and change scale by less than 7 % of rest per frame;
+    - visible release moves less than 0.08 per frame, and loose seeds less than 5 cm per frame;
+    - the completion pose never rewinds before cooldown, and the cancel eases fully back.
 - **`ProcessorFamilyEditModeTests`** (10) were updated for the Wind Condenser: the meadow base, a rotor turning about the front axis, and no `SkySpinner` left anywhere.
 - **`EssenceWorkshopEditModeTests`** (8) were updated for the `Rosette` base.
 - **`IronWorkshopEditModeTests`** (8) pass again now that the duplicates are gone.

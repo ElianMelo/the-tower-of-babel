@@ -57,6 +57,10 @@ The current revision separates the recessed water interior from the smooth glass
 - `Asset/Arch-Supported-Pillar-Pads-User.png` — remove the separate square support pads when a pillar connects directly to an arch below; keep support bridges where a setback leaves no arch beneath the pillar.
 - `Asset/Tile-Gaps-And-Distance-Culling-User.png` — reported missing distant river/floor assets and visible grid joints in the covered tower interior. See [the repair and verification](../Documentation/FrutigerAero/Buildings/TILE_VISIBILITY_AND_JOINS.md) and its floor 0, 20 and 42 previews. Tile frames should not interrupt the continuous marble or enclosed river.
 
+### Dandelion clock — 2026-11-15
+
+- `Asset/Dandelion-Clock-User.webp` — supplied photo of a real dandelion clock: a sphere of fine white parachute seeds (pappus umbrellas on thin beaks) around a dark seed core, and beside it a spent head with only a few seeds left and its bracts curled down. Used for the ten Cloud Dandelions designs in [sky essence concepts, Round02](../Documentation/FrutigerAero/Resources/SKY_ESSENCE_CONCEPTS.md#round02-frutiger-aero-dandelion-designs).
+
 ### Soft golden sun — 2026-11-14
 
 - `Asset/Golden-Sun-Glow-User.webp` — supplied golden-hour field: the sun is a white-hot inner circle that smooths out into a wide warm halo, the sky on its side washes gold, and distant hills and trees toward the sun melt into the glow while the rest of the scene stays readable. Backlit grass glows (not implemented yet). See [soft golden sun glow](../Documentation/FrutigerAero/Lighting/SUN_GLOW.md) and its captures in `../_Screenshots-and-previews-to-delete/SunGlow/`.

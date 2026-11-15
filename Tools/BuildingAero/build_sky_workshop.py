@@ -1,17 +1,16 @@
-"""Sky workshop: the Wind Condenser processor and the Cloud Dandelion sky essence node (production models).
+"""Sky workshop: the Wind Condenser processor (production model). The Cloud Dandelions node it used to build
+moved to build_sky_dandelions.py on 2026-11-15.
 
 Requested 2026-11-04. The user picked Wind Condenser variant 03A (Bliss Hill) for the sky processor and
 sky essence concept 03 (Cloud Dandelions) for the resource, to be enhanced and animated in Unity.
 Run inside the connected Blender (MCP socket). Builds its own scene, 'Aero_SkyWorkshop', exports:
   Assets/_Project/Models/Resources/WindCondenser.fbx
-  Assets/_Project/Models/Resources/SkyDandelions.fbx
 and saves the data to ArtSource/Resources/Sky_Workshop.blend without changing the open file.
 
 Every part that moves in Unity is its own object with its pivot where it turns:
   WindCondenser  Base, Grass (vertex colour: albedo + wind weight in alpha), Daisy_0..n, MachineBody, Orb,
                  OrbGlow, OrbCloud, CloudMass (fill, pivot at its base), Rotor (pivot at the hub), CloudRing,
                  WindSpiral_0/1, Feed, StatusLight_0..2, BlockSocket
-  SkyDandelions  SkyEssence (container: Bloom with child Stalk_1/2, Seed_0..4), Rosette, Grass
 Materials are named Workshop_* so the Unity importer remaps them to the project's materials.
 Front faces -Y (Unity -Z). Exported like build_processor_family.py (no baked space transform).
 """
@@ -227,58 +226,18 @@ bake_scale(root, CONDENSER_SCALE)
 export(root, OUT + 'WindCondenser.fbx')
 
 
-# ================================================================ Cloud Dandelions (sky essence 03, enhanced)
-node = begin('SkyDandelions', 0)
-container = empty('SkyEssence', (0, 0, 0))
-with Capture() as rosette:
-    for i in range(9):
-        a = i * TAU / 9 + .2; r = .33 if i % 2 else .42; s = .34 if i % 2 else .42
-        sphere('RosetteLeaf', (math.cos(a) * r, math.sin(a) * r, .035), s, 'Leaf', scale=(1, .36, .07), rot=(0, -.16, a), seg=20, rings=10)
-        sphere('LeafRib', (math.cos(a) * r, math.sin(a) * r, .06), s * .9, 'Stem', scale=(1, .04, .03), rot=(0, -.16, a), seg=12, rings=4)
-    sphere('Crown', (0, 0, .05), .12, 'Leaf', scale=(1, 1, .45), seg=16, rings=8)
-    rod('BudStem', (.28, .26, .04), (.33, .3, .3), .009, 'Stem', seg=6)
-    sphere('Bud', (.33, .3, .33), .045, 'Leaf', scale=(1, 1, 1.6), seg=12, rings=8)
-    sphere('BudTip', (.33, .3, .39), .022, 'Cloud', seg=10, rings=6)
-    with Capture() as yb: flower((-.34, .16, .04), .2, 'Pollen', 'Pollen', 1.6, (.2, -.2, 0))
-    pebbles(10, .72, .95, (.05, .1), seed=31, mat='RiverStone')
-merge('Rosette', rosette.objects)
-grass_vc('Grass', 380, .55, 1.0, (.08, .22), lambda x, y: 0, 23)
-
-
-def stalk(name, base, height, lean, r, seeds, parent):
-    top = Vector((base[0] + lean[0], base[1] + lean[1], height))
-    with Capture() as c:
-        ribbon('Stem', [base, ((base[0] + top.x) / 2 + lean[0] * .2, (base[1] + top.y) / 2 + lean[1] * .2, height * .55), tuple(top)], .012, 'Stem')
-        sphere('Receptacle', top, .045, 'SkyGlow', seg=14, rings=8)
-        sphere('CloudHead', top, r * .86, 'Cloud', seg=20, rings=10)
-        gold = math.pi * (3 - math.sqrt(5))
-        for i in range(seeds):
-            z = 1 - 2 * (i + .5) / seeds; rr = math.sqrt(1 - z * z); a = gold * i
-            tip = top + Vector((math.cos(a) * rr, math.sin(a) * rr, z)) * r
-            rod('Pappus', top, tip, .003, 'Daisy', seg=4)
-            sphere('Fluff', tip, .036, 'Cloud', scale=(1, 1, .8), seg=8, rings=5)
-    o = merge(name, c.objects, base, parent)
-    return o
-
-
-into(container)
-bloom = stalk('Bloom', (0, 0, .02), 1.0, (.05, .05), .17, 30, container)
-stalk('Stalk_1', (.12, -.05, .02), .8, (.3, -.12), .15, 26, bloom)
-stalk('Stalk_2', (-.1, .05, .02), .64, (-.28, .1), .14, 24, bloom)
-for i, (p, s) in enumerate([((.55, -.2, .95), .42), ((.7, .1, .82), .36), ((-.5, -.25, .78), .38), ((.2, .45, .9), .34), ((-.35, .35, 1.0), .3)]):
-    t = tuft(p, s, (0, 0, i * 1.3)); decimate(merge('Seed_%d' % i, [t], p, container), .3)
-export(node, OUT + 'SkyDandelions.fbx')
-node.location.x = 4
+# Cloud Dandelions moved to build_sky_dandelions.py on 2026-11-15 (the Silk Clock production model).
+# This script now builds only the Wind Condenser, so re-running it never overwrites SkyDandelions.fbx.
 
 bpy.data.libraries.write(BLEND, {scene}, fake_user=True, compress=True)
 report = {}
-for r in (root, node):
+for r in (root,):
     meshes = [o for o in r.children_recursive if o.type == 'MESH']
     report[r.name] = (sum(len(o.data.polygons) for o in meshes), sorted({o.name for o in r.children_recursive})[:60])
 for k, (faces, names) in report.items(): print(k, faces, 'faces;', ', '.join(names))
 def bb(o):
     pts = [o.matrix_world @ Vector(c) for c in o.bound_box]
     return tuple(round(min(p[i] for p in pts), 2) for i in range(3)), tuple(round(max(p[i] for p in pts), 2) for i in range(3))
-for n in ('Base', 'MachineBody', 'Rotor', 'Orb', 'CloudMass', 'Feed', 'Bloom', 'Stalk_1', 'Rosette', 'Seed_0', 'Grass'):
+for n in ('Base', 'MachineBody', 'Rotor', 'Orb', 'CloudMass', 'Feed', 'Grass'):
     o = bpy.data.objects.get(n)
     if o: print(n, 'origin', tuple(round(v, 2) for v in o.matrix_world.translation), 'bounds', bb(o))

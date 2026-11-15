@@ -16,7 +16,8 @@ public static class ResourceStationKit
     public const float RowZ = -101.5f;
     public static readonly string[] WorkshopMaterials =
         { "Pearl", "Azure", "Steel", "Glass", "Heat", "Sand", "Chip", "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
-          "IronOre", "Rust", "Ingot", "Molten", "GrassBlade", "LeafGlow", "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem" };
+          "IronOre", "Rust", "Ingot", "Molten", "GrassBlade", "LeafGlow", "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem",
+          "DandelionGreen", "DandelionSeeds", "AquaPebble", "WhitePebble" };
     private static readonly string[] OwnMaterials = { "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
         "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem" };
 

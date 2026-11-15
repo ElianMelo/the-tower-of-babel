@@ -79,7 +79,7 @@ cam.data.lens = 85; scene.camera = cam
 r = scene.render
 r.engine = 'BLENDER_EEVEE'; r.film_transparent = False; r.image_settings.file_format = 'PNG'
 ee = scene.eevee
-for attr, val in (('taa_render_samples', 96), ('use_raytracing', True), ('use_shadows', True), ('shadow_ray_count', 2),
+for attr, val in (('taa_render_samples', G.get('SAMPLES', 96)),('use_raytracing', True), ('use_shadows', True), ('shadow_ray_count', 2),
                   ('shadow_step_count', 8), ('use_fast_gi', True)):
     try: setattr(ee, attr, val)
     except AttributeError: pass
@@ -87,7 +87,21 @@ try: ee.ray_tracing_options.resolution_scale = '1'
 except (AttributeError, TypeError): pass
 scene.view_settings.view_transform = 'Standard'
 scene.view_settings.look = 'None'
-scene.view_settings.exposure = -.15
+scene.view_settings.exposure = G.get('EXPOSURE', -.15)
+
+if G.get('GLARE'):                     # optional soft bloom on emissive and clipped highlights (Blender 5 compositor)
+    try:
+        tree = bpy.data.node_groups.get('ConceptGlare') or bpy.data.node_groups.new('ConceptGlare', 'CompositorNodeTree')
+        tree.nodes.clear()
+        if not tree.interface.items_tree: tree.interface.new_socket('Image', in_out='OUTPUT', socket_type='NodeSocketColor')
+        rl = tree.nodes.new('CompositorNodeRLayers'); gl = tree.nodes.new('CompositorNodeGlare'); go = tree.nodes.new('NodeGroupOutput')
+        for k, v in dict(Type='Bloom', Threshold=1.0, Strength=G['GLARE'], Size=.6).items():
+            try: gl.inputs[k].default_value = v
+            except (KeyError, TypeError, ValueError) as ex: print('Glare', k, ex)
+        tree.links.new(rl.outputs['Image'], gl.inputs['Image']); tree.links.new(gl.outputs['Image'], go.inputs[0])
+        scene.compositing_node_group = tree; r.use_compositing = True
+    except Exception as ex:
+        print('Glare skipped:', ex)
 
 
 def aim(target, azimuth, elevation, distance):
@@ -108,10 +122,10 @@ def render(path):
 
 # One 3/4 close-up per concept, others hidden.
 roots = sorted([o for o in scene.objects if o.name.startswith(PREFIX) and 'height' in o], key=lambda o: o.name)
-r.resolution_x, r.resolution_y, r.resolution_percentage = 800, 1000, 100
+(r.resolution_x, r.resolution_y), r.resolution_percentage = G.get('RES', (800, 1000)), 100
 for root in roots:
     for c in top.children: c.hide_render = c is not root.users_collection[0] and True
-    h = root['height']; size = max(h * 1.15, 3.0)
+    h = root['height']; size = max(h * 1.15, G.get('MIN_SIZE', 3.0))
     centre = root.location + Vector((0, -.25, h * .46))
     place_lights(root.location)
     aim(centre, -34, 16, size / 2 / math.tan(math.radians(12)) + .6)

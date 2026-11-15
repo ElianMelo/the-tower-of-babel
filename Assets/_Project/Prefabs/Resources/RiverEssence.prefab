@@ -116,6 +116,9 @@ MonoBehaviour:
   strokeClip: {fileID: 8300000, guid: 70d6cfc16bd2d7848ae3afd649b19d46, type: 3}
   breakClip: {fileID: 8300000, guid: fb1e3cef34ebd5149934697257dcc1fb, type: 3}
   respawnClip: {fileID: 8300000, guid: 06a90877d8a622b4ea4fbbf7f11646e3, type: 3}
+  flowers: []
+  seedHeads: []
+  windDirection: {x: 1, y: 0, z: -0.25}
 --- !u!1 &4130475944096478249
 GameObject:
   m_ObjectHideFlags: 0

@@ -40,16 +40,29 @@ SHEETS = {
         '08': ('Breeze Sheaf', 'Wind-bent tall grass, cloud streaming through'),
         '09': ('Cloud Bubbles', 'Iridescent bubbles holding clouds, on moss'),
         '10': ('Wind Arch', 'Wind-carved arch with a cloud stream')}),
+    'essence02': ('SkyEssenceConcepts/Round02', 'SkyDandelion', 'SkyDandelion_Designs_Round02.png',
+                  'Cloud Dandelions - Frutiger Aero designs, round 02', 'Heads + seeds = gathered essence  /  rosette + grass = base', {
+        '01': ('Silk Clock', 'Real parachute seeds, aqua achenes'),
+        '02': ('Dewdrop Clock', 'Glass dew on seeds, tips and leaves'),
+        '03': ('Bubble Clock', 'Heads and seeds in soap bubbles'),
+        '04': ('Fiber Optic Clock', 'Bristles fade to glowing cyan tips'),
+        '05': ('Iridescent Clock', 'Pastel thin-film tips, pearl seeds'),
+        '06': ('Cloud Halo Clock', 'Cloud core kept inside a silk halo'),
+        '07': ('Crystal Clock', 'Crystal seeds, frosted glass fibres'),
+        '08': ('Half Blown Clock', 'Full, half-blown and closed heads'),
+        '09': ('Jelly Clock', 'Y2K candy-gel stems, beaded seeds'),
+        '10': ('Sparkle Clock', 'Star glints, bokeh orbs, pollen')}, (600, 500)),
 }
-W, H, BAR, PAD, HEAD = 480, 600, 92, 14, 74
+TILE, BAR, PAD, HEAD = (480, 600), 92, 14, 74
 font = lambda name, size: ImageFont.truetype('C:/Windows/Fonts/' + name, size)
 BIG, TITLE, SMALL = font('segoeuib.ttf', 34), font('segoeuib.ttf', 24), font('segoeui.ttf', 18)
 
 
 def sheet(key):
-    folder, prefix, out_name, heading, subtitle, notes = SHEETS[key]
+    folder, prefix, out_name, heading, subtitle, notes = SHEETS[key][:6]
+    W, H = SHEETS[key][6] if len(SHEETS[key]) > 6 else TILE          # optional tile size (landscape rounds)
     shots = SHOT_DIR = SHOTS / folder
-    files = sorted(SHOT_DIR.glob(prefix + '_*_*.png'))
+    files = sorted(f for f in SHOT_DIR.glob(prefix + '_*_*.png') if f.name != out_name)   # not the sheet itself
     cols = min(5, len(files)); rows = (len(files) + cols - 1) // cols
     img = Image.new('RGB', (W * cols + PAD * (cols + 1), HEAD + (H + BAR) * rows + PAD * (rows + 1)), (226, 240, 252))
     d = ImageDraw.Draw(img)
