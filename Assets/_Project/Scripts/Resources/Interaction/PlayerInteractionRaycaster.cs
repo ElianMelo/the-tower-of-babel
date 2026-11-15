@@ -37,6 +37,8 @@ namespace TowerOfBabel.Resources.Interaction
         private IServerInteractionCompletion serverCompletion;
         private IServerAuthoritativeInteractable authoritativeInteractable;
         private bool serverRejected;
+        private InteractionMovementCancel movementCancel;
+        private readonly RaycastHit[] targetHits = new RaycastHit[16];
 
         private void Awake()
         {
@@ -74,14 +76,38 @@ namespace TowerOfBabel.Resources.Interaction
                 return;
             }
 
-            Ray ray = interactionCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
-            if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactionMask, triggerInteraction))
-                SetTarget(hit.collider.gameObject);
+            if (TryFindTarget(interactionCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f)), out GameObject target))
+                SetTarget(target);
             else
                 ClearTarget();
 
             if (currentInteractable != null && currentInteractable.CanInteract && TowerOfBabel.Settings.GameInput.InteractPressed)
                 TryBeginCurrentInteraction();
+        }
+
+        /// <summary>
+        /// The nearest object along the crosshair ray within reach of the player, skipping the player's own body. A
+        /// third-person camera's ray starts where it passes the player's eyes, so the reach matches first person.
+        /// </summary>
+        public bool TryFindTarget(Ray cameraRay, out GameObject target)
+        {
+            target = null;
+            PlayerFollower follower = PlayerFollower.For(transform);
+            Ray ray = follower != null && follower.CameraDistance > 0f
+                ? PlayerCameraZoom.StartNear(cameraRay, follower.Pivot)
+                : cameraRay;
+            int count = Physics.RaycastNonAlloc(ray, targetHits, interactionDistance, interactionMask, triggerInteraction);
+            float nearest = float.MaxValue;
+            for (int i = 0; i < count; i++)
+            {
+                Collider hitCollider = targetHits[i].collider;
+                if (hitCollider == null || targetHits[i].distance >= nearest || hitCollider.transform.IsChildOf(transform))
+                    continue;
+                nearest = targetHits[i].distance;
+                target = hitCollider.gameObject;
+            }
+
+            return target != null;
         }
 
         public bool ScanNearbyConstruction()
@@ -221,6 +247,7 @@ namespace TowerOfBabel.Resources.Interaction
             activeInteractionBehaviour = currentInteractableBehaviour;
             interactionElapsed = 0f;
             interactionDuration = activeInteraction.Duration;
+            movementCancel.Begin(TowerOfBabel.Settings.GameInput.Move);
             activeInteraction.BeginInteraction(gameObject);
             serverCompletion = activeInteraction as IServerInteractionCompletion;
             if (serverCompletion != null)
@@ -247,7 +274,8 @@ namespace TowerOfBabel.Resources.Interaction
                 return;
             }
 
-            if (TowerOfBabel.Settings.GameInput.InteractPressed)
+            if (TowerOfBabel.Settings.GameInput.InteractPressed ||
+                MovementCancelsInteraction(TowerOfBabel.Settings.GameInput.Move, TowerOfBabel.Settings.GameInput.JumpPressed))
             {
                 CancelCurrentInteraction();
                 return;
@@ -260,6 +288,23 @@ namespace TowerOfBabel.Resources.Interaction
 
             if (normalizedProgress >= 1f && serverCompletion == null)
                 CompleteInteraction();
+        }
+
+        /// <summary>
+        /// Moving or jumping cancels the active action; looking around does not. Input typed into an open menu is
+        /// ignored, and keys still held when the menu closes count as already held.
+        /// </summary>
+        public bool MovementCancelsInteraction(Vector2 move, bool jumpPressed)
+        {
+            if (activeInteraction == null)
+                return false;
+            if (playerStateMachine != null && playerStateMachine.IsModalInputLocked)
+            {
+                movementCancel.Begin(move);
+                return false;
+            }
+
+            return movementCancel.ShouldCancel(move, jumpPressed);
         }
 
         private void CompleteInteraction()

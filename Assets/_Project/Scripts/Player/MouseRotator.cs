@@ -21,6 +21,15 @@ public class MouseRotator : MonoBehaviour, IPlayerControlLock
 
     private Vector2 _inputDir;
     private bool controlsLocked;
+    private PlayerFollower follower;
+
+    /// <summary>False while menus are open or the player is disconnected; timed actions keep the camera free.</summary>
+    public bool CanLook => !controlsLocked;
+
+    private void Awake()
+    {
+        follower = GetComponent<PlayerFollower>();
+    }
 
     private void Start()
     {
@@ -33,6 +42,10 @@ public class MouseRotator : MonoBehaviour, IPlayerControlLock
     {
         if (controlsLocked)
             return;
+
+        // The wheel moves the camera between the first-person eyes and the third-person orbit behind them.
+        if (follower != null)
+            follower.Zoom(TowerOfBabel.Settings.GameInput.ZoomScroll);
 
         //if (GameManager.Instance.currentGameState == GameManager.GameState.Drawing) return;
         //if (PlayerController.Instance == null) return;

@@ -70,9 +70,24 @@ were introduced with the [far tower's GPU culling](Performance/PERFORMANCE.md).
 | Settings / back | Escape (fixed) |
 | Developer controls, Developer graphics window | F3, F4 |
 | Start a local host, Join the local host | F1, F2 |
+| Camera zoom: first person / third person | Mouse wheel (fixed) |
 
 A key that another control already uses is swapped: that control takes the previous key, so nothing is left unbound.
 The arrow keys also move the player and are not remapped.
+
+### Camera and timed actions
+
+The game starts in first person. Rolling the **mouse wheel back** moves the camera behind the player into an
+over-the-shoulder third-person view (1.75 m, then 0.75 m per notch up to 6 m); rolling it **forward** brings it closer and
+past the nearest distance switches back to first person. Walls pull the third-person camera in, and the player's head
+shows only while the camera is behind it. The interaction reach is the same in both views (`PlayerFollower`,
+`PlayerCameraZoom`).
+
+While gathering, processing or building, the player stays in place but the mouse still turns and zooms the camera; that
+never cancels the action. A loading ring fills at the centre of the screen where the crosshair aims
+(`CrosshairProgressRing`). Pressing a movement key or jumping cancels the action, as does pressing Interact again. Keys
+already held when the action started are ignored until released, so walking up to a node and pressing E does not cancel
+it. Open menus take the mouse and the keys as before.
 
 ## Implementation
 

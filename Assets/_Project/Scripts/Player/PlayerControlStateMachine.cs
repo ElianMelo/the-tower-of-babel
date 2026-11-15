@@ -24,6 +24,11 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
 
     public PlayerControlState CurrentState { get; private set; } = PlayerControlState.Locked;
     public bool CanScanConstruction => connected && !modalInputLocked;
+    /// <summary>Walking and jumping: only while free, never during a timed action or with a menu open.</summary>
+    public bool CanMove => CurrentState == PlayerControlState.Moving && !modalInputLocked;
+    /// <summary>Turning and zooming the camera: also during gathering, processing and building.</summary>
+    public bool CanLook => CurrentState != PlayerControlState.Locked && !modalInputLocked;
+    public bool IsModalInputLocked => modalInputLocked;
     public event Action InteractionInterrupted;
     public event Action GatheringInterrupted
     {
@@ -111,8 +116,8 @@ public sealed class PlayerControlStateMachine : MonoBehaviour
 
     private void ApplyControlLocks()
     {
-        bool locked = CurrentState != PlayerControlState.Moving || modalInputLocked;
-        playerController?.SetControlLocked(locked);
-        mouseRotator?.SetControlLocked(locked);
+        // A timed action holds the player in place, but the camera stays free to look around and zoom.
+        playerController?.SetControlLocked(!CanMove);
+        mouseRotator?.SetControlLocked(!CanLook);
     }
 }

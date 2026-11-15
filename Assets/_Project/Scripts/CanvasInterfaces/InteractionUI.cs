@@ -27,8 +27,11 @@ public class InteractionUI : MonoBehaviour
     [SerializeField] private TMP_Text resultAmount;
     [SerializeField] private TMP_Text resultCaption;
     [SerializeField] private GameObject recipeArrow;
+    [Tooltip("Loading ring at the screen centre during timed actions. Built at runtime when left empty.")]
+    [SerializeField] private TowerOfBabel.Interface.CrosshairProgressRing crosshairRing;
 
     public InteractionActionKind Action { get; private set; }
+    public TowerOfBabel.Interface.CrosshairProgressRing CrosshairRing => crosshairRing;
 
     public void Show(string objectName, string detail, Color detailColor, string prompt,ResourceType? resourceType=null)
     {
@@ -71,6 +74,10 @@ public class InteractionUI : MonoBehaviour
         progressVisuals.SetActive(true);
         progressFill.fillAmount = clampedProgress;
         progressText.text = $"{Mathf.RoundToInt(clampedProgress * 100f)}%";
+        // The interaction screen spans the whole canvas, so its centre is where the crosshair aims.
+        if (crosshairRing == null)
+            crosshairRing = TowerOfBabel.Interface.CrosshairProgressRing.Create(transform);
+        crosshairRing.SetProgress(clampedProgress);
     }
 
     public void HideProgress()
@@ -78,6 +85,8 @@ public class InteractionUI : MonoBehaviour
         progressVisuals.SetActive(false);
         progressFill.fillAmount = 0f;
         progressText.text = "0%";
+        if (crosshairRing != null)
+            crosshairRing.Hide();
     }
 
     public void Hide()

@@ -44,6 +44,8 @@ namespace TowerOfBabel
         [Tooltip("Collapses the head bone only for the locally controlled first-person avatar.")]
         [SerializeField] private bool hideHeadForLocalPlayer = true;
 
+        private Transform hiddenHead;
+        private Vector3 hiddenHeadScale = Vector3.one;
         private bool walking;
         private bool running;
         private bool actionActive;
@@ -291,9 +293,26 @@ namespace TowerOfBabel
 
             Transform head = FindHeadTransform();
             if (head != null)
+            {
+                hiddenHead = head;
+                hiddenHeadScale = head.localScale;
                 head.localScale = Vector3.zero;
+            }
             else
                 Debug.LogWarning("Could not find the local player's head bone to hide it.", this);
+        }
+
+        /// <summary>True unless the local avatar's head is collapsed for the first-person camera.</summary>
+        public bool IsLocalHeadVisible => hiddenHead == null || hiddenHead.localScale != Vector3.zero;
+
+        /// <summary>
+        /// Shows the local avatar's head while the camera is behind it (third person) and collapses it again in first
+        /// person. Does nothing for avatars whose head was never hidden.
+        /// </summary>
+        public void SetLocalHeadVisible(bool visible)
+        {
+            if (hiddenHead != null)
+                hiddenHead.localScale = visible ? hiddenHeadScale : Vector3.zero;
         }
 
         private Transform FindHeadTransform()

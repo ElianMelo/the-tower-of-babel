@@ -92,6 +92,19 @@ namespace TowerOfBabel.Settings
         public static bool StartHostPressed => Pressed(ref startHost);
         public static bool JoinGamePressed => Pressed(ref joinGame);
 
+        /// <summary>
+        /// Mouse-wheel notches this frame, positive when the wheel rolls forward (camera zoom; not remappable). The
+        /// Input System's default uniform scroll range reports one unit per notch.
+        /// </summary>
+        public static float ZoomScroll
+        {
+            get
+            {
+                Mouse mouse = Mouse.current;
+                return mouse == null ? 0f : Mathf.Clamp(mouse.scroll.ReadValue().y, -3f, 3f);
+            }
+        }
+
         private static bool Pressed(ref InputAction action) { Resolve(); return action.WasPressedThisFrame(); }
         private static bool Held(ref InputAction action) { Resolve(); return action.IsPressed(); }
 
