@@ -60,8 +60,8 @@ public static class AeroCloudReview
                 sheet.SetPixels(column * width, (presets.Length - 1 - row) * height, width, height, frame.GetPixels());
             }
             sheet.Apply();
-            Directory.CreateDirectory(OutputFolder);
             string path = Path.Combine(OutputFolder, sheetName + ".png").Replace('\\', '/');
+            Directory.CreateDirectory(Path.GetDirectoryName(path)); // sheet names may include subfolders
             File.WriteAllBytes(path, sheet.EncodeToPNG());
             File.WriteAllText(Path.Combine(OutputFolder, sheetName + ".txt"),
                 "Rows: " + string.Join(", ", presets.Select(p => p.name)) + "\nColumns (time of day): " + string.Join(", ", times));

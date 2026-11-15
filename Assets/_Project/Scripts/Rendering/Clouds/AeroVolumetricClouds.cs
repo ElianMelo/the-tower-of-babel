@@ -37,6 +37,8 @@ namespace TowerOfBabel.Rendering
         public float SecondsToReroll => rerollTimer;
         /// <summary>Accumulated drift of the shapes (x, z metres) and the boiling offset (metres).</summary>
         public Vector3 WindOffset { get; private set; }
+        /// <summary>How far the billows have risen through the clouds (metres), accumulated from <see cref="AeroCloudLook.updraft"/>.</summary>
+        public float RiseOffset { get; private set; }
         /// <summary>Unit vector toward the light that lights the clouds (sun or moon).</summary>
         public Vector3 LightDirection { get; private set; } = Vector3.up;
         /// <summary>Linear light colour on the clouds, including intensity, tint and night boost.</summary>
@@ -182,6 +184,8 @@ namespace TowerOfBabel.Rendering
             // Days of drift stay well inside float precision; past 1000 km the pattern resets once.
             if (Mathf.Abs(offset.x) > 1e6f || Mathf.Abs(offset.y) > 1e6f || Mathf.Abs(offset.z) > 1e6f) offset = Vector3.zero;
             WindOffset = offset;
+            float rise = RiseOffset + look.updraft * dt;
+            RiseOffset = rise > 1e6f ? 0 : rise;
 
             UpdateLighting(look, daylight);
             if (dayNight != null) dayNight.cloudShade = look.sunOcclusion * Mathf.Clamp01(look.coverage * 1.4f);

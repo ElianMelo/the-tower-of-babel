@@ -24,10 +24,15 @@ MonoBehaviour:
     baseAltitude: 140
     thickness: 600
     heightVariation: 180
+    fibres: 0
+    stretch: 1
+    raggedBase: 0.33333334
+    sculpt: 0
     windDirection: 60
     windSpeed: 8
     evolution: 1.5
     shear: 150
+    updraft: 0
     sunLight: 1
     ambientLight: 1
     litTint: {r: 1, g: 1, b: 1, a: 1}

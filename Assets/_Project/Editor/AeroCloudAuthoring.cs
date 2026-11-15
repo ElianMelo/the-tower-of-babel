@@ -26,6 +26,7 @@ public static class AeroCloudAuthoring
     public const string ShapePath = NoiseFolder + "/AeroCloudShape128.asset";
     public const string DetailPath = NoiseFolder + "/AeroCloudDetail32.asset";
     public const string CoveragePath = NoiseFolder + "/AeroCloudCoverage256.asset";
+    public const string CirrusPath = NoiseFolder + "/AeroCloudCirrus1024.asset";
     public const string SkyPath = Root + "/AeroClearSky.mat";
     public const string RendererPath = "Assets/Settings/PC_Renderer.asset";
     public const string ScenePath = "Assets/_Project/Scenes/Tower.unity";
@@ -155,6 +156,8 @@ public static class AeroCloudAuthoring
             Save(AeroCloudNoise.CreateTexture3D("AeroCloudDetail32", AeroCloudNoise.DefaultDetailSize, AeroCloudNoise.Detail(AeroCloudNoise.DefaultDetailSize, NoiseSeed + 1)), DetailPath);
         if (force || AssetDatabase.LoadAssetAtPath<Texture2D>(CoveragePath) == null)
             Save(AeroCloudNoise.CreateCoverageTexture("AeroCloudCoverage256", AeroCloudNoise.DefaultCoverageSize, AeroCloudNoise.Coverage(AeroCloudNoise.DefaultCoverageSize, NoiseSeed + 2)), CoveragePath);
+        if (force || AssetDatabase.LoadAssetAtPath<Texture2D>(CirrusPath) == null)
+            Save(AeroCloudNoise.CreateCirrusTexture("AeroCloudCirrus1024", AeroCloudNoise.DefaultCirrusSize, AeroCloudNoise.Cirrus(AeroCloudNoise.DefaultCirrusSize, NoiseSeed + 3)), CirrusPath);
     }
 
     static void Save(Texture texture, string path)
@@ -195,6 +198,7 @@ public static class AeroCloudAuthoring
         feature.shapeNoise = AssetDatabase.LoadAssetAtPath<Texture3D>(ShapePath);
         feature.detailNoise = AssetDatabase.LoadAssetAtPath<Texture3D>(DetailPath);
         feature.coverageMap = AssetDatabase.LoadAssetAtPath<Texture2D>(CoveragePath);
+        feature.cirrusMap = AssetDatabase.LoadAssetAtPath<Texture2D>(CirrusPath);
         feature.SetActive(true); feature.Create();
         var serialized = new SerializedObject(renderer);
         var map = serialized.FindProperty("m_RendererFeatureMap");
@@ -245,8 +249,11 @@ public static class AeroCloudAuthoring
             (ref AeroCloudLook l) => { l.cloudSize = 0.75f; l.heightVariation = 220; l.baseAltitude = 150; l.coverage = .38f; });
         yield return P("Clear Cotton Puffs", AeroCloudWeather.ClearDay, 1.2f, "Small popcorn cumulus, crisp and bright.",
             (ref AeroCloudLook l) => { l.heightVariation = 180; l.coverage = .32f; l.density = .9f; l.cloudSize = .55f; l.cloudType = .42f; l.erosion = .45f; l.edgeSoftness = .3f; l.baseAltitude = 140; l.thickness = 260; });
-        yield return P("Clear Towering Cumulus", AeroCloudWeather.ClearDay, .7f, "Tall congestus towers with deep shading.",
-            (ref AeroCloudLook l) => { l.heightVariation = 250; l.coverage = .3f; l.density = 1.15f; l.cloudSize = 1.1f; l.cloudType = .78f; l.baseAltitude = 160; l.thickness = 1100; l.shear = 300; l.powder = .6f; l.sunOcclusion = .12f; });
+        // Review 2026-11-14: the old towers (1.1 km wide, 250 m float, torn lower third) read as blurry fragments with
+        // flat walls and horizontal lines. Congestus are separate, narrower towers that turbulence sculpts (sculpt),
+        // billowy almost to a shared flat base (raggedBase), growing upward (updraft). Deep layers march 2x steps.
+        yield return P("Clear Towering Cumulus", AeroCloudWeather.ClearDay, .7f, "Cumulus congestus: separate towers sculpted by turbulence, flat shared bases, cauliflower tops; billows rise as the towers grow.",
+            (ref AeroCloudLook l) => { l.heightVariation = 100; l.coverage = .3f; l.density = 1.2f; l.cloudSize = .6f; l.cloudType = .75f; l.erosion = .75f; l.edgeSoftness = .25f; l.baseAltitude = 160; l.thickness = 1000; l.raggedBase = .06f; l.sculpt = 1; l.windSpeed = 6; l.evolution = .6f; l.updraft = 2.5f; l.shear = 100; l.sunLight = 1.1f; l.ambientLight = .9f; l.litTint = new Color(1, .99f, .97f); l.shadowTint = new Color(.66f, .76f, .96f); l.powder = .8f; l.silverLining = .7f; l.multiScatter = .5f; l.hazeDistance = 12000; l.fadeDistance = 24000; l.sunOcclusion = .12f; });
         // Review 2026-11-06: the old fleece (thin torn sheet, erosion .7) read as floating lines. Altocumulus is a
         // high field of small, rounded cloudlets: billowy (low erosion), a little thicker, little shear.
         yield return P("Clear Altocumulus Fleece", AeroCloudWeather.ClearDay, .8f, "Altocumulus: a high field of small, rounded cloudlets with shaded undersides, like fleece.",
@@ -256,10 +263,20 @@ public static class AeroCloudAuthoring
         // Review 2026-11-06: crisper billowy tops (more erosion, firmer edges) and sky-blue shaded bellies.
         yield return P("Clear Frutiger Dream", AeroCloudWeather.ClearDay, 1.4f, "Bright Frutiger Aero cumulus: crisp billowy tops, sky-blue shaded bellies.",
             (ref AeroCloudLook l) => { l.heightVariation = 220; l.baseAltitude = 150; l.coverage = .35f; l.density = .85f; l.cloudSize = 0.9f; l.cloudType = .52f; l.erosion = .5f; l.edgeSoftness = .28f; l.litTint = new Color(1, .97f, .92f); l.shadowTint = new Color(.66f, .8f, 1); l.ambientLight = 1.2f; l.sunLight = 1.1f; l.silverLining = .75f; l.powder = .45f; l.hazeStrength = .35f; });
-        yield return P("Clear Thin High Veil", AeroCloudWeather.ClearDay, .5f, "Faint high veil; soft light, almost no shade.",
-            (ref AeroCloudLook l) => { l.heightVariation = 350; l.coverage = .55f; l.density = .8f; l.cloudSize = 2.4f; l.cloudType = .05f; l.erosion = .7f; l.edgeSoftness = .8f; l.baseAltitude = 900; l.thickness = 250; l.ambientLight = 1.3f; l.powder = 0; l.sunOcclusion = .04f; });
-        yield return P("Clear Scattered Wisps", AeroCloudWeather.ClearDay, .9f, "Sparse, torn wisps drifting quickly.",
-            (ref AeroCloudLook l) => { l.heightVariation = 280; l.coverage = .22f; l.density = .9f; l.cloudSize = .8f; l.cloudType = .35f; l.erosion = .8f; l.edgeSoftness = .45f; l.baseAltitude = 170; l.thickness = 300; l.windSpeed = 12; l.sunOcclusion = .03f; });
+        // Review 2026-11-14 (second round): the wisps still read as clumps of smeared slashes. Strand cirrus (fibres
+        // above .5) now draws long filaments from the baked cirrus map inside smooth, curving bands (no billow noise).
+        // Review 2026-11-15 (third round): still not clouds (smeared paint, a ghost); strand cirrus became a thin sheet
+        // textured with traced hair. Review 2026-11-15 (fourth round): "don't even look like cloud"; Towering Cumulus is
+        // the best shape. Scattered Wisps is now built like the towers (sculpted by turbulence, flat shared bases,
+        // cauliflower tops, rising billows) but smaller, shorter and more scattered, with wind-torn wispy fringes
+        // (more erosion, more shear). 700 m deep plus a 100 m float keeps the authored ray steps.
+        // Review 2026-11-14: the old veil and wisps did not look like clouds. A 350/280 m float bent their thin sheets
+        // into twisted ribbons, and heavy torn-base erosion left nets of lines. Both are now ice cloud: one flat sheet
+        // (little float) whose shapes are combed out along the wind (stretch) into fibres (fibres).
+        yield return P("Clear Thin High Veil", AeroCloudWeather.ClearDay, .5f, "Cirrostratus: a thin, milky ice veil with faint fibres combed along the wind; the sun shines through, almost no shade.",
+            (ref AeroCloudLook l) => { l.heightVariation = 20; l.coverage = .6f; l.density = .8f; l.cloudSize = 3; l.cloudType = .05f; l.erosion = .2f; l.edgeSoftness = 1; l.baseAltitude = 1000; l.thickness = 250; l.fibres = .2f; l.stretch = 2.5f; l.windSpeed = 5; l.evolution = .4f; l.shear = 60; l.ambientLight = 1.3f; l.shadowTint = new Color(.9f, .94f, 1); l.powder = 0; l.silverLining = .8f; l.multiScatter = .7f; l.hazeStrength = .5f; l.fadeDistance = 30000; l.sunOcclusion = .05f; });
+        yield return P("Clear Scattered Wisps", AeroCloudWeather.ClearDay, .9f, "Scattered cumulus: small sculpted towers with cauliflower tops, flat bases and wind-torn wispy fringes, spread over open blue sky; built like Towering Cumulus.",
+            (ref AeroCloudLook l) => { l.heightVariation = 100; l.coverage = .26f; l.density = 1.2f; l.cloudSize = .4f; l.cloudType = .75f; l.erosion = .85f; l.edgeSoftness = .3f; l.baseAltitude = 160; l.thickness = 700; l.raggedBase = .1f; l.sculpt = 1; l.windSpeed = 6; l.evolution = .6f; l.updraft = 2.5f; l.shear = 160; l.sunLight = 1.1f; l.ambientLight = .9f; l.litTint = new Color(1, .99f, .97f); l.shadowTint = new Color(.66f, .76f, .96f); l.powder = .8f; l.silverLining = .7f; l.multiScatter = .5f; l.hazeDistance = 12000; l.fadeDistance = 24000; l.sunOcclusion = .1f; });
         yield return P("Clear Big Sky Banks", AeroCloudWeather.ClearDay, .8f, "Large cumulus banks with wide open sky between.",
             (ref AeroCloudLook l) => { l.heightVariation = 180; l.coverage = .33f; l.cloudSize = 1.8f; l.cloudType = .55f; l.baseAltitude = 140; l.thickness = 600; });
         yield return P("Clear Golden Afternoon", AeroCloudWeather.ClearDay, .8f, "Warm-lit cumulus with lavender shadows.",

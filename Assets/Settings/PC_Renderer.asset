@@ -171,9 +171,11 @@ MonoBehaviour:
   shapeNoise: {fileID: 11700000, guid: 144dbb1e7dd8de447aba220c70a45ad4, type: 2}
   detailNoise: {fileID: 11700000, guid: bfbd2f2deda352d40869e64f71588f90, type: 2}
   coverageMap: {fileID: 2800000, guid: bedd9df9ec5c1794ebfc980c1b4b6c0f, type: 2}
+  cirrusMap: {fileID: 2800000, guid: 8a58c0416f0cad746a3fc15a205c21c9, type: 2}
   shapeTile: 1200
   detailTile: 200
   coverageTile: 7000
+  cirrusTile: 3000
   extinction: 0.009
   sunExposure: 0.45
   skyExposure: 1.1

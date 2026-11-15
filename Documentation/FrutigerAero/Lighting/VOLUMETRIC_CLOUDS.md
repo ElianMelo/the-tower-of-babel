@@ -24,14 +24,24 @@ The implementation is independent. GPL-3.0 and unlicensed code was not copied.
    - a 128³ Perlin-Worley shape noise
    - a 32³ Worley detail noise that makes bases wispy and tops billowy
    - per-cloud height: the coverage map's height channel, sampled in ~1 km patches, lifts each cloud by up to the look's `heightVariation` (squared, so most clouds stay near the base and fewer float high). The traced shell reaches base + variation + thickness.
+   - form (added 2026-11-14; the defaults leave every other preset exactly as before):
+     - `stretch` draws the shapes out along the wind, so streaks point the way the sky drifts. Cloud fields stretch by its square root, so they line up in bands.
+     - `fibres` draws cirrus from a baked 1024² cirrus hair map (since 2026-11-15):
+       - The map is traced hair. Strands follow a gently curving, wind-combed flow field. Each wisp is a few brush strokes of 10–25 thin hairs that start together, run side by side and fade out one by one into a feathered tail; some strokes hook at the head (mares' tails). Faint loose threads link the wisps, a soft glow surrounds them, and clear sky lies between.
+       - Above 0.5 (separate strands), cirrus is a thin sheet halfway up the layer, textured with the map, and the volume fades out (at 1 the march is skipped). No shipped preset uses the sheet since 2026-11-15 (fourth round); looks without it skip its texture fetches. Two copies of the map (the second larger, turned 11° and drifting a little faster as the sky evolves) hide the tile's repeats. The weather map spreads the wisps over the sky with a threshold that is soft over kilometres. Opacity grows on slanted paths (capped at about 3×). Haze builds 2.5× faster than for the volume, so distant wisps melt into the horizon.
+       - The sheet is sampled with screen derivatives and 8× anisotropic filtering, so strands toward the horizon stay sharp along their length.
+       - Below 0.5 (veils), fibres only add a faint texture to the volume.
+     - `raggedBase` is the share of each cloud, from its underside up, that is torn and wispy; above it, billows. It defaults to a third (the old fixed value).
+     - `sculpt` lowers the local coverage and tapers it with height. The 3D noise then outlines tall clouds instead of the weather map.
+     - `updraft` makes billows rise through the column (metres per second).
 
-   Six light samples toward the sun or moon give self-shadowing. Distant (long) steps read coarser mips so the horizon does not sparkle. Steps start short (8 m) near the camera and grow by a quarter of the distance. Inside a cloud, the fog around the player is sampled finely. The first ~45 m around the camera thin out, so blocks you are building stay readable inside a cloud.
+   Six light samples toward the sun or moon give self-shadowing. Distant (long) steps read coarser mips so the horizon does not sparkle. Steps start short (8 m) near the camera and grow by a quarter of the distance. Layers deeper than 800 m (base to highest top) get more steps: 2× at 1100 m and deeper (`AeroVolumetricCloudsRendererFeature.PrimarySteps`). Every clear preset except Towering Cumulus is shallower and keeps the authored count. The deep rain decks get the extra steps too. Inside a cloud, the fog around the player is sampled finely. The first ~45 m around the camera thin out, so blocks you are building stay readable inside a cloud.
 2. **Temporal**: per-camera history, reprojected at the cloud layer through URP's own projection, variance-clamped, 90% history.
 3. **Composite** at full resolution (`Blend One SrcAlpha`; the alpha channel is left unchanged). Geometry nearer than the cloud layer stays unclouded, with a 150 m soft edge.
 
 Distant clouds take on the fog colour (`hazeDistance`/`hazeStrength`) and fade out by `fadeDistance`. Overcast skies (coverage > 0.55) keep a grey haze down to the horizon where the deck lies beyond the fade distance.
 
-Noise is baked by `AeroCloudNoise` (tiling Perlin, Worley, histogram equalization) into `Environment/Clouds/Noise/`, about 2.2 MB in total.
+Noise is baked by `AeroCloudNoise` (tiling Perlin, Worley, histogram equalization, traced hair) into `Environment/Clouds/Noise/`, about 3.6 MB in memory. The 1024² R8 cirrus hair map adds about 1.4 MB of that (baked in about 1 s).
 
 ## Sky
 
@@ -64,12 +74,12 @@ Shipped presets (altitudes and densities: see the feedback round below):
 | --- | --- | --- |
 | Clear Fair Weather Cumulus | Clear | Classic flat-based, domed cumulus |
 | Clear Cotton Puffs | Clear | Small crisp popcorn cumulus |
-| Clear Towering Cumulus | Clear | Tall congestus towers, deep shading |
+| Clear Towering Cumulus | Clear | Cumulus congestus: separate towers sculpted by turbulence, flat shared bases, cauliflower tops, rising billows |
 | Clear Altocumulus Fleece | Clear | High thin sheet of small puffs |
 | Clear Stratocumulus Rolls | Clear | Broad low rolls with blue gaps |
 | Clear Frutiger Dream | Clear | Glossy airy clouds with saturated blue shadows |
-| Clear Thin High Veil | Clear | Faint high veil |
-| Clear Scattered Wisps | Clear | Sparse torn wisps |
+| Clear Thin High Veil | Clear | Cirrostratus: a milky ice veil with faint fibres along the wind |
+| Clear Scattered Wisps | Clear | Scattered cumulus built like Towering Cumulus: small sculpted towers with cauliflower tops, flat bases and wind-torn wispy fringes over open sky |
 | Clear Big Sky Banks | Clear | Large banks with wide open sky |
 | Clear Golden Afternoon | Clear | Warm-lit with lavender shadows |
 | Rain Heavy Nimbostratus | Rain | Low, thick, dark grey ceiling (most likely) |
@@ -82,6 +92,10 @@ Shipped presets (altitudes and densities: see the feedback round below):
 - **Live:** in Play Mode, drag a preset into *AeroVolumetricClouds → Preview Preset* and edit the preset asset; changes show immediately. Clear the field to return to the weather. `Reseed(int)` and `RerollClearSky()` roll a new sky.
 - **Contact sheet:** **Tower of Babel/Environment/Clouds/Capture preset contact sheet** renders every preset at morning, noon, sunset and night to `_Screenshots-and-previews-to-delete/Clouds/AllPresets.png`. `AeroCloudReview.Capture` takes chosen presets, times and camera.
 - **New presets:** *Create → Tower of Babel → Clouds → Cloud preset*, then add the asset to a list in `AeroCloudWeather.asset`.
+- **Cloud families:**
+  - Ice clouds (cirrus, cirrostratus): thin high sheet, float under ~40 m, `stretch` 2–5, `fibres` (faint .1–.3 for veils, 1 for strands), `powder` 0. Strand cirrus (`fibres` 1) is a textured sheet: `cloudSize` scales the strokes, `density` and `thickness` set their opacity, `coverage` how much of the sky has wisps, and `hazeStrength` (about .75) how softly they fade into the horizon. Float, erosion, cloud type and shear do not shape it.
+  - Tall convective towers: `sculpt` near 1, `raggedBase` under ~.1, `updraft` 1–3 m/s, a float under ~150 m (a large float shears tall towers). Scattered Wisps is the same build, smaller (size .4), shorter (700 m), more scattered (coverage .26), with more erosion and shear for wind-torn fringes. Keep float + thickness at 800 m or less to keep the authored ray steps.
+  - Leave `stretch` 1, `fibres` 0, `sculpt` 0 and `raggedBase` ⅓ for ordinary cumulus.
 - **Authoring:** **Tower of Babel/Environment/Clouds/Author volumetric clouds** (idempotent) creates any missing assets, adds the renderer feature and wires the scene. It never overwrites edited presets. *Reset cloud presets to shipped values* and *Rebake cloud noise* restore defaults.
 - **Measured cost** (2026-11-05, `FrameRateBenchmarkPlayModeTests`, Editor at 1920×1080, outside at ground level 160 m from the tower):
   - The *Aero cloud trace* pass takes 0.21 ms of GPU time.
@@ -101,6 +115,23 @@ The tower stands at y = 0 and its top floor is near 192 m (32 floors × 6 m). Th
 | Clouds too filled; should be softer and more transparent | Global extinction is 0.009 (was 0.014). Border gain is 2.2→1 (was 4→1.2), so fringes thin out gradually. Defaults are now density 0.8, erosion 0.6 and edge softness 0.4. Density tiers are lower: soft ×0.35–0.55, medium ×0.65–0.85, dense ×0.95–1.2. Rain presets got denser (2–3) so their decks stay dark. |
 | No visible volumetric clouds (round 3, 2026-11-06) | The softening above left clear days nearly empty: seen top-down, Fair Weather covered 8% of the sky at coverage 0.38, Big Sky Banks 1%, Scattered Wisps and Thin High Veil 0%. The coverage map and the shape noise each thresholded the area, then detail erosion ate the weak cores. Now the map alone decides where clouds form, and inside a region local coverage starts at 0.35 and rises over 0.08–0.3 of the map (by edge softness). Density is remapped above the coverage threshold, so every cloud reaches full density in its core. Transparency still comes from density and extinction. Medium-tier clear skies now cover 75–100% of their coverage value; the softest tier still shows clouds. Thin High Veil went from density 0.25 to 0.8 (erosion 0.85 to 0.7), and Scattered Wisps from density 0.55 to 0.8 (erosion 0.9 to 0.8), so both stay visible at the softest tier. |
 | Smaller clouds at different heights (round 4, 2026-11-06) | Noise tiles on the renderer feature: shape 2600 → 1200 m, detail 300 → 200 m, coverage 18000 → 7000 m. Larger presets shrank: Fair Weather 1 → 0.75, Frutiger Dream 1.2 → 0.9, Golden Afternoon 1 → 0.8, Towering 1.4 → 1.1, Stratocumulus 1.6 → 1.3, Big Sky Banks 2.2 → 1.8. New look value `heightVariation` (metres; default 200): clear presets 120–350 m (veil 350, wisps 280, fleece and towering 250, cumulus 180–220, stratocumulus 120); rain decks 40–120 m so they stay an even, low ceiling. Seen top-down, Fair Weather clouds went from ~1.5 km blobs to a few hundred metres. |
+
+## Feedback round (2026-11-14): closer to real clouds
+
+Captures: `_Screenshots-and-previews-to-delete/Clouds/Rework/BeforeAfter_Horizon.png` and `BeforeAfter_Up.png`. Before is on the left, after on the right; rows are Wisps, Veil and Towering; columns are noon and sunset.
+
+| Feedback | Cause | Change |
+| --- | --- | --- |
+| Thin High Veil does not look like clouds | A 350 m float bent the 250 m sheet into twisted ribbons. Erosion .7 with the torn-base rule left nets of lines. | Cirrostratus: one flat sheet (float 20 m) at 1000 m, very soft edges, erosion .2. Shapes are stretched 2.5× along the wind, with faint fibres (`fibres` .2). It looks milky and the sun shines through. |
+| Scattered Wisps do not look like clouds | The same ribbons (280 m float, erosion .8), low at 170 m. | Cirrus at 950 m, float 40 m, strands along the wind (`fibres` 1). First version: strands from the 3D Worley detail noise. |
+| Scattered Wisps still do not look like clouds (second round) | The Worley strands were short, blurry slashes clumped into patches (claw marks, smeared paint). The billowy shape noise cut each band into small blobs: a field of flecks toward the horizon. | Strands now come from the baked cirrus map: long thin filaments that curve, fork and feather out. Strand cirrus drops the billow noise, so bands are smooth, drawn out along the wind and bent by the flow field. Cutting bands with a quarter of the billow noise brought the flecks back and ended bands bluntly, so it was rejected. Look: density 1.2, size 1.3, `stretch` 3, edge softness .9. Captures: `_Screenshots-and-previews-to-delete/Clouds/Wisps/BeforeAfter_Wisps.png` (left before, right after; horizon above, overhead below). |
+| Scattered Wisps still do not look like clouds (third round, 2026-11-15) | Still a 250 m deep volume: each strand stood as a wall that the view from below smeared into a broad band, and the weather map cut the bands off along smooth outlines (smeared paint, a ghost). The smooth noise contours never looked like hair. | Strand cirrus is now a thin sheet halfway up the layer (no volume; the march is skipped), textured with the new traced hair map: wisps of fine hairs with feathered tails, some hooked, with clear sky between them. More haze (`hazeStrength` .5 → .75, sheet haze 2.5× faster) lets the strokes toward the horizon fade instead of packing into white flecks. The old 512² cirrus map is replaced. Captures: `_Screenshots-and-previews-to-delete/Clouds/Wisps3/BeforeAfter_Wisps.png` (left before, right after; horizon above, overhead below). |
+| Scattered Wisps "don't even look like cloud" (fourth round, 2026-11-15); Towering Cumulus is the best shape | No cirrus form (Worley strands, a strand map in a volume, a hair-textured sheet) read as cloud. | Scattered Wisps is rebuilt as scattered cumulus on the Towering Cumulus design: `sculpt` 1, `raggedBase` .1, `updraft` 2.5 m/s, cloud type .75, the towers' lighting. Smaller (size .4), shorter (700 m, float 100 m, so the authored ray steps), more scattered (coverage .26), with wind-torn fringes (erosion .85, shear 160), density 1.2, base 160 m. The cirrus sheet and hair map stay in the shader for cirrus looks (the veil's faint fibres use the map). Captures: `_Screenshots-and-previews-to-delete/Clouds/Wisps4/BeforeAfter_Wisps.png` (left the third round, right now; horizon above, overhead below) and `Final_Times.png` (wisps above, towers below; morning, noon, sunset). |
+| Towering Cumulus: fragments and weird lines | 1. The weather map's outline rose up the whole 1.1 km tower as a flat wall.<br>2. The torn base reached a third of the cloud: 370 m of streaky fragments.<br>3. A 250 m float sheared the towers.<br>4. Rays toward the horizon ran out of steps inside distant towers, at a distance that changes row by row, which drew horizontal lines. More light samples, shorter steps and longer settling did not help; more ray steps did. | Cumulus congestus: `sculpt` 1 (turbulence outlines bulging towers that narrow toward cauliflower tops), `raggedBase` .06 (60 m), float 100 m, narrower towers (size .6, 1000 m tall), erosion .75, crisp edges, bluer shadows, `updraft` 2.5 m/s. Deep layers march 2× steps. |
+
+Every other preset keeps its look: the new settings default to the old behaviour. The softest-tier coverage measurements for the untouched presets match the earlier values exactly.
+
+The Towering Cumulus trace costs about 2× while that sky is shown; its deep layer gets 2× the steps. Scattered Wisps keeps the authored steps. The frame-rate benchmark has not been re-run.
 
 ## Limits and follow-ups
 
@@ -135,3 +166,16 @@ The tower stands at y = 0 and its top floor is near 192 m (32 floors × 6 m). Th
 - a GPU render top-down over nine spots per clear preset at the softest density tier: each sky shows at least 30% of its coverage value as cloud (15% for thin high sheets) and stays under coverage + 0.2 (fails on the round-2 shader, where Fair Weather showed 9%)
 - a GPU render from inside a cloud: a block 12 m away stays readable while a far wall fogs over
 - a GPU render looking down from inside a cloud at transparent water: the fog lies over the water (the late composite)
+- the 2026-11-14 rework:
+  - the new form settings blend, clamp and default to the old look
+  - veil, wisps and towers have the shipped values and match their definitions; the wisps are built like the towers but smaller, shorter, more scattered and more torn, within the authored ray steps
+  - only the deep tower layer gets 2× steps
+  - the form constants and rise offset reach the shader
+  - billows rise at the updraft speed
+- the cirrus sheet, on a test-only strand cirrus look (the wisps' third-round values):
+  - a GPU render straight up: strands run across the screen in an east wind and up it in a north wind. Measured anisotropy (hair sheet, 2026-11-15): 0.32 east, 2.23 north, 0.93 without fibres.
+  - a GPU render with a blank hair map: the sky stays empty (0.000), while a look that keeps the volume (`fibres` .5) still shows cloud (0.644): every wisp comes from the sheet, with no volume left to smear
+  - a GPU render toward the horizon: mean cloud contrast in the 6° above the horizon over that at 22–38° is 0.19 shipped and 0.33 without haze (the busy band of flecks)
+- the cirrus hair map: R8, deterministic, wisps with clear sky between them (8–40% of texels), combed along the wind, wraps across both tile edges, wired to the renderer as R8 with anisotropic filtering
+- a GPU render of the wisps above the horizon: sculpting removes flat walls (column coherence 0.482 shipped, 0.516 unsculpted) and the scattered clouds leave more sky open than the towers (58% against 74% of the view)
+- a GPU render of the towers above the horizon: brightness edges line up down columns (walls) and along rows (lines) less than without sculpting, with the old step count, and in the reported look. Columns: 0.455 shipped, 0.540 unsculpted, 0.494 reported. Rows: 0.332 shipped, 0.422 with the old step count, 0.501 reported.

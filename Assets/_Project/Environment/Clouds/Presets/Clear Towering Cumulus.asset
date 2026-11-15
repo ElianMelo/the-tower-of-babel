@@ -13,30 +13,36 @@ MonoBehaviour:
   m_Name: Clear Towering Cumulus
   m_EditorClassIdentifier: TowerOfBabel.Rendering::TowerOfBabel.Rendering.AeroCloudPreset
   weather: 0
-  notes: Tall congestus towers with deep shading.
+  notes: 'Cumulus congestus: separate towers sculpted by turbulence, flat shared
+    bases, cauliflower tops; billows rise as the towers grow.'
   look:
     coverage: 0.3
-    density: 1.15
-    cloudSize: 1.1
-    cloudType: 0.78
-    erosion: 0.6
-    edgeSoftness: 0.4
+    density: 1.2
+    cloudSize: 0.6
+    cloudType: 0.75
+    erosion: 0.75
+    edgeSoftness: 0.25
     baseAltitude: 160
-    thickness: 1100
-    heightVariation: 250
+    thickness: 1000
+    heightVariation: 100
+    fibres: 0
+    stretch: 1
+    raggedBase: 0.06
+    sculpt: 1
     windDirection: 60
-    windSpeed: 8
-    evolution: 1.5
-    shear: 300
-    sunLight: 1
-    ambientLight: 1
-    litTint: {r: 1, g: 1, b: 1, a: 1}
-    shadowTint: {r: 0.82, g: 0.88, b: 1, a: 1}
+    windSpeed: 6
+    evolution: 0.6
+    shear: 100
+    updraft: 2.5
+    sunLight: 1.1
+    ambientLight: 0.9
+    litTint: {r: 1, g: 0.99, b: 0.97, a: 1}
+    shadowTint: {r: 0.66, g: 0.76, b: 0.96, a: 1}
     darkness: 0
-    powder: 0.6
-    silverLining: 0.65
+    powder: 0.8
+    silverLining: 0.7
     multiScatter: 0.5
-    hazeDistance: 14000
+    hazeDistance: 12000
     hazeStrength: 0.55
-    fadeDistance: 32000
+    fadeDistance: 24000
     sunOcclusion: 0.12

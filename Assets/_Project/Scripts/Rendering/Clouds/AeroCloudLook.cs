@@ -30,6 +30,18 @@ namespace TowerOfBabel.Rendering
         [Tooltip("Each cloud floats up to this many metres above the base, so clouds sit at different heights. 0 = one shared base.")]
         [Range(0, 1000)] public float heightVariation;
 
+        [Header("Form")]
+        [Tooltip("Cirrus ice fibres: 0 billowy water cloud, 1 fine silky strands that curl into hooks. Combine with stretch.")]
+        [Range(0, 1)] public float fibres;
+        [Tooltip("Stretches the shapes along the wind: 1 round, higher = long streaks combed downwind (cirrus).")]
+        [Range(1, 12)] public float stretch;
+        [Tooltip("Share of each cloud, from its underside up, that is torn and wispy; above it the cloud is billowy. " +
+                 "Tall towers keep this small so their sides stay cauliflower-like.")]
+        [Range(.01f, 1)] public float raggedBase;
+        [Tooltip("0 the weather map outlines each cloud (soft masses); 1 turbulence sculpts bulging towers that narrow " +
+                 "toward cauliflower tops. Use for tall convective clouds, whose map outline otherwise rises as a flat wall.")]
+        [Range(0, 1)] public float sculpt;
+
         [Header("Motion")]
         [Range(0, 360)] public float windDirection;
         [Tooltip("Drift speed, metres per second.")]
@@ -38,6 +50,8 @@ namespace TowerOfBabel.Rendering
         [Min(0)] public float evolution;
         [Tooltip("Tops lean downwind by this many metres (shear).")]
         public float shear;
+        [Tooltip("Billows rise through the cloud at this speed, metres per second: growing convective towers.")]
+        [Range(0, 10)] public float updraft;
 
         [Header("Lighting")]
         [Tooltip("Multiplies direct sun or moon light on the clouds.")]
@@ -71,11 +85,15 @@ namespace TowerOfBabel.Rendering
         {
             coverage = .4f, density = .8f, cloudSize = 1, cloudType = .5f, erosion = .6f, edgeSoftness = .4f,
             baseAltitude = 150, thickness = 450, heightVariation = 200,
-            windDirection = 60, windSpeed = 8, evolution = 1.5f, shear = 150,
+            fibres = 0, stretch = 1, raggedBase = DefaultRaggedBase, sculpt = 0,
+            windDirection = 60, windSpeed = 8, evolution = 1.5f, shear = 150, updraft = 0,
             sunLight = 1, ambientLight = 1, litTint = Color.white, shadowTint = new Color(.82f, .88f, 1),
             darkness = 0, powder = .5f, silverLining = .65f, multiScatter = .5f,
             hazeDistance = 14000, hazeStrength = .55f, fadeDistance = 32000, sunOcclusion = .08f
         };
+
+        /// <summary>The bottom third of each cloud is torn, the rest billowy (the look before this became a setting).</summary>
+        public const float DefaultRaggedBase = 1 / 3f;
 
         /// <summary>Blends every value; wind direction takes the short way round.</summary>
         public static AeroCloudLook Lerp(in AeroCloudLook a, in AeroCloudLook b, float t)
@@ -92,6 +110,11 @@ namespace TowerOfBabel.Rendering
                 baseAltitude = Mathf.Lerp(a.baseAltitude, b.baseAltitude, t),
                 thickness = Mathf.Lerp(a.thickness, b.thickness, t),
                 heightVariation = Mathf.Lerp(a.heightVariation, b.heightVariation, t),
+                fibres = Mathf.Lerp(a.fibres, b.fibres, t),
+                stretch = Mathf.Lerp(a.stretch, b.stretch, t),
+                raggedBase = Mathf.Lerp(a.raggedBase, b.raggedBase, t),
+                sculpt = Mathf.Lerp(a.sculpt, b.sculpt, t),
+                updraft = Mathf.Lerp(a.updraft, b.updraft, t),
                 windDirection = Mathf.Repeat(Mathf.LerpAngle(a.windDirection, b.windDirection, t), 360),
                 windSpeed = Mathf.Lerp(a.windSpeed, b.windSpeed, t),
                 evolution = Mathf.Lerp(a.evolution, b.evolution, t),
@@ -120,8 +143,10 @@ namespace TowerOfBabel.Rendering
             l.erosion = Mathf.Clamp01(l.erosion); l.edgeSoftness = Mathf.Clamp(l.edgeSoftness, .02f, 1);
             l.baseAltitude = Mathf.Max(50, l.baseAltitude); l.thickness = Mathf.Max(50, l.thickness);
             l.heightVariation = Mathf.Clamp(l.heightVariation, 0, 1000);
+            l.fibres = Mathf.Clamp01(l.fibres); l.stretch = Mathf.Clamp(l.stretch, 1, 12);
+            l.raggedBase = Mathf.Clamp(l.raggedBase, .01f, 1); l.sculpt = Mathf.Clamp01(l.sculpt);
             l.windDirection = Mathf.Repeat(l.windDirection, 360); l.windSpeed = Mathf.Max(0, l.windSpeed);
-            l.evolution = Mathf.Max(0, l.evolution);
+            l.evolution = Mathf.Max(0, l.evolution); l.updraft = Mathf.Clamp(l.updraft, 0, 10);
             l.sunLight = Mathf.Clamp(l.sunLight, 0, 4); l.ambientLight = Mathf.Clamp(l.ambientLight, 0, 4);
             l.darkness = Mathf.Clamp01(l.darkness); l.powder = Mathf.Clamp01(l.powder);
             l.silverLining = Mathf.Clamp(l.silverLining, 0, .95f); l.multiScatter = Mathf.Clamp(l.multiScatter, 0, .95f);

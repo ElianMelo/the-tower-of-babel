@@ -37,6 +37,23 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(safe.windDirection, Is.EqualTo(270)); Assert.That(safe.baseAltitude, Is.GreaterThanOrEqualTo(50));
             wild.heightVariation = -5; Assert.That(wild.Sanitized().heightVariation, Is.EqualTo(0));
             wild.heightVariation = 5000; Assert.That(wild.Sanitized().heightVariation, Is.EqualTo(1000));
+
+            // Form and growth (review 2026-11-14): cirrus fibres, streaks along the wind, ragged base, sculpted towers.
+            a.fibres = 0; b.fibres = 1; a.stretch = 1; b.stretch = 5; a.raggedBase = .1f; b.raggedBase = .5f;
+            a.sculpt = 0; b.sculpt = 1; a.updraft = 0; b.updraft = 4;
+            mid = AeroCloudLook.Lerp(a, b, .5f);
+            Assert.That(mid.fibres, Is.EqualTo(.5f).Within(1e-5f)); Assert.That(mid.stretch, Is.EqualTo(3).Within(1e-5f));
+            Assert.That(mid.raggedBase, Is.EqualTo(.3f).Within(1e-5f)); Assert.That(mid.sculpt, Is.EqualTo(.5f).Within(1e-5f));
+            Assert.That(mid.updraft, Is.EqualTo(2).Within(1e-5f));
+            wild.fibres = 2; wild.stretch = 0; wild.raggedBase = 0; wild.sculpt = -1; wild.updraft = 99;
+            safe = wild.Sanitized();
+            Assert.That(safe.fibres, Is.EqualTo(1)); Assert.That(safe.stretch, Is.EqualTo(1), "Stretch 0 would divide by zero in the shader.");
+            Assert.That(safe.raggedBase, Is.EqualTo(.01f)); Assert.That(safe.sculpt, Is.EqualTo(0)); Assert.That(safe.updraft, Is.EqualTo(10));
+            wild.stretch = 50; Assert.That(wild.Sanitized().stretch, Is.EqualTo(12));
+            // New looks keep the shape every preset had before these settings existed.
+            var plain = AeroCloudLook.Default;
+            Assert.That(plain.fibres, Is.Zero); Assert.That(plain.stretch, Is.EqualTo(1)); Assert.That(plain.sculpt, Is.Zero);
+            Assert.That(plain.updraft, Is.Zero); Assert.That(plain.raggedBase, Is.EqualTo(1 / 3f).Within(1e-6f));
         }
 
         [Test]
@@ -166,20 +183,120 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(dream.edgeSoftness, Is.LessThanOrEqualTo(.3f), "Crisp outlines.");
             Assert.That(dream.shadowTint.b, Is.GreaterThan(dream.shadowTint.r + .25f), "Sky-blue shaded bellies.");
 
-            // The shipped assets are what "Reset cloud presets to shipped values" rebuilds. The authoring script lives
-            // in the editor assembly, which test assemblies cannot reference, so read its definitions by reflection.
+            AssertShippedMatchesDefinition("Clear Altocumulus Fleece", "Clear Frutiger Dream");
+        }
+
+        /// <summary>
+        /// The shipped assets are what "Reset cloud presets to shipped values" rebuilds. The authoring script lives in
+        /// the editor assembly, which test assemblies cannot reference, so its definitions are read by reflection.
+        /// </summary>
+        static void AssertShippedMatchesDefinition(params string[] names)
+        {
             var authoring = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("AeroCloudAuthoring")).Single(t => t != null);
             var definitions = ((System.Collections.IEnumerable)authoring.GetMethod("PresetDefinitions").Invoke(null, null)).Cast<object>().ToArray();
-            foreach (string name in new[] { "Clear Altocumulus Fleece", "Clear Frutiger Dream" })
+            var library = Library;
+            foreach (string name in names)
             {
                 var definition = definitions.Single(d => (string)d.GetType().GetField("name").GetValue(d) == name);
                 var args = new object[] { AeroCloudLook.Default };
                 ((System.Delegate)definition.GetType().GetField("edit").GetValue(definition)).DynamicInvoke(args);
                 var look = (AeroCloudLook)args[0];
-                var shipped = library.clearDay.Select(e => e.preset).Single(p => p.name == name);
+                var shipped = library.clearDay.Concat(library.rain).Select(e => e.preset).Single(p => p.name == name);
                 Assert.That(JsonUtility.ToJson(shipped.look.Sanitized()), Is.EqualTo(JsonUtility.ToJson(look.Sanitized())), name + " matches its definition.");
                 Assert.That(shipped.notes, Is.EqualTo((string)definition.GetType().GetField("notes").GetValue(definition)));
             }
+        }
+
+        static AeroCloudLook Shipped(string name) => Library.clearDay.Concat(Library.rain).Select(e => e.preset).Single(p => p.name == name).look;
+
+        /// <summary>
+        /// Strand cirrus: the hair-textured sheet (fibres 1). Scattered Wisps used this look until review 2026-11-15
+        /// (fourth round); no shipped preset uses it now, but the sheet stays available for cirrus looks.
+        /// </summary>
+        static AeroCloudLook StrandCirrus()
+        {
+            var l = AeroCloudLook.Default;
+            l.heightVariation = 40; l.coverage = .3f; l.density = 1.2f; l.cloudSize = 1.3f; l.cloudType = .1f; l.erosion = .3f; l.edgeSoftness = .9f;
+            l.baseAltitude = 950; l.thickness = 250; l.fibres = 1; l.stretch = 3; l.windSpeed = 7; l.evolution = .5f; l.shear = 120;
+            l.sunLight = 1.05f; l.ambientLight = 1.25f; l.shadowTint = new Color(.88f, .93f, 1); l.powder = 0; l.silverLining = .8f;
+            l.multiScatter = .7f; l.hazeStrength = .75f; l.fadeDistance = 30000; l.sunOcclusion = .03f;
+            return l.Sanitized();
+        }
+
+        [Test]
+        public void ReworkedPresets_VeilIsCirrusAndTowersAndWispsAreSculptedCumulus()
+        {
+            // Review 2026-11-14: Thin High Veil and Scattered Wisps did not look like clouds (a 280-350 m float bent
+            // their thin sheets into twisted ribbons; heavy torn-base erosion left nets of lines), and Towering Cumulus
+            // broke into blurry fragments with flat walls and horizontal lines.
+            var veil = Shipped("Clear Thin High Veil");
+            Assert.That(veil.cloudType, Is.LessThan(.25f), "The veil is a high sheet.");
+            Assert.That(veil.heightVariation, Is.LessThanOrEqualTo(40), "One flat sheet; a large float twisted it into ribbons.");
+            Assert.That(veil.fibres, Is.InRange(.1f, .4f), "Faint fibres in a milky sheet, not separate strands.");
+            Assert.That(veil.stretch, Is.GreaterThanOrEqualTo(2), "Combed along the wind.");
+            Assert.That(veil.edgeSoftness, Is.GreaterThanOrEqualTo(.8f), "No hard outlines.");
+            Assert.That(veil.density, Is.LessThanOrEqualTo(AeroCloudLook.Default.density), "Translucent: the sun shines through.");
+            Assert.That(veil.powder, Is.Zero, "Ice veils have no dark edges.");
+
+            var tower = Shipped("Clear Towering Cumulus");
+            Assert.That(tower.sculpt, Is.GreaterThanOrEqualTo(.8f), "Turbulence outlines the towers, not flat map walls.");
+            Assert.That(tower.raggedBase * tower.thickness, Is.LessThanOrEqualTo(100), "Billowy almost to the base (a torn lower third was 370 m of fragments).");
+            Assert.That(tower.thickness, Is.GreaterThan(tower.cloudSize * 1200), "Taller than the shape noise is wide: towers, not blobs.");
+            Assert.That(tower.heightVariation, Is.LessThanOrEqualTo(150), "Congestus share one condensation level.");
+            Assert.That(tower.updraft, Is.GreaterThan(tower.evolution), "Billows rise faster than they boil: growing towers.");
+            Assert.That(tower.fibres, Is.Zero); Assert.That(tower.stretch, Is.EqualTo(1));
+
+            // Review 2026-11-15 (fourth round): no cirrus form of the wisps looked like cloud, and Towering Cumulus has the
+            // best shape. Scattered Wisps is built like the towers, but smaller, shorter and more scattered, with
+            // wind-torn fringes.
+            var wisps = Shipped("Clear Scattered Wisps");
+            Assert.That(wisps.fibres, Is.Zero, "Volumetric cumulus, not the cirrus sheet."); Assert.That(wisps.stretch, Is.EqualTo(1));
+            Assert.That(wisps.sculpt, Is.GreaterThanOrEqualTo(.8f), "Turbulence outlines the clouds, as for the towers.");
+            Assert.That(wisps.cloudType, Is.EqualTo(tower.cloudType).Within(.1f), "The towers' billowy build.");
+            Assert.That(wisps.raggedBase * wisps.thickness, Is.LessThanOrEqualTo(100), "Billowy almost to a flat base.");
+            Assert.That(wisps.updraft, Is.GreaterThan(wisps.evolution), "Billows rise.");
+            Assert.That(wisps.cloudSize, Is.LessThan(tower.cloudSize), "Smaller than the towers.");
+            Assert.That(wisps.thickness, Is.LessThan(tower.thickness), "Shorter than the towers.");
+            Assert.That(wisps.coverage, Is.LessThanOrEqualTo(tower.coverage), "Scattered, with open sky between.");
+            Assert.That(wisps.erosion, Is.GreaterThan(tower.erosion), "Wind-torn, wispy fringes...");
+            Assert.That(wisps.shear, Is.GreaterThan(tower.shear), "...trailing downwind.");
+            Assert.That(wisps.heightVariation + wisps.thickness, Is.LessThanOrEqualTo(AeroVolumetricCloudsRendererFeature.DeepLayerMetres), "Keeps the authored ray steps.");
+
+            // Every other preset keeps the shape it had before the new settings existed.
+            foreach (var p in Library.clearDay.Concat(Library.rain).Select(e => e.preset)
+                         .Where(p => p.name != "Clear Thin High Veil" && p.name != "Clear Scattered Wisps" && p.name != "Clear Towering Cumulus"))
+            {
+                Assert.That(p.look.fibres, Is.Zero, p.name); Assert.That(p.look.stretch, Is.EqualTo(1), p.name);
+                Assert.That(p.look.sculpt, Is.Zero, p.name); Assert.That(p.look.updraft, Is.Zero, p.name);
+                Assert.That(p.look.raggedBase, Is.EqualTo(1 / 3f).Within(1e-5f), p.name);
+            }
+            AssertShippedMatchesDefinition("Clear Thin High Veil", "Clear Scattered Wisps", "Clear Towering Cumulus");
+        }
+
+        [Test]
+        public void DeepLayers_MarchMoreStepsWhileShallowSkiesKeepTheirCost()
+        {
+            // Review 2026-11-14: rays toward the horizon ran out of steps inside distant towers at a distance that
+            // changed row by row, drawing horizontal lines across them.
+            var quality = Feature.quality;
+            var tower = Shipped("Clear Towering Cumulus");
+            Assert.That(AeroVolumetricCloudsRendererFeature.PrimarySteps(quality, tower), Is.EqualTo(quality.PrimarySteps * 2), "Towers get twice the steps.");
+            foreach (var p in Library.clearDay.Select(e => e.preset).Where(p => p.name != "Clear Towering Cumulus"))
+                Assert.That(AeroVolumetricCloudsRendererFeature.PrimarySteps(quality, p.look), Is.EqualTo(quality.PrimarySteps), $"{p.name}: no extra cost.");
+
+            var go = new GameObject("Form fixture"); go.SetActive(false);
+            var preset = ScriptableObject.CreateInstance<AeroCloudPreset>();
+            try
+            {
+                var clouds = go.AddComponent<AeroVolumetricClouds>();
+                preset.look = tower; preset.look.windDirection = 90; clouds.previewPreset = preset; clouds.Tick(0); clouds.Tick(4);
+                var block = new MaterialPropertyBlock();
+                AeroVolumetricCloudsRendererFeature.FillConstants(block, clouds, quality, 1200, 200, 7000, .009f);
+                Assert.That(block.GetVector("_AeroCloudMarch").x, Is.EqualTo(quality.PrimarySteps * 2));
+                Assert.That(block.GetVector("_AeroCloudForm"), Is.EqualTo(new Vector4(tower.fibres, tower.stretch, tower.raggedBase, tower.sculpt)));
+                Assert.That(block.GetVector("_AeroCloudWindDir").z, Is.EqualTo(tower.updraft * 4).Within(1e-3f), "The rise offset reaches the shader.");
+            }
+            finally { Object.DestroyImmediate(go); Object.DestroyImmediate(preset); }
         }
 
         [Test]
@@ -205,7 +322,8 @@ namespace TowerOfBabel.Rendering.Tests
         {
             string hlsl = File.ReadAllText("Assets/_Project/Shaders/Aero/AeroClouds.hlsl");
             // Tops keep the Worley cell centres (billows); eroding them left only the cell borders, a net of lines.
-            StringAssert.Contains("detail = lerp(detail, 1 - detail, saturate(h * 3));", hlsl);
+            // The torn underside is a share of each cloud (raggedBase: a third by default, small for towers).
+            StringAssert.Contains("float detail = lerp(noise, 1 - noise, saturate(h / _AeroCloudForm.z));", hlsl);
             // Whole-step skipping keeps one sample lattice for every pixel (a 1.6x skip drew contour bands).
             StringAssert.DoesNotContain("step * 1.6", hlsl);
             StringAssert.Contains("else t += step * 2;", hlsl);
@@ -220,7 +338,19 @@ namespace TowerOfBabel.Rendering.Tests
             // The per-cloud float mixes a rotated lookup at an unrelated scale (no axis-aligned repeat), and the
             // weather map is filtered to the sample footprint.
             StringAssert.Contains("float2 turned = float2(uv.x * .819 - uv.y * .574, uv.x * .574 + uv.y * .819) * .731;", hlsl);
-            StringAssert.Contains("_AeroCloudCoverage, sampler_LinearRepeat, (world.xz + drift) * _AeroCloudShape2.z, coverageLod)", hlsl);
+            StringAssert.Contains("_AeroCloudCoverage, sampler_LinearRepeat, AeroAlongWind(field, sqrt(_AeroCloudForm.y)) * _AeroCloudShape2.z, coverageLod)", hlsl);
+            // Strand cirrus (review 2026-11-15, third round) is a thin sheet textured with the hair map, filtered with
+            // screen derivatives (anisotropic toward the horizon). The volume fades out as the sheet fades in, and a pure
+            // sheet skips the march.
+            StringAssert.Contains("float4 AeroCirrusSheet(float3 ray, float sceneDistance, float3 hazeColor, float3 phases)", hlsl);
+            StringAssert.Contains("float2 adx = ddx(a), ady = ddy(a), bdx = ddx(b), bdy = ddy(b);", hlsl);
+            StringAssert.Contains("SAMPLE_TEXTURE2D_GRAD(_AeroCloudCirrus, sampler_AeroCloudCirrus, a, adx, ady)", hlsl);
+            StringAssert.Contains("return volume * saturate((shape * profile - (1 - sculpted))", hlsl);
+            StringAssert.Contains("|| AeroStrandy() >= 1) return empty;", hlsl);
+            StringAssert.Contains("float AeroCirrusStrands(float2 xz, float lod)", hlsl);
+            StringAssert.DoesNotContain("shape = lerp(shape, 1, strandy);", hlsl);
+            // Stretch along the wind leaves unstretched skies exactly as they were (no rotation into a wind frame).
+            StringAssert.Contains("return xz - _AeroCloudWindDir.xy * (along * (1 - 1 / stretch));", hlsl);
             string feature = File.ReadAllText("Assets/_Project/Scripts/Rendering/Clouds/AeroVolumetricCloudsRendererFeature.cs");
             StringAssert.Contains("march.z = NextJitterFrame(camera);", feature);
         }
@@ -395,13 +525,14 @@ namespace TowerOfBabel.Rendering.Tests
             var preset = ScriptableObject.CreateInstance<AeroCloudPreset>();
             try
             {
-                preset.look.windDirection = 90; preset.look.windSpeed = 10; preset.look.evolution = 2;
+                preset.look.windDirection = 90; preset.look.windSpeed = 10; preset.look.evolution = 2; preset.look.updraft = 1.5f;
                 rig.Clouds.previewPreset = preset; rig.Clouds.Tick(0);
-                var start = rig.Clouds.WindOffset;
+                var start = rig.Clouds.WindOffset; float risen = rig.Clouds.RiseOffset;
                 rig.Clouds.Tick(3);
                 var moved = rig.Clouds.WindOffset - start;
                 Assert.That(moved.x, Is.EqualTo(30).Within(1e-3f), "East wind drifts +x."); Assert.That(moved.y, Is.EqualTo(0).Within(1e-3f));
                 Assert.That(moved.z, Is.EqualTo(6).Within(1e-3f));
+                Assert.That(rig.Clouds.RiseOffset - risen, Is.EqualTo(4.5f).Within(1e-3f), "Billows rise at the updraft speed.");
             }
             finally { Object.DestroyImmediate(preset); }
         }
@@ -419,8 +550,43 @@ namespace TowerOfBabel.Rendering.Tests
             int above = 0; for (int i = 0; i < coverage.Length; i += 2) if (coverage[i] >= 255 * .6f) above++;
             Assert.That(above / (coverage.Length / 2f), Is.EqualTo(.4f).Within(.02f), "Coverage map is equalized: threshold 0.6 covers 40% of the sky.");
 
+
             var shape = AeroCloudNoise.Shape(16, 2);
             Assert.That(shape.Min(), Is.EqualTo(0)); Assert.That(shape.Max(), Is.EqualTo(255));
+        }
+
+        [Test]
+        public void CirrusMap_IsWispsOfHairCombedAlongTheWindWithClearSkyBetween()
+        {
+            // Review 2026-11-15 (third round): the cirrus map is traced hair, one byte per texel, u along the wind.
+            const int n = 128;
+            var cirrus = AeroCloudNoise.Cirrus(n, 9);
+            Assert.That(cirrus.Length, Is.EqualTo(n * n), "R8: one byte per texel.");
+            Assert.That(cirrus, Is.EqualTo(AeroCloudNoise.Cirrus(n, 9)), "Cirrus map is deterministic.");
+            float share = cirrus.Count(b => b > 25) / (float)cirrus.Length;
+            Assert.That(share, Is.InRange(.08f, .4f), $"Wisps with clear sky between them, not a pelt of hair (share {share:0.00}).");
+            // Strands run along u: brightness changes far less along a row than down a column.
+            float along = 0, across = 0;
+            for (int y = 0; y < n; y++)
+            for (int x = 0; x < n; x++)
+            {
+                int c = cirrus[y * n + x];
+                along += Mathf.Abs(cirrus[y * n + (x + 1) % n] - c);
+                across += Mathf.Abs(cirrus[(y + 1) % n * n + x] - c);
+            }
+            Assert.That(across, Is.GreaterThan(along * 2), $"Hair combed along the wind (across {across:0} vs along {along:0}).");
+            // Hairs wrap across both tile edges: the wrap pair differs no more than the roughest pair inside the tile.
+            float Step(int a, int b, bool columns)
+            {
+                float sum = 0;
+                for (int i = 0; i < n; i++) sum += columns ? Mathf.Abs(cirrus[i * n + a] - cirrus[i * n + b]) : Mathf.Abs(cirrus[a * n + i] - cirrus[b * n + i]);
+                return sum / n;
+            }
+            foreach (bool columns in new[] { true, false })
+            {
+                float roughest = 0; for (int i = 0; i < n - 1; i++) roughest = Mathf.Max(roughest, Step(i, i + 1, columns));
+                Assert.That(Step(n - 1, 0, columns), Is.LessThanOrEqualTo(roughest), (columns ? "Columns" : "Rows") + " wrap with no seam line in the sky.");
+            }
         }
 
         [Test]
@@ -432,6 +598,10 @@ namespace TowerOfBabel.Rendering.Tests
             Assert.That(feature.cloudShader, Is.EqualTo(Shader.Find("Hidden/TowerOfBabel/Volumetric Clouds")));
             Assert.That(feature.quality, Is.Not.Null); Assert.That(feature.shapeNoise, Is.Not.Null);
             Assert.That(feature.detailNoise, Is.Not.Null); Assert.That(feature.coverageMap, Is.Not.Null);
+            Assert.That(feature.cirrusMap, Is.Not.Null, "Cirrus strands need their baked map.");
+            Assert.That(feature.cirrusMap.wrapMode, Is.EqualTo(TextureWrapMode.Repeat)); Assert.That(feature.cirrusMap.mipmapCount, Is.GreaterThan(1));
+            Assert.That(feature.cirrusMap.format, Is.EqualTo(TextureFormat.R8)); Assert.That(feature.cirrusMap.width, Is.EqualTo(AeroCloudNoise.DefaultCirrusSize));
+            Assert.That(feature.cirrusMap.anisoLevel, Is.GreaterThanOrEqualTo(4), "The sheet is seen at grazing angles toward the horizon.");
             Assert.That(feature.shapeNoise.wrapMode, Is.EqualTo(TextureWrapMode.Repeat)); Assert.That(feature.shapeNoise.mipmapCount, Is.GreaterThan(1));
             Assert.That(ShaderUtil.ShaderHasError(feature.cloudShader), Is.False);
             Assert.That(feature.cloudShader.passCount, Is.EqualTo(3));
@@ -666,6 +836,258 @@ namespace TowerOfBabel.Rendering.Tests
                 Assert.That(streaky, Is.GreaterThan(clean * 1.15f), "The measure detects streaks. " + report);
                 Assert.That(streaky, Is.GreaterThan(clean * 1.25f), "...clearly. " + report);
                 Assert.That(clean, Is.LessThan(.7f), "The shipped fleece has no streak fan (it measured ~0.62; streaky skies ~0.87). " + report);
+            }
+            finally { Object.DestroyImmediate(cloudsObject); }
+        }
+
+        /// <summary>Horizontal over vertical brightness change of the cloud layer (image minus background).</summary>
+        static float Anisotropy(Color[] image, Color[] background, int size, int fromRow, int toRow)
+        {
+            float horizontal = 0, vertical = 0;
+            for (int y = fromRow; y < toRow - 1; y++)
+            for (int x = 0; x < size - 1; x++)
+            {
+                float c = (image[y * size + x] - background[y * size + x]).grayscale;
+                horizontal += Mathf.Abs((image[y * size + x + 1] - background[y * size + x + 1]).grayscale - c);
+                vertical += Mathf.Abs((image[(y + 1) * size + x] - background[(y + 1) * size + x]).grayscale - c);
+            }
+            return horizontal / Mathf.Max(vertical, 1e-5f);
+        }
+
+        [Test]
+        public void Gpu_CirrusStrandsAreCombedAlongTheWind()
+        {
+            // Review 2026-11-14: the wisps read as twisted ribbons, not clouds. Cirrus strands now trail along the
+            // wind, so seen from straight below they run across the screen in an east wind and up it in a north wind.
+            using var h = new AeroRenderHarness(128);
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            // Looking straight up: screen right is world +x, screen up is world -z.
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 20, 0), Quaternion.Euler(-90, 0, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            var clouds = cloudsObject.GetComponent<AeroVolumetricClouds>();
+            int s = h.Size;
+            float Measure(AeroCloudLook look, out float share)
+            {
+                preset.look = look; clouds.Tick(0);
+                for (int i = 0; i < 3; i++) h.Render();
+                var image = h.Render();
+                share = image.Where((c, i) => Rgb(c - background[i]) > .03f).Count() / (float)image.Length;
+                return Anisotropy(image, background, s, 0, s);
+            }
+            try
+            {
+                var wisps = StrandCirrus(); wisps.coverage = .6f; wisps.hazeStrength = 0;
+                var east = wisps; east.windDirection = 90;
+                var north = wisps; north.windDirection = 0;
+                var round = east; round.stretch = 1; round.fibres = 0;
+                float e = Measure(east, out float share), n = Measure(north, out _), r = Measure(round, out _);
+                string report = $"east {e:0.000} (cloud share {share:0.00}), north {n:0.000}, unstretched {r:0.000}";
+                TestContext.WriteLine(report);
+                // Measured 2026-11-14 (cirrus map strands): east 0.21, north 3.46, unstretched 0.92 (cloud share 0.54).
+                // Measured 2026-11-15 (hair sheet): east 0.32, north 2.23, unstretched 0.93 (cloud share 0.33).
+                Assert.That(share, Is.GreaterThan(.1f), "Strands in view. " + report);
+                Assert.That(e, Is.LessThan(r * .6f), "East wind: the strands run across the screen. " + report);
+                Assert.That(n, Is.GreaterThan(r * 1.6f), "North wind: the strands run up the screen. " + report);
+            }
+            finally { Object.DestroyImmediate(cloudsObject); }
+        }
+
+        /// <summary>
+        /// How much of the brightness change along one axis keeps the same sign across the other axis: 1 when every
+        /// row (or column) steps the same way at once, near 0 for natural, uncorrelated edges.
+        /// Rows: horizontal lines. Columns: vertical walls.
+        /// </summary>
+        static float Coherence(Color[] image, Color[] background, int size, int fromRow, int toRow, bool rows)
+        {
+            float C(int x, int y) => (image[y * size + x] - background[y * size + x]).grayscale;
+            float coherent = 0, total = 0;
+            int outer = rows ? toRow - fromRow - 1 : size - 1, inner = rows ? size : toRow - fromRow;
+            for (int o = 0; o < outer; o++)
+            {
+                float signedSum = 0, absSum = 0;
+                for (int i = 0; i < inner; i++)
+                {
+                    float d = rows ? C(i, fromRow + o + 1) - C(i, fromRow + o) : C(o + 1, fromRow + i) - C(o, fromRow + i);
+                    signedSum += d; absSum += Mathf.Abs(d);
+                }
+                coherent += Mathf.Abs(signedSum); total += absSum;
+            }
+            return coherent / Mathf.Max(total, 1e-5f);
+        }
+
+        [Test]
+        public void Gpu_DistantCirrusMeltsIntoTheHorizonInsteadOfAFieldOfFlecks()
+        {
+            // Review 2026-11-14 (second round): a field of small flecks toward the horizon. Review 2026-11-15 (third
+            // round): the sheet's strokes, foreshortened toward the horizon, packed into a busy band of white flecks as
+            // crisp as the wisps overhead. Real cirrus there sits behind far more air and fades into the haze. Measured
+            // as the mean cloud contrast in the 6 degrees above the horizon over that at 22-38 degrees.
+            using var h = new AeroRenderHarness(256);
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 45, 0), Quaternion.Euler(-20, 38, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            var clouds = cloudsObject.GetComponent<AeroVolumetricClouds>();
+            // Rows count from the bottom; the horizon sits 20 degrees below the centre.
+            int s = h.Size, horizon = s / 2 - Mathf.RoundToInt(s * 20 / 70f);
+            int Row(float degrees) => horizon + Mathf.RoundToInt(s * degrees / 70f);
+            (float low, float high) Measure(AeroCloudLook look)
+            {
+                preset.look = look; clouds.Tick(0);
+                for (int i = 0; i < 6; i++) h.Render();
+                var image = h.Render();
+                float Contrast(int from, int to)
+                {
+                    float sum = 0;
+                    for (int y = from; y < to; y++)
+                    for (int x = 0; x < s; x++) sum += Rgb(image[y * s + x] - background[y * s + x]);
+                    return sum / (s * (to - from));
+                }
+                return (Contrast(horizon + 1, Row(6)), Contrast(Row(22), Row(38)));
+            }
+            try
+            {
+                var wisps = StrandCirrus();
+                var clear = wisps; clear.hazeStrength = 0;
+                var shipped = Measure(wisps);
+                var crisp = Measure(clear);
+                float fade = shipped.low / Mathf.Max(shipped.high, 1e-5f), flecks = crisp.low / Mathf.Max(crisp.high, 1e-5f);
+                string report = $"shipped horizon/high contrast {shipped.low:0.000}/{shipped.high:0.000} = {fade:0.00}; without haze {crisp.low:0.000}/{crisp.high:0.000} = {flecks:0.00}";
+                TestContext.WriteLine(report);
+                Assert.That(shipped.high, Is.GreaterThan(.03f), "Wisps in view higher up. " + report);
+                Assert.That(shipped.low, Is.GreaterThan(.005f), "Still some cirrus toward the horizon. " + report);
+                // Measured 2026-11-15: shipped 0.016/0.082 = 0.19; without haze 0.032/0.097 = 0.33.
+                Assert.That(flecks, Is.GreaterThan(fade * 1.4f), "The measure sees a crisp horizon band. " + report);
+                Assert.That(fade, Is.LessThan(.6f), "Distant wisps fade into the horizon haze. " + report);
+            }
+            finally { Object.DestroyImmediate(cloudsObject); }
+        }
+
+        [Test]
+        public void Gpu_StrandCirrusIsAHairSheetWithNoVolumeLeftToSmear()
+        {
+            // Review 2026-11-15 (third round): drawn as a 250 m deep volume, each strand stood as a wall that the view
+            // from below smeared into a broad band, and the weather map cut the bands off along smooth outlines.
+            // Strand cirrus is now only the hair-textured sheet: with a blank hair map the sky stays empty, while a
+            // look that keeps the volume (fibres .5) still shows cloud there.
+            using var h = new AeroRenderHarness(128);
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 20, 0), Quaternion.Euler(-50, 30, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            var clouds = cloudsObject.GetComponent<AeroVolumetricClouds>();
+            var feature = Feature; var hairMap = feature.cirrusMap;
+            var blank = new Texture2D(4, 4, TextureFormat.R8, true, true) { wrapMode = TextureWrapMode.Repeat };
+            blank.SetPixelData(new byte[16], 0); blank.Apply(true, false);
+            float Share(AeroCloudLook look, Texture2D map)
+            {
+                feature.cirrusMap = map; preset.look = look; clouds.Tick(0);
+                for (int i = 0; i < 4; i++) h.Render();
+                var image = h.Render();
+                return image.Where((c, i) => Rgb(c - background[i]) > .03f).Count() / (float)image.Length;
+            }
+            try
+            {
+                var wisps = StrandCirrus(); wisps.coverage = .6f; wisps.hazeStrength = 0;
+                var volume = wisps; volume.fibres = .5f;
+                float sheet = Share(wisps, hairMap), bare = Share(wisps, blank), kept = Share(volume, blank);
+                string report = $"sheet {sheet:0.000}, sheet without hair {bare:0.000}, volume without hair {kept:0.000}";
+                TestContext.WriteLine(report);
+                // Measured 2026-11-15: sheet 0.482, sheet without hair 0.000, volume without hair 0.644.
+                Assert.That(sheet, Is.GreaterThan(.1f), "Wisps in view. " + report);
+                Assert.That(kept, Is.GreaterThan(.1f), "The measure sees a volume when one is drawn. " + report);
+                Assert.That(bare, Is.LessThan(.005f), "Every wisp comes from the hair sheet; no volume behind it. " + report);
+            }
+            finally { feature.cirrusMap = hairMap; Object.DestroyImmediate(blank); Object.DestroyImmediate(cloudsObject); }
+        }
+
+        [Test]
+        public void Gpu_ToweringCumulusShowsNoFlatWallsOrHorizontalLines()
+        {
+            // Review 2026-11-14: Towering Cumulus "fragment and weird lines". The weather map's outline rose up the
+            // whole tower as a flat wall (left-right edges lined up down each column), and rays toward the horizon ran
+            // out of steps inside distant towers at a distance that changes row by row (edges lined up along rows).
+            // Measured 2026-11-14 in the 17 degrees above the horizon: shipped 0.455 (columns) / 0.332 (rows);
+            // unsculpted 0.540 columns; the authored step count 0.422 rows; the reported look 0.494 / 0.501.
+            using var h = new AeroRenderHarness(256);
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 45, 0), Quaternion.Euler(-12, 38, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            var clouds = cloudsObject.GetComponent<AeroVolumetricClouds>();
+            var quality = Feature.quality;
+            int authoredSteps = quality.primarySteps;
+            int s = h.Size, horizon = s / 2 - Mathf.RoundToInt(s * 12 / 70f), top = horizon + s / 4;
+            (float walls, float lines) Measure(AeroCloudLook look, int steps)
+            {
+                quality.primarySteps = steps; preset.look = look; clouds.Tick(0);
+                for (int i = 0; i < 8; i++) h.Render();
+                var image = h.Render();
+                return (Coherence(image, background, s, horizon + 1, top, false), Coherence(image, background, s, horizon + 1, top, true));
+            }
+            try
+            {
+                var tower = Shipped("Clear Towering Cumulus"); tower.hazeStrength = 0;
+                var unsculpted = tower; unsculpted.sculpt = 0;
+                var reported = AeroCloudLook.Default; // the look reviewed on 2026-11-14
+                reported.heightVariation = 250; reported.coverage = .3f; reported.density = 1.15f; reported.cloudSize = 1.1f; reported.cloudType = .78f;
+                reported.baseAltitude = 160; reported.thickness = 1100; reported.shear = 300; reported.powder = .6f; reported.hazeStrength = 0;
+                var shipped = Measure(tower, authoredSteps);
+                var walls = Measure(unsculpted, authoredSteps);
+                var fewSteps = Measure(tower, authoredSteps / 2); // the step count before deep layers doubled it
+                var before = Measure(reported, authoredSteps / 2);
+                string report = $"shipped columns {shipped.walls:0.000} rows {shipped.lines:0.000}; unsculpted columns {walls.walls:0.000}; " +
+                                $"authored steps rows {fewSteps.lines:0.000}; reported look columns {before.walls:0.000} rows {before.lines:0.000}";
+                TestContext.WriteLine(report);
+                Assert.That(walls.walls, Is.GreaterThan(shipped.walls * 1.08f), "Sculpting removes the flat walls. " + report);
+                Assert.That(fewSteps.lines, Is.GreaterThan(shipped.lines * 1.1f), "Doubled steps remove the horizontal lines. " + report);
+                Assert.That(before.walls, Is.GreaterThan(shipped.walls * 1.03f), "Fewer walls than the reported look. " + report);
+                Assert.That(before.lines, Is.GreaterThan(shipped.lines * 1.2f), "Fewer lines than the reported look. " + report);
+            }
+            finally { quality.primarySteps = authoredSteps; Object.DestroyImmediate(cloudsObject); }
+        }
+
+        [Test]
+        public void Gpu_ScatteredWispsAreSculptedLikeTheTowersWithMoreOpenSky()
+        {
+            // Review 2026-11-15 (fourth round): Scattered Wisps now shares the towers' build. Turbulence outlines the
+            // clouds (without sculpting, the weather map's outline rises up each cloud as a flat wall, which lines
+            // brightness edges up down the columns), and the smaller, scattered clouds leave more sky open.
+            using var h = new AeroRenderHarness(256);
+            var preset = h.Own(ScriptableObject.CreateInstance<AeroCloudPreset>());
+            h.Camera.fieldOfView = 70; h.Camera.farClipPlane = 65536;
+            h.Camera.transform.SetPositionAndRotation(new Vector3(0, 45, 0), Quaternion.Euler(-12, 38, 0));
+            var background = h.Render();
+            var cloudsObject = CloudsInScene(h, preset);
+            var clouds = cloudsObject.GetComponent<AeroVolumetricClouds>();
+            int s = h.Size, horizon = s / 2 - Mathf.RoundToInt(s * 12 / 70f), top = horizon + s / 4;
+            (float walls, float share) Measure(AeroCloudLook look)
+            {
+                preset.look = look; clouds.Tick(0);
+                for (int i = 0; i < 8; i++) h.Render();
+                var image = h.Render();
+                int cloud = 0;
+                for (int y = horizon + 1; y < s; y++)
+                for (int x = 0; x < s; x++) if (Rgb(image[y * s + x] - background[y * s + x]) > .05f) cloud++;
+                return (Coherence(image, background, s, horizon + 1, top, false), cloud / (float)(s * (s - horizon - 1)));
+            }
+            try
+            {
+                var wisps = Shipped("Clear Scattered Wisps"); wisps.hazeStrength = 0;
+                var unsculpted = wisps; unsculpted.sculpt = 0;
+                var tower = Shipped("Clear Towering Cumulus"); tower.hazeStrength = 0;
+                var shipped = Measure(wisps); var walls = Measure(unsculpted); var towers = Measure(tower);
+                string report = $"wisps columns {shipped.walls:0.000} (sky share {shipped.share:0.00}); unsculpted columns {walls.walls:0.000}; towers sky share {towers.share:0.00}";
+                TestContext.WriteLine(report);
+                Assert.That(shipped.share, Is.GreaterThan(.08f), "Clouds in view. " + report);
+                // Measured 2026-11-15: wisps columns 0.482 (sky share 0.58); unsculpted 0.516; towers sky share 0.74.
+                Assert.That(walls.walls, Is.GreaterThan(shipped.walls * 1.04f), "Sculpting removes the flat walls. " + report);
+                Assert.That(shipped.share, Is.LessThan(towers.share * .9f), "More open sky than the towers. " + report);
             }
             finally { Object.DestroyImmediate(cloudsObject); }
         }

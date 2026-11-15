@@ -24,11 +24,15 @@ namespace TowerOfBabel.Rendering
         public Texture3D shapeNoise;
         public Texture3D detailNoise;
         public Texture2D coverageMap;
+        [Tooltip("Cirrus hair map: wisps of thin strands traced along the wind (u). Strand cirrus (fibres above .5) is a sheet textured with it; veils take faint fibres from it.")]
+        public Texture2D cirrusMap;
 
         [Header("Scale (metres per noise tile at cloud size 1)")]
         [Min(100)] public float shapeTile = 1200;
         [Min(10)] public float detailTile = 200;
         [Min(500)] public float coverageTile = 7000;
+        [Tooltip("Cirrus hair map tile, metres at cloud size 1.")]
+        [Min(200)] public float cirrusTile = DefaultCirrusTile;
         [Tooltip("Extinction per metre at density 1.")]
         [Range(.001f, .1f)] public float extinction = .009f;
 
@@ -39,7 +43,7 @@ namespace TowerOfBabel.Rendering
         [Tooltip("Scales sky light (the blue fill in shadowed sides and bases).")]
         [Range(0, 3)] public float skyExposure = DefaultSkyExposure;
 
-        public const float DefaultSunExposure = .45f, DefaultSkyExposure = 1.1f;
+        public const float DefaultSunExposure = .45f, DefaultSkyExposure = 1.1f, DefaultCirrusTile = 3000;
 
         private Material material;
         private CloudPass pass;
@@ -47,6 +51,20 @@ namespace TowerOfBabel.Rendering
 
         /// <summary>Per-cloud height noise repeats this many times per coverage tile (~1 km patches at size 1).</summary>
         public const float HeightNoiseFrequency = 6;
+
+        /// <summary>
+        /// Layers deeper than <see cref="DeepLayerMetres"/> (base to highest top) get more ray steps, reaching
+        /// <see cref="MaxStepScale"/>x at <see cref="DeepLayerMetres"/> + <see cref="DeepLayerRamp"/>. Rays toward the
+        /// horizon cross a tall layer over many kilometres; at the authored count they ran out of samples partway
+        /// through the distant towers, at a distance that changes row by row, which drew horizontal lines across them
+        /// (Towering Cumulus, review 2026-11-14). 1.4x still left faint lines; 2x removed them. Shallower layers
+        /// (every cumulus, veil and fleece preset) keep the authored count and cost.
+        /// </summary>
+        public const float DeepLayerMetres = 800, DeepLayerRamp = 300, MaxStepScale = 2;
+
+        /// <summary>Ray steps for a look: the quality's count, more for deep layers.</summary>
+        public static int PrimarySteps(AeroCloudQuality quality, in AeroCloudLook look) =>
+            Mathf.RoundToInt(quality.PrimarySteps * Mathf.Clamp(1 + (look.heightVariation + look.thickness - DeepLayerMetres) / DeepLayerRamp, 1, MaxStepScale));
 
         public const int TracePass = 0, TemporalPass = 1, CompositePass = 2;
         /// <summary>Distinct ray-march jitter patterns before the sequence repeats.</summary>
@@ -91,19 +109,21 @@ namespace TowerOfBabel.Rendering
         /// <summary>Shader constants for one camera and look. Public for tests.</summary>
         public static void FillConstants(MaterialPropertyBlock p, AeroVolumetricClouds clouds, AeroCloudQuality quality,
             float shapeTile, float detailTile, float coverageTile, float extinction,
-            float sunExposure = DefaultSunExposure, float skyExposure = DefaultSkyExposure)
+            float sunExposure = DefaultSunExposure, float skyExposure = DefaultSkyExposure,
+            float cirrusTile = DefaultCirrusTile, float cirrusResolution = AeroCloudNoise.DefaultCirrusSize)
         {
             var l = clouds.Look;
             float size = Mathf.Max(.25f, l.cloudSize);
             // The shell reaches the highest cloud: base + variation + thickness.
             p.SetVector(Ids.Layer, new Vector4(l.baseAltitude, l.baseAltitude + l.heightVariation + l.thickness, clouds.PlanetRadius, l.thickness));
-            p.SetVector(Ids.Heights, new Vector4(l.heightVariation, HeightNoiseFrequency, 0, 0));
+            p.SetVector(Ids.Heights, new Vector4(l.heightVariation, HeightNoiseFrequency, 1 / (cirrusTile * size), cirrusResolution));
             p.SetVector(Ids.Shape, new Vector4(l.coverage, l.density * extinction, 1 / (shapeTile * size), 1 / (detailTile * Mathf.Sqrt(size))));
             p.SetVector(Ids.Shape2, new Vector4(l.erosion, l.cloudType, 1 / (coverageTile * size), Mathf.Max(.02f, l.edgeSoftness)));
             var offset = clouds.WindOffset;
             p.SetVector(Ids.Wind, new Vector4(offset.x, offset.y, offset.z, l.shear));
             var dir = l.WindVector.sqrMagnitude > 1e-6f ? l.WindVector.normalized : Vector2.up;
-            p.SetVector(Ids.WindDir, new Vector4(dir.x, dir.y, 0, 0));
+            p.SetVector(Ids.WindDir, new Vector4(dir.x, dir.y, clouds.RiseOffset, 0));
+            p.SetVector(Ids.Form, new Vector4(Mathf.Clamp01(l.fibres), Mathf.Max(1, l.stretch), Mathf.Clamp(l.raggedBase, .01f, 1), Mathf.Clamp01(l.sculpt)));
             p.SetVector(Ids.Lighting, new Vector4(l.powder, l.silverLining, l.multiScatter, l.darkness));
             p.SetVector(Ids.Haze, new Vector4(l.hazeDistance, l.hazeStrength, l.fadeDistance * .6f, l.fadeDistance));
             p.SetVector(Ids.SunDir, clouds.LightDirection.normalized);
@@ -111,7 +131,7 @@ namespace TowerOfBabel.Rendering
             p.SetVector(Ids.AmbientTop, (Vector4)clouds.AmbientTop);
             p.SetVector(Ids.AmbientBottom, (Vector4)clouds.AmbientBottom);
             p.SetVector(Ids.FogColor, (Vector4)clouds.FogColor);
-            p.SetVector(Ids.March, new Vector4(quality.PrimarySteps, quality.LightSteps, Time.frameCount % JitterCycle, quality.maxStep));
+            p.SetVector(Ids.March, new Vector4(PrimarySteps(quality, l), quality.LightSteps, Time.frameCount % JitterCycle, quality.maxStep));
             p.SetVector(Ids.Tone, new Vector4(sunExposure, skyExposure, 0, 0));
         }
 
@@ -127,9 +147,9 @@ namespace TowerOfBabel.Rendering
                 Forward = Shader.PropertyToID("_AeroCloudForward"), Texel = Shader.PropertyToID("_AeroCloudTexel"),
                 DepthTexel = Shader.PropertyToID("_AeroCloudDepthTexel"), Temporal = Shader.PropertyToID("_AeroCloudTemporal"),
                 PrevView = Shader.PropertyToID("_AeroCloudPrevView"), Composite = Shader.PropertyToID("_AeroCloudComposite"), Heights = Shader.PropertyToID("_AeroCloudHeights"),
-                Tone = Shader.PropertyToID("_AeroCloudTone"),
+                Tone = Shader.PropertyToID("_AeroCloudTone"), Form = Shader.PropertyToID("_AeroCloudForm"),
                 ShapeNoise = Shader.PropertyToID("_AeroCloudShapeNoise"), DetailNoise = Shader.PropertyToID("_AeroCloudDetailNoise"),
-                Coverage = Shader.PropertyToID("_AeroCloudCoverage"), Depth = Shader.PropertyToID("_AeroCloudDepth"),
+                Coverage = Shader.PropertyToID("_AeroCloudCoverage"), Cirrus = Shader.PropertyToID("_AeroCloudCirrus"), Depth = Shader.PropertyToID("_AeroCloudDepth"),
                 History = Shader.PropertyToID("_AeroCloudHistory"), BlitTexture = Shader.PropertyToID("_BlitTexture"),
                 BlitScaleBias = Shader.PropertyToID("_BlitScaleBias");
         }
@@ -151,7 +171,7 @@ namespace TowerOfBabel.Rendering
             public int shaderPass;
             public TextureHandle source, depth, history;
             public Texture3D shape, detail;
-            public Texture2D coverage;
+            public Texture2D coverage, cirrus;
         }
 
         /// <summary>This frame's cloud result, handed from the main pass to the late composite.</summary>
@@ -236,7 +256,8 @@ namespace TowerOfBabel.Rendering
                 Vector3 position = camera.transform.position;
 
                 var constants = blocks[0];
-                FillConstants(constants, clouds, quality, owner.shapeTile, owner.detailTile, owner.coverageTile, owner.extinction, owner.sunExposure, owner.skyExposure);
+                FillConstants(constants, clouds, quality, owner.shapeTile, owner.detailTile, owner.coverageTile, owner.extinction, owner.sunExposure, owner.skyExposure,
+                    owner.cirrusTile, owner.cirrusMap != null ? owner.cirrusMap.width : AeroCloudNoise.DefaultCirrusSize);
                 // A new jitter pattern every traced frame, per camera: Time.frameCount stands still between several
                 // renders in one frame (editor captures, extra cameras), which froze the step slices into bands.
                 var march = constants.GetVector(Ids.March); march.z = NextJitterFrame(camera); constants.SetVector(Ids.March, march);
@@ -300,7 +321,7 @@ namespace TowerOfBabel.Rendering
             {
                 Ids.Layer, Ids.Shape, Ids.Shape2, Ids.Wind, Ids.WindDir, Ids.Lighting, Ids.Haze, Ids.SunDir, Ids.SunColor,
                 Ids.AmbientTop, Ids.AmbientBottom, Ids.FogColor, Ids.March, Ids.Camera, Ids.Forward, Ids.Texel, Ids.DepthTexel, Ids.BlitScaleBias,
-                Ids.Composite, Ids.Heights, Ids.Tone
+                Ids.Composite, Ids.Heights, Ids.Tone, Ids.Form
             };
 
             private static void CopyConstants(MaterialPropertyBlock from, MaterialPropertyBlock to)
@@ -314,7 +335,7 @@ namespace TowerOfBabel.Rendering
                 using var builder = graph.AddRasterRenderPass<PassData>(name, out var d, sampler);
                 d.material = owner.material; d.props = props; d.shaderPass = shaderPass;
                 d.source = source; d.depth = depth; d.history = history;
-                d.shape = owner.shapeNoise; d.detail = owner.detailNoise; d.coverage = owner.coverageMap;
+                d.shape = owner.shapeNoise; d.detail = owner.detailNoise; d.coverage = owner.coverageMap; d.cirrus = owner.cirrusMap;
                 if (source.IsValid()) builder.UseTexture(source, AccessFlags.Read);
                 if (depth.IsValid()) builder.UseTexture(depth, AccessFlags.Read);
                 if (history.IsValid()) builder.UseTexture(history, AccessFlags.Read);
@@ -323,6 +344,7 @@ namespace TowerOfBabel.Rendering
                 {
                     var p = data.props;
                     p.SetTexture(Ids.ShapeNoise, data.shape); p.SetTexture(Ids.DetailNoise, data.detail); p.SetTexture(Ids.Coverage, data.coverage);
+                    p.SetTexture(Ids.Cirrus, data.cirrus != null ? data.cirrus : Texture2D.grayTexture);
                     if (data.source.IsValid()) p.SetTexture(Ids.BlitTexture, (Texture)data.source);
                     if (data.depth.IsValid()) p.SetTexture(Ids.Depth, (Texture)data.depth);
                     if (data.history.IsValid()) p.SetTexture(Ids.History, (Texture)data.history);
