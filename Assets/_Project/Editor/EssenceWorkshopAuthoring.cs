@@ -175,7 +175,7 @@ public static class EssenceWorkshopAuthoring
     }
 
     /// <summary>Loose parachute seeds (DandelionSeed.fbx, pappus up) drifting downwind with a slow turn.</summary>
-    private static ParticleSystem SeedParticles(Transform parent, string name, Vector3 position, float lifetime, float rate)
+    internal static ParticleSystem SeedParticles(Transform parent, string name, Vector3 position, float lifetime, float rate)
     {
         var ps = Particles(parent, name, position, Mat("Cloud"), Mesh("DandelionSeed"), new Color(1, 1, 1, .95f), .55f, .85f, -.02f, lifetime, .05f, rate, .3f);
         var main = ps.main; main.startRotation3D = true;

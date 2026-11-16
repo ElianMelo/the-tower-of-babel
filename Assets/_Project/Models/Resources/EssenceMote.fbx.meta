@@ -122,6 +122,16 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Workshop_OrbCloud
+    second: {fileID: 2100000, guid: 5382da36e8c27e94cafde5954a85fb8c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_OrbGlass
+    second: {fileID: 2100000, guid: c5c81f97f07af4b45a0401b26fcfd2fb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Workshop_Pearl
     second: {fileID: 2100000, guid: 50aab8d489d7fde419135aca58f8e97f, type: 2}
   - first:
@@ -154,6 +164,21 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Workshop_Sand
     second: {fileID: 2100000, guid: 9f0fcc32614b3354191295a0af70af6c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_SilkTurbineBlade
+    second: {fileID: 2100000, guid: e889fc933d81e0941b03d66da9e18857, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_SilkTurbinePaint
+    second: {fileID: 2100000, guid: df982de4688700b4286b6de837754d6d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Workshop_SilkTurbineTop
+    second: {fileID: 2100000, guid: ac7f24ef3c57f11449c1a07bf3176b66, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule

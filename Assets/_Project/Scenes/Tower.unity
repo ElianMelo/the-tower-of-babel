@@ -1299,7 +1299,7 @@ Light:
   serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 0.97, b: 0.88, a: 1}
-  m_Intensity: 2.3208144
+  m_Intensity: 2.3633368
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1411,7 +1411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.LensFlareComponentSRP
   m_LensFlareData: {fileID: 11400000, guid: 15d76ef70c24ef242aedec97efdbb43c, type: 2}
   version: 0
-  intensity: 0.85
+  intensity: 0.8370151
   maxAttenuationDistance: 100
   maxAttenuationScale: 100
   distanceAttenuationCurve:
@@ -571728,7 +571728,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7422706814231141972, guid: 502fdf7c11e25c64c88b14261c22bb7d, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -572018,6 +572018,18 @@ MonoBehaviour:
   player: {fileID: 805851541}
   fallbackHeadHeight: 0.75
   eyeHeightOffset: 0.06
+  startDistance: 0
+  minThirdPersonDistance: 1.75
+  maxThirdPersonDistance: 6
+  zoomStep: 0.75
+  shoulderOffset: {x: 0.45, y: 0.25}
+  zoomSharpness: 12
+  collisionRadius: 0.2
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  collisionRecoverySpeed: 6
+  headHiddenBelowDistance: 0.6
 --- !u!1001 &1273116479
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -572426,7 +572438,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7422706814231141972, guid: 502fdf7c11e25c64c88b14261c22bb7d, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7422706814231141972, guid: 502fdf7c11e25c64c88b14261c22bb7d, type: 3}
       propertyPath: m_Shadows.m_Type

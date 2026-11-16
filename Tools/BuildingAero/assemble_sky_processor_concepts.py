@@ -52,6 +52,18 @@ SHEETS = {
         '08': ('Half Blown Clock', 'Full, half-blown and closed heads'),
         '09': ('Jelly Clock', 'Y2K candy-gel stems, beaded seeds'),
         '10': ('Sparkle Clock', 'Star glints, bokeh orbs, pollen')}, (600, 500)),
+    'silk03': ('SkyProcessorConcepts/Round03', 'SilkProcessor', 'SilkProcessor_Concepts_Round03.png',
+               'Wind Condenser rework - Silk Clock propositions, round 03', 'Silk Clock seeds in  ->  silk  ->  cloud  ->  Sky Block out (front)', {
+        '01': ('Silk Turbine', 'Real turbine; seeds spiral into the orb'),
+        '02': ('Pinwheel Trio', 'Three pinwheels in the pick order'),
+        '03': ('Pappus Rotor', 'Glass pappus, rolling vortex ring'),
+        '04': ('Cup Anemometer', 'Cups scoop seeds one by one'),
+        '05': ('Silk Spinning Wheel', 'Silk drafted into a thread'),
+        '06': ('Floss Spinner', 'Silk flung into a web, wound'),
+        '07': ('Silk Sail Mill', 'Sails dressed with silk in turn'),
+        '08': ('Clock Rebuilder', 'Seeds dock back on a glass head'),
+        '09': ('Silk Top', 'A silk band wound on a glass top'),
+        '10': ('Kite Winch', 'A silk kite reeled in with cloud')}),
 }
 TILE, BAR, PAD, HEAD = (480, 600), 92, 14, 74
 font = lambda name, size: ImageFont.truetype('C:/Windows/Fonts/' + name, size)

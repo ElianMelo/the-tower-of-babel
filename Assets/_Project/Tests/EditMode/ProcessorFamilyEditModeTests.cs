@@ -65,7 +65,7 @@ namespace TowerOfBabel.Resources.Tests
                 new[] { "Workshop_Brick", "Workshop_Heat" },         // brick hearth with glowing vents, cooling rack
                 new[] { "Workshop_RiverStone", "Workshop_RiverGlass" }, // riverbed and flume
                 new[] { "Workshop_WaterGlass", "Workshop_ClearGlass" }, // hydraulic platform with a glass catch basin
-                new[] { "Workshop_Meadow", "Workshop_LeafGlow" },     // Bliss-style meadow hill with green status lights
+                new[] { "Workshop_SilkTurbinePaint", "Workshop_LeafGlow" }, // Silk Turbine: a hand-painted pad, no green base, green lamps
                 new[] { "Workshop_IronOre", "Workshop_Molten" },     // cast-iron plinth with a glowing runner and casting mould
             };
             var sets = MachineIndices.Select(i =>

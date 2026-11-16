@@ -401,17 +401,19 @@ def bracts(g, top, R, s, rng, length=1.):
                   p0 + o * L * .16 + Vector((0, 0, -L * .32))], (.0045, .004, .003, .001), s['bract'])
 
 
-def parachute(g, p, up, s, rng, size=.16, k=14):
-    """One loose seed floating pappus-up: achene, beak and a flat umbrella of bristles."""
+def parachute(g, p, up, s, rng, size=.16, k=14, width=None):
+    """One loose seed floating pappus-up: achene, beak and a flat umbrella of bristles.
+    width (optional) thickens the bristles and beak so a seed reads at machine distance (the Silk Turbine)."""
     p, up = Vector(p), Vector(up).normalized(); u, v = frame(up); hue = rng.random(); tips = []
     g.seed = (p.copy(), hue)
     a0, a1 = p - up * size, p - up * size * .62; aw = .008 * size / .16
     g.strand([a0, a0.lerp(a1, .5), a1], (aw * .3, aw, aw * .5), s['ach'], sides=s['ach_sides'], hue=hue)
-    g.prism(a1, p, .0018, .0015, s['beak'], hue=hue)
+    bw = (.0017, .0012, .0004) if width is None else (width, width * .75, width * .3)
+    g.prism(a1, p, .0018 if width is None else width * .9, .0015 if width is None else width * .8, s['beak'], hue=hue)
     for j in range(k):
         phi = j * TAU / k + rng.uniform(-.2, .2); th = math.radians(78 + rng.uniform(-8, 6))
         b = up * math.cos(th) + (u * math.cos(phi) + v * math.sin(phi)) * math.sin(th)
         L = size * .42 * rng.uniform(.9, 1.1); m = p + b * L * .55; e = m + (b * .8 + up * .2).normalized() * L * .48
-        g.prism(p, m, .0017, .0012, s['pap'], 0, .55, hue); g.prism(m, e, .0012, .0004, s['pap'], .55, 1, hue)
+        g.prism(p, m, bw[0], bw[1], s['pap'], 0, .55, hue); g.prism(m, e, bw[1], bw[2], s['pap'], .55, 1, hue)
         tips.append((e, up, hue))
     return tips

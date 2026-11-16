@@ -17,7 +17,7 @@ public static class ResourceStationKit
     public static readonly string[] WorkshopMaterials =
         { "Pearl", "Azure", "Steel", "Glass", "Heat", "Sand", "Chip", "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
           "IronOre", "Rust", "Ingot", "Molten", "GrassBlade", "LeafGlow", "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem",
-          "DandelionGreen", "DandelionSeeds", "AquaPebble", "WhitePebble" };
+          "DandelionGreen", "DandelionSeeds", "AquaPebble", "WhitePebble", "SilkTurbinePaint", "SilkTurbineBlade", "SilkTurbineTop", "OrbCloud", "OrbGlass" };
     private static readonly string[] OwnMaterials = { "RiverGlass", "RiverGlow", "WaterGlass", "WaterFoam", "SkyGlass", "SkyGlow", "Cloud", "RiverStone", "Moss", "ClearGlass", "Brick",
         "Meadow", "FrostBlade", "WindRibbon", "Daisy", "Pollen", "Leaf", "Stem" };
 

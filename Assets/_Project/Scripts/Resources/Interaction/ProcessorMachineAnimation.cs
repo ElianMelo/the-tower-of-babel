@@ -79,6 +79,8 @@ namespace TowerOfBabel.Resources.Interaction
         [Tooltip("Where the input travels while it is consumed, relative to its rest point.")]
         [SerializeField] private Vector3 feedConsume;
         [SerializeField] private float feedSwirl;
+        [Tooltip("Degrees the input tumbles on its way in. Zero keeps it upright (the Silk Turbine's seeds stay pappus-up).")]
+        [SerializeField] private float feedTumble = 540;
         [SerializeField] private Transform output;
         [Header("Lights and effects")]
         [SerializeField] private Renderer[] statusLights = Array.Empty<Renderer>();
@@ -327,7 +329,7 @@ namespace TowerOfBabel.Resources.Interaction
                 float orbit = elapsed * 6;
                 Vector3 swirl = (rest[0].SideA * Mathf.Cos(orbit) + rest[0].SideB * Mathf.Sin(orbit)) * (feedSwirl * consume * (1 - consume) * 4);
                 feed.localPosition = rest[0].Position + path + swirl;
-                feed.localRotation = Quaternion.AngleAxis((1 - enter) * 540, rest[0].SideA) * rest[0].Rotation;
+                feed.localRotation = Quaternion.AngleAxis((1 - enter) * feedTumble, rest[0].SideA) * rest[0].Rotation;
                 feed.localScale = rest[0].Scale * (1 - consume * .94f);
             }
             if (output != null)

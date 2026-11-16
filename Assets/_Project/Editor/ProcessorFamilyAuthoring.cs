@@ -56,7 +56,10 @@ public static class ProcessorFamilyAuthoring
         RequireCleanTowerScene();
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         CreateMaterials();
-        foreach (string model in Machines.SelectMany(m => new[] { m.Name, m.Output }).Distinct().Append("EssenceMote")) ImportModel(model);
+        CreateSilkTurbineMaterials();
+        // The Silk Turbine is fed the Silk Clock's seeds: their material and particle mesh come from the essence tools.
+        if (Mat("DandelionSeeds") == null) EssenceWorkshopAuthoring.CreateDandelionMaterials();
+        foreach (string model in Machines.SelectMany(m => new[] { m.Name, m.Output }).Distinct().Append("EssenceMote").Append("DandelionSeed")) ImportModel(model);
         foreach (string sound in new[] { "CondenserHum", "BlockChime", "IronClang", "SkyChime" }) MakeSound(sound);
         foreach (var spec in Machines)
         {
@@ -208,19 +211,76 @@ public static class ProcessorFamilyAuthoring
     }
 
     /// <summary>
-    /// Wind Condenser (sky essence): a turbine on a Bliss-style hill over a glass cloud orb. At rest the rotor turns in
-    /// the breeze, a ring of cloud orbits the tower, wind ribbons spiral up it and daisies nod (AmbientMotion). Working,
-    /// a cloud tuft is swept up into the rotor's wind and drawn down the tower into the orb, the rotor winds up, the orb
-    /// fills with cloud and its glow ring charges. Completion whirls the rotor, pops the orb and sends a gust ring out
-    /// over the grass.
+    /// The Silk Turbine's materials: the hand-painted atlas (Tools/BuildingAero/paint_silk_turbine.py) on every pearl,
+    /// azure and blade surface, the painted wind-swirl medallion on the plinth and in the tray's dish, and the Orb Cloud
+    /// shader on the fluffy clouds inside the glass orb. The atlas repeats in u, because each part's strokes wrap around it.
+    /// </summary>
+    public static void CreateSilkTurbineMaterials()
+    {
+        Texture2D Import(string file, TextureWrapMode wrap)
+        {
+            string texturePath = Models + "Textures/" + file;
+            AssetDatabase.ImportAsset(texturePath, ImportAssetOptions.ForceSynchronousImport);
+            var importer = (TextureImporter)AssetImporter.GetAtPath(texturePath);
+            importer.textureType = TextureImporterType.Default; importer.sRGBTexture = true; importer.mipmapEnabled = true;
+            importer.wrapMode = wrap; importer.anisoLevel = 4; importer.maxTextureSize = 1024;
+            importer.textureCompression = TextureImporterCompression.CompressedHQ; importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
+        }
+        var texture = Import("SilkTurbinePaint.png", TextureWrapMode.Repeat);
+        var top = Import("SilkTurbineTop.png", TextureWrapMode.Clamp);
+        Material Make(string name, Shader shader)
+        {
+            string path = Models + "Materials/Workshop_" + name + ".mat"; var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat == null) { mat = new Material(shader); AssetDatabase.CreateAsset(mat, path); }
+            mat.shader = shader; mat.enableInstancing = true; return mat;
+        }
+        var lit = Shader.Find("Universal Render Pipeline/Lit");
+        var paint = Make("SilkTurbinePaint", lit); paint.SetTexture("_BaseMap", texture); paint.SetColor("_BaseColor", Color.white);
+        paint.SetFloat("_Smoothness", .62f); paint.SetFloat("_Metallic", 0);
+        // Blades stay frosted: the painted strokes on a slightly see-through glass.
+        var blade = Make("SilkTurbineBlade", lit); blade.SetTexture("_BaseMap", texture); blade.SetColor("_BaseColor", new Color(1, 1, 1, .82f));
+        blade.SetFloat("_Smoothness", .88f); blade.SetFloat("_Metallic", 0);
+        blade.SetFloat("_Surface", 1); blade.SetFloat("_Blend", 0); blade.SetFloat("_ZWrite", 0);
+        blade.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha); blade.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        blade.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); blade.renderQueue = 3000; blade.SetOverrideTag("RenderType", "Transparent");
+        var medallion = Make("SilkTurbineTop", lit); medallion.SetTexture("_BaseMap", top); medallion.SetColor("_BaseColor", Color.white);
+        medallion.SetFloat("_Smoothness", .66f); medallion.SetFloat("_Metallic", 0);
+        var cloud = Make("OrbCloud", Shader.Find("TowerOfBabel/Resources/Orb Cloud"));
+        cloud.SetColor("_GlowColor", new Color(1, .97f, .93f)); cloud.SetFloat("_Glow", .7f);
+        cloud.SetColor("_RimColor", new Color(.92f, .98f, 1)); cloud.SetFloat("_Rim", 1); cloud.SetFloat("_Wrap", .45f);
+        cloud.SetFloat("_Billow", .01f); cloud.SetFloat("_BillowSpeed", .75f); cloud.SetFloat("_BillowScale", 16);
+        // The orb's own glass: much clearer than the shared, blue-tinted SkyGlass, so the painted cloud inside reads.
+        var orb = Make("OrbGlass", lit); orb.SetTexture("_BaseMap", null); orb.SetColor("_BaseColor", new Color(.84f, .94f, 1, .2f));
+        orb.SetFloat("_Smoothness", .97f); orb.SetFloat("_Metallic", .1f);
+        orb.SetFloat("_Surface", 1); orb.SetFloat("_Blend", 0); orb.SetFloat("_ZWrite", 0);
+        orb.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha); orb.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        orb.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); orb.renderQueue = 3000; orb.SetOverrideTag("RenderType", "Transparent");
+        foreach (var m in new[] { paint, blade, medallion, cloud, orb }) EditorUtility.SetDirty(m);
+        AssetDatabase.SaveAssets();
+    }
+
+    /// <summary>
+    /// Wind Condenser (sky essence), rebuilt on 2026-11-15 as the Silk Turbine (Round 03 proposition 01): a real
+    /// three-blade turbine over the glass cloud orb, with no meadow base, hand-painted from Textures/SilkTurbinePaint.png.
+    /// It stands on a petal-scalloped painted plinth with a glass sky channel (small clouds drift round it) and a
+    /// painted wind-swirl medallion; a fluffy painted cumulus billows inside the orb (Orb Cloud shader, clear OrbGlass).
+    /// Its input is the Silk Clock's own seeds: two puffs drift up from the player's side
+    /// into the rotor's wake, pappus-up, and are drawn down the tower into the orb, where their silk knits into the
+    /// cloud. At rest the rotor turns in the breeze, a loose ring of seeds orbits the tower, two silk spirals carry
+    /// seeds down to the orb and the orb's cloud drifts (AmbientMotion). Working, the rotor winds up, the orb fills
+    /// with cloud and its glow ring charges. Completion whirls the rotor, pops the orb and sends a ring of seeds out.
     /// </summary>
     private static void WindCondenser(GameObject root, GameObject model, SerializedObject anim, ParticleSystem glints)
     {
         Spin(anim, Find(model, "Rotor"), Vector3.forward, 320);
         anim.FindProperty("spins").GetArrayElementAtIndex(0).FindPropertyRelative("idleSpeed").floatValue = 30;
         FillLevel(anim, Find(model, "CloudMass"), Vector3.up, new Vector2(.32f, .92f));
-        // Swept up from in front of the player into the wind at the hub, then drawn down the tower into the orb.
-        Feed(anim, model, new Vector3(0, -1.5f, -1.05f), Vector3.zero, .7f, new Vector2(.3f, .7f), new Vector3(0, -1.22f, .29f), .06f);
+        // The seeds rise from in front of the player into the rotor's wake, then are drawn down the tower into the orb.
+        // They stay pappus-up all the way: seeds float, they do not tumble like a thrown stone.
+        Vector3 rest = Find(model, "Feed").position - root.transform.position, orbCentre = Find(model, "Orb").position - root.transform.position;
+        Feed(anim, model, new Vector3(0, .35f, -1.45f) - rest, Vector3.zero, .7f, new Vector2(.3f, .7f), orbCentre + Vector3.up * .15f - rest, .06f);
+        anim.FindProperty("feedTumble").floatValue = 0;
         Refs(anim, "heatSurfaces", new UnityEngine.Object[] { Find(model, "OrbGlow").GetComponent<Renderer>() });
         anim.FindProperty("heatColor").colorValue = new Color(.45f, .85f, 1);
         anim.FindProperty("completionClip").objectReferenceValue = Clip("SkyChime");
@@ -229,44 +289,43 @@ public static class ProcessorFamilyAuthoring
         var hub = Find(model, "Rotor").position - root.transform.position;
         var orb = Find(model, "Orb").position - root.transform.position;
 
-        // Work: cloud is sucked in around the rotor and motes swirl inside the orb.
-        var intake = Particles(root.transform, "Cloud intake", hub, dust, null, new Color(.97f, .99f, 1, .6f), .1f, .22f, 0, .9f, .05f, 16, .85f);
+        // Work: silk is drawn in around the hub and motes swirl inside the orb.
+        var intake = Particles(root.transform, "Silk intake", hub, dust, null, new Color(.97f, .99f, 1, .55f), .06f, .14f, 0, .9f, .05f, 14, .75f);
         var v = intake.velocityOverLifetime; v.enabled = true; v.space = ParticleSystemSimulationSpace.Local; v.radial = -1.1f;
         var swirl = Particles(root.transform, "Orb swirl", orb, Mat("SkyGlow"), mote, new Color(.75f, .9f, 1), .015f, .035f, 0, .8f, .05f, 12, .3f);
         var o = swirl.velocityOverLifetime; o.enabled = true; o.space = ParticleSystemSimulationSpace.Local; o.orbitalZ = 3.2f; o.radial = -.15f;
-        // The essence leaves a cloud trail on its way in, so the player can follow it into the machine.
-        var trail = Particles(Find(model, "Feed"), "Feed trail", Vector3.zero, dust, null, new Color(1, 1, 1, .6f), .05f, .12f, 0, .55f, .05f, 30, .08f);
+        // A few loose parachutes peel off the incoming seeds, so the player can follow them into the machine.
+        var trail = EssenceWorkshopAuthoring.SeedParticles(Find(model, "Feed"), "Feed trail", Vector3.zero, .9f, 12);
         Refs(anim, "workEffects", new UnityEngine.Object[] { intake, swirl, trail });
 
-        // Completion: a puff of cloud from the orb and a gust ring rolling out over the grass, with the output glints.
+        // Completion: a puff of cloud from the orb and a ring of seeds blown out from the pad, with the output glints.
         var puff = Particles(root.transform, "Cloud burst", orb, dust, null, new Color(1, 1, 1, .75f), .14f, .3f, -.04f, 1, 1.1f, 0, .35f);
-        var ring = Particles(root.transform, "Gust ring", new Vector3(0, .38f, 0), dust, null, new Color(.95f, .99f, 1, .7f), .1f, .18f, 0, .65f, 2.4f);
+        var ring = EssenceWorkshopAuthoring.SeedParticles(root.transform, "Seed gust", new Vector3(0, .3f, 0), 1.2f, 0);
+        var gust = ring.main; gust.loop = false; gust.startSpeed = new ParticleSystem.MinMaxCurve(.7f, 1.3f);
         var circle = ring.shape; circle.shapeType = ParticleSystemShapeType.Circle; circle.radius = .35f; circle.radiusThickness = 0;
         Refs(anim, "completionEffects", new UnityEngine.Object[] { glints, puff, ring });
 
-        // Ambient: motes and pollen drift at rest and thicken while it works; wind streaks blow through the rotor.
+        // Ambient: motes and loose seeds drift at rest and thicken while it works; wind streaks blow through the rotor.
         var motes = Particles(root.transform, "Sky motes", orb + Vector3.up * .2f, Mat("SkyGlow"), mote, new Color(.8f, .92f, 1), .014f, .03f, -.02f, 2.2f, .08f, 3, 1);
-        var pollen = Particles(root.transform, "Pollen drift", new Vector3(0, .34f, 0), Mat("Pollen"), mote, new Color(1, .85f, .3f), .01f, .02f, -.03f, 2.6f, .05f, 2, .8f);
+        var drift = EssenceWorkshopAuthoring.SeedParticles(root.transform, "Seed drift", Find(model, "SeedRing").position - root.transform.position, 3, 1);
         var streaks = Particles(root.transform, "Wind streaks", hub + new Vector3(0, -.1f, -1.1f), dust, null, new Color(.95f, .98f, 1, .32f), .03f, .06f, 0, .8f, 2.2f, 1);
         streaks.transform.localRotation = Quaternion.identity;          // the cone points along +Z: front to back, through the rotor
         var cone = streaks.shape; cone.angle = 8; cone.radius = .55f;
         var stretch = streaks.GetComponent<ParticleSystemRenderer>(); stretch.renderMode = ParticleSystemRenderMode.Stretch; stretch.lengthScale = 5; stretch.velocityScale = .05f;
 
         var ambient = new SerializedObject(root.AddComponent<AmbientMotion>());
-        AmbientChannel(ambient, Find(model, "CloudRing"), AmbientMotion.Kind.Spin, Vector3.up, 8, 42, 0, 0, .4f);
-        AmbientChannel(ambient, Find(model, "WindSpiral_0"), AmbientMotion.Kind.Spin, Vector3.up, 18, 95, 0, 0, .5f);
-        AmbientChannel(ambient, Find(model, "WindSpiral_1"), AmbientMotion.Kind.Spin, Vector3.up, -15, -80, 0, 0, .5f);
-        AmbientChannel(ambient, Find(model, "WindSpiral_0"), AmbientMotion.Kind.Breathe, Vector3.up, .02f, .035f, 1.1f, 0, .3f);
-        AmbientChannel(ambient, Find(model, "WindSpiral_1"), AmbientMotion.Kind.Breathe, Vector3.up, .02f, .035f, .9f, 1.4f, .3f);
+        AmbientChannel(ambient, Find(model, "SeedRing"), AmbientMotion.Kind.Spin, Vector3.up, 8, 42, 0, 0, .4f);
+        // Both silk spirals turn clockwise seen from above, so their seeds appear to flow down the tower into the orb.
+        AmbientChannel(ambient, Find(model, "SilkSpiral_0"), AmbientMotion.Kind.Spin, Vector3.up, 18, 95, 0, 0, .5f);
+        AmbientChannel(ambient, Find(model, "SilkSpiral_1"), AmbientMotion.Kind.Spin, Vector3.up, 15, 80, 0, 0, .5f);
+        AmbientChannel(ambient, Find(model, "SilkSpiral_0"), AmbientMotion.Kind.Breathe, Vector3.up, .02f, .035f, 1.1f, 0, .3f);
+        AmbientChannel(ambient, Find(model, "SilkSpiral_1"), AmbientMotion.Kind.Breathe, Vector3.up, .02f, .035f, .9f, 1.4f, .3f);
         AmbientChannel(ambient, Find(model, "OrbCloud"), AmbientMotion.Kind.Spin, Vector3.up, 6, 32, 0, 0, .2f);
         AmbientChannel(ambient, Find(model, "OrbCloud"), AmbientMotion.Kind.Bob, Vector3.up, .01f, .018f, .8f, 0, 0);
+        // Small clouds drift round the plinth's glass sky channel, the same way as the silk.
+        AmbientChannel(ambient, Find(model, "ChannelClouds"), AmbientMotion.Kind.Spin, Vector3.up, 5, 24, 0, 0, .3f);
         AmbientChannel(ambient, Find(model, "Orb"), AmbientMotion.Kind.Punch, Vector3.up, .04f, .08f, 0, 0, 0);
-        for (int i = 0; TryFind(model, "Daisy_" + i) != null; i++)
-        {
-            float a = i * 2.39f;
-            AmbientChannel(ambient, Find(model, "Daisy_" + i), AmbientMotion.Kind.Sway, new Vector3(Mathf.Cos(a), 0, Mathf.Sin(a)), 3, 5, .9f + i * .09f, i, .7f);
-        }
-        AmbientEffects(ambient, (motes, 3, 12), (pollen, 2, 5), (streaks, .8f, 10));
+        AmbientEffects(ambient, (motes, 3, 12), (drift, 1, 4), (streaks, .8f, 10));
         ambient.FindProperty("visibility").objectReferenceValue = Find(model, "MachineBody").GetComponent<Renderer>();
         ambient.ApplyModifiedPropertiesWithoutUndo();
     }
